@@ -1,0 +1,29 @@
+MY-MODULE DEFINITIONS ::= BEGIN
+
+-- Original definition by Alain
+--T-POS ::= BOOLEAN
+
+
+TypeEnumerated ::= ENUMERATED {
+    red(0),
+    green(1),
+    blue(2)
+}
+
+
+SubType ::= SEQUENCE {
+    intValue	INTEGER(0 .. 10),
+    intArray	SEQUENCE (SIZE (10)) OF INTEGER (0 .. 3),
+    enumValue	TypeEnumerated,
+    label	OCTET STRING (SIZE(10..40))
+}
+
+-- A more realistic definition
+T-POS ::= SEQUENCE {
+    longitude	REAL(-180.0 .. 180.0),
+    latitude	REAL(-90.0 .. 90.0),
+    height	REAL(30000.0 .. 45000.0),
+    subTypeArray SEQUENCE (SIZE(10..15)) OF SubType
+}
+
+END
