@@ -35,7 +35,7 @@ DataInterChange ::= CHOICE
 
 TransferBatch ::= [APPLICATION 1] SEQUENCE
 {
-    batchControlInfo       BatchControlInfo            OPTIONAL, -- *m.m.
+    e       BatchControlInfo            OPTIONAL, -- *m.m.
     accountingInfo         AccountingInfo              OPTIONAL,
     networkInfo            NetworkInfo                 OPTIONAL, -- *m.m.
     vasInfo                VasInfo                     OPTIONAL,
