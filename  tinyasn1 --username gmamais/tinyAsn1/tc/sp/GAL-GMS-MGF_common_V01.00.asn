@@ -1,0 +1,137 @@
+-- =============================================================================
+-- Project:    Galileo Ground Mission Segment (GMS)
+-- =============================================================================
+-- Version:
+--   $Source: /home/projects/galileo/work/cvs/mgf/src/ext-int/MGF_Output_IF/ASN-1\040schemas/GAL-GMS-MGF_common.asn,v $
+--   $RCSfile: GAL-GMS-MGF_common.asn,v $
+--   $Name:  $
+--   $Revision: 1.4 $
+--   $Date: 2006/11/28 17:22:04 $
+--   $Author: anls $ anls
+-- =============================================================================
+-- Originator: Deimos Space, Message Generation Facility
+-- Copyright:  Deimos Space, S.L.
+-- Purpose:    This file defines common ASN.1 types.
+-- History: 
+--             2006/05/29: Update for MGF IDP v.3A
+--             2006/09/08: Update for MGF IDP v.4A
+--                         Modified the RLSP monitoring info definition
+--             2006/12/12: Updated according to actions from MGF ICD WS #6
+--                         MoM GAL-MOM-AAS-MGF-02206_MGF-ICD-WS
+--             2006/12/15: Remove Source Address (use of GAL-GMS-IPF-GLAdType
+--                         and GAL-GMS-OSPF-GLAdType in GAL-GMS-MGF_MM)
+-- 	 04-Jan-07 
+--               - Modify GMS common module name to GAL-GMS-common-types-V01-00.
+--             
+-- Issue:     V01-00
+-- =============================================================================
+
+
+
+-- =============================================================================
+--                            Message Generation facility
+--                                 Common types
+-- =============================================================================
+
+
+MGF-Common-V01-00 DEFINITIONS 
+
+AUTOMATIC TAGS ::= BEGIN
+
+-- =================================================================
+-- Imports and exports
+-- =================================================================
+
+IMPORTS
+    CRC32,
+    max-SV-ID,
+    GSTtimeStamp,
+    max-UInt32 
+         FROM GAL-GMS-common-types-V01-00;
+	
+-- ==================================================================
+-- Message definitions
+-- ==================================================================
+
+-- ==================================================================
+-- Integrity Sub-Frame Field Definition
+-- ==================================================================
+
+
+-- Integrity Sub-frame with the structure defined in GMSSSICD 
+
+IntSubFr ::= BIT STRING (SIZE(528))
+
+
+-- ==================================================================
+-- Message Sub-Frame Field Definition
+-- ==================================================================
+
+-- Message Sub-frame with the structure defined in GMSSSICD 
+
+MsgSubFr ::= BIT STRING (SIZE(3568))
+
+
+-- ==========================================
+-- Single Message for G/NAV data
+-- ==========================================
+
+GnavDataMsg     ::= BIT STRING (SIZE(164))
+-- DMS proposes to move this data to GMS_common
+
+
+
+max-satellites INTEGER ::= max-SV-ID
+
+
+
+-- =============================================================================
+--                             V a r i o u s  I t e m s
+-- =============================================================================
+
+max-dissemination-time INTEGER ::= 5000000
+Dissemination-Time ::= INTEGER (0 .. max-dissemination-time)   -- Milliseconds
+
+CRC ::= CRC32
+
+Int-QoS ::= MGF-Service-QoS
+Nav-QoS ::= MGF-Service-QoS
+
+Message-Time-Tag  ::= GSTtimeStamp
+
+Frame-Identifier ::= INTEGER (0 .. 29)                         -- Frame No From each 30s cycle
+
+-- Max Number of OSPF
+max-num-OSPF INTEGER ::= 4
+
+-- Max Number of IPF
+max-num-IPF INTEGER ::= 4
+
+
+-- =============================================================================
+-- =============================================================================
+
+-- =====  The following are proposed to be moved to GMS_common  =====
+-- ==================================================================
+
+-- MGF-Service QoS
+-- 3 Bits Indicating the presence of (As per MGF ICD):
+-- The following one-bit fields are boolean ‘presence’ fields:
+--     C-band authentication presence,
+--     PRS data presence,
+--     SoL authentication presence,
+--     MGF in Operational mode.
+-- The fields within the 'MGF QoS value' section are set only by MGF. A value TRUE 
+-- indicates ‘Yes’ and FALSE indicates ‘No’.
+
+MGF-Service-QoS ::= SEQUENCE { 
+  c-band-data       BOOLEAN,
+  prs-data          BOOLEAN,
+  sol-auth-data     BOOLEAN,
+  mgf-mode          BOOLEAN
+}
+
+Galileo-Standard-Time ::= BIT STRING (SIZE (32))
+
+
+END

@@ -1,0 +1,80 @@
+-- Author: GMPS team
+-- Created: 14/12/2006 (v01.03)
+
+GAL-GMS-MUCF-common-types-V01-03 DEFINITIONS AUTOMATIC TAGS ::= 
+BEGIN
+
+-- =================== IMPORTS ====================
+
+IMPORTS
+	SV-PRN,
+	max-SV-ID,
+	SV-ID,
+	max-SV-inView,
+	max-ULS-Sites,
+	max-ULS-Antenna,
+	max-ERIS-Region,
+	ContactPlan-ID,
+	GAL-GMS-ULS-GLADType,
+	CRC32 FROM GAL-GMS-common-Types;
+
+
+-- ================= COMMON VALUES =================
+
+maxContactsPerSatellite	INTEGER ::= 7200
+maxContactsPerAntenna	INTEGER ::= 4800
+maxContacts		INTEGER ::= 200000
+
+
+-- ================= COMMON TYPES =================
+
+ErisRegionIdent ::= INTEGER (1..max-ERIS-Region)
+
+Date ::= SEQUENCE {
+	day 	INTEGER(1..31),
+	month	INTEGER(1..12),
+	year	INTEGER(2000..2100),
+	hour	INTEGER(0..23),
+	minute	INTEGER(0..59),
+	second	INTEGER(0..59)
+}
+TimeSpan ::= SEQUENCE {
+	startTime	Date,
+	endTime		Date
+}
+
+AlmanacParamType ::= SEQUENCE {
+	satelliteId		SV-ID,
+	satellitePRN		SV-PRN,
+	meanAnomaly		REAL,
+	meanMotionDiff		REAL,
+	eccentricity   		REAL,
+	squareRootSemiMajorAxis REAL,
+	longitudeAscendNode	REAL,
+	inclinationAngle	REAL,   
+	argumentOfPerigee	REAL,  
+	rateOfRightAscension	REAL,   
+	rateOfInclinationAngle  REAL, 
+	ephemerisDataRefTime  	Date, 
+	ephemerisDataIssue	INTEGER(1..10000000)
+}
+
+MucfRunningMode ::= ENUMERATED { mucf-operational(0), mucf-in-test(1) } 
+OperationFlagType ::= ENUMERATED { operation(0), test(1) } 
+
+SatelliteTrackPeriod ::= SEQUENCE {
+	satelliteId	SV-ID,
+	trackPeriod	TimeSpan,
+	operationFlag	OperationFlagType
+}
+ContactWithUlsAntennaType ::= SEQUENCE {
+	antennaId	GAL-GMS-ULS-GLADType, -- ULS site from 1 to 10, instance is allways 1, subsystem from MP1 to MP5
+	contactPeriod	TimeSpan,
+	operationFlag	OperationFlagType
+}
+SatelliteContactsWithUlsAntennas ::= SEQUENCE { 
+	satelliteId		SV-ID,
+	contactWithAntenna	SEQUENCE (SIZE(0..maxContactsPerSatellite)) OF ContactWithUlsAntennaType -- Contacts are time ordered and do not overlap and takes into account ssatellite aquisition time.
+}
+
+END

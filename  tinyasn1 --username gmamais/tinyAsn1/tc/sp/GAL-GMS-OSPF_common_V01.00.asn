@@ -1,0 +1,1600 @@
+-- ========================================
+-- Project  : Galileo Ground Mission Segment (GMS)
+--
+-- Version  : GAL-GMS-OSPF_common.asn,v 1.3 2006/12/13 16:57:04 jcgg Exp
+--
+-- Source   : GMV Aerospace and Defence
+--
+-- Purpose  :
+--     This ASN.1 file contains the OSPF common type definitions
+--
+-- History  : (see Log below for mor information)
+--   13-Oct-06 - Correted according to comments from PTF Team (DI)
+--   03-Oct-06 - DELIVERY: OSPF & IPF IDP 4.A
+--   30-Oct-06 - Created after 5th ID WS, targeted for IDP 4.A
+--   27-Oct-06 - Created after 5th ICD WS
+--   24-Oct-06 - Initial revision of this module
+--
+-- Warnings :
+--     Nil.
+-- 
+-- Comments : Extended GMV CM information follows
+--   Project..: OSPF
+--   File.....: GAL-GMS-OSPF_common.asn,v
+--   Version..: 1.3
+--   Date.....: 2006/12/13 16:57:04
+--   Module...: GAL-GMS-OSPF-common-V01-00
+--   Language.: ASN.1
+--   Author...: jcgg
+-- ========================================
+
+GAL-GMS-OSPF-common-V01-00 DEFINITIONS
+
+    AUTOMATIC TAGS ::=
+
+BEGIN
+
+IMPORTS
+
+    SV-ID,
+    max-SV-ID,
+    GSTtimeStamp,
+    max-GSS-Sites,
+    GAL-GMS-GSS-GLAdType
+        FROM GMS-common-Version1;
+
+-- ============================================================================
+-- CONSTANTS
+-- ============================================================================
+
+-- max-GSS
+-- Maximum number of GSS
+max-GSS                            INTEGER ::= max-GSS-Sites
+
+-- max-GSS-Channels
+-- Maximum number of channels
+-- This value is (max-GSS-Sites*2)
+max-GSS-Channels                   INTEGER ::= 104 
+
+-- max-ODTS-Epochs
+-- TBC Maximum number of Epochs in ODTS estimation
+max-ODTS-Epochs                    INTEGER ::= 30
+
+-- max-NumFrequencies
+-- TBC Maximum number of Number of Frequencies
+max-NumFrequencies                 INTEGER ::= 30
+
+-- max-TropoInterv
+-- TBC Maximum number of Tropospheric Intervals
+max-TropoInterv                    INTEGER ::= 30
+
+-- max-IonoData 
+-- TBC Maximum number of Ionospheric data points
+max-IonoData                       INTEGER ::= 36
+
+-- max-RECEIVER
+-- Maximum number of receiver, all GSS together
+-- (Defined as max_GSS*max_RECEIVERS_PER_GSS)
+max-RECEIVER                       INTEGER ::= 208
+
+-- max-RECEIVERS-PER-GSS
+-- Maximum number of receiver per GSS
+max-RECEIVERS-PER-GSS              INTEGER ::= 4
+
+-- max-TARG-LOCS
+-- Maximum number of QoS target locations for DOC check [TBC]
+max-TARG-LOCS                      INTEGER ::= 100
+
+-- max-BGD-FREQ-COMB
+-- BGD frequency combinations: L1-E5a, L1-E5b, L1-E6 and L1-E6 (PRS)
+max-BGD-FREQ-COMB                  INTEGER ::= 4
+
+-- num-MODIP-VAL
+-- Number of values in the modip file.
+num-MODIP-VAL                      INTEGER ::= 1369
+
+-- num-MONTHS
+-- Number of months of a year
+num-MONTHS                         INTEGER ::= 12
+
+-- num-ROWS-CCIR
+-- Number of rows in the CCIR file.
+num-ROWS-CCIR                      INTEGER ::= 715
+
+-- num-COLS-CCIR
+-- Number of columns in the CCIR file.
+num-COLS-CCIR                      INTEGER ::= 4
+
+-- max-SR-DAYS
+-- Maximum number of days for which the Solar Radiation Intensity Constant 
+-- can be provided 
+max-SR-DAYS                        INTEGER ::= 100
+
+-- max-NUM-GRAV-COEFF
+-- Maximum number of gravitational coefficients
+-- 
+max-NUM-GRAV-COEFF                 INTEGER ::= 2556
+
+-- max-SIZE-GSS-ID
+-- Number of characters allowed for the name of each Gss
+-- (Defined as 4*8)
+max-SIZE-GSS-ID                    INTEGER ::= 32
+
+-- max-SIZE-SITE-ID
+-- Number of characters allowed for the name of each Site
+-- (Defined as 3*8)
+max-SIZE-SITE-ID                   INTEGER ::= 24
+
+-- max-NUM-SITE
+-- Maximum number of sites
+max-NUM-SITE                       INTEGER ::= 52
+
+-- max-GSS-PER-SITE
+-- Max number of GSS per site.
+max-GSS-PER-SITE                   INTEGER ::= 4
+
+-- dim-VECTOR
+-- Dimension of a position/velocity vector
+dim-VECTOR                         INTEGER ::= 3
+
+-- dim-VECTOR-SQR
+-- Number of elements in 3x3 matrix
+dim-VECTOR-SQR                     INTEGER ::= 9
+
+-- max-NUM-FREQ
+-- Max number of frequencies to be processes in the [TBC]
+max-NUM-FREQ                       INTEGER ::= 10
+
+-- max-PassLosDay
+-- Maximum number of passes for a line of sight per day.
+max-PassLosDay                    INTEGER ::= 4
+
+-- max-ODTSLONG-DAYS
+-- Maximum number of estimated days by ODTS Long.*/
+max-ODTSLONG-DAYS                 INTEGER ::= 2
+
+-- max-ODTS-RESTART-PREPRO-DATA-BUFFER-SIZE
+max-ODTS-RESTART-PREPRO-DATA-BUFFER-SIZE INTEGER ::= 2
+
+-- max-CarrPhasAmbData
+-- TBC Maximum number of Carrier-Phase Ambiguity data
+-- (max-SV-ID * max-NUM-SITE * max-PassLosDay * max-ODTSLONG-DAYS)
+max-CarrPhasAmbData                INTEGER ::= 14976
+
+-- num-RESTART-PACKETS
+-- Number of packets in a reconstructed restart point. A packet is 
+-- generated every 10  minutes, a restart point has to contain information 
+-- of the last 48 h=288 packets. 
+num-RESTART-PACKETS                INTEGER ::= 288
+
+-- max-ODTS-OBS-TYPE
+-- Maximum number of GSS observation types for ODTS
+max-ODTS-OBS-TYPE                  INTEGER ::= 2
+
+-- max-SV-ONE-GSS
+-- Maximum number of satellites in view for one GSS
+max-SV-ONE-GSS                     INTEGER ::= 20
+
+-- max-ODTS-SHORT-OBS-EPOCHS
+-- [TBC]
+max-ODTS-SHORT-OBS-EPOCHS          INTEGER ::= 100
+
+-- max-ODTS-SHORT-OBS
+-- Maximum number of observations for ODTS Short rings per service
+-- (Defined as max_ODTS_SHORT_OBS_EPOCHS* max_LOS_EPOCH * max_ODTS_OBS_TYPE)
+max-ODTS-SHORT-OBS                 INTEGER ::= 200000
+
+-- max-ODTS-LONG-OBS
+-- Maximum number of observations for ODTS Long rings per service [TBC]
+max-ODTS-LONG-OBS                  INTEGER ::= 1000
+
+-- max-ODTS-LONG-OBS-ALL-SERVS
+-- Maximum number of observations for ODTS Long rings, all services[TBC]
+-- (Defined as max_ODTS_LONG_OBS*max_SERV)
+max-ODTS-LONG-OBS-ALL-SERVS        INTEGER ::= 3000
+
+-- max-SV-LOS
+-- Maximum number of satellite lines of sight
+max-SV-LOS                         INTEGER ::= 16
+
+-- max-GSS-STATUS-MEAS-PER-INTERVAL
+-- maximum number of messages arrived to a GSS per 10 minutes
+-- (600)
+max-GSS-STATUS-MEAS-PER-INTERVAL   INTEGER ::= 600
+
+-- max-CHAN
+-- [TBC]
+max-CHAN                           INTEGER ::= 3
+
+-- max-SERV
+-- Maximun number of services for which nav. messages are generated 
+-- (i.e. CS not included)
+-- Order is the one given by GalileoService: 1st:OS, 2nd:SoL, 3rd:PRS
+max-SERV                           INTEGER ::= 3
+
+-- max-SERV-and-GSS
+-- (Defined as max_SERV*max_GSS)
+max-SERV-and-GSS                   INTEGER ::= 156
+
+-- max-SV-and-GSS
+-- [TBC]
+-- (Defined as max_SERV*max_SV)
+max-SV-and-GSS                     INTEGER ::= 144
+
+-- num-PPV-CHAN
+-- Number of channels (frequency signals) per service
+num-PPV-CHAN                       INTEGER ::= 2
+
+-- max-SIZE-DUMPDATA
+-- Maximun number of bytes in the string of dump data
+-- (Defined as 256*8)
+max-SIZE-DUMPDATA                  INTEGER ::= 2048
+
+-- max-FUNCTION-ID-SIZE
+-- [TBC]
+-- (Defined as 32*8)
+max-FUNCTION-ID-SIZE               INTEGER ::= 256
+
+-- maxNumOf-FNav-IODs
+-- Number of IODs for F/NAV and I/NAV data
+maxNumOf-FNav-IODs                 INTEGER ::= 8
+
+-- maxNumOf-INav-IODs
+-- Number of IODs for F/NAV and I/NAV data
+maxNumOf-INav-IODs                 INTEGER ::= 8
+
+-- maxNumOf-GNav-IODs
+-- Number of IODs for G/NAV
+maxNumOf-GNav-IODs                 INTEGER ::= 8
+
+-- maxNumOf-FNavDataMsgs
+-- Number of F/NAV nav. Msgs but a single batch (IOD)
+maxNumOf-FNavDataMsgs              INTEGER ::= 4
+
+-- maxNumOf-INavDataMsgs
+-- Number of I/NAV nav. Msgs but a single batch (IOD)
+maxNumOf-INavDataMsgs              INTEGER ::= 6
+
+-- maxNumOf-FNavPartialAlmanacEpochs
+-- Number of epochs along which Partial Almanac is transferred (F/NAV)
+maxNumOf-FNavPartialAlmanacEpochs  INTEGER ::= 8
+
+-- maxNumOf-FNavPartialAlmanacBlocks
+-- Number of blocks (epoch pairs) along which Partial Almanac is 
+-- transferred (F/NAV)
+maxNumOf-FNavPartialAlmanacBlocks  INTEGER ::= 4
+
+-- maxNumOf-FNavPartialAlmanacSVs
+-- Number of SV for which almanac data is transferred in F/NAV Partial Almanac
+maxNumOf-FNavPartialAlmanacSVs     INTEGER ::= 12
+
+-- maxNumOf-INavAlmanacEpochs
+-- Number of epochs along which Almanac is transferred (I/NAV)
+maxNumOf-INavAlmanacEpochs         INTEGER ::= 12
+
+-- maxNumOf-GNavAlmanacEpochs
+-- Number of epochs along which Almanac is transferred (G/NAV)
+maxNumOf-GNavAlmanacEpochs         INTEGER ::= 9
+
+-- max-SATS-COORDS
+-- [TBC]
+-- (Defined as max_SV*dim_VECTOR)
+max-SATS-COORDS                    INTEGER ::= 108
+
+-- max-SV-CLOCKS-STAB-TIMES
+-- [TBC]
+-- (Defined as max_SV*max_SV_CLOCKS)
+max-SV-CLOCKS-STAB-TIMES           INTEGER ::= 72
+
+-- max-SV-CLOCKS
+-- [TBC]
+max-SV-CLOCKS                      INTEGER ::= 2
+
+-- max-PPV-CHAN-ALL-SERVS
+-- [TBC]
+-- (Defined as max_SERV*num_PPV_CHAN)
+max-PPV-CHAN-ALL-SERVS             INTEGER ::= 16
+
+-- max-CODE-PHASE-OBS
+-- [TBC]
+-- (Defined as max_LOS_EPOCH * max_ODTS_OBS_TYPE)
+max-CODE-PHASE-OBS                 INTEGER ::= 2000
+
+-- max-ODTS-ORBIT-EPOCHS
+-- [TBC]
+max-ODTS-ORBIT-EPOCHS              INTEGER ::= 1000
+
+-- max-ODTS-OBS-EPOCHS-and-CLOCKS
+-- [TBC]
+-- (Defined as max_ODTS_SHORT_OBS_EPOCHS*max_SV_CLOCKS)
+max-ODTS-OBS-EPOCHS-and-CLOCKS     INTEGER ::= 200
+
+-- max-GSS-and-TROPO-INT
+-- [TBC]
+-- (Defined as max_GSS*max_TropoInterv)
+max-GSS-and-TROPO-INT              INTEGER ::= 1500
+
+-- max-ODTS-ORBIT-EPOCHS-and-SV-POSVEL
+-- [TBC]
+-- (Defined as max_ODTS_ORBIT_EPOCHS*max_SV*dim_VECTOR)
+max-ODTS-ORBIT-EPOCHS-and-SV-POSVEL  INTEGER ::= 108000
+
+-- max-GSS-VECTOR
+-- [TBC]
+-- (Defined as max_GSS*dim_VECTOR)
+max-GSS-VECTOR                     INTEGER ::= 156
+
+-- max-SATS-NM-STEER-BUFFER
+-- [TBC]
+max-SATS-NM-STEER-BUFFER           INTEGER ::= 1000
+
+-- max-GSS-NM-STEER-BUFFER
+-- [TBC]
+max-GSS-NM-STEER-BUFFER            INTEGER ::= 1000
+
+-- max-AllanStDevIntervals
+-- Allan Std. Dev. Stability Intervals
+max-AllanStDevIntervals            INTEGER ::= 7
+
+-- max-BarriersNumber
+-- Number of defined barriers
+max-BarriersNumber                 INTEGER ::= 100
+
+max-barrier-code                   INTEGER ::= 4096
+
+-- ==================================================================
+-- This section taken from AF-RMTC Int.ICD
+-- ==================================================================
+
+--  ALGO_Constants.h
+--  Copyright: GMV, S.A.
+--  Project: OSPF
+--  File: GAL-GMS-OSPF_common.asn,v
+--  Code Management Tool File Version: 1.3
+--  Date (YYMMDD): 2006/12/13 16:57:04
+--  Module: AF
+--  Purpose:
+--     This file contains constants used by the OSPF algorithms
+--     interface definition.
+--  Language: C
+--  Author: jcgg
+--  History:
+--     AF internal ICD working ativities during the detailed design phase.
+
+--   Constants for array dimensions. Three elements array.
+three-DIM INTEGER ::= 3
+
+--    Number of measurements types used by ODTS.
+num-MEAS-TYPE INTEGER ::= 2
+
+--   Maximum number of available GSS sites
+max-SITE INTEGER ::= 52
+
+--    Maximum number of GSSs per site that are used by the OSPF 
+--    (chain A and chain B)
+max-NUM-GSS-PER-SITE INTEGER ::= 2
+
+--   Maximum number of available GSS and PTF-GSS stations.
+--   => [(MAX_SITE_SI*MAX_NUM_GSS_PER_SITE_SI)]
+max-GSS-ALL-SITES INTEGER ::= 104
+
+--  Maximum number of Galileo satellites
+max-SATS INTEGER ::= 36
+
+--   Number of  navigation messages to be computed for each satellite
+max-NM INTEGER ::= 8
+
+--   Buffer of the steering parameters kept by NavMess in its restart data
+nm-STEER-BUFFER INTEGER ::= 10
+
+--   Maximum number of averaging times for computing the satellite and
+--   station clock stability with the allan deviation in NavMess
+max-STAB-TIME INTEGER ::= 20
+
+--   Maximum number of OD&TS iterations
+max-ODTS-ITER INTEGER ::= 3
+
+--   Maximum number of ERP sets
+max-ERP-SETS INTEGER ::= 30
+	
+--   Number of estimated SRPs
+num-EST-SRP INTEGER ::= 10
+
+--  Maximum number of pre-defined regions for ionospheric disturbance
+--    flag information.
+max-IDF-REG INTEGER ::= 5
+
+--   Maximum number of iterations for Brent method
+max-BRENT-ITER INTEGER ::= 100
+
+--   Maximum number of IDF time slots.
+max-IDF-TSLOT INTEGER ::= 5
+
+--  Maximum number of configured events:
+--    clock resynchronization, clock switch or satellite manoeuvre
+max-EVENTS INTEGER ::= 3
+
+--   Maximum number of DOC checks.
+max-DOC-CHECKS INTEGER ::= 10
+
+--    SFIONO data buffer size
+sf-BUFFER-SIZE INTEGER ::= 43200
+
+--   SFIONO sampling rate
+sf-SAMPLING INTEGER ::= 1200
+
+--    Maximum epochs used by the SFIONO algorithm
+--   => [(SF_BUFFER_SIZE_SI/SF_SAMPLING_SI)]
+sf-EPOCHS INTEGER ::= 36
+
+--  Time between subsequent satellite positions in the position table
+--   at the output of the ODTS processing.
+--   Note: This is the E-OSPF since this time must m.c.d of the SP3 sampling (15) and
+--   the nav. execution rate (10)  (NSL constraint) . In the future it could be set
+--   to nav. exec rate. This is also can be influenced by the experimentation (e.g.
+--   5 minutes sampling could be enough for Nav Mess and so, interpolation, which is a time
+--   consuming operation, is avoided.
+orbit-POS-TIME INTEGER ::= 300
+
+--    ODTS short estimation data buffer size
+odts-SHORT-EST-BUFFER-SIZE INTEGER ::= 21600
+
+--    ODTS short estimation data buffer size
+odts-SHORT-PRD-BUFFER-SIZE INTEGER ::= 90000
+
+--    ODTS short sampling rate
+odts-SHORT-SAMPLING INTEGER ::= 300
+
+--    Maximum epochs used by the OD&TS short algorithm (estimation)
+--   => [(ODTS_SHORT_EST_BUFFER_SIZE_SI/ODTS_SHORT_SAMPLING_SI)]
+odts-SHORT-EST-EPOCHS INTEGER ::= 72
+
+--    Maximum epochs used by the OD&TS short algorithm (prediction)
+--   => [(ODTS_SHORT_PRD_BUFFER_SIZE_SI/ODTS_SHORT_SAMPLING_SI)]
+odts-SHORT-PRD-EPOCHS INTEGER ::= 300
+
+--   Number of OD&TS short estimated sampling orbits
+--   => [(ODTS_SHORT_EST_BUFFER_SIZE_SI/ORBIT_POS_TIME_SI)]
+odts-SHORT-EST-ORBIT-SAMPLES INTEGER ::= 72
+
+--   Number of OD&TS short predicted sampling orbits
+--   => [(ODTS_SHORT_PRD_BUFFER_SIZE_SI/ORBIT_POS_TIME_SI)]
+odts-SHORT-PRD-ORBIT-SAMPLES INTEGER ::= 300
+
+--    ODTS long estimation data buffer size
+odts-LONG-EST-BUFFER-SIZE INTEGER ::= 172800
+
+--    ODTS long estimation data buffer size
+odts-LONG-PRD-BUFFER-SIZE INTEGER ::= 43200
+
+--    ODTS long sampling rate
+odts-LONG-SAMPLING INTEGER ::= 600
+
+--    Maximum epochs used by the OD&TS long algorithm (estimation)
+--   => [(ODTS_LONG_EST_BUFFER_SIZE_SI/ODTS_LONG_SAMPLING_SI)]
+odts-LONG-EST-EPOCHS INTEGER ::= 288
+
+--    Maximum epochs used by the OD&TS long algorithm (prediction)
+--   => [(ODTS_LONG_PRD_BUFFER_SIZE_SI/ODTS_LONG_SAMPLING_SI)]
+odts-LONG-PRD-EPOCHS INTEGER ::= 72
+
+--   Number of OD&TS long estimated sampling orbits
+--   => [(ODTS_LONG_EST_BUFFER_SIZE_SI/ORBIT_POS_TIME_SI)]
+odts-LONG-EST-ORBIT-SAMPLES INTEGER ::= 576
+
+--   Number of OD&TS long predicted sampling orbits
+--   => [(ODTS_LONG_PRD_BUFFER_SIZE_SI/ORBIT_POS_TIME_SI)]
+odts-LONG-PRD-ORBIT-SAMPLES INTEGER ::= 144
+
+--  Number of positionvelocity parameters
+posvel-PAR INTEGER ::= 6
+
+--   Size Tropo interval (2 hours)
+odts-TROPO-INTERVAL-SIZE INTEGER ::= 7200
+
+--    Number tropo interval to be estimated in OD&TS short
+--   => [(ODTS_SHORT_EST_BUFFER_SIZE_SI/ODTS_TROPO_INTERVAL_SIZE_SI)]
+odts-SHORT-NUMBER-TROPO-INTERVAL INTEGER ::= 3
+
+--    Number tropo interval to be estimated in OD&TS long
+--   => [(ODTS_LONG_EST_BUFFER_SIZE_SI/ODTS_TROPO_INTERVAL_SIZE_SI)]
+odts-LONG-NUMBER-TROPO-INTERVAL INTEGER ::= 24
+
+--    Number of epochs of the buffer used by the Nav PPV module to store the PPV measurements during a whole
+--    navigation chain execution
+--   => [(NAV_EXEC_RATE_SI/PC_SAMPLING_SI)]
+ppv-OUTPUT-NAV-SAMPLES INTEGER ::= 60
+
+--    Number of epochs of the buffer used by the Iono PPV module to store the PPV measurements during two
+--    consecutive calls to IDF algorithm
+--   => [(IDF_EXEC_RATE_SI/IDF_SAMPLING_SI)]
+ppv-OUTPUT-IONO-SAMPLES INTEGER ::= 2
+
+--   Maximum number of line-of-sights per epoch and service.
+--   => [(MAX_SIV_ONE_GSS_SI * MAX_GSS_SI)]
+max-LOS-EPOCH INTEGER ::= 2080
+
+--  Number of TEC coefficients in the IFB algorithm
+num-TEC-COEFF INTEGER ::= 6
+
+--  Number of one sample iono-free pre-processed measurements
+--   => [(MAX_LOS_EPOCH_SI * NUM_MEAS_TYPE_SI)]
+num-ALGO-CODEPHASE-OBS INTEGER ::= 4160
+
+--  Size of the IFB Kalman matrix
+--   => [(MAX_SERV_SI * (MAX_SITE_SI * NUM_TEC_COEFF_SI + 2 * MAX_GSS_SI - 2 + MAX_SATS_SI))]
+ifb-KALMAN-SIZE INTEGER ::= 1662
+
+-- ifb-KALMAN-SIZE-SQR
+-- (Defined as IFB_KALMAN_SIZE^2)
+ifb-KALMAN-SIZE-SQR                INTEGER ::= 2762244
+
+--  Number of AF_Instances in the OSPF There will be:
+--      - AF_HC_OS_Nav
+--      - AF_HC_PR_Nav
+--      - AF_HC_SL_Nav
+--      - AF_HC_OS_Lon
+--      - AF_HC_PR_Lon
+--      - AF_HC_SL_Lon
+--      - AF_HC_AL_Mes
+--      - AF_MC_AL_Ion
+num-AF-INSTANCES INTEGER ::= 8
+
+--  Size in characters (without the end of string) of the Function ID. 
+max-FUNCTION-ID INTEGER ::= 255
+
+-- ============================================================================
+-- ENUMERATED
+-- ============================================================================
+
+-- OSPF Mode
+OSPF-Mode ::= ENUMERATED {
+  mode-OFF(0),
+  mode-LOADED(1),
+  mode-INITIALISED(2),
+  mode-RUNNING(3),
+  mode-EMULATION(4),
+  mode-OPERATIONAL(5),
+  mode-TEST(6),
+  mode-FAILED(7)
+}
+
+--  AF_Instance identification
+AF-Instance ::= ENUMERATED {
+  af-hc-os-nav(0),
+  af-hc-pr-nav,
+  af-hc-sl-nav,
+  af-hc-os-lon,
+  af-hc-pr-lon,
+  af-hc-sl-lon,
+  af-hc-al-mes,
+  af-mc-al-ion
+}
+
+--    Galileo services
+GalileoService ::= ENUMERATED {
+  e-os(0),
+  e-sol(1),
+  e-prs(2)
+}
+
+--    Type of observation
+OdtsObsType ::= ENUMERATED {
+  e-obstype-phase(0),
+  e-obstype-scode(1)
+}
+
+--   Disturbance flag (or Storm Flag) type.
+SF ::= ENUMERATED {
+  e-sf-no-disturbance(0),
+  e-sf-disturbance(1)
+}
+
+--    In case of SISA not monitored, defines the cause
+SISA-Not-Monitored-Reason ::= ENUMERATED {
+  e-sisa-not-monit-thres(0),
+  e-sisa-not-monit-doc-short(1),
+  e-sisa-not-monit-doc-long(2),
+  e-sisa-not-monit-orb-diff(3),
+  e-sisa-not-monit-clk-diff(4),
+  e-sisa-not-monit-srp(5),
+  e-sisa-not-monit-empac(6),
+  e-sisa-not-monit-clk-stb(7)
+}
+
+--    QoS working mode
+QOS-Mode ::= ENUMERATED {
+  e-qos-mode-foc(0),
+  e-qos-mode-iov(1),
+  e-qos-mode-deg-prs(3)
+}
+
+--    In case of degraded QoS, defines the cause
+QOS-Degraded-Reason ::= ENUMERATED {
+  e-qos-deg-reason-doc(0),
+  e-qos-deg-reason-ptf-switch(1),
+  e-qos-deg-reason-master-ptf(2),
+  e-qos-deg-reason-sisa(3),
+  e-qos-deg-reason-siv(4),
+  e-qos-deg-reason-ind(5)
+}
+
+--    Outage reason
+Outage-Reason ::= ENUMERATED {
+  e-outage-reason-manou(0),
+  e-outage-reason-clock-resynch(1),
+  e-outage-reason-clock-switch(2),
+  e-outage-reason-outage(3)
+}
+
+--    Chain selection reason
+Chain-Selection-Reason ::= ENUMERATED {
+  e-oodts-ch-selec-out(0),
+  e-oodts-ch-selec-qual(1)
+}
+
+--    PTF identfier
+PTF-Id ::= ENUMERATED {
+  e-ptf1(0),
+  e-ptf(1)
+}
+
+--    Barrier status
+BarrierStatus ::= ENUMERATED {
+  e-barrier-status-ok(0),
+  e-barrier-status-nok(1),
+  e-barrier-status-unavalaible(2)
+}
+
+--    Orbit status
+OrbitStatus ::= ENUMERATED {
+  e-orb-stat-nok(0),
+  e-orb-stat-degraded(1),
+  e-orb-stat-ok(2)
+}
+
+--  IFB status
+IFBstatus ::= ENUMERATED {
+  e-ifb-stat-invalid(0),
+  e-ifb-stat-degraded(1),
+  e-ifb-stat-valid(2)
+}
+
+--  GSS disturbance flag values
+IDFGssFlag ::= ENUMERATED {
+  e-idf-no-disturbance(0),
+  e-idf-disturbance(1),
+  e-idf-data-rejected(2)
+}
+
+--  QoS Status Flag
+QoSStatus ::= ENUMERATED {
+  e-qos-red(0),
+  e-qos-yellow(1),
+  e-qos-green(2)
+}
+
+--   Nav. Mess. Clock Status
+ClockStatus ::= ENUMERATED {
+  e-clk-stat-discarded(0),
+  e-clk-stat-not-usable(1),
+  e-clk-stat-ok(2)
+}
+
+--  Ephemeris or Almanac Status
+EphemStatus ::= ENUMERATED {
+  e-ephem-stat-not-ok(0),
+  e-ephem-stat-ok(1)
+}
+
+--   Preliminary status for SISA computation.
+SisaPreStatus ::= ENUMERATED {
+  e-prelim-sisa-no-computed(0),
+  e-prelim-sisa-computed(1)
+}
+
+--  SISA Flags.
+SisaFlag ::= ENUMERATED {
+  e-sisa-not-monitored(0),
+  e-sisa-monitored(1)
+}
+
+--  Navigation Message Health Flags.
+HealthFlag ::= ENUMERATED {
+  e-sat-health-healthy(0),
+  e-sat-health-unhealthy(1)
+}
+
+--  Satellite orbit status flag
+SatOrbFlag ::= ENUMERATED {
+  e-sat-orb-nominal(0),
+  e-sat-orb-degraded(1)
+}
+
+--  Satellite clock information flag
+SatClkInfoFlag ::= ENUMERATED {
+  e-clk-info-nominal(0),
+  e-clk-info-degraded(1),
+  e-clk-info-faulty(2)
+}
+
+-- GssChnlStatus
+-- GSS Channel Status
+GssChnlStatus                 ::= ENUMERATED {
+  e-acquisition(0),
+  e-fault-detection(1),
+  e-tracking(2),
+  e-idle(4)
+}
+
+
+-- GSS Status Data
+GssStatusData                ::= SEQUENCE {
+ 
+  
+  -- GSTtimeStamp Time corresponding to generation of gssStatus and
+  -- pre-processing statistics pstGssPreproResults as well as
+  -- Gss clock stability information GssClkAllanDev.
+  generationTime          GSTtimeStamp,
+  
+  -- GSS Sanity and Rej. Status Information
+  gssInfo                 SEQUENCE (SIZE(0..max-GSS))
+                            OF GssStatusStatistics
+}
+    
+-- GSS Sanity and Rej. Status Information
+GssStatusStatistics     ::= SEQUENCE {
+    
+  -- Time where data time interval for each GSS begins
+  initialTime             GSTtimeStamp,
+  
+  -- Time where data time interval for each GSS begins
+  endTime                 GSTtimeStamp,
+  
+  -- GSS Identifier 
+  gssId                   GAL-GMS-GSS-GLAdType,
+  
+  -- Total Num. of Meas. in Sanity Status Stats.
+  numOfSanityMeas         INTEGER (0..max-GSS-STATUS-MEAS-PER-INTERVAL),
+  
+  -- GSS Status statistics
+  gssSanityStats          SEQUENCE (SIZE(max-Index-GssSanityStatus)) 
+                            OF GssSanityIndicator,
+  
+  -- Total Num. of Meas. in Status Stats.
+  numOfMeas               INTEGER (0..max-GSS-STATUS-MEAS-PER-INTERVAL),
+  
+  -- GSS Status statistics
+  gssStatusStats          SEQUENCE (SIZE(max-Index-GssStatus)) 
+                            OF GssStatusIndicator
+}
+
+-- GSS Status Counter
+GssSanityIndicator ::= SEQUENCE {
+  status                  GssSanityStatus,
+  numberOfMeas            INTEGER (0..max-GSS-STATUS-MEAS-PER-INTERVAL)
+}
+    
+-- GssSanityStatus
+-- Status of a single GSS channel
+GssSanityStatus               ::= ENUMERATED {
+  ok(0),
+  wrong-CRC(1),
+  data-Out-of-Time(2)
+}
+
+max-Index-GssSanityStatus  INTEGER ::= 3
+
+-- GSS Status Counter
+GssStatusIndicator ::= SEQUENCE {
+  status                  GssStatus,
+  numberOfMeas            INTEGER (0..max-GSS-STATUS-MEAS-PER-INTERVAL)
+}
+    
+-- GSS Status
+GssStatus ::= ENUMERATED {
+  -- OK 
+  e-gss-stat-ok(0),
+  -- GSS not monitored 
+  e-gss-stat-not-monitored,
+  -- Excessive number of detected cycle slips 
+  e-gss-stat-exc-det-cs, 
+  -- Excessive number of repaired cycle slips 
+  e-gss-stat-exc-rep-cs, 
+  -- Excessive number of rejected code measurements in PPV 
+  e-gss-stat-exc-rej-code,
+  -- Excessive number of rejected phase measurements in PPV 
+  e-gss-stat-exc-rej-phase,
+  -- Rejected "out-of-time" measurements in PPV 
+  e-gss-stat-rej-too-late-meas, 
+  -- Not enough measurements for ODTS short batch 
+  e-gss-stat-no-meas-short, 
+  -- Not enough measurements for ODTS long batch 
+  e-gss-stat-no-meas-long,
+  -- Excessive RMS of code residuals after ODTS short batch 
+  e-gss-stat-exc-rms-code-short, 
+  -- Excessive RMS of phase residuals after ODTS short batch 
+  e-gss-stat-exc-rms-phase-short, 
+  -- Excessive RMS of code residuals after ODTS long batch 
+  e-gss-stat-exc-rms-code-long, 
+  -- Excessive RMS of phase residuals after ODTS long batch 
+  e-gss-stat-exc-rms-phase-long, 
+  -- Zenith tropo delay above threshold 
+  e-gss-stat-ztd-above-thr, 
+  -- Zenith tropo delay below threshold 
+  e-gss-stat-ztd-below-thr, 
+  -- Excessive zenith tropo delay instability 
+  e-gss-stat-exc-ztd-instab, 
+  -- Excessive clock instability (Allan deviation) 
+  e-gss-stat-exc-clk-instab 
+}
+
+max-Index-GssStatus  INTEGER ::= 17
+
+-- ============================================================================
+-- Message definitions for interface OSPF_Common
+-- ============================================================================
+
+-- GssChannelNum
+-- TBC GSS Channel Number
+GssChannelNum                 ::= INTEGER (0..max-GSS-Channels)
+
+-- Ephemeris
+-- Ephemeris Parameters
+Ephemeris                     ::= SEQUENCE {
+
+  -- Mean anomaly at reference time  [Semi-circles]
+  m0                                INTEGER (-2147483648..2147483647),
+
+  -- Mean motiondifference from computed value  [Semi-circles]
+  dn                                INTEGER (-32768..32767),
+
+  -- Eccentricity  [N/A]
+  e                                 INTEGER (0..4294967295),
+
+  -- Square root of the semi-major axis  [m^(1/2)]
+  aSqRoot                           INTEGER (0..4294967295),
+
+  -- Longitude of ascending node weekly epoch of orbital plane at  
+  -- [Semi-circles] (Right ascension of the ascending node at reference time)
+  omega0                            INTEGER (-2147483648..2147483647),
+
+  -- Inclination angle at reference time  [Semi-circles]
+  i0                                INTEGER (-2147483648..2147483647),
+
+  -- Argument of perigee  [Semi-circles]
+  omega                             INTEGER (-2147483648..2147483647),
+
+  -- Rate of right ascension  [Semi-circles/s]
+  omegaDot                          INTEGER (-8388608..8388607),
+
+  -- Rate of inclination angle  [Semi-circles/s]
+  iDot                              INTEGER (-8192..8191),
+
+  -- Amplitude of the cosine harmonic to the argument of latitude  [rad]
+  cuc                               INTEGER (-32768..32767),
+
+  -- Amplitude of the sine harmonic correction term to the argument of 
+  -- latitude 16 *  [rad] 
+  cus                               INTEGER (-32768..32767),
+
+  -- Amplitude of the cosine harmonic to the orbit radius correction term  [m]
+  crc                               INTEGER (-32768..32767),
+
+  -- Amplitude of the sine the orbit radius harmonic correction term to  [m]
+  crs                               INTEGER (-32768..32767),
+
+  -- Amplitude of the cosine harmonic to the angle of inclination correction 
+  -- term  [rad] 
+  cic                               INTEGER (-32768..32767),
+
+  -- Amplitude of the sine harmonic correction term to the angle of 
+  -- inclination  [rad] 
+  cis                               INTEGER (-32768..32767),
+
+  -- Ephemeris reference time  [s]
+  t0e                               INTEGER (0..16383)
+}
+
+-- Almanac-Parameters
+-- Almanac Parameters
+Almanac-Parameters            ::= SEQUENCE {
+
+  -- Square root of the absolute value of the deviation of the mean 
+  -- semi-major axis from its nominal value [m^(1/2)] 
+  aSqRoot                           INTEGER (-65536..65535),
+
+  -- Eccentricity
+  ecc                               INTEGER (0..2047),
+
+  -- Inclination at reference time relative to i0 =56 deg [Semi-circles]
+  deltai                            INTEGER (-1024..1023),
+
+  -- Right ascension [Semi-circles]
+  omega0                            INTEGER (-32768..32767),
+
+  -- Rate of right ascension [Semi-circles/s]
+  omegaDot                          INTEGER (-1024..1023),
+
+  -- Argument of perigee [Semi-circles]
+  w                                 INTEGER (-32768..32767),
+
+  -- Satellite mean anomaly at reference time [Semi-circles]
+  m0                                INTEGER (-32768..32767),
+
+  -- Satellite clock correction bias "truncated" [s]
+  af0                               INTEGER (-8192..8191),
+
+  -- Satellite clock correction linear "truncated" [s/s]
+  af1                               INTEGER (-1024..1023),
+
+  -- Almanac Issue Of Data 
+  iod                               INTEGER (0..3),
+
+  -- Almanac reference time [s]
+  t0a                               INTEGER (0..255),
+
+  -- Almanac reference Week Number [weeks]
+  wna                               INTEGER (0..255)
+}
+
+-- ClkCorrection
+-- Clock Correction Parameters
+ClkCorrection                 ::= SEQUENCE {
+
+  -- Clock Reference Time [s]
+  toc                               INTEGER (0..16383),
+
+  -- Constant parameter, Clock Offset [s]
+  af0                               INTEGER (0..268435455),
+
+  -- Clock drift [s7s]
+  af1                               INTEGER (0..262143),
+
+  -- Second order clock correction term. [s/s^2]
+  af2                               INTEGER (0..4095)
+}
+
+-- IonoCorrection
+-- Iono Correction Model
+IonoCorrection                ::= SEQUENCE {
+
+  -- Iono Correction Parameters
+  ionoParam                         IonoParameters,
+
+  -- Ionospheric Disturbance (Storm) Flags
+  sf                                StormFlags
+}
+
+-- IonoParameters
+-- Iono Correction Parameters
+IonoParameters                ::= SEQUENCE {
+
+  -- Effective Ionisation Level 1st order parameter [-]
+  af0                               INTEGER (0..4095),
+
+  -- Effective Ionisation Level 2nd order parameter [-]
+  af1                               INTEGER (0..4095),
+
+  -- Effective Ionisation Level 3rd order parameter [-]
+  af2                               INTEGER (0..4095)
+}
+
+-- StormFlags
+-- Storm Flags
+StormFlags                    ::= SEQUENCE {
+
+  -- Ionospheric Disturbance Flag (or storm flag) for region 1 (The Northern 
+  -- Region Units: NA  
+  eSF1                              StormFlag,
+
+  -- Ionospheric Disturbance Flag (or storm flag) for region 2 (The Northern 
+  -- Middle Region): Units: NA  
+  eSF2                              StormFlag,
+
+  -- Ionospheric Disturbance Flag (or storm flag) for region 3 (The 
+  -- Equatorial Region): Units: NA  
+  eSF3                              StormFlag,
+
+  -- Ionospheric Disturbance Flag (or storm flag) for region 4 (The Southern 
+  -- Middle Region): Units: NA  
+  eSF4                              StormFlag,
+
+  -- Ionospheric Disturbance Flag (or storm flag) for region 5 (The Southern 
+  -- Region): Units: NA  
+  eSF5                              StormFlag
+}
+
+-- GSTUTCConversion
+-- GSTtimeStamp to UTC Conversion Parameters
+GSTUTCConversion              ::= SEQUENCE {
+
+  -- Constant term of polynomial 
+  a0                                INTEGER (0..4294967295),
+
+  -- 1st order term of polynomial 
+  a1                                INTEGER (0..16777215),
+
+  -- Delta time due to leap seconds 
+  dtLeapSec                         INTEGER (0..255),
+
+  -- Reference time for UTC data 
+  t0                                INTEGER (0..255),
+
+  -- UTC reference Week Number 
+  wN                                INTEGER (0..255),
+
+  -- Week Number of the Leap Second 
+  wNLeapSec                         INTEGER (0..255),
+
+  -- Day Number of the Leap Second 
+  dayNumLeapSec                     INTEGER (0..7),
+
+  -- Delta time due to leap second 
+  dtLeapSecF                        INTEGER (0..255)
+}
+
+-- GPSGSTOffsetParams
+-- GPS to GSTtimeStamp Offset Model Parameters
+GPSGSTOffsetParams            ::= SEQUENCE {
+
+  -- Constant term of the polynomial describing the offset 
+  a0G                               INTEGER (0..65535),
+
+  -- Rate of change of the offset 
+  a1G                               INTEGER (0..4095),
+
+  -- Reference time for GGTO data 
+  t0G                               INTEGER (0..255),
+
+  -- Week Number of GGTO reference 
+  wN0G                              INTEGER (0..63)
+}
+
+-- StormFlag
+-- Storm Flag
+StormFlag                     ::= ENUMERATED {
+  no-disturbance(0),
+  disturbance(1)
+}
+
+-- GST-WeekSec
+-- Galileo System Time
+GST-WeekSec                   ::= SEQUENCE {
+
+  -- Week Number [s]
+  wn                                INTEGER (0..4095),
+
+  -- Seconds in Week 
+  tow                               INTEGER (0..604800)
+}
+
+
+-- SV-Status-FNav -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+-- SV Signal Status Health for F/Nav (E5A)
+SV-Status-FNav                ::= SEQUENCE {
+  statusE5a                         Signal-Health-Status
+}
+  
+-- SV-Status-INav -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+-- SV Signal Status Health for I/Nav (E5b & L1B)
+SV-Status-INav                ::= SEQUENCE {
+  statusE5b                         Signal-Health-Status,
+  statusL1B                         Signal-Health-Status
+}
+
+-- SV-Status-GNav -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+-- SV Signal Status Health for G/Nav
+SV-Status-GNav                ::= SEQUENCE {
+  statusE6a                         Signal-Health-Status,
+  statusL1A                         Signal-Health-Status
+}
+  
+-- Signal-Health-Status -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+-- Signal Status Health
+Signal-Health-Status          ::= ENUMERATED {
+  health-ok(0),
+  out-of-service(1),
+  will-be-out-of-service(2),
+  currently-in-test(3)
+}
+
+-- TropoDelays
+-- Tropospheric zenith delays for a full arc
+TropoDelays                   ::= SEQUENCE (SIZE(0..max-TropoInterv))
+                                   OF TropoDelayAllGss
+
+-- TropoDelayAllGss 
+-- Tropospheric zenith delays for all GSS
+TropoDelayAllGss              ::= SEQUENCE (SIZE(0..max-GSS))
+                                   OF TropoDelaySingleGss
+
+-- TropoDelaySingleGss
+-- Tropospheric zenith delays for a single GSS
+TropoDelaySingleGss           ::= SEQUENCE {
+
+  -- GSS Id
+  gssId                             GAL-GMS-GSS-GLAdType,
+
+  -- Estimated zenith tropospheric delay for each station and for each 
+  -- interval [cm] 
+  gssTropDelay                      GssTropoDelay,
+
+  -- Tropo.Delay availability status (0: NOK, 1: OK)
+  status                            BOOLEAN
+}
+
+-- IonoDelays 
+-- Ionospheric zenith delays for a full arc
+IonoDelays                    ::= SEQUENCE (SIZE(0..max-GSS))
+                                   OF SEQUENCE (SIZE(0..max-IonoData))
+                                     OF IonoZenithDelay
+
+-- IonoDelaySingleGssSingleSV
+-- Ionospheric zenith delays for a GSS and a SV
+IonoZenithDelay               ::= SEQUENCE {
+
+  -- GSS Id
+  gssId                             GAL-GMS-GSS-GLAdType,
+
+  -- SV ID
+  svId                              SV-ID,
+
+  -- Estimated zenith Ionospheric delay for each station and SV [cm]
+  gssIonoDelay                      GssIonoDelay,
+
+  -- Iono.Delay availability status (0: NOK, 1: OK)
+  status                            BOOLEAN
+}
+
+-- IFBiasAllGss
+-- Inter frequency bias parameters for either all GSS
+IFBiasAllGss                  ::= SEQUENCE (SIZE(0..max-GSS))
+                                   OF IFBiasGss
+
+-- IFBiasAllSV 
+-- Inter frequency bias parameters for either all SV
+IFBiasAllSV                   ::= SEQUENCE (SIZE(0..max-SV-ID))
+                                   OF IFBiasSV
+
+-- IFBiasGss
+-- Inter frequency bias parameters for either a GSS receiving chain
+IFBiasGss                     ::= SEQUENCE {
+  gssId                             GAL-GMS-GSS-GLAdType,
+  ifbias                            IFBias,
+  status                            IFBiasStatus
+}
+
+-- IFBiasSV
+-- Inter frequency bias parameters for either a satellite receiving chain
+IFBiasSV                      ::= SEQUENCE {
+  svId                              SV-ID,
+  ifbias                            IFBias,
+  status                            IFBiasStatus
+}
+
+-- GssTropoDelay
+-- GSS Trospospheric Delay
+-- Units: cm
+GssTropoDelay                 ::= INTEGER (-10000000..10000000)
+
+-- GssIonoDelay
+-- GSS Ionospheric Delay
+  -- Units: cm
+GssIonoDelay                  ::= INTEGER (-10000000..10000000)
+
+-- CarrierPhaseAmb
+-- Carrier-Phase Ambiguity Information
+CarrierPhaseAmb               ::= INTEGER (-100000..100000)
+
+-- IOD-Almanac
+-- IOD for Almanac data
+IOD-Almanac                   ::= INTEGER (0..3)
+
+-- BGD
+-- Broadcast Group Delay
+BGD                           ::= INTEGER (0..1023)
+
+-- SISA
+-- SISA index. The SISA index values are: 
+-- * 0  - 49 =  0 cm to 49    cm with  1 cm resolution 
+-- * 50 - 74 = 50 cm to  0.98  m with  2 cm resolution 
+-- * 75 - 99 =  1  m to  2     m with  4 cm resolution 
+-- * 100-125 =  2  m to  6     m with 16 cm resolution 
+-- * 126-254 = Spare
+-- * 255     = No prediction is available
+SISA                          ::= INTEGER (0..255)
+
+-- Arc-Seconds
+-- Definition of structure Arc-Seconds
+Arc-Seconds                   ::= INTEGER (-3600..3600)
+
+-- Arc-Milliseconds
+-- Definition of structure Arc-Milliseconds
+Arc-Milliseconds              ::= INTEGER (-1000..1000)
+
+-- Health
+-- Health Status
+Health                        ::= ENUMERATED {
+  healthy(0),
+  unhealthy(1)
+}
+
+-- IFBiasStatus
+-- Status of a single GSS channel
+IFBiasStatus                  ::= ENUMERATED {
+  invalid(0),
+  degraded(1),
+  valid(2)
+}
+
+-- FrequencyID
+-- Frequency Identifier
+FrequencyID                   ::= ENUMERATED {
+  e5a(0),
+  e5b(1),
+  e6a(2),
+  e6b(3),
+  l1a(4),
+  l1b(5),
+  l1c(6)
+}
+
+-- IOD-Nav
+-- Issue of Data (10 bits), valid for I/Nav, F/Nav and G/Nav
+-- This value is reset to 0 with the Week Number and incremented by one every 10 min.
+IOD-Nav				::= INTEGER (0..1023)
+
+-- IOD-FNav
+-- F/NAV IOD indicator n value and Integrity data content 
+IOD-FNav                      ::= ENUMERATED {
+
+  -- Nominal navigation data batch valid between ToA(0) and ToA(1) seconds 
+  fNav-IOD-nominal(0),
+
+  -- Degraded navigation data batch valid between ToA(1) and  ToA(2) seconds 
+  fNav-IOD-degraded1(1),
+
+  -- Degraded navigation data batch valid between  ToA(2) and  ToA(3) seconds 
+  fNav-IOD-degraded2(2),
+
+  -- Degraded navigation data batch valid from ToA(3) seconds 
+  fNav-IOD-degraded3(3),
+
+  -- Almanacs
+  fNav-IOD-almanacs(4)
+}
+
+-- IOD-INav
+-- I/NAV IOD indicator n value and Integrity data content 
+IOD-INav                      ::= ENUMERATED {
+
+  -- Nominal navigation data batch valid between ToA(0) and ToA(1) seconds 
+  iNav-IOD-nominal(0),
+
+  -- Degraded navigation data batch valid between ToA(1) and  ToA(2) seconds 
+  iNav-IOD-degraded1(1),
+
+  -- Degraded navigation data batch valid between  ToA(2) and  ToA(3) seconds 
+  iNav-IOD-degraded2(2),
+
+  -- Degraded navigation data batch valid from ToA(3) seconds 
+  iNav-IOD-degraded3(3),
+
+  -- Almanacs
+  iNav-IOD-almanacs(4)
+}
+
+-- IOD-GNav
+-- G/NAV IOD indicator n value and Integrity data content 
+IOD-GNav                      ::= ENUMERATED {
+
+  -- Nominal navigation data batch valid between ToA(0) and ToA(1) seconds 
+  gNav-IOD-nominal(0),
+
+  -- Degraded navigation data batch valid between ToA(1) and  ToA(2) seconds 
+  gNav-IOD-degraded1(1),
+
+  -- Degraded navigation data batch valid between  ToA(2) and  ToA(3) seconds 
+  gNav-IOD-degraded2(2),
+
+  -- Degraded navigation data batch valid from ToA(3) seconds 
+  gNav-IOD-degraded3(3),
+
+  -- Almanacs
+  gNav-IOD-almanacs(4)
+}
+
+-- Service-QoS
+-- General definition of Servince associated QoS
+Service-QoS                   ::= SEQUENCE {
+  ovStatus                          QoSStatus,
+  perf                              PerfExpectedAccuracy
+}
+
+-- ElmtThreeState
+-- Three-state variable
+ElmtThreeState                ::= QoSStatus
+  
+-- AFProcStatus
+-- AF Processing Function Status
+AFProcStatus                  ::= ENUMERATED {
+  nominal(0),     -- No errors detected                         
+  degraded(1),    -- Error detected continue degraded.          
+  faulty(2)       -- Failure detected, cannot continue operation
+}
+  
+-- PerfExpectedAccuracy
+-- Nav.Performance - Expected Accuracy
+PerfExpectedAccuracy          ::= INTEGER (0..1023)
+
+-- IFBias
+-- Interfrequency bias for GSS and SV chains
+IFBias                        ::= INTEGER (-1000000..1000000)
+
+-- ReceiverID
+-- Definition of structure ReceiverID
+ReceiverID                    ::= INTEGER (0..max-RECEIVER)
+
+-- EmpAcc
+-- Emp. Acceleration for one SV (1:along, 2:across, 3:radial)
+EmpAcc                        ::= SEQUENCE (SIZE(3))
+                                   OF EmpAcc-Vector
+
+-- EmpAcc-Vector
+-- Emp. Acceleration components (1:sine, 2:cosine, 3:constant)
+EmpAcc-Vector                 ::= SEQUENCE (SIZE(3))
+                                   OF EmpAcc-Component
+
+-- EmpAcc-Component
+-- Emp. Acceleration single component
+EmpAcc-Component              ::= INTEGER (-1000000..1000000)
+  
+-- OSPF-ID
+OSPF-ID                       ::= INTEGER (0..255)
+  
+-- Definition of structure DOUBLE
+DOUBLE                        ::= REAL
+
+-- TBD
+-- THIS IS A DUMMY TYPE FOR TBD STRUCTURES
+TBD                           ::= NULL
+
+-- ============================================================================
+-- Message definitions for interface OSPF_Clks
+-- ============================================================================
+
+-- SatClkGstData
+-- Deviation of SV w.r.t. GST
+SatClkGstData                 ::= SEQUENCE {
+  svId                              SV-ID,
+  sv-TimeStamp                      GSTtimeStamp,
+  sv-Gst-Offset                     ClockOffset,
+  sv-Clk-AllanStDev                 AllanStDevSet
+}
+
+-- GssClkGstData
+-- Deviation of GSS w.r.t. GST
+GssClkGstData                 ::= SEQUENCE {
+  gssChnlNum                        GssChannelNum,
+  gss-TimeStamp                     GSTtimeStamp,
+  gss-Gst-Offset                    ClockOffset,
+  gss-Clk-AllanStDev                AllanStDevSet
+}
+
+-- AllanStDevSet
+-- Set of Allan Std. Deviation and Stability Interval pairs
+AllanStDevSet                 ::= SEQUENCE (SIZE(0..max-AllanStDevIntervals))
+                                   OF AllanStDev
+
+-- AllanStDev
+-- Allan Std. Deviation and Stability Interval pairs
+AllanStDev                    ::= SEQUENCE {
+  stabilityTime                     AllanStabilityTime,
+  allanStDev                        AllanStandardDeviation
+}
+
+-- AllanStabilityTime
+-- Definition of structure AllanStabilityTime
+AllanStabilityTime            ::= INTEGER (-100000000..100000000)
+
+-- AllanStandardDeviation
+-- Definition of structure AllanStandardDeviation
+AllanStandardDeviation        ::= INTEGER (-1000000..1000000)
+
+
+-- MJD-TAI-Time
+-- Definition of structure MJD-TAI-Time
+MJD-TAI-Time                  ::= SEQUENCE {
+  day                               Day,
+  sec                               Seconds,
+  msec                              Milliseconds
+}
+
+-- ClockOffset
+-- Definition of structure ClockOffset
+ClockOffset                   ::= SEQUENCE {
+  sec                               Seconds,
+  nsec                              Nanoseconds,
+  nsec-frac                         NanosecondsFrac
+}
+
+-- Day
+-- Definition of structure Day
+Day                           ::= INTEGER (0..366)
+
+-- Seconds
+-- Definition of structure Seconds
+Seconds                       ::= INTEGER (-3600..3600)
+
+-- Milliseconds
+-- Definition of structure Milliseconds
+Milliseconds                  ::= INTEGER (-1000..1000)
+
+-- Nanoseconds
+-- Definition of structure Nanoseconds
+Nanoseconds                   ::= INTEGER (-1000000000..1000000000)
+
+-- NanosecondsFrac
+-- Definition of structure fraction of Nanoseconds
+NanosecondsFrac               ::= INTEGER (-100..100)
+  
+-- ============================================================================
+-- Message definitions for interface EFT and Testport
+-- ============================================================================
+  
+-- ClkBias
+-- Clock offset at a given epoch and for a given clock referred to GST
+ClkBias                       ::= SEQUENCE {
+
+  -- Estimated clock offset for the corresponding epoch with respect to GSTtimeStamp 
+  -- Units: cm  
+  dBias                             DOUBLE,
+
+  -- Status of the clock estimation for each satellite and epoch
+  --  (0: NOK, 1: OK)
+  bStatus                           BOOLEAN
+}
+
+-- ClockJumps
+-- Satellite and GSS clock jumps at a given epoch.
+ClockJumps                    ::= SEQUENCE {
+
+  -- Gss clock jumps at a given epoch and service
+  ptGssJumps                        SEQUENCE (SIZE(max-GSS))
+                                     OF ClockJumpPar,
+
+  -- Sat clock jumps at a given epoch and service
+  pstSatJumps                       SEQUENCE (SIZE(max-SV-ID))
+                                     OF ClockJumpPar
+}
+
+-- ClockJumpPar
+-- Parameters that describe a clock jump
+ClockJumpPar                  ::= SEQUENCE {
+
+  -- Flag to indicate the existance of a clock jump.
+  -- Units: N/A
+  -- (1: Clock Jump)
+  bJump                             BOOLEAN,
+
+  -- Estimated clock jump magnitude. The clock jump is positive when 
+  -- the pseudorange and carrier phase measurements are increased:
+  -- (RHOafter-jump = (RHObefore-jump + Magnitude)
+  --  (PHIafter-jump = (PHIbefore-jump + Magnitude)
+  -- Units: metre
+  dMagnitude                        DOUBLE
+}
+
+-- ManFields
+-- ODTS parameters for describing a detected manoeuvre.
+ManFields                     ::= SEQUENCE {
+
+  -- Manoeuvre time in MJD format and in TAI reference
+  stMjdTaiTime                      GSTtimeStamp,
+
+  -- Estimated position of the CoM after manoeuvre in local satellite 
+  -- reference frame (X, Y and Z) Units: meters 
+  pdNewPos                          SEQUENCE (SIZE(dim-VECTOR))
+                                     OF DOUBLE,
+
+  -- Estimated values for the components of the velocity increment 
+  -- associated to the manoeuvre, in the satellite orbital frame (walong, 
+  -- wcross , wrad). Units: m/s 
+  pdDeltaV                          SEQUENCE (SIZE(dim-VECTOR))
+                                     OF DOUBLE,
+
+  -- New mass after satellite manoeuvre Units: Kg
+  dNewMass                          DOUBLE,
+
+  -- Status of the estimated satellite manoeuvre.  (0: NOK, 1: OK)
+  -- Units: N/A
+  bStatus                           BOOLEAN
+}
+
+-- SrpCoeff
+-- Solar Radiation Pressure Coefficients and status for one satellite
+SrpCoeff                      ::= SEQUENCE {
+
+  -- Value of the Solar Radiation Pressure model estimated parameters for 
+  -- each satellite (in principle, Cr and Y-bias) and the considered service 
+  -- Units: N/A 
+  pdCoeff                           SEQUENCE (SIZE(num-EST-SRP))
+                                     OF DOUBLE,
+
+  -- Status of estimated SRP coefficients from ODTS for each satellite for 
+  -- the considered service.  (0: NOK, 1: OK)
+  -- Units: N/A 
+  bStatus                           BOOLEAN
+}
+
+-- SteeringParam
+-- Clock steering parameters
+SteeringParam ::= SEQUENCE {
+
+  -- GSSclock bias for the prescribed time window
+  -- Range:
+  -- Units: s
+  dA0                           REAL,
+
+  -- GSS clock drift for the prescribed time window
+  -- Range:
+  -- Units: s/s
+  dA1                           REAL,
+
+  -- GSS clock frequency drift for the prescribed time window
+  -- Range:
+  -- Units: s/s2
+  dA2                           REAL,
+
+  -- Reference epoch of the clock model
+  -- Range:
+  -- Units:
+  stTocEpoch                    GSTtimeStamp,
+
+  -- Time of applicability of the clock models.
+  -- Range:
+  -- Units: seconds
+  siTimeOfApplicability         INTEGER,
+ 
+  -- Status of the provided clock model  (0: NOK, 1: OK)
+  -- Range: TRUE | FALSE
+  -- Units: N/A
+  bClockModStatus               BOOLEAN
+}
+
+END
+
+-- 
+-- GAL-GMS-OSPF_common.asn,v
+-- Revision 1.3  2006/12/13 16:57:04  jcgg
+-- Merge from V01.01 Development branch, for IDP 4.B
+--
+-- Revision 1.1.2.7  2006/12/13 13:05:23  jcgg
+-- Preparation of OSPF IDP 4.B Delivery
+--
+-- Revision 1.1.2.6  2006/12/05 16:37:56  jcgg
+-- Draft release for OSPF IDP 4.B
+--
+-- Revision 1.1.2.5  2006/11/13 14:07:57  jcgg
+-- Correted according to comments from PTF Team (mail from Daniel ILL-Ferrer, 09/11/2006)
+--
+-- Revision 1.1.2.4  2006/11/03 13:52:46  jcgg
+-- DELIVERY: OSPF & IPF IDP 4.A
+--
+-- Revision 1.1.2.3  2006/10/30 15:02:56  jcgg
+-- Created after 5th ID WS, targeted for IDP 4.A, fine revision
+--
+-- Revision 1.1.2.2  2006/10/30 14:15:21  jcgg
+-- Created after 5th ID WS, targeted for IDP 4.A
+--
+-- Revision 1.1.2.1  2006/10/27 07:33:42  jcgg
+-- Created after 5th ICD WS
+--
+-- Revision 1.1.2.1  2006/10/24 14:58:06  jcgg
+-- Initial revision
+--
+--
+--
+
+-- EOF

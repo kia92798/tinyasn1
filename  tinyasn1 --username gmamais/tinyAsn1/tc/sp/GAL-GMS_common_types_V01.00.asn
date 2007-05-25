@@ -1,0 +1,501 @@
+-- ========================================
+-- Project  : Galileo Ground Mission Segment (GMS)
+--
+-- Version  : $Id: GAL-GMS_common_types_V01.00.asn,v 1.12 2007/01/08 13:24:59 castrib Exp $
+--
+-- Source   : Alcatel Alenia Space
+--
+-- Purpose  :
+--     This ASN.1 file contains the common types and parameters defined
+--     at GMS level.
+--
+-- History  :
+-- 	 04-Jan-07 - Modified module name to GAL-GMS-common-types-V01-00.
+--               - Added definition of GLAd for OSPF & IPF Elements.
+--               - Added definition of 3-state light.
+--               - Added definition of GMS Element state & mode.
+--               - Added definition of OSPF service QoS.
+-- 	 20-Dec-06 - Included IPF QoS definition for PRS and SoL.
+-- 	 19-Dec-06 - New definition max-GSS-Remote-Sites.
+--     14-Dec-06 - Updated max value of ContactPlan-ID to 1000000.
+--     17-Nov-06 - Corrected definition for ContactPlan-ID.
+--		     - Added posibility of addressing "all" sites and "all" instances
+--                   in GLAd definition.
+--               - Added GLAd definition for PTF.
+--     14-Nov-06 - Added definition of max-SV, max-ULS-Sites, max-ULS-Antennas,
+--                   max-GSS-Sites and max-GSS-Chains.
+--               - Added definitions of ERIS and CS regions.
+--               - Added definitions of ContactPlan-ID.
+--     10-Nov-06 - Added NAV message definitions (page and page size).
+--     09-Nov-06 - Added definition of SV-ID.
+--     19-Oct-06 - Added definition of GLAd for ULS Elements.
+--     17-Oct-06 - Added definition of GLAd for GSS Elements.
+--               - Renamed file from former GMS_common.asn.
+--     27-Jul-06 - Updated per DCN 1509 ID 13 on SIS ICD 2918.
+--
+-- Warnings :
+--     Nil.
+-- 
+-- Comments :
+--     This file may be upgraded with proposals of common types coming
+--     from Element contractors.            
+-- ========================================
+
+GAL-GMS-common-types-V01-00 DEFINITIONS
+
+    AUTOMATIC TAGS ::=
+
+BEGIN
+
+-- ==================================
+-- Maximum SV identifier
+-- ==================================
+
+max-SV-ID INTEGER ::= 36
+
+-- ==================================
+-- Maximum number of SV in view
+-- ==================================
+
+max-SV-inView INTEGER ::= 16
+
+-- ==================================
+-- Maximum GSS sites (remote + GCC-located)
+-- ==================================
+
+max-GSS-Sites INTEGER ::= 52
+
+-- ==================================
+-- Maximum GSS remote sites (remote only)
+-- ==================================
+
+max-GSS-remote-Sites INTEGER ::= 50
+
+-- ==================================
+-- Maximum GLAd value for GSS sites (remote + GCC-located)
+-- ==================================
+-- max-GSS-GLAd is defined as max-GSS-Sites+1 
+
+max-GSS-GLAd INTEGER ::= 53
+
+-- ==================================
+-- Maximum number of Chains per GSS Site
+-- ==================================
+
+max-GSS-Chains INTEGER ::= 3
+
+-- ==================================
+-- Maximum GLAd valur for GSS Chains per GSS Site
+-- ==================================
+-- max-GSS-Chains-GLAd is defined as max-GSS-Chains+1 
+
+max-GSS-Chains-GLAd INTEGER ::= 4
+
+-- ==================================
+-- Maximum ULS sites
+-- ==================================
+
+max-ULS-Sites INTEGER ::= 10
+
+-- ==================================
+-- Maximum GLAd value for ULS sites 
+-- ==================================
+-- max-ULS-GLAd is defined as max-ULS-Sites+1 
+
+max-ULS-GLAd INTEGER ::= 11
+
+-- ==================================
+-- Maximum GCC sites
+-- ==================================
+
+max-GCC-Sites INTEGER ::= 2
+
+-- ==================================
+-- Maximum GLAd value for GCC sites
+-- ==================================
+-- max-GCC-GLAd is defined as max-GCC-Sites+1 
+
+max-GCC-GLAd INTEGER ::= 3
+
+-- ==================================
+-- Maximum number of Antennas per ULS Site
+-- ==================================
+
+max-ULS-Antenna INTEGER ::= 5
+
+-- ==================================
+-- Maximum number of Eris Regions
+-- ==================================
+
+max-ERIS-Region INTEGER ::= 5
+
+-- ==================================
+-- Maximum number of CS Regions
+-- ==================================
+
+max-CS-Region INTEGER ::= 7
+
+-- ==================================
+-- Schedule and Contact Plan Identifier
+-- ==================================
+
+ContactPlan-ID ::=INTEGER(1..1000000)
+
+-- ==================================
+-- Maximum SV Pseudo-Random Number
+-- ==================================
+
+max-SV-PRN INTEGER ::= 50
+
+-- ==================================
+-- IPF QoS definition for PRS and SoL
+-- ==================================
+
+-- IPFQoS-Type
+-- IPF QOS for PRS Service
+IPFQoS-Type ::= SEQUENCE 
+    {
+    ipfQoS  IPFQoS,   -- False=RUNNING, True=OPERATIONAL
+    ipfMode	BOOLEAN 
+    }
+
+-- IPF QOS for Service (see QoS-Status)
+--  Bit Code    Colour              Meaning
+--    000      RED light       Failure, re-init necessary
+--    001      GREEN light 1   Nominal Mode, best accuracy
+--    010      GREEN light 2   Nominal Mode, second best accuracy
+--    011      GREEN light 3   ...
+--    100      GREEN light 4   ...
+--    101      GREEN light 5   ...
+--    110      GREEN light 6   Nominal Mode, worst accuracy
+--    111      YELLOW light    Degraded mode or No Satellites Monitored
+IPFQoS ::= BIT STRING (SIZE(3))
+
+-- ==================================
+-- Galileo Navigation Messages
+-- ==================================
+-- Reference: SISICD
+
+--
+-- Every second on E6b.
+--
+c-NAV-page-size INTEGER ::= 486
+C-NAV-page ::= BIT STRING (SIZE(c-NAV-page-size))
+C-NAV-message ::= SEQUENCE
+    {
+    startTime           PageStartTime,
+    message             C-NAV-page
+    }
+
+--
+-- Every second on E5b and L1b.
+--
+i-NAV-page-size INTEGER ::= 114
+I-NAV-page ::= BIT STRING (SIZE(i-NAV-page-size))
+I-NAV-message ::= SEQUENCE
+    {
+    startTime           PageStartTime,
+    message             I-NAV-page
+    }
+
+--
+-- Every 10 seconds only on E5a.
+--
+f-NAV-page-size INTEGER ::= 238
+F-NAV-page ::= BIT STRING (SIZE(f-NAV-page-size))
+F-NAV-message ::= SEQUENCE
+    {
+    startTime           PageStartTime,
+    message             F-NAV-page
+    }
+
+-- 
+-- May be NAV or INT (Alarm).
+-- From one of L1a|E6a if NAV,
+-- Aggregated from both L1a&E6a if INT.
+-- Content is:
+--     PRS data             164 bits 
+--     On-board data         27 bits
+--     Global region status   8 bits
+g-NAV-page-size INTEGER ::= 199
+G-NAV-page ::= BIT STRING (SIZE(g-NAV-page-size))
+G-NAV-message ::= SEQUENCE
+    {
+    startTime           PageStartTime,
+    message             G-NAV-page
+    }
+
+-- ==================================
+-- Channel number
+-- ==================================
+
+ChannelNumber ::= INTEGER (0..127)
+
+-- ==================================
+-- Page start time
+-- ==================================
+-- Offset:     Receiver local time
+-- Minimum:    -1000.0 ms
+-- Maximum:    +1000.0 ms
+-- Resolution:     0.1 ms
+
+PageStartTime ::= SEQUENCE
+    {
+    date                INTEGER (-10000..10000),
+    validity            BOOLEAN
+    }
+
+-- ==================================
+-- GST time stamp
+-- ==================================
+-- Offset:             TBD
+-- Minimum:            0 s
+-- Maximum:   max-UInt32 s
+-- Resolution:         1 s
+
+GSTtimeStamp ::= INTEGER (0..max-UInt32)
+
+-- ==================================
+-- Number of SV in view
+-- ==================================
+-- Minimum: 0
+-- Maximum: max-SV-inView
+
+Nb-SV-inView ::= INTEGER (0..max-SV-inView)
+
+-- ==================================
+-- Satelite Vehicule Identifier
+-- ==================================
+-- Minimum:  1
+-- Maximum: max-SV-ID
+
+SV-ID ::= INTEGER (1..max-SV-ID)
+
+-- ==================================
+-- Spreading code of a Galileo SV
+-- ==================================
+-- Minimum:  1
+-- Maximum: max-SV-PRN
+
+SV-PRN ::= INTEGER (1..max-SV-PRN)
+
+-- ==================================
+-- Cyclic Redundancy Check on 32 bits
+-- ==================================
+-- This CRC is applied on the application-useful
+-- part of the information transmitted, before
+-- it is encoded. It is then inserted into the
+-- encoded message.
+-- It is used on the receiver side to check that
+-- the information was transferred and received
+-- without error, and then correctly decoded.
+-- It is computed as per IETF RFC 1662.
+
+CRC32 ::= UInt32
+
+-- ==================================
+-- Unsigned 32-bit integer
+-- ==================================
+
+UInt32 ::= INTEGER (0..max-UInt32)
+
+-- ==================================
+-- Maximum unsigned 32-bit integer
+-- ==================================
+
+max-UInt32 INTEGER ::= 4294967295
+
+-- ==================================
+-- UDP datagram filler
+-- ==================================
+-- This filler is intended to be used
+-- for load tests of the GMS-MDDN.
+-- It's maximal size corresponds to the
+-- maximum UDP datagram size.
+
+Filler ::= BIT STRING (SIZE(1..524280))
+
+-- ==================================
+-- Three-state light
+-- ==================================
+
+ThreeStateLight ::= ENUMERATED
+    {
+    green  (0),
+    yellow (1),
+    red    (2)
+    }
+
+-- ==================================
+-- GMS Element state & mode
+-- ==================================
+-- Operative modes only are considered.
+-- 'ope' for     Operational state,
+-- 'nop' for Non-Operational state.
+
+ElementStateMode ::= ENUMERATED
+    {
+    ope-operational (0),
+    nop-running     (1)
+    }
+
+-- ==================================
+-- OSPF service QoS
+-- ==================================
+OSPF-Service-QoS ::= SEQUENCE
+    {
+    overallStatus ThreeStateLight,
+    perf          OSPF-PerfExpectedAccuracy
+    }
+ 
+OSPF-PerfExpectedAccuracy ::= INTEGER (0..1023)
+
+-- ==================================
+-- Partial GLAd for GSS Elements
+-- ==================================
+
+-- 0         reserved for 'any'
+-- 1..50     reserved for GSS-01..GSS-50
+-- 51        reserved for GCC-1
+-- 52        reserved for GCC-2
+-- max value reserved for 'all'
+GSS-siteType ::= INTEGER (0..max-GSS-GLAd)      
+ 
+-- min value reserved for 'any'
+-- max value reserved for 'all'
+GSS-instanceNoType ::= INTEGER (0..max-GSS-Chains-GLAd)  
+
+GAL-GMS-GSS-subsystemType ::= ENUMERATED
+    {
+    any         (0),
+    cc          (1),
+    gpsN        (2),
+    gpsP        (3),
+    grcN        (4),
+    grcP        (5),
+    sm          (6),
+    all         (15)
+    }
+
+GAL-GMS-GSS-GLAdType ::= SEQUENCE
+    { 
+    site        GSS-siteType,
+    instance    GSS-instanceNoType,
+    subsystem   GAL-GMS-GSS-subsystemType OPTIONAL
+    } 
+
+-- ==================================
+-- Partial GLAd for ULS Elements
+-- ==================================
+
+-- min value reserved for 'any'
+-- max value reserved for 'all'
+ULS-siteType ::= INTEGER (0..max-ULS-GLAd)
+                                                   
+-- min value reserved for 'any'
+-- max value reserved for 'all'
+ULS-instanceNoType ::= INTEGER (0..2)
+                                                   
+GAL-GMS-ULS-subsystemType ::= ENUMERATED
+    {
+    any         (0),
+    mc1         (1),
+    mc2         (2),
+    mc3         (3),
+    mc4         (4),
+    mc5         (5),
+    mp1         (8),
+    mp2         (9),
+    mp3         (10),
+    mp4         (11),
+    mp5         (12), 
+    all         (15)
+    }
+
+GAL-GMS-ULS-GLAdType ::= SEQUENCE
+    { 
+    site        ULS-siteType,
+    instance    ULS-instanceNoType,
+    subsystem   GAL-GMS-ULS-subsystemType OPTIONAL
+    }
+
+-- ==================================
+-- Partial GLAd for PTF Elements
+-- ==================================
+
+-- min value reserved for 'any'
+-- max value reserved for 'all'
+PTF-siteType ::= INTEGER (0..max-GCC-GLAd)
+
+-- min value reserved for 'any'
+-- max value reserved for 'all'
+PTF-instanceNoType ::= INTEGER (0..3)
+                                                                                         
+GAL-GMS-PTF-subsystemType ::= ENUMERATED
+    {
+    any         (0),
+    all         (15)
+    }
+
+GAL-GMS-PTF-GLAdType ::= SEQUENCE
+    { 
+    site        PTF-siteType,
+    instance    PTF-instanceNoType,
+    subsystem   GAL-GMS-PTF-subsystemType OPTIONAL
+    }
+
+-- ==================================
+-- Partial GLAd for OSPF Elements
+-- ==================================
+
+-- min value reserved for 'any'
+-- max value reserved for 'all'
+OSPF-siteType ::= INTEGER (0..max-GCC-GLAd)
+
+-- min value reserved for 'any'
+-- max value reserved for 'all'
+OSPF-instanceNoType ::= INTEGER (0..5)
+                                       
+GAL-GMS-OSPF-subsystemType ::= ENUMERATED
+    {
+    any         (0),
+    af          (1),
+    rtmc        (2),
+    all         (15)
+    }
+
+GAL-GMS-OSPF-GLAdType ::= SEQUENCE
+    { 
+    site        OSPF-siteType,
+    instance    OSPF-instanceNoType,
+    subsystem   GAL-GMS-OSPF-subsystemType OPTIONAL
+    }
+
+-- ==================================
+-- Partial GLAd for IPF Elements
+-- ==================================
+
+-- min value reserved for 'any'
+-- max value reserved for 'all'
+IPF-siteType ::= INTEGER (0..max-GCC-GLAd)
+
+-- min value reserved for 'any'
+-- max value reserved for 'all'
+IPF-instanceNoType ::= INTEGER (0..5)
+                                                   
+GAL-GMS-IPF-subsystemType ::= ENUMERATED 
+    {
+    any         (0),
+    af          (1),
+    rtmc        (2),
+    all         (15)
+    }
+
+GAL-GMS-IPF-GLAdType ::= SEQUENCE 
+    { 
+    site        IPF-siteType,
+    instance    IPF-instanceNoType,
+    subsystem   GAL-GMS-IPF-subsystemType OPTIONAL
+    }
+
+END
