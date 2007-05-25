@@ -11,11 +11,22 @@ moduleDefinition :  	UID			//module id
 			('EXPLICIT' 'TAGS' | 'IMPLICIT' 'TAGS' | 'AUTOMATIC' 'TAGS')?
 			('EXTENSIBILITY' 'IMPLIED')?
 			'::=' 'BEGIN'
+			(exports)?
+			(imports)?
 			(
 				typeAssigment
 				|valueAssigment
 			)*
 			'END';
+			
+exports :
+	 'EXPORTS' 'ALL' ';'
+	| 'EXPORTS' (UID | LID) (',' (UID | LID))*  ';'
+;			
+
+imports :
+	'IMPORTS' ((UID | LID) (',' (UID | LID))* 'FROM' UID)* ';'	
+	;
 	
 valueAssigment	
 	:	LID type '::=' value	
@@ -86,7 +97,7 @@ namedNumber
 signedNumber
 	:	('+'|'-')? INT;
 	
-	
+/*	
 constraint
 	:	'(' unionSet (',' '..' (',' unionSet)?)? ')'
 	;	
@@ -105,14 +116,24 @@ element
 	| '(' unionSet ')'
 	| 'SIZE' constraint
 	;
+*/
 
-value	
-:
+constraint
+	:	'(' element ')'
+	;
+
+element
+:	  value ( ('<')? '..' ('<')? value)?
+	| 'SIZE' constraint
+	;
+
+value	:
 		bitStringValue
 	|	booleanValue
 //	|	characterStringValue
 	|	LID		//enumerated value
-	|	('+'|'-')? INT ('.' INT?)?
+	|	('+'|'-')? INT ('.' INT?)? 
+//	|	('+'|'-')? INT ('.' INT?)? ( ('E'|'e') ('+'|'-')? INT)?
 	|	'MIN'
 	|	'MAX'
 	;	
@@ -128,6 +149,8 @@ booleanValue
 	;
 
 
+lID	:	LID;
+
 		
 Bstring	:
 	'\'' ('0'|'1')* '\'B'
@@ -135,14 +158,14 @@ Bstring	:
 Hstring	:
 	'\'' ('0'..'9'|'a'..'f'|'A'..'F')* '\'H'
 	;
-
+/*
 
 UnionMark  :  '|'	
 |	'UNION'
 	;
 
 IntersectionMark  :	'^'	|	'INTERSECTION';
-	
+*/	
 	
 UID  :   ('A'..'Z') ('a'..'z'|'A'..'Z'|'0'..'9'|'-')*
     ;
