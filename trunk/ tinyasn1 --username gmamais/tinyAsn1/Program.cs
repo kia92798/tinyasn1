@@ -19,7 +19,7 @@ namespace tinyAsn1
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             asn1Parser parser = new asn1Parser(tokens);
             
-            parser.moduleDefinition();
+            parser.moduleDefinitions();
             //parser.element();
             
             

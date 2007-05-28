@@ -6,37 +6,50 @@ options {
 @header {
 }
 
-moduleDefinition :  	UID			//module id
-			'DEFINITIONS'
-			('EXPLICIT' 'TAGS' | 'IMPLICIT' 'TAGS' | 'AUTOMATIC' 'TAGS')?
-			('EXTENSIBILITY' 'IMPLIED')?
-			'::=' 'BEGIN'
+
+
+moduleDefinitions 
+	:	moduleDefinition*;
+
+moduleDefinition :  	modulereference	definitiveIdentifier?
+			DEFINITIONS
+			(EXPLICIT TAGS | IMPLICIT TAGS | AUTOMATIC TAGS)?
+			(EXTENSIBILITY IMPLIED)?
+			'::=' BEGIN
 			(exports)?
 			(imports)?
 			(
 				typeAssigment
 				|valueAssigment
 			)*
-			'END';
+			END;
+definitiveIdentifier
+	:	'{' definitiveObjIdComponent* '}'
+	;
+		
+definitiveObjIdComponent
+	:	identifier ( '(' INT ')' )?
+	|	INT;		
 			
 exports :
-	 'EXPORTS' 'ALL' ';'
-	| 'EXPORTS' (UID | LID) (',' (UID | LID))*  ';'
+	 EXPORTS ALL ';'
+	| EXPORTS (typereference | valuereference) (',' (typereference | valuereference))*  ';'
 ;			
 
 imports :
-	'IMPORTS' ((UID | LID) (',' (UID | LID))* 'FROM' UID)* ';'	
+	IMPORTS ((typereference | valuereference) (',' (typereference | valuereference))* FROM modulereference)* ';'	
 	;
 	
+	
 valueAssigment	
-	:	LID type '::=' value	
+	:	valuereference type '::=' value	
 	;		
 		
 typeAssigment 
-	:	UID '::=' type
+	:	typereference '::=' type
 	;	
 
-type	: ('[' ('UNIVERSAL' | 'APPLICATION' | 'PRIVATE')? INT  ']' ( 'IMPLICIT' | 'EXPLICIT')? )?
+type	: ('[' (UNIVERSAL | APPLICATION | PRIVATE)? INT  ']' ( IMPLICIT | EXPLICIT)? )?
 (	(
 	    bitStringType
 	    |booleanType
@@ -44,7 +57,7 @@ type	: ('[' ('UNIVERSAL' | 'APPLICATION' | 'PRIVATE')? INT  ']' ( 'IMPLICIT' | '
 	    |integerType
 	    |octetStringType
 	    |realType
-	    |UID			// reference type 
+	    |typereference			// reference type 
 	) constraint?
 	|sequenceOfType
 	|choiceType
@@ -54,40 +67,40 @@ type	: ('[' ('UNIVERSAL' | 'APPLICATION' | 'PRIVATE')? INT  ']' ( 'IMPLICIT' | '
 
 
 bitStringType
-	:	'BIT' 'STRING' ('{' (LID '(' INT ')' (',' LID '(' INT ')' )* )? '}' )?
+	:	BIT STRING ('{' (identifier '(' INT ')' (',' identifier '(' INT ')' )* )? '}' )?
 	;
 	
 booleanType
-	:	'BOOLEAN'
+	:	BOOLEAN
 	;
 	
 enumeratedType 
-	:	'ENUMERATED' '{' (LID ( '(' signedNumber ')')? (',' LID ( '(' signedNumber ')')?)*)? '}'
+	:	ENUMERATED '{' (identifier ( '(' signedNumber ')')? (',' identifier ( '(' signedNumber ')')?)*)? '}'
 	;	
 
 integerType
-	:	'INTEGER' ( '{' (LID '(' signedNumber ')' (',' LID '(' signedNumber ')')*)? '}')?
+	:	INTEGER ( '{' (identifier '(' signedNumber ')' (',' identifier '(' signedNumber ')')*)? '}')?
 	;
 	
 realType 
-	:	'REAL'
+	:	REAL
 	;
 	
 choiceType
-	:	'CHOICE' '{' (LID type (',' LID type)* )? '}'
+	:	CHOICE '{' (identifier type (',' identifier type)* )? '}'
 	;
 
 sequenceType
-	:	'SEQUENCE' '{' (LID type ('OPTIONAL')?  (',' LID type ('OPTIONAL')? )*)?  '}' 
+	:	SEQUENCE '{' (identifier type (OPTIONAL)?  (',' identifier type (OPTIONAL)? )*)?  '}' 
 	;
 	
 sequenceOfType
-	:	'SEQUENCE' ( '(' 'SIZE' constraint ')' )? 'OF' type
+	:	SEQUENCE ( '(' SIZE constraint ')' )? OF type
 	;	
 
 	
 octetStringType
-	:	'OCTET' 'STRING';
+	:	OCTET STRING;
 	
 	
 namedNumber
@@ -124,18 +137,18 @@ constraint
 
 element
 :	  value ( ('<')? '..' ('<')? value)?
-	| 'SIZE' constraint
+	| SIZE constraint
 	;
 
 value	:
 		bitStringValue
 	|	booleanValue
 //	|	characterStringValue
-	|	LID		//enumerated value
+	|	valuereference		
 	|	('+'|'-')? INT ('.' INT?)? 
 //	|	('+'|'-')? INT ('.' INT?)? ( ('E'|'e') ('+'|'-')? INT)?
-	|	'MIN'
-	|	'MAX'
+	|	MIN
+	|	MAX
 	;	
 	
 bitStringValue
@@ -144,20 +157,22 @@ bitStringValue
 	;
 		
 booleanValue
-	:	'TRUE'
-	|	'FALSE'
+	:	TRUE
+	|	FALSE
 	;
 
 
 lID	:	LID;
 
+modulereference	:	UID;
+
+typereference	:	UID;
+	
+valuereference 	:	LID;		
+
+identifier	:	LID;
+
 		
-Bstring	:
-	'\'' ('0'|'1')* '\'B'
-	;
-Hstring	:
-	'\'' ('0'..'9'|'a'..'f'|'A'..'F')* '\'H'
-	;
 /*
 
 UnionMark  :  '|'	
@@ -166,6 +181,76 @@ UnionMark  :  '|'
 
 IntersectionMark  :	'^'	|	'INTERSECTION';
 */	
+
+DEFINITIONS :	 'DEFINITIONS';
+
+EXPLICIT:	 'EXPLICIT';
+
+TAGS 	:	'TAGS';
+
+IMPLICIT:	'IMPLICIT';
+
+AUTOMATIC	:	'AUTOMATIC';
+
+EXTENSIBILITY	:	'EXTENSIBILITY';
+
+IMPLIED :	'IMPLIED';
+
+BEGIN	:	'BEGIN';
+END	:	'END';
+
+EXPORTS	:	'EXPORTS';
+
+ALL	: 	'ALL';
+
+IMPORTS	:	'IMPORTS';
+
+FROM	:	'FROM';
+
+UNIVERSAL	: 'UNIVERSAL';
+APPLICATION	: 'APPLICATION';
+PRIVATE		:'PRIVATE';
+BIT	: 'BIT';
+
+STRING	:	'STRING';
+
+BOOLEAN :	'BOOLEAN';
+
+ENUMERATED	:'ENUMERATED';
+
+INTEGER	:	'INTEGER';
+
+REAL	:	'REAL';
+
+CHOICE	:	'CHOICE';
+
+SEQUENCE	:'SEQUENCE';
+
+OPTIONAL	:'OPTIONAL';
+
+SIZE	:	'SIZE';
+
+OF	:	'OF';
+
+OCTET	:	'OCTET';
+
+MIN	: 	'MIN';
+
+MAX	:	'MAX';
+
+TRUE	:	'TRUE';
+
+FALSE	:	'FALSE';
+
+
+
+Bstring	:
+	'\'' ('0'|'1')* '\'B'
+	;
+Hstring	:
+	'\'' ('0'..'9'|'a'..'f'|'A'..'F')* '\'H'
+	;
+
 	
 UID  :   ('A'..'Z') ('a'..'z'|'A'..'Z'|'0'..'9'|'-')*
     ;
@@ -189,3 +274,4 @@ COMMENT
 LINE_COMMENT
     : '--' ~('\n'|'\r')* '\r'? '\n' {$channel=HIDDEN;}
     ;
+
