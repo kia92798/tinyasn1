@@ -2084,7 +2084,7 @@ HandoverFromUTRANCommand-GSM-r6-IEs ::= SEQUENCE {
 			-- 3> depending on need, final padding (all Ò0Ós) is added to ensure the final result
 			--    comprises a full number of octets
 			single-GSM-Message				SEQUENCE {},
-			gsm-MessageList					SEQUENCE {
+			gsm-MessageList					SEQUENCE {	
 				gsm-Messages					GSM-MessageList
 			}
 		},

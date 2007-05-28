@@ -50,15 +50,14 @@ typeAssigment
 	;	
 
 type	: ('[' (UNIVERSAL | APPLICATION | PRIVATE)? INT  ']' ( IMPLICIT | EXPLICIT)? )?
-(	(
-	    bitStringType
-	    |booleanType
-	    |enumeratedType
-	    |integerType
-	    |octetStringType
-	    |realType
-	    |typereference			// reference type 
-	) constraint?
+(	
+	 bitStringType
+	|booleanType
+	|enumeratedType
+	|integerType singleValueOrRangeConstraint?
+        |realType (singleValueOrRangeConstraint | withComponentsConstraint)?
+	|stringType (sizeConstraint |permittedAlphabetConstraint)*
+	|typereference	constraint?
 	|sequenceOfType
 	|choiceType
         |sequenceType
@@ -86,6 +85,14 @@ realType
 	:	REAL
 	;
 	
+/*
+REAL 	::= [UNIVERSAL 10] SEQUENCE {
+	f mantissa INTEGER (ALL EXCEPT 0),
+	base INTEGER (2|10),
+	exponent INTEGER g
+	}
+*/	
+	
 choiceType
 	:	CHOICE '{' (identifier type (',' identifier type)* )? '}'
 	;
@@ -95,12 +102,25 @@ sequenceType
 	;
 	
 sequenceOfType
-	:	SEQUENCE ( '(' SIZE constraint ')' )? OF type
+	:	SEQUENCE sizeConstraint? OF type
 	;	
 
 	
-octetStringType
-	:	OCTET STRING;
+stringType	:
+	 OCTET STRING
+	|NumericString
+	|PrintableString
+	|VisibleString
+	|IA5String
+	|TeletexString
+	|VideotexString
+	|GraphicString
+	|GeneralString
+	|UniversalString
+	|BMPString
+	|UTF8String
+	;
+	
 	
 	
 namedNumber
@@ -132,18 +152,39 @@ element
 */
 
 constraint
-	:	'(' element ')'
+	:	singleValueOrRangeConstraint
+	|	sizeConstraint
+	|	withComponentsConstraint
+	;
+	
+	
+singleValueOrRangeConstraint 
+	: '(' value ( ('<')? '..' ('<')? value)? ')'
 	;
 
-element
-:	  value ( ('<')? '..' ('<')? value)?
-	| SIZE constraint
-	;
+sizeConstraint
+	:	'(' SIZE singleValueOrRangeConstraint ')'
+	;	
+	
+permittedAlphabetConstraint
+	:	'(' FROM singleValueOrRangeConstraint ')'
+	;	
+	
+withComponentsConstraint 
+	:	'('  WITH COMPONENTS '{'
+			( '...' ',')?
+			namedConstraint  (',' namedConstraint)*
+		'}'
+		')'
+	;	
+
+namedConstraint
+	:	identifier (singleValueOrRangeConstraint)? (PRESENT|ABSENT | OPTIONAL)?;	
 
 value	:
 		bitStringValue
 	|	booleanValue
-//	|	characterStringValue
+	|	StringLiteral
 	|	valuereference		
 	|	('+'|'-')? INT ('.' INT?)? 
 //	|	('+'|'-')? INT ('.' INT?)? ( ('E'|'e') ('+'|'-')? INT)?
@@ -242,7 +283,24 @@ TRUE	:	'TRUE';
 
 FALSE	:	'FALSE';
 
+ABSENT	:	'ABSENT';
 
+PRESENT	:	'PRESENT';
+
+WITH 	:	'WITH';
+COMPONENTS 	:	'COMPONENTS';
+
+NumericString	:'NumericString';
+PrintableString	:'PrintableString';
+VisibleString	:'VisibleString';
+IA5String	:'IA5String';
+TeletexString	:'TeletexString';
+VideotexString	:'VideotexString';
+GraphicString	:'GraphicString';
+GeneralString	:'GeneralString';
+UniversalString	:'UniversalString';
+BMPString	:'BMPString';
+UTF8String	:'UTF8String';
 
 Bstring	:
 	'\'' ('0'|'1')* '\'B'
@@ -251,6 +309,8 @@ Hstring	:
 	'\'' ('0'..'9'|'a'..'f'|'A'..'F')* '\'H'
 	;
 
+
+StringLiteral 	: 	'"' (options {greedy=false;} : .)* '"' ;
 	
 UID  :   ('A'..'Z') ('a'..'z'|'A'..'Z'|'0'..'9'|'-')*
     ;
