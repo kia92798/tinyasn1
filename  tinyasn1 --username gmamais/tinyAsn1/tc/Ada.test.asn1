@@ -15,7 +15,9 @@ SubType ::= SEQUENCE {
     intValue	INTEGER(0 .. 10),
     intArray	SEQUENCE (SIZE (10)) OF INTEGER (0 .. 3),
     enumValue	TypeEnumerated,
-    label	OCTET STRING (SIZE(10..40))
+    label	OCTET STRING (SIZE(10..40)),
+    label2 OCTET STRING  (SIZE (1..10)) (FROM ("A".."Z"))
+
 }
 
 -- A more realistic definition
