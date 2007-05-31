@@ -6,6 +6,13 @@ options {
 @header {
 }
 
+@members {
+public override void ReportError(RecognitionException e) {
+	base.ReportError(e);
+        throw e;
+}
+
+}
 
 
 moduleDefinitions 
@@ -21,6 +28,7 @@ moduleDefinition :  	modulereference	definitiveIdentifier?
 			(
 				typeAssigment
 				|valueAssigment
+				|valueSetAssigment
 			)*
 			END;
 definitiveIdentifier
@@ -33,11 +41,11 @@ definitiveObjIdComponent
 			
 exports :
 	 EXPORTS ALL ';'
-	| EXPORTS (typereference | valuereference) (',' (typereference | valuereference))*  ';'
+	| EXPORTS ((typereference | valuereference) (',' (typereference | valuereference))*)?  ';'
 ;			
 
 imports :
-	IMPORTS ((typereference | valuereference) (',' (typereference | valuereference))* FROM modulereference)* ';'	
+	IMPORTS ((typereference | valuereference) (',' (typereference | valuereference))* FROM modulereference definitiveIdentifier?)*  ';'	
 	;
 	
 	
@@ -45,28 +53,40 @@ valueAssigment
 	:	valuereference type '::=' value	
 	;		
 		
+valueSetAssigment
+	:	typereference type '::=' '{' g_elementSetSpecs '}'
+	;		
 typeAssigment 
 	:	typereference '::=' type
 	;	
 
 type	: ('[' (UNIVERSAL | APPLICATION | PRIVATE)? INT  ']' ( IMPLICIT | EXPLICIT)? )?
 (	
-	 bitStringType
-	|booleanType
-	|enumeratedType
-	|integerType singleValueOrRangeConstraint?
-        |realType (singleValueOrRangeConstraint | withComponentsConstraint)?
-	|stringType (sizeConstraint |permittedAlphabetConstraint)*
-	|typereference	constraint?
+	 NULL
+	|bitStringType
+	|booleanType g_constraint*
+	|enumeratedType g_constraint*
+//	|integerType valueConstraint*
+//        |realType (valueConstraint | withComponentsConstraint)*
+//	|stringType (sizeConstraint |permittedAlphabetConstraint)*
+//	|typereference	constraint*
+	|integerType g_constraint*
+        |realType g_constraint*
+	|stringType g_constraint*
+	|referencedType	g_constraint*
 	|sequenceOfType
 	|choiceType
         |sequenceType
+        | setType
+        | setOfType
+        | objectIdentifier
+        |relativeOID
 )
 	;
 
 
 bitStringType
-	:	BIT STRING ('{' (identifier '(' INT ')' (',' identifier '(' INT ')' )* )? '}' )?
+	:	BIT STRING ('{' (identifier '(' (INT|valuereference) ')' (',' identifier '(' (INT|valuereference) ')' )* )? '}' )?
 	;
 	
 booleanType
@@ -74,11 +94,15 @@ booleanType
 	;
 	
 enumeratedType 
-	:	ENUMERATED '{' (identifier ( '(' signedNumber ')')? (',' identifier ( '(' signedNumber ')')?)*)? '}'
-	;	
+	:	ENUMERATED '{' enumeratedTypeItems  ( ',' '...' g_exceptionSpec? (',' enumeratedTypeItems)? )? '}'
+	;
+
+enumeratedTypeItems 
+	:	identifier ( '(' (signedNumber|valuereference) ')')? (',' identifier ( '(' (signedNumber|valuereference) ')')?)*
+	;		
 
 integerType
-	:	INTEGER ( '{' (identifier '(' signedNumber ')' (',' identifier '(' signedNumber ')')*)? '}')?
+	:	INTEGER ( '{' (identifier '(' (signedNumber|valuereference) ')' (',' identifier '(' (signedNumber|valuereference) ')')*)? '}')?
 	;
 	
 realType 
@@ -94,16 +118,66 @@ REAL 	::= [UNIVERSAL 10] SEQUENCE {
 */	
 	
 choiceType
-	:	CHOICE '{' (identifier type (',' identifier type)* )? '}'
+	:	CHOICE '{' choiceList (',' '...' g_exceptionSpec?  choiceListExtension?   (',' '...')?  )? '}'
 	;
 
-sequenceType
-	:	SEQUENCE '{' (identifier type (OPTIONAL)?  (',' identifier type (OPTIONAL)? )*)?  '}' 
+choiceList
+	:	identifier type (',' identifier type)*
 	;
+
+choiceListExtension
+	:	',' extensionAdditionAlternative (',' extensionAdditionAlternative)*
+	;	
+extensionAdditionAlternative
+	:	 '[[' versionNumber? choiceList ']]'
+		| identifier type
+	;	
+
+sequenceType
+	:	SEQUENCE '{' sequenceOrSetBody?  '}' 
+	;
+	
+setType	:	SET '{' sequenceOrSetBody?  '}' 
+	;	
+	
+sequenceOrSetBody	:
+		  componentTypeList ( ',' seqOrSetExtBody)?
+		| seqOrSetExtBody
+	;
+	
+seqOrSetExtBody
+	:	'...' g_exceptionSpec? (',' extensionAdditionList)? (',' '...'   (',' componentTypeList )? )?
+	;	
+	
+extensionAdditionList
+	:	extensionAddition (',' extensionAddition)*
+	;	
+
+extensionAddition
+	:	componentType
+	       |extensionAdditionGroup
+	;
+extensionAdditionGroup
+	:	'[[' versionNumber? componentTypeList ']]'
+	;
+
+componentTypeList 
+	:	componentType  (',' componentType )*
+	;
+	
+componentType
+	:	identifier type (OPTIONAL | DEFAULT value)?
+	;	
 	
 sequenceOfType
 	:	SEQUENCE sizeConstraint? OF type
-	;	
+	|	SEQUENCE SIZE valueConstraint OF type
+	;
+	
+setOfType
+	:	SET sizeConstraint? OF type
+	|	SET SIZE valueConstraint OF type
+	;		
 
 	
 stringType	:
@@ -121,54 +195,44 @@ stringType	:
 	|UTF8String
 	;
 	
-	
-	
-namedNumber
-	:	LID '(' signedNumber ')'
-	;
+referencedType
+	:	UID ('.' UID)?
+	;	
 
+objectIdentifier
+	:	OBJECT IDENTIFIER;
+
+relativeOID	:	RELATIVE_OID;
+
+	
 signedNumber
 	:	('+'|'-')? INT;
 	
-/*	
-constraint
-	:	'(' unionSet (',' '..' (',' unionSet)?)? ')'
-	;	
-
-unionSet
-	:	intersectionSet (UnionMark intersectionSet)* 	
-	|	'ALL'  'EXCEPT' element 
-	;
-	
-intersectionSet
-	:	element ( 'EXCEPT' element)? (IntersectionMark element ( 'EXCEPT' element)?)*
-	;
-
-element
-:	  value ( ('<')? '..' ('<')? value)?
-	| '(' unionSet ')'
-	| 'SIZE' constraint
-	;
-*/
 
 constraint
-	:	singleValueOrRangeConstraint
+	:	valueConstraint
 	|	sizeConstraint
 	|	withComponentsConstraint
+	|	subTypeConstraint
 	;
 	
+
 	
-singleValueOrRangeConstraint 
+valueConstraint 
 	: '(' value ( ('<')? '..' ('<')? value)? ')'
 	;
 
 sizeConstraint
-	:	'(' SIZE singleValueOrRangeConstraint ')'
+	:	'(' SIZE valueConstraint ')'
 	;	
 	
 permittedAlphabetConstraint
-	:	'(' FROM singleValueOrRangeConstraint ')'
-	;	
+	:	'(' FROM valueConstraint ')'
+	;
+	
+subTypeConstraint 
+	:	'(' type ')'
+	;		
 	
 withComponentsConstraint 
 	:	'('  WITH COMPONENTS '{'
@@ -179,11 +243,14 @@ withComponentsConstraint
 	;	
 
 namedConstraint
-	:	identifier (singleValueOrRangeConstraint)? (PRESENT|ABSENT | OPTIONAL)?;	
+	:	identifier (valueConstraint)? (PRESENT|ABSENT | OPTIONAL)?;	
 
 value	:
-		bitStringValue
-	|	booleanValue
+		BitStringLiteral
+	|	bitStringValue
+	|	OctectStringLiteral
+	|	TRUE
+	|	FALSE
 	|	StringLiteral
 	|	valuereference		
 	|	('+'|'-')? INT ('.' INT?)? 
@@ -193,14 +260,8 @@ value	:
 	;	
 	
 bitStringValue
-	:	Bstring
-	|	Hstring
-	;
-		
-booleanValue
-	:	TRUE
-	|	FALSE
-	;
+	:	'{' identifier (',' identifier)* '}'
+	;		
 
 
 lID	:	LID;
@@ -213,15 +274,89 @@ valuereference 	:	LID;
 
 identifier	:	LID;
 
-		
-/*
+versionNumber	:	INT;
 
-UnionMark  :  '|'	
-|	'UNION'
+
+
+/* ***************************************************************************************************************** */
+/* ***************************************************************************************************************** */
+/* ***************************************************************************************************************** */
+/* ***************************************************************************************************************** */
+g_constraint 
+	:	'(' g_subtypeConstraint  g_exceptionSpec? ')'
 	;
 
-IntersectionMark  :	'^'	|	'INTERSECTION';
-*/	
+g_exceptionSpec 
+	:	'!' 
+	(
+		 signedNumber
+		|valuereference
+				|type ':' value
+	)
+	;
+
+
+g_subtypeConstraint
+	: g_elementSetSpecs;
+
+g_elementSetSpecs
+	:	g_unionElement (',' '...' ( ',' g_unionElement)?)?;
+	
+g_unionElement
+	:	g_intersectionElement (UnionMark g_intersectionElement)*
+	|	ALL EXCEPT g_elementSetSpec
+	;	
+	
+g_intersectionElement
+	:	g_elementSetSpec (EXCEPT g_elementSetSpec)? (IntersectionMark g_elementSetSpec (EXCEPT g_elementSetSpec)?)*
+	;	
+
+g_elementSetSpec
+	: g_valueElement
+	| g_containedSubtype
+	| g_SizeConstraint
+	| g_permittedAlphabet
+	| g_innerTypeConstraints
+	| g_patternConstraint
+	| '(' g_elementSetSpecs ')'
+	;	
+	
+g_valueElement
+	: value ( ('<')? '..' ('<')? value)?	
+	;
+g_containedSubtype: INCLUDES? type;
+
+g_SizeConstraint : SIZE g_constraint;
+
+g_permittedAlphabet : FROM g_constraint;
+
+g_innerTypeConstraints 
+	: WITH COMPONENT g_constraint
+	| WITH COMPONENTS '{'
+			( '...' ',')?
+			g_namedConstraint  (',' g_namedConstraint)*
+		'}'
+	;
+
+
+g_namedConstraint
+	:	identifier (g_constraint)? (PRESENT|ABSENT | OPTIONAL)?;	
+
+g_patternConstraint : PATTERN value;
+	
+
+/* ***************************************************************************************************************** */
+/* ***************************************************************************************************************** */
+/* ***************************************************************************************************************** */
+/* ***************************************************************************************************************** */
+/* ***************************************************************************************************************** */
+		
+
+
+UnionMark  :  '|'|'UNION';
+
+IntersectionMark  :	'^' | 'INTERSECTION';
+	
 
 DEFINITIONS :	 'DEFINITIONS';
 
@@ -288,8 +423,14 @@ ABSENT	:	'ABSENT';
 PRESENT	:	'PRESENT';
 
 WITH 	:	'WITH';
-COMPONENTS 	:	'COMPONENTS';
-
+COMPONENT	: 'COMPONENT';		
+COMPONENTS 	: 'COMPONENTS';
+DEFAULT 	: 'DEFAULT';
+NULL		:'NULL';
+PATTERN		:'PATTERN';
+OBJECT 		:'OBJECT';
+IDENTIFIER	:'IDENTIFIER';
+RELATIVE_OID	:'RELATIVE-OID';
 NumericString	:'NumericString';
 PrintableString	:'PrintableString';
 VisibleString	:'VisibleString';
@@ -301,17 +442,24 @@ GeneralString	:'GeneralString';
 UniversalString	:'UniversalString';
 BMPString	:'BMPString';
 UTF8String	:'UTF8String';
+INCLUDES	:'INCLUDES';
+EXCEPT		:'EXCEPT';
 
-Bstring	:
+SET		:'SET';
+
+BitStringLiteral	:
 	'\'' ('0'|'1')* '\'B'
 	;
-Hstring	:
+OctectStringLiteral	:
 	'\'' ('0'..'9'|'a'..'f'|'A'..'F')* '\'H'
 	;
 
 
-StringLiteral 	: 	'"' (options {greedy=false;} : .)* '"' ;
-	
+StringLiteral 	: 	STR+ ;
+
+fragment
+STR 	:	'"' ( options {greedy=false;} : .)* '"' ;
+			
 UID  :   ('A'..'Z') ('a'..'z'|'A'..'Z'|'0'..'9'|'-')*
     ;
 
@@ -331,7 +479,9 @@ COMMENT
     :   '/*' ( options {greedy=false;} : . )* '*/' {$channel=HIDDEN;}
     ;
 
-LINE_COMMENT
-    : '--' ~('\n'|'\r')* '\r'? '\n' {$channel=HIDDEN;}
+COMMENT2
+    :   '--' ( options {greedy=false;} : . )* ('--'|'\r'?'\n') {$channel=HIDDEN;}
     ;
+
+
 

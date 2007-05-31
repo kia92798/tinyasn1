@@ -17,7 +17,6 @@ SubType ::= SEQUENCE {
     enumValue	TypeEnumerated,
     label	OCTET STRING (SIZE(10..40)),
     label2 OCTET STRING  (SIZE (1..10)) (FROM ("A".."Z"))
-
 }
 
 -- A more realistic definition
