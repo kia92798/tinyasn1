@@ -97,8 +97,8 @@ namespace tinyAsn1
 
     public class Constraint
     {
-        UnionSet set;
-        UnionSet addSet;
+//        UnionSet set;
+        //UnionSet addSet;
     }
 
     public class UnionSet
@@ -122,7 +122,12 @@ namespace tinyAsn1
             Set
         }
 
-        ElementType elementType;
+        ElementType elementType = ElementType.Set;
+
+        public ElementType ElementType1
+        {
+            get { return elementType; }
+        }
 
         Asn1Value singleValue;
         public Element(Asn1Value v)

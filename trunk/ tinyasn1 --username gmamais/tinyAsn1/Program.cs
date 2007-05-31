@@ -11,15 +11,23 @@ namespace tinyAsn1
 {
     class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
             string inputFileName = args[0];
             ICharStream input = new ANTLRFileStream(inputFileName);
             asn1Lexer lexer = new asn1Lexer(input);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             asn1Parser parser = new asn1Parser(tokens);
-            
-            parser.moduleDefinitions();
+
+            try
+            {
+                parser.moduleDefinitions();
+
+                return 0;
+            } catch(RecognitionException ) {
+
+                return 1;
+            }
             //parser.element();
             
             

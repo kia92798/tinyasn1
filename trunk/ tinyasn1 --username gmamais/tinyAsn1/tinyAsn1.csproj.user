@@ -1,5 +1,5 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <StartArguments>C:\prj\DataModeling\tinyAsn1\tinyAsn1\tc\Ada.test.asn1</StartArguments>
+    <StartArguments>C:\prj\ESA\ASN.1.TestCases\05-enum-SE.asn1</StartArguments>
   </PropertyGroup>
 </Project>
