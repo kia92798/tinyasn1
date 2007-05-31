@@ -63,7 +63,7 @@ typeAssigment
 type	: ('[' (UNIVERSAL | APPLICATION | PRIVATE)? INT  ']' ( IMPLICIT | EXPLICIT)? )?
 (	
 	 NULL
-	|bitStringType
+	|bitStringType g_constraint*
 	|booleanType g_constraint*
 	|enumeratedType g_constraint*
 //	|integerType valueConstraint*
@@ -74,12 +74,12 @@ type	: ('[' (UNIVERSAL | APPLICATION | PRIVATE)? INT  ']' ( IMPLICIT | EXPLICIT)
         |realType g_constraint*
 	|stringType g_constraint*
 	|referencedType	g_constraint*
-	|sequenceOfType
+	|sequenceOfType 
 	|choiceType
-        |sequenceType
+        |sequenceType g_constraint*	//WITH COMPONENTS
         | setType
         | setOfType
-        | objectIdentifier
+        | objectIdentifier g_constraint*
         |relativeOID
 )
 	;
@@ -170,13 +170,13 @@ componentType
 	;	
 	
 sequenceOfType
-	:	SEQUENCE sizeConstraint? OF type
-	|	SEQUENCE SIZE valueConstraint OF type
+	:	SEQUENCE sizeConstraint? OF (identifier)? type
+	|	SEQUENCE SIZE valueConstraint OF (identifier)? type
 	;
 	
 setOfType
-	:	SET sizeConstraint? OF type
-	|	SET SIZE valueConstraint OF type
+	:	SET sizeConstraint? OF (identifier)? type
+	|	SET SIZE valueConstraint OF (identifier)? type
 	;		
 
 	
@@ -257,12 +257,27 @@ value	:
 //	|	('+'|'-')? INT ('.' INT?)? ( ('E'|'e') ('+'|'-')? INT)?
 	|	MIN
 	|	MAX
+	|	objectIdentifierValue
 	;	
 	
 bitStringValue
 	:	'{' identifier (',' identifier)* '}'
-	;		
+	;
+	
+objectIdentifierValue
+	:	'{' objectIdentifierComponent+  '}'
+	;	
+objectIdentifierComponent
+	:	identifier ('(' (INT | definedValue) ')' )?	//3 cases identifier or valuereference or identifier(number)
+	| 	INT
+	|	modulereference '.' valuereference	//external ref
+	;
 
+
+definedValue
+	:	valuereference
+		| modulereference '.' valuereference
+	;
 
 lID	:	LID;
 
@@ -468,9 +483,6 @@ LID  :   ('a'..'z') ('a'..'z'|'A'..'Z'|'0'..'9'|'-')*
 
 INT	:	( '0' | ('1'..'9') ('0'..'9')*);
 
-//Real
-//    :   ('+'|'-')?('0'..'9')+ '.' ('0'..'9')+
-//	;
 
 WS  :   (' ' | '\t' | '\r' | '\n')+ {$channel=HIDDEN;}
     ;    
