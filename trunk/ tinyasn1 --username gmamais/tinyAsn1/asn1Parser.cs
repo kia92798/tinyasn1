@@ -1,4 +1,4 @@
-// $ANTLR 3.0 C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g 2007-05-31 14:30:30
+// $ANTLR 3.0 C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g 2007-05-31 16:10:52
 
 
 
@@ -1178,13 +1178,13 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start type
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:63:1: type : ( '[' ( UNIVERSAL | APPLICATION | PRIVATE )? INT ']' ( IMPLICIT | EXPLICIT )? )? ( NULL | bitStringType | booleanType ( g_constraint )* | enumeratedType ( g_constraint )* | integerType ( g_constraint )* | realType ( g_constraint )* | stringType ( g_constraint )* | referencedType ( g_constraint )* | sequenceOfType | choiceType | sequenceType | setType | setOfType | objectIdentifier | relativeOID ) ;
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:63:1: type : ( '[' ( UNIVERSAL | APPLICATION | PRIVATE )? INT ']' ( IMPLICIT | EXPLICIT )? )? ( NULL | bitStringType ( g_constraint )* | booleanType ( g_constraint )* | enumeratedType ( g_constraint )* | integerType ( g_constraint )* | realType ( g_constraint )* | stringType ( g_constraint )* | referencedType ( g_constraint )* | sequenceOfType | choiceType | sequenceType ( g_constraint )* | setType | setOfType | objectIdentifier ( g_constraint )* | relativeOID ) ;
     public void type() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:63:8: ( ( '[' ( UNIVERSAL | APPLICATION | PRIVATE )? INT ']' ( IMPLICIT | EXPLICIT )? )? ( NULL | bitStringType | booleanType ( g_constraint )* | enumeratedType ( g_constraint )* | integerType ( g_constraint )* | realType ( g_constraint )* | stringType ( g_constraint )* | referencedType ( g_constraint )* | sequenceOfType | choiceType | sequenceType | setType | setOfType | objectIdentifier | relativeOID ) )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:63:8: ( '[' ( UNIVERSAL | APPLICATION | PRIVATE )? INT ']' ( IMPLICIT | EXPLICIT )? )? ( NULL | bitStringType | booleanType ( g_constraint )* | enumeratedType ( g_constraint )* | integerType ( g_constraint )* | realType ( g_constraint )* | stringType ( g_constraint )* | referencedType ( g_constraint )* | sequenceOfType | choiceType | sequenceType | setType | setOfType | objectIdentifier | relativeOID )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:63:8: ( ( '[' ( UNIVERSAL | APPLICATION | PRIVATE )? INT ']' ( IMPLICIT | EXPLICIT )? )? ( NULL | bitStringType ( g_constraint )* | booleanType ( g_constraint )* | enumeratedType ( g_constraint )* | integerType ( g_constraint )* | realType ( g_constraint )* | stringType ( g_constraint )* | referencedType ( g_constraint )* | sequenceOfType | choiceType | sequenceType ( g_constraint )* | setType | setOfType | objectIdentifier ( g_constraint )* | relativeOID ) )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:63:8: ( '[' ( UNIVERSAL | APPLICATION | PRIVATE )? INT ']' ( IMPLICIT | EXPLICIT )? )? ( NULL | bitStringType ( g_constraint )* | booleanType ( g_constraint )* | enumeratedType ( g_constraint )* | integerType ( g_constraint )* | realType ( g_constraint )* | stringType ( g_constraint )* | referencedType ( g_constraint )* | sequenceOfType | choiceType | sequenceType ( g_constraint )* | setType | setOfType | objectIdentifier ( g_constraint )* | relativeOID )
             {
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:63:8: ( '[' ( UNIVERSAL | APPLICATION | PRIVATE )? INT ']' ( IMPLICIT | EXPLICIT )? )?
             	int alt23 = 2;
@@ -1270,38 +1270,38 @@ public class asn1Parser : Parser
             	
             	}
 
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:64:1: ( NULL | bitStringType | booleanType ( g_constraint )* | enumeratedType ( g_constraint )* | integerType ( g_constraint )* | realType ( g_constraint )* | stringType ( g_constraint )* | referencedType ( g_constraint )* | sequenceOfType | choiceType | sequenceType | setType | setOfType | objectIdentifier | relativeOID )
-            	int alt30 = 15;
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:64:1: ( NULL | bitStringType ( g_constraint )* | booleanType ( g_constraint )* | enumeratedType ( g_constraint )* | integerType ( g_constraint )* | realType ( g_constraint )* | stringType ( g_constraint )* | referencedType ( g_constraint )* | sequenceOfType | choiceType | sequenceType ( g_constraint )* | setType | setOfType | objectIdentifier ( g_constraint )* | relativeOID )
+            	int alt33 = 15;
             	switch ( input.LA(1) ) 
             	{
             	case NULL:
             		{
-            	    alt30 = 1;
+            	    alt33 = 1;
             	    }
             	    break;
             	case BIT:
             		{
-            	    alt30 = 2;
+            	    alt33 = 2;
             	    }
             	    break;
             	case BOOLEAN:
             		{
-            	    alt30 = 3;
+            	    alt33 = 3;
             	    }
             	    break;
             	case ENUMERATED:
             		{
-            	    alt30 = 4;
+            	    alt33 = 4;
             	    }
             	    break;
             	case INTEGER:
             		{
-            	    alt30 = 5;
+            	    alt33 = 5;
             	    }
             	    break;
             	case REAL:
             		{
-            	    alt30 = 6;
+            	    alt33 = 6;
             	    }
             	    break;
             	case OCTET:
@@ -1317,79 +1317,79 @@ public class asn1Parser : Parser
             	case BMPString:
             	case UTF8String:
             		{
-            	    alt30 = 7;
+            	    alt33 = 7;
             	    }
             	    break;
             	case UID:
             		{
-            	    alt30 = 8;
+            	    alt33 = 8;
             	    }
             	    break;
             	case SEQUENCE:
             		{
-            	    int LA30_9 = input.LA(2);
+            	    int LA33_9 = input.LA(2);
             	    
-            	    if ( (LA30_9 == 74) )
+            	    if ( ((LA33_9 >= OF && LA33_9 <= SIZE) || LA33_9 == 76) )
             	    {
-            	        alt30 = 11;
+            	        alt33 = 9;
             	    }
-            	    else if ( ((LA30_9 >= OF && LA30_9 <= SIZE) || LA30_9 == 76) )
+            	    else if ( (LA33_9 == 74) )
             	    {
-            	        alt30 = 9;
+            	        alt33 = 11;
             	    }
             	    else 
             	    {
-            	        NoViableAltException nvae_d30s9 =
-            	            new NoViableAltException("64:1: ( NULL | bitStringType | booleanType ( g_constraint )* | enumeratedType ( g_constraint )* | integerType ( g_constraint )* | realType ( g_constraint )* | stringType ( g_constraint )* | referencedType ( g_constraint )* | sequenceOfType | choiceType | sequenceType | setType | setOfType | objectIdentifier | relativeOID )", 30, 9, input);
+            	        NoViableAltException nvae_d33s9 =
+            	            new NoViableAltException("64:1: ( NULL | bitStringType ( g_constraint )* | booleanType ( g_constraint )* | enumeratedType ( g_constraint )* | integerType ( g_constraint )* | realType ( g_constraint )* | stringType ( g_constraint )* | referencedType ( g_constraint )* | sequenceOfType | choiceType | sequenceType ( g_constraint )* | setType | setOfType | objectIdentifier ( g_constraint )* | relativeOID )", 33, 9, input);
             	    
-            	        throw nvae_d30s9;
+            	        throw nvae_d33s9;
             	    }
             	    }
             	    break;
             	case CHOICE:
             		{
-            	    alt30 = 10;
+            	    alt33 = 10;
             	    }
             	    break;
             	case SET:
             		{
-            	    int LA30_11 = input.LA(2);
+            	    int LA33_11 = input.LA(2);
             	    
-            	    if ( (LA30_11 == 74) )
+            	    if ( (LA33_11 == 74) )
             	    {
-            	        alt30 = 12;
+            	        alt33 = 12;
             	    }
-            	    else if ( ((LA30_11 >= OF && LA30_11 <= SIZE) || LA30_11 == 76) )
+            	    else if ( ((LA33_11 >= OF && LA33_11 <= SIZE) || LA33_11 == 76) )
             	    {
-            	        alt30 = 13;
+            	        alt33 = 13;
             	    }
             	    else 
             	    {
-            	        NoViableAltException nvae_d30s11 =
-            	            new NoViableAltException("64:1: ( NULL | bitStringType | booleanType ( g_constraint )* | enumeratedType ( g_constraint )* | integerType ( g_constraint )* | realType ( g_constraint )* | stringType ( g_constraint )* | referencedType ( g_constraint )* | sequenceOfType | choiceType | sequenceType | setType | setOfType | objectIdentifier | relativeOID )", 30, 11, input);
+            	        NoViableAltException nvae_d33s11 =
+            	            new NoViableAltException("64:1: ( NULL | bitStringType ( g_constraint )* | booleanType ( g_constraint )* | enumeratedType ( g_constraint )* | integerType ( g_constraint )* | realType ( g_constraint )* | stringType ( g_constraint )* | referencedType ( g_constraint )* | sequenceOfType | choiceType | sequenceType ( g_constraint )* | setType | setOfType | objectIdentifier ( g_constraint )* | relativeOID )", 33, 11, input);
             	    
-            	        throw nvae_d30s11;
+            	        throw nvae_d33s11;
             	    }
             	    }
             	    break;
             	case OBJECT:
             		{
-            	    alt30 = 14;
+            	    alt33 = 14;
             	    }
             	    break;
             	case RELATIVE_OID:
             		{
-            	    alt30 = 15;
+            	    alt33 = 15;
             	    }
             	    break;
             		default:
-            		    NoViableAltException nvae_d30s0 =
-            		        new NoViableAltException("64:1: ( NULL | bitStringType | booleanType ( g_constraint )* | enumeratedType ( g_constraint )* | integerType ( g_constraint )* | realType ( g_constraint )* | stringType ( g_constraint )* | referencedType ( g_constraint )* | sequenceOfType | choiceType | sequenceType | setType | setOfType | objectIdentifier | relativeOID )", 30, 0, input);
+            		    NoViableAltException nvae_d33s0 =
+            		        new NoViableAltException("64:1: ( NULL | bitStringType ( g_constraint )* | booleanType ( g_constraint )* | enumeratedType ( g_constraint )* | integerType ( g_constraint )* | realType ( g_constraint )* | stringType ( g_constraint )* | referencedType ( g_constraint )* | sequenceOfType | choiceType | sequenceType ( g_constraint )* | setType | setOfType | objectIdentifier ( g_constraint )* | relativeOID )", 33, 0, input);
             	
-            		    throw nvae_d30s0;
+            		    throw nvae_d33s0;
             	}
             	
-            	switch (alt30) 
+            	switch (alt33) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:65:3: NULL
@@ -1399,23 +1399,13 @@ public class asn1Parser : Parser
             	        }
             	        break;
             	    case 2 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:66:3: bitStringType
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:66:3: bitStringType ( g_constraint )*
             	        {
             	        	PushFollow(FOLLOW_bitStringType_in_type404);
             	        	bitStringType();
             	        	followingStackPointer_--;
 
-            	        
-            	        }
-            	        break;
-            	    case 3 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:67:3: booleanType ( g_constraint )*
-            	        {
-            	        	PushFollow(FOLLOW_booleanType_in_type408);
-            	        	booleanType();
-            	        	followingStackPointer_--;
-
-            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:67:15: ( g_constraint )*
+            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:66:17: ( g_constraint )*
             	        	do 
             	        	{
             	        	    int alt24 = 2;
@@ -1430,9 +1420,9 @@ public class asn1Parser : Parser
             	        	    switch (alt24) 
             	        		{
             	        			case 1 :
-            	        			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:67:15: g_constraint
+            	        			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:66:17: g_constraint
             	        			    {
-            	        			    	PushFollow(FOLLOW_g_constraint_in_type410);
+            	        			    	PushFollow(FOLLOW_g_constraint_in_type406);
             	        			    	g_constraint();
             	        			    	followingStackPointer_--;
 
@@ -1451,14 +1441,14 @@ public class asn1Parser : Parser
             	        
             	        }
             	        break;
-            	    case 4 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:68:3: enumeratedType ( g_constraint )*
+            	    case 3 :
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:67:3: booleanType ( g_constraint )*
             	        {
-            	        	PushFollow(FOLLOW_enumeratedType_in_type415);
-            	        	enumeratedType();
+            	        	PushFollow(FOLLOW_booleanType_in_type411);
+            	        	booleanType();
             	        	followingStackPointer_--;
 
-            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:68:18: ( g_constraint )*
+            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:67:15: ( g_constraint )*
             	        	do 
             	        	{
             	        	    int alt25 = 2;
@@ -1473,9 +1463,9 @@ public class asn1Parser : Parser
             	        	    switch (alt25) 
             	        		{
             	        			case 1 :
-            	        			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:68:18: g_constraint
+            	        			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:67:15: g_constraint
             	        			    {
-            	        			    	PushFollow(FOLLOW_g_constraint_in_type417);
+            	        			    	PushFollow(FOLLOW_g_constraint_in_type413);
             	        			    	g_constraint();
             	        			    	followingStackPointer_--;
 
@@ -1494,14 +1484,14 @@ public class asn1Parser : Parser
             	        
             	        }
             	        break;
-            	    case 5 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:73:3: integerType ( g_constraint )*
+            	    case 4 :
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:68:3: enumeratedType ( g_constraint )*
             	        {
-            	        	PushFollow(FOLLOW_integerType_in_type426);
-            	        	integerType();
+            	        	PushFollow(FOLLOW_enumeratedType_in_type418);
+            	        	enumeratedType();
             	        	followingStackPointer_--;
 
-            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:73:15: ( g_constraint )*
+            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:68:18: ( g_constraint )*
             	        	do 
             	        	{
             	        	    int alt26 = 2;
@@ -1516,9 +1506,9 @@ public class asn1Parser : Parser
             	        	    switch (alt26) 
             	        		{
             	        			case 1 :
-            	        			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:73:15: g_constraint
+            	        			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:68:18: g_constraint
             	        			    {
-            	        			    	PushFollow(FOLLOW_g_constraint_in_type428);
+            	        			    	PushFollow(FOLLOW_g_constraint_in_type420);
             	        			    	g_constraint();
             	        			    	followingStackPointer_--;
 
@@ -1537,14 +1527,14 @@ public class asn1Parser : Parser
             	        
             	        }
             	        break;
-            	    case 6 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:74:10: realType ( g_constraint )*
+            	    case 5 :
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:73:3: integerType ( g_constraint )*
             	        {
-            	        	PushFollow(FOLLOW_realType_in_type440);
-            	        	realType();
+            	        	PushFollow(FOLLOW_integerType_in_type429);
+            	        	integerType();
             	        	followingStackPointer_--;
 
-            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:74:19: ( g_constraint )*
+            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:73:15: ( g_constraint )*
             	        	do 
             	        	{
             	        	    int alt27 = 2;
@@ -1559,9 +1549,9 @@ public class asn1Parser : Parser
             	        	    switch (alt27) 
             	        		{
             	        			case 1 :
-            	        			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:74:19: g_constraint
+            	        			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:73:15: g_constraint
             	        			    {
-            	        			    	PushFollow(FOLLOW_g_constraint_in_type442);
+            	        			    	PushFollow(FOLLOW_g_constraint_in_type431);
             	        			    	g_constraint();
             	        			    	followingStackPointer_--;
 
@@ -1580,14 +1570,14 @@ public class asn1Parser : Parser
             	        
             	        }
             	        break;
-            	    case 7 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:75:3: stringType ( g_constraint )*
+            	    case 6 :
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:74:10: realType ( g_constraint )*
             	        {
-            	        	PushFollow(FOLLOW_stringType_in_type447);
-            	        	stringType();
+            	        	PushFollow(FOLLOW_realType_in_type443);
+            	        	realType();
             	        	followingStackPointer_--;
 
-            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:75:14: ( g_constraint )*
+            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:74:19: ( g_constraint )*
             	        	do 
             	        	{
             	        	    int alt28 = 2;
@@ -1602,9 +1592,9 @@ public class asn1Parser : Parser
             	        	    switch (alt28) 
             	        		{
             	        			case 1 :
-            	        			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:75:14: g_constraint
+            	        			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:74:19: g_constraint
             	        			    {
-            	        			    	PushFollow(FOLLOW_g_constraint_in_type449);
+            	        			    	PushFollow(FOLLOW_g_constraint_in_type445);
             	        			    	g_constraint();
             	        			    	followingStackPointer_--;
 
@@ -1623,14 +1613,14 @@ public class asn1Parser : Parser
             	        
             	        }
             	        break;
-            	    case 8 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:76:3: referencedType ( g_constraint )*
+            	    case 7 :
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:75:3: stringType ( g_constraint )*
             	        {
-            	        	PushFollow(FOLLOW_referencedType_in_type454);
-            	        	referencedType();
+            	        	PushFollow(FOLLOW_stringType_in_type450);
+            	        	stringType();
             	        	followingStackPointer_--;
 
-            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:76:18: ( g_constraint )*
+            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:75:14: ( g_constraint )*
             	        	do 
             	        	{
             	        	    int alt29 = 2;
@@ -1645,9 +1635,9 @@ public class asn1Parser : Parser
             	        	    switch (alt29) 
             	        		{
             	        			case 1 :
-            	        			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:76:18: g_constraint
+            	        			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:75:14: g_constraint
             	        			    {
-            	        			    	PushFollow(FOLLOW_g_constraint_in_type456);
+            	        			    	PushFollow(FOLLOW_g_constraint_in_type452);
             	        			    	g_constraint();
             	        			    	followingStackPointer_--;
 
@@ -1666,10 +1656,53 @@ public class asn1Parser : Parser
             	        
             	        }
             	        break;
+            	    case 8 :
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:76:3: referencedType ( g_constraint )*
+            	        {
+            	        	PushFollow(FOLLOW_referencedType_in_type457);
+            	        	referencedType();
+            	        	followingStackPointer_--;
+
+            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:76:18: ( g_constraint )*
+            	        	do 
+            	        	{
+            	        	    int alt30 = 2;
+            	        	    int LA30_0 = input.LA(1);
+            	        	    
+            	        	    if ( (LA30_0 == 76) )
+            	        	    {
+            	        	        alt30 = 1;
+            	        	    }
+            	        	    
+            	        	
+            	        	    switch (alt30) 
+            	        		{
+            	        			case 1 :
+            	        			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:76:18: g_constraint
+            	        			    {
+            	        			    	PushFollow(FOLLOW_g_constraint_in_type459);
+            	        			    	g_constraint();
+            	        			    	followingStackPointer_--;
+
+            	        			    
+            	        			    }
+            	        			    break;
+            	        	
+            	        			default:
+            	        			    goto loop30;
+            	        	    }
+            	        	} while (true);
+            	        	
+            	        	loop30:
+            	        		;	// Stops C# compiler whinging that label 'loop30' has no statements
+
+            	        
+            	        }
+            	        break;
             	    case 9 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:77:3: sequenceOfType
             	        {
-            	        	PushFollow(FOLLOW_sequenceOfType_in_type461);
+            	        	PushFollow(FOLLOW_sequenceOfType_in_type464);
             	        	sequenceOfType();
             	        	followingStackPointer_--;
 
@@ -1679,7 +1712,7 @@ public class asn1Parser : Parser
             	    case 10 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:78:3: choiceType
             	        {
-            	        	PushFollow(FOLLOW_choiceType_in_type465);
+            	        	PushFollow(FOLLOW_choiceType_in_type469);
             	        	choiceType();
             	        	followingStackPointer_--;
 
@@ -1687,11 +1720,44 @@ public class asn1Parser : Parser
             	        }
             	        break;
             	    case 11 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:79:10: sequenceType
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:79:10: sequenceType ( g_constraint )*
             	        {
-            	        	PushFollow(FOLLOW_sequenceType_in_type476);
+            	        	PushFollow(FOLLOW_sequenceType_in_type480);
             	        	sequenceType();
             	        	followingStackPointer_--;
+
+            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:79:23: ( g_constraint )*
+            	        	do 
+            	        	{
+            	        	    int alt31 = 2;
+            	        	    int LA31_0 = input.LA(1);
+            	        	    
+            	        	    if ( (LA31_0 == 76) )
+            	        	    {
+            	        	        alt31 = 1;
+            	        	    }
+            	        	    
+            	        	
+            	        	    switch (alt31) 
+            	        		{
+            	        			case 1 :
+            	        			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:79:23: g_constraint
+            	        			    {
+            	        			    	PushFollow(FOLLOW_g_constraint_in_type482);
+            	        			    	g_constraint();
+            	        			    	followingStackPointer_--;
+
+            	        			    
+            	        			    }
+            	        			    break;
+            	        	
+            	        			default:
+            	        			    goto loop31;
+            	        	    }
+            	        	} while (true);
+            	        	
+            	        	loop31:
+            	        		;	// Stops C# compiler whinging that label 'loop31' has no statements
 
             	        
             	        }
@@ -1699,7 +1765,7 @@ public class asn1Parser : Parser
             	    case 12 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:80:11: setType
             	        {
-            	        	PushFollow(FOLLOW_setType_in_type488);
+            	        	PushFollow(FOLLOW_setType_in_type496);
             	        	setType();
             	        	followingStackPointer_--;
 
@@ -1709,7 +1775,7 @@ public class asn1Parser : Parser
             	    case 13 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:81:11: setOfType
             	        {
-            	        	PushFollow(FOLLOW_setOfType_in_type500);
+            	        	PushFollow(FOLLOW_setOfType_in_type508);
             	        	setOfType();
             	        	followingStackPointer_--;
 
@@ -1717,11 +1783,44 @@ public class asn1Parser : Parser
             	        }
             	        break;
             	    case 14 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:82:11: objectIdentifier
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:82:11: objectIdentifier ( g_constraint )*
             	        {
-            	        	PushFollow(FOLLOW_objectIdentifier_in_type512);
+            	        	PushFollow(FOLLOW_objectIdentifier_in_type520);
             	        	objectIdentifier();
             	        	followingStackPointer_--;
+
+            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:82:28: ( g_constraint )*
+            	        	do 
+            	        	{
+            	        	    int alt32 = 2;
+            	        	    int LA32_0 = input.LA(1);
+            	        	    
+            	        	    if ( (LA32_0 == 76) )
+            	        	    {
+            	        	        alt32 = 1;
+            	        	    }
+            	        	    
+            	        	
+            	        	    switch (alt32) 
+            	        		{
+            	        			case 1 :
+            	        			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:82:28: g_constraint
+            	        			    {
+            	        			    	PushFollow(FOLLOW_g_constraint_in_type522);
+            	        			    	g_constraint();
+            	        			    	followingStackPointer_--;
+
+            	        			    
+            	        			    }
+            	        			    break;
+            	        	
+            	        			default:
+            	        			    goto loop32;
+            	        	    }
+            	        	} while (true);
+            	        	
+            	        	loop32:
+            	        		;	// Stops C# compiler whinging that label 'loop32' has no statements
 
             	        
             	        }
@@ -1729,7 +1828,7 @@ public class asn1Parser : Parser
             	    case 15 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:83:10: relativeOID
             	        {
-            	        	PushFollow(FOLLOW_relativeOID_in_type523);
+            	        	PushFollow(FOLLOW_relativeOID_in_type534);
             	        	relativeOID();
             	        	followingStackPointer_--;
 
@@ -1765,72 +1864,72 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:89:4: ( BIT STRING ( '{' ( identifier '(' ( INT | valuereference ) ')' ( ',' identifier '(' ( INT | valuereference ) ')' )* )? '}' )? )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:89:4: BIT STRING ( '{' ( identifier '(' ( INT | valuereference ) ')' ( ',' identifier '(' ( INT | valuereference ) ')' )* )? '}' )?
             {
-            	Match(input,BIT,FOLLOW_BIT_in_bitStringType537); 
-            	Match(input,STRING,FOLLOW_STRING_in_bitStringType539); 
+            	Match(input,BIT,FOLLOW_BIT_in_bitStringType548); 
+            	Match(input,STRING,FOLLOW_STRING_in_bitStringType550); 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:89:15: ( '{' ( identifier '(' ( INT | valuereference ) ')' ( ',' identifier '(' ( INT | valuereference ) ')' )* )? '}' )?
-            	int alt35 = 2;
-            	int LA35_0 = input.LA(1);
+            	int alt38 = 2;
+            	int LA38_0 = input.LA(1);
             	
-            	if ( (LA35_0 == 74) )
+            	if ( (LA38_0 == 74) )
             	{
-            	    alt35 = 1;
+            	    alt38 = 1;
             	}
-            	switch (alt35) 
+            	switch (alt38) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:89:16: '{' ( identifier '(' ( INT | valuereference ) ')' ( ',' identifier '(' ( INT | valuereference ) ')' )* )? '}'
             	        {
-            	        	Match(input,74,FOLLOW_74_in_bitStringType542); 
+            	        	Match(input,74,FOLLOW_74_in_bitStringType553); 
             	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:89:20: ( identifier '(' ( INT | valuereference ) ')' ( ',' identifier '(' ( INT | valuereference ) ')' )* )?
-            	        	int alt34 = 2;
-            	        	int LA34_0 = input.LA(1);
+            	        	int alt37 = 2;
+            	        	int LA37_0 = input.LA(1);
             	        	
-            	        	if ( (LA34_0 == LID) )
+            	        	if ( (LA37_0 == LID) )
             	        	{
-            	        	    alt34 = 1;
+            	        	    alt37 = 1;
             	        	}
-            	        	switch (alt34) 
+            	        	switch (alt37) 
             	        	{
             	        	    case 1 :
             	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:89:21: identifier '(' ( INT | valuereference ) ')' ( ',' identifier '(' ( INT | valuereference ) ')' )*
             	        	        {
-            	        	        	PushFollow(FOLLOW_identifier_in_bitStringType545);
+            	        	        	PushFollow(FOLLOW_identifier_in_bitStringType556);
             	        	        	identifier();
             	        	        	followingStackPointer_--;
 
-            	        	        	Match(input,76,FOLLOW_76_in_bitStringType547); 
+            	        	        	Match(input,76,FOLLOW_76_in_bitStringType558); 
             	        	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:89:36: ( INT | valuereference )
-            	        	        	int alt31 = 2;
-            	        	        	int LA31_0 = input.LA(1);
+            	        	        	int alt34 = 2;
+            	        	        	int LA34_0 = input.LA(1);
             	        	        	
-            	        	        	if ( (LA31_0 == INT) )
+            	        	        	if ( (LA34_0 == INT) )
             	        	        	{
-            	        	        	    alt31 = 1;
+            	        	        	    alt34 = 1;
             	        	        	}
-            	        	        	else if ( (LA31_0 == LID) )
+            	        	        	else if ( (LA34_0 == LID) )
             	        	        	{
-            	        	        	    alt31 = 2;
+            	        	        	    alt34 = 2;
             	        	        	}
             	        	        	else 
             	        	        	{
-            	        	        	    NoViableAltException nvae_d31s0 =
-            	        	        	        new NoViableAltException("89:36: ( INT | valuereference )", 31, 0, input);
+            	        	        	    NoViableAltException nvae_d34s0 =
+            	        	        	        new NoViableAltException("89:36: ( INT | valuereference )", 34, 0, input);
             	        	        	
-            	        	        	    throw nvae_d31s0;
+            	        	        	    throw nvae_d34s0;
             	        	        	}
-            	        	        	switch (alt31) 
+            	        	        	switch (alt34) 
             	        	        	{
             	        	        	    case 1 :
             	        	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:89:37: INT
             	        	        	        {
-            	        	        	        	Match(input,INT,FOLLOW_INT_in_bitStringType550); 
+            	        	        	        	Match(input,INT,FOLLOW_INT_in_bitStringType561); 
             	        	        	        
             	        	        	        }
             	        	        	        break;
             	        	        	    case 2 :
             	        	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:89:41: valuereference
             	        	        	        {
-            	        	        	        	PushFollow(FOLLOW_valuereference_in_bitStringType552);
+            	        	        	        	PushFollow(FOLLOW_valuereference_in_bitStringType563);
             	        	        	        	valuereference();
             	        	        	        	followingStackPointer_--;
 
@@ -1840,62 +1939,62 @@ public class asn1Parser : Parser
             	        	        	
             	        	        	}
 
-            	        	        	Match(input,77,FOLLOW_77_in_bitStringType555); 
+            	        	        	Match(input,77,FOLLOW_77_in_bitStringType566); 
             	        	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:89:61: ( ',' identifier '(' ( INT | valuereference ) ')' )*
             	        	        	do 
             	        	        	{
-            	        	        	    int alt33 = 2;
-            	        	        	    int LA33_0 = input.LA(1);
+            	        	        	    int alt36 = 2;
+            	        	        	    int LA36_0 = input.LA(1);
             	        	        	    
-            	        	        	    if ( (LA33_0 == 79) )
+            	        	        	    if ( (LA36_0 == 79) )
             	        	        	    {
-            	        	        	        alt33 = 1;
+            	        	        	        alt36 = 1;
             	        	        	    }
             	        	        	    
             	        	        	
-            	        	        	    switch (alt33) 
+            	        	        	    switch (alt36) 
             	        	        		{
             	        	        			case 1 :
             	        	        			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:89:62: ',' identifier '(' ( INT | valuereference ) ')'
             	        	        			    {
-            	        	        			    	Match(input,79,FOLLOW_79_in_bitStringType558); 
-            	        	        			    	PushFollow(FOLLOW_identifier_in_bitStringType560);
+            	        	        			    	Match(input,79,FOLLOW_79_in_bitStringType569); 
+            	        	        			    	PushFollow(FOLLOW_identifier_in_bitStringType571);
             	        	        			    	identifier();
             	        	        			    	followingStackPointer_--;
 
-            	        	        			    	Match(input,76,FOLLOW_76_in_bitStringType562); 
+            	        	        			    	Match(input,76,FOLLOW_76_in_bitStringType573); 
             	        	        			    	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:89:81: ( INT | valuereference )
-            	        	        			    	int alt32 = 2;
-            	        	        			    	int LA32_0 = input.LA(1);
+            	        	        			    	int alt35 = 2;
+            	        	        			    	int LA35_0 = input.LA(1);
             	        	        			    	
-            	        	        			    	if ( (LA32_0 == INT) )
+            	        	        			    	if ( (LA35_0 == INT) )
             	        	        			    	{
-            	        	        			    	    alt32 = 1;
+            	        	        			    	    alt35 = 1;
             	        	        			    	}
-            	        	        			    	else if ( (LA32_0 == LID) )
+            	        	        			    	else if ( (LA35_0 == LID) )
             	        	        			    	{
-            	        	        			    	    alt32 = 2;
+            	        	        			    	    alt35 = 2;
             	        	        			    	}
             	        	        			    	else 
             	        	        			    	{
-            	        	        			    	    NoViableAltException nvae_d32s0 =
-            	        	        			    	        new NoViableAltException("89:81: ( INT | valuereference )", 32, 0, input);
+            	        	        			    	    NoViableAltException nvae_d35s0 =
+            	        	        			    	        new NoViableAltException("89:81: ( INT | valuereference )", 35, 0, input);
             	        	        			    	
-            	        	        			    	    throw nvae_d32s0;
+            	        	        			    	    throw nvae_d35s0;
             	        	        			    	}
-            	        	        			    	switch (alt32) 
+            	        	        			    	switch (alt35) 
             	        	        			    	{
             	        	        			    	    case 1 :
             	        	        			    	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:89:82: INT
             	        	        			    	        {
-            	        	        			    	        	Match(input,INT,FOLLOW_INT_in_bitStringType565); 
+            	        	        			    	        	Match(input,INT,FOLLOW_INT_in_bitStringType576); 
             	        	        			    	        
             	        	        			    	        }
             	        	        			    	        break;
             	        	        			    	    case 2 :
             	        	        			    	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:89:86: valuereference
             	        	        			    	        {
-            	        	        			    	        	PushFollow(FOLLOW_valuereference_in_bitStringType567);
+            	        	        			    	        	PushFollow(FOLLOW_valuereference_in_bitStringType578);
             	        	        			    	        	valuereference();
             	        	        			    	        	followingStackPointer_--;
 
@@ -1905,18 +2004,18 @@ public class asn1Parser : Parser
             	        	        			    	
             	        	        			    	}
 
-            	        	        			    	Match(input,77,FOLLOW_77_in_bitStringType570); 
+            	        	        			    	Match(input,77,FOLLOW_77_in_bitStringType581); 
             	        	        			    
             	        	        			    }
             	        	        			    break;
             	        	        	
             	        	        			default:
-            	        	        			    goto loop33;
+            	        	        			    goto loop36;
             	        	        	    }
             	        	        	} while (true);
             	        	        	
-            	        	        	loop33:
-            	        	        		;	// Stops C# compiler whinging that label 'loop33' has no statements
+            	        	        	loop36:
+            	        	        		;	// Stops C# compiler whinging that label 'loop36' has no statements
 
             	        	        
             	        	        }
@@ -1924,7 +2023,7 @@ public class asn1Parser : Parser
             	        	
             	        	}
 
-            	        	Match(input,75,FOLLOW_75_in_bitStringType578); 
+            	        	Match(input,75,FOLLOW_75_in_bitStringType589); 
             	        
             	        }
             	        break;
@@ -1957,7 +2056,7 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:93:4: ( BOOLEAN )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:93:4: BOOLEAN
             {
-            	Match(input,BOOLEAN,FOLLOW_BOOLEAN_in_booleanType593); 
+            	Match(input,BOOLEAN,FOLLOW_BOOLEAN_in_booleanType604); 
             
             }
     
@@ -1984,41 +2083,41 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:97:4: ( ENUMERATED '{' enumeratedTypeItems ( ',' '...' ( g_exceptionSpec )? ( ',' enumeratedTypeItems )? )? '}' )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:97:4: ENUMERATED '{' enumeratedTypeItems ( ',' '...' ( g_exceptionSpec )? ( ',' enumeratedTypeItems )? )? '}'
             {
-            	Match(input,ENUMERATED,FOLLOW_ENUMERATED_in_enumeratedType606); 
-            	Match(input,74,FOLLOW_74_in_enumeratedType608); 
-            	PushFollow(FOLLOW_enumeratedTypeItems_in_enumeratedType610);
+            	Match(input,ENUMERATED,FOLLOW_ENUMERATED_in_enumeratedType617); 
+            	Match(input,74,FOLLOW_74_in_enumeratedType619); 
+            	PushFollow(FOLLOW_enumeratedTypeItems_in_enumeratedType621);
             	enumeratedTypeItems();
             	followingStackPointer_--;
 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:97:40: ( ',' '...' ( g_exceptionSpec )? ( ',' enumeratedTypeItems )? )?
-            	int alt38 = 2;
-            	int LA38_0 = input.LA(1);
+            	int alt41 = 2;
+            	int LA41_0 = input.LA(1);
             	
-            	if ( (LA38_0 == 79) )
+            	if ( (LA41_0 == 79) )
             	{
-            	    alt38 = 1;
+            	    alt41 = 1;
             	}
-            	switch (alt38) 
+            	switch (alt41) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:97:42: ',' '...' ( g_exceptionSpec )? ( ',' enumeratedTypeItems )?
             	        {
-            	        	Match(input,79,FOLLOW_79_in_enumeratedType615); 
-            	        	Match(input,82,FOLLOW_82_in_enumeratedType617); 
+            	        	Match(input,79,FOLLOW_79_in_enumeratedType626); 
+            	        	Match(input,82,FOLLOW_82_in_enumeratedType628); 
             	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:97:52: ( g_exceptionSpec )?
-            	        	int alt36 = 2;
-            	        	int LA36_0 = input.LA(1);
+            	        	int alt39 = 2;
+            	        	int LA39_0 = input.LA(1);
             	        	
-            	        	if ( (LA36_0 == 90) )
+            	        	if ( (LA39_0 == 90) )
             	        	{
-            	        	    alt36 = 1;
+            	        	    alt39 = 1;
             	        	}
-            	        	switch (alt36) 
+            	        	switch (alt39) 
             	        	{
             	        	    case 1 :
             	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:97:52: g_exceptionSpec
             	        	        {
-            	        	        	PushFollow(FOLLOW_g_exceptionSpec_in_enumeratedType619);
+            	        	        	PushFollow(FOLLOW_g_exceptionSpec_in_enumeratedType630);
             	        	        	g_exceptionSpec();
             	        	        	followingStackPointer_--;
 
@@ -2029,20 +2128,20 @@ public class asn1Parser : Parser
             	        	}
 
             	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:97:69: ( ',' enumeratedTypeItems )?
-            	        	int alt37 = 2;
-            	        	int LA37_0 = input.LA(1);
+            	        	int alt40 = 2;
+            	        	int LA40_0 = input.LA(1);
             	        	
-            	        	if ( (LA37_0 == 79) )
+            	        	if ( (LA40_0 == 79) )
             	        	{
-            	        	    alt37 = 1;
+            	        	    alt40 = 1;
             	        	}
-            	        	switch (alt37) 
+            	        	switch (alt40) 
             	        	{
             	        	    case 1 :
             	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:97:70: ',' enumeratedTypeItems
             	        	        {
-            	        	        	Match(input,79,FOLLOW_79_in_enumeratedType623); 
-            	        	        	PushFollow(FOLLOW_enumeratedTypeItems_in_enumeratedType625);
+            	        	        	Match(input,79,FOLLOW_79_in_enumeratedType634); 
+            	        	        	PushFollow(FOLLOW_enumeratedTypeItems_in_enumeratedType636);
             	        	        	enumeratedTypeItems();
             	        	        	followingStackPointer_--;
 
@@ -2058,7 +2157,7 @@ public class asn1Parser : Parser
             	
             	}
 
-            	Match(input,75,FOLLOW_75_in_enumeratedType632); 
+            	Match(input,75,FOLLOW_75_in_enumeratedType643); 
             
             }
     
@@ -2085,49 +2184,49 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:101:4: ( identifier ( '(' ( signedNumber | valuereference ) ')' )? ( ',' identifier ( '(' ( signedNumber | valuereference ) ')' )? )* )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:101:4: identifier ( '(' ( signedNumber | valuereference ) ')' )? ( ',' identifier ( '(' ( signedNumber | valuereference ) ')' )? )*
             {
-            	PushFollow(FOLLOW_identifier_in_enumeratedTypeItems644);
+            	PushFollow(FOLLOW_identifier_in_enumeratedTypeItems655);
             	identifier();
             	followingStackPointer_--;
 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:101:15: ( '(' ( signedNumber | valuereference ) ')' )?
-            	int alt40 = 2;
-            	int LA40_0 = input.LA(1);
+            	int alt43 = 2;
+            	int LA43_0 = input.LA(1);
             	
-            	if ( (LA40_0 == 76) )
+            	if ( (LA43_0 == 76) )
             	{
-            	    alt40 = 1;
+            	    alt43 = 1;
             	}
-            	switch (alt40) 
+            	switch (alt43) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:101:17: '(' ( signedNumber | valuereference ) ')'
             	        {
-            	        	Match(input,76,FOLLOW_76_in_enumeratedTypeItems648); 
+            	        	Match(input,76,FOLLOW_76_in_enumeratedTypeItems659); 
             	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:101:21: ( signedNumber | valuereference )
-            	        	int alt39 = 2;
-            	        	int LA39_0 = input.LA(1);
+            	        	int alt42 = 2;
+            	        	int LA42_0 = input.LA(1);
             	        	
-            	        	if ( (LA39_0 == INT || (LA39_0 >= 86 && LA39_0 <= 87)) )
+            	        	if ( (LA42_0 == INT || (LA42_0 >= 86 && LA42_0 <= 87)) )
             	        	{
-            	        	    alt39 = 1;
+            	        	    alt42 = 1;
             	        	}
-            	        	else if ( (LA39_0 == LID) )
+            	        	else if ( (LA42_0 == LID) )
             	        	{
-            	        	    alt39 = 2;
+            	        	    alt42 = 2;
             	        	}
             	        	else 
             	        	{
-            	        	    NoViableAltException nvae_d39s0 =
-            	        	        new NoViableAltException("101:21: ( signedNumber | valuereference )", 39, 0, input);
+            	        	    NoViableAltException nvae_d42s0 =
+            	        	        new NoViableAltException("101:21: ( signedNumber | valuereference )", 42, 0, input);
             	        	
-            	        	    throw nvae_d39s0;
+            	        	    throw nvae_d42s0;
             	        	}
-            	        	switch (alt39) 
+            	        	switch (alt42) 
             	        	{
             	        	    case 1 :
             	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:101:22: signedNumber
             	        	        {
-            	        	        	PushFollow(FOLLOW_signedNumber_in_enumeratedTypeItems651);
+            	        	        	PushFollow(FOLLOW_signedNumber_in_enumeratedTypeItems662);
             	        	        	signedNumber();
             	        	        	followingStackPointer_--;
 
@@ -2137,7 +2236,7 @@ public class asn1Parser : Parser
             	        	    case 2 :
             	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:101:35: valuereference
             	        	        {
-            	        	        	PushFollow(FOLLOW_valuereference_in_enumeratedTypeItems653);
+            	        	        	PushFollow(FOLLOW_valuereference_in_enumeratedTypeItems664);
             	        	        	valuereference();
             	        	        	followingStackPointer_--;
 
@@ -2147,7 +2246,7 @@ public class asn1Parser : Parser
             	        	
             	        	}
 
-            	        	Match(input,77,FOLLOW_77_in_enumeratedTypeItems656); 
+            	        	Match(input,77,FOLLOW_77_in_enumeratedTypeItems667); 
             	        
             	        }
             	        break;
@@ -2157,71 +2256,71 @@ public class asn1Parser : Parser
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:101:57: ( ',' identifier ( '(' ( signedNumber | valuereference ) ')' )? )*
             	do 
             	{
-            	    int alt43 = 2;
-            	    int LA43_0 = input.LA(1);
+            	    int alt46 = 2;
+            	    int LA46_0 = input.LA(1);
             	    
-            	    if ( (LA43_0 == 79) )
+            	    if ( (LA46_0 == 79) )
             	    {
-            	        int LA43_1 = input.LA(2);
+            	        int LA46_1 = input.LA(2);
             	        
-            	        if ( (LA43_1 == LID) )
+            	        if ( (LA46_1 == LID) )
             	        {
-            	            alt43 = 1;
+            	            alt46 = 1;
             	        }
             	        
             	    
             	    }
             	    
             	
-            	    switch (alt43) 
+            	    switch (alt46) 
             		{
             			case 1 :
             			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:101:58: ',' identifier ( '(' ( signedNumber | valuereference ) ')' )?
             			    {
-            			    	Match(input,79,FOLLOW_79_in_enumeratedTypeItems661); 
-            			    	PushFollow(FOLLOW_identifier_in_enumeratedTypeItems663);
+            			    	Match(input,79,FOLLOW_79_in_enumeratedTypeItems672); 
+            			    	PushFollow(FOLLOW_identifier_in_enumeratedTypeItems674);
             			    	identifier();
             			    	followingStackPointer_--;
 
             			    	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:101:73: ( '(' ( signedNumber | valuereference ) ')' )?
-            			    	int alt42 = 2;
-            			    	int LA42_0 = input.LA(1);
+            			    	int alt45 = 2;
+            			    	int LA45_0 = input.LA(1);
             			    	
-            			    	if ( (LA42_0 == 76) )
+            			    	if ( (LA45_0 == 76) )
             			    	{
-            			    	    alt42 = 1;
+            			    	    alt45 = 1;
             			    	}
-            			    	switch (alt42) 
+            			    	switch (alt45) 
             			    	{
             			    	    case 1 :
             			    	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:101:75: '(' ( signedNumber | valuereference ) ')'
             			    	        {
-            			    	        	Match(input,76,FOLLOW_76_in_enumeratedTypeItems667); 
+            			    	        	Match(input,76,FOLLOW_76_in_enumeratedTypeItems678); 
             			    	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:101:79: ( signedNumber | valuereference )
-            			    	        	int alt41 = 2;
-            			    	        	int LA41_0 = input.LA(1);
+            			    	        	int alt44 = 2;
+            			    	        	int LA44_0 = input.LA(1);
             			    	        	
-            			    	        	if ( (LA41_0 == INT || (LA41_0 >= 86 && LA41_0 <= 87)) )
+            			    	        	if ( (LA44_0 == INT || (LA44_0 >= 86 && LA44_0 <= 87)) )
             			    	        	{
-            			    	        	    alt41 = 1;
+            			    	        	    alt44 = 1;
             			    	        	}
-            			    	        	else if ( (LA41_0 == LID) )
+            			    	        	else if ( (LA44_0 == LID) )
             			    	        	{
-            			    	        	    alt41 = 2;
+            			    	        	    alt44 = 2;
             			    	        	}
             			    	        	else 
             			    	        	{
-            			    	        	    NoViableAltException nvae_d41s0 =
-            			    	        	        new NoViableAltException("101:79: ( signedNumber | valuereference )", 41, 0, input);
+            			    	        	    NoViableAltException nvae_d44s0 =
+            			    	        	        new NoViableAltException("101:79: ( signedNumber | valuereference )", 44, 0, input);
             			    	        	
-            			    	        	    throw nvae_d41s0;
+            			    	        	    throw nvae_d44s0;
             			    	        	}
-            			    	        	switch (alt41) 
+            			    	        	switch (alt44) 
             			    	        	{
             			    	        	    case 1 :
             			    	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:101:80: signedNumber
             			    	        	        {
-            			    	        	        	PushFollow(FOLLOW_signedNumber_in_enumeratedTypeItems670);
+            			    	        	        	PushFollow(FOLLOW_signedNumber_in_enumeratedTypeItems681);
             			    	        	        	signedNumber();
             			    	        	        	followingStackPointer_--;
 
@@ -2231,7 +2330,7 @@ public class asn1Parser : Parser
             			    	        	    case 2 :
             			    	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:101:93: valuereference
             			    	        	        {
-            			    	        	        	PushFollow(FOLLOW_valuereference_in_enumeratedTypeItems672);
+            			    	        	        	PushFollow(FOLLOW_valuereference_in_enumeratedTypeItems683);
             			    	        	        	valuereference();
             			    	        	        	followingStackPointer_--;
 
@@ -2241,7 +2340,7 @@ public class asn1Parser : Parser
             			    	        	
             			    	        	}
 
-            			    	        	Match(input,77,FOLLOW_77_in_enumeratedTypeItems675); 
+            			    	        	Match(input,77,FOLLOW_77_in_enumeratedTypeItems686); 
             			    	        
             			    	        }
             			    	        break;
@@ -2253,12 +2352,12 @@ public class asn1Parser : Parser
             			    break;
             	
             			default:
-            			    goto loop43;
+            			    goto loop46;
             	    }
             	} while (true);
             	
-            	loop43:
-            		;	// Stops C# compiler whinging that label 'loop43' has no statements
+            	loop46:
+            		;	// Stops C# compiler whinging that label 'loop46' has no statements
 
             
             }
@@ -2286,64 +2385,64 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:105:4: ( INTEGER ( '{' ( identifier '(' ( signedNumber | valuereference ) ')' ( ',' identifier '(' ( signedNumber | valuereference ) ')' )* )? '}' )? )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:105:4: INTEGER ( '{' ( identifier '(' ( signedNumber | valuereference ) ')' ( ',' identifier '(' ( signedNumber | valuereference ) ')' )* )? '}' )?
             {
-            	Match(input,INTEGER,FOLLOW_INTEGER_in_integerType692); 
+            	Match(input,INTEGER,FOLLOW_INTEGER_in_integerType703); 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:105:12: ( '{' ( identifier '(' ( signedNumber | valuereference ) ')' ( ',' identifier '(' ( signedNumber | valuereference ) ')' )* )? '}' )?
-            	int alt48 = 2;
-            	int LA48_0 = input.LA(1);
+            	int alt51 = 2;
+            	int LA51_0 = input.LA(1);
             	
-            	if ( (LA48_0 == 74) )
+            	if ( (LA51_0 == 74) )
             	{
-            	    alt48 = 1;
+            	    alt51 = 1;
             	}
-            	switch (alt48) 
+            	switch (alt51) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:105:14: '{' ( identifier '(' ( signedNumber | valuereference ) ')' ( ',' identifier '(' ( signedNumber | valuereference ) ')' )* )? '}'
             	        {
-            	        	Match(input,74,FOLLOW_74_in_integerType696); 
+            	        	Match(input,74,FOLLOW_74_in_integerType707); 
             	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:105:18: ( identifier '(' ( signedNumber | valuereference ) ')' ( ',' identifier '(' ( signedNumber | valuereference ) ')' )* )?
-            	        	int alt47 = 2;
-            	        	int LA47_0 = input.LA(1);
+            	        	int alt50 = 2;
+            	        	int LA50_0 = input.LA(1);
             	        	
-            	        	if ( (LA47_0 == LID) )
+            	        	if ( (LA50_0 == LID) )
             	        	{
-            	        	    alt47 = 1;
+            	        	    alt50 = 1;
             	        	}
-            	        	switch (alt47) 
+            	        	switch (alt50) 
             	        	{
             	        	    case 1 :
             	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:105:19: identifier '(' ( signedNumber | valuereference ) ')' ( ',' identifier '(' ( signedNumber | valuereference ) ')' )*
             	        	        {
-            	        	        	PushFollow(FOLLOW_identifier_in_integerType699);
+            	        	        	PushFollow(FOLLOW_identifier_in_integerType710);
             	        	        	identifier();
             	        	        	followingStackPointer_--;
 
-            	        	        	Match(input,76,FOLLOW_76_in_integerType701); 
+            	        	        	Match(input,76,FOLLOW_76_in_integerType712); 
             	        	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:105:34: ( signedNumber | valuereference )
-            	        	        	int alt44 = 2;
-            	        	        	int LA44_0 = input.LA(1);
+            	        	        	int alt47 = 2;
+            	        	        	int LA47_0 = input.LA(1);
             	        	        	
-            	        	        	if ( (LA44_0 == INT || (LA44_0 >= 86 && LA44_0 <= 87)) )
+            	        	        	if ( (LA47_0 == INT || (LA47_0 >= 86 && LA47_0 <= 87)) )
             	        	        	{
-            	        	        	    alt44 = 1;
+            	        	        	    alt47 = 1;
             	        	        	}
-            	        	        	else if ( (LA44_0 == LID) )
+            	        	        	else if ( (LA47_0 == LID) )
             	        	        	{
-            	        	        	    alt44 = 2;
+            	        	        	    alt47 = 2;
             	        	        	}
             	        	        	else 
             	        	        	{
-            	        	        	    NoViableAltException nvae_d44s0 =
-            	        	        	        new NoViableAltException("105:34: ( signedNumber | valuereference )", 44, 0, input);
+            	        	        	    NoViableAltException nvae_d47s0 =
+            	        	        	        new NoViableAltException("105:34: ( signedNumber | valuereference )", 47, 0, input);
             	        	        	
-            	        	        	    throw nvae_d44s0;
+            	        	        	    throw nvae_d47s0;
             	        	        	}
-            	        	        	switch (alt44) 
+            	        	        	switch (alt47) 
             	        	        	{
             	        	        	    case 1 :
             	        	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:105:35: signedNumber
             	        	        	        {
-            	        	        	        	PushFollow(FOLLOW_signedNumber_in_integerType704);
+            	        	        	        	PushFollow(FOLLOW_signedNumber_in_integerType715);
             	        	        	        	signedNumber();
             	        	        	        	followingStackPointer_--;
 
@@ -2353,7 +2452,7 @@ public class asn1Parser : Parser
             	        	        	    case 2 :
             	        	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:105:48: valuereference
             	        	        	        {
-            	        	        	        	PushFollow(FOLLOW_valuereference_in_integerType706);
+            	        	        	        	PushFollow(FOLLOW_valuereference_in_integerType717);
             	        	        	        	valuereference();
             	        	        	        	followingStackPointer_--;
 
@@ -2363,55 +2462,55 @@ public class asn1Parser : Parser
             	        	        	
             	        	        	}
 
-            	        	        	Match(input,77,FOLLOW_77_in_integerType709); 
+            	        	        	Match(input,77,FOLLOW_77_in_integerType720); 
             	        	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:105:68: ( ',' identifier '(' ( signedNumber | valuereference ) ')' )*
             	        	        	do 
             	        	        	{
-            	        	        	    int alt46 = 2;
-            	        	        	    int LA46_0 = input.LA(1);
+            	        	        	    int alt49 = 2;
+            	        	        	    int LA49_0 = input.LA(1);
             	        	        	    
-            	        	        	    if ( (LA46_0 == 79) )
+            	        	        	    if ( (LA49_0 == 79) )
             	        	        	    {
-            	        	        	        alt46 = 1;
+            	        	        	        alt49 = 1;
             	        	        	    }
             	        	        	    
             	        	        	
-            	        	        	    switch (alt46) 
+            	        	        	    switch (alt49) 
             	        	        		{
             	        	        			case 1 :
             	        	        			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:105:69: ',' identifier '(' ( signedNumber | valuereference ) ')'
             	        	        			    {
-            	        	        			    	Match(input,79,FOLLOW_79_in_integerType712); 
-            	        	        			    	PushFollow(FOLLOW_identifier_in_integerType714);
+            	        	        			    	Match(input,79,FOLLOW_79_in_integerType723); 
+            	        	        			    	PushFollow(FOLLOW_identifier_in_integerType725);
             	        	        			    	identifier();
             	        	        			    	followingStackPointer_--;
 
-            	        	        			    	Match(input,76,FOLLOW_76_in_integerType716); 
+            	        	        			    	Match(input,76,FOLLOW_76_in_integerType727); 
             	        	        			    	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:105:88: ( signedNumber | valuereference )
-            	        	        			    	int alt45 = 2;
-            	        	        			    	int LA45_0 = input.LA(1);
+            	        	        			    	int alt48 = 2;
+            	        	        			    	int LA48_0 = input.LA(1);
             	        	        			    	
-            	        	        			    	if ( (LA45_0 == INT || (LA45_0 >= 86 && LA45_0 <= 87)) )
+            	        	        			    	if ( (LA48_0 == INT || (LA48_0 >= 86 && LA48_0 <= 87)) )
             	        	        			    	{
-            	        	        			    	    alt45 = 1;
+            	        	        			    	    alt48 = 1;
             	        	        			    	}
-            	        	        			    	else if ( (LA45_0 == LID) )
+            	        	        			    	else if ( (LA48_0 == LID) )
             	        	        			    	{
-            	        	        			    	    alt45 = 2;
+            	        	        			    	    alt48 = 2;
             	        	        			    	}
             	        	        			    	else 
             	        	        			    	{
-            	        	        			    	    NoViableAltException nvae_d45s0 =
-            	        	        			    	        new NoViableAltException("105:88: ( signedNumber | valuereference )", 45, 0, input);
+            	        	        			    	    NoViableAltException nvae_d48s0 =
+            	        	        			    	        new NoViableAltException("105:88: ( signedNumber | valuereference )", 48, 0, input);
             	        	        			    	
-            	        	        			    	    throw nvae_d45s0;
+            	        	        			    	    throw nvae_d48s0;
             	        	        			    	}
-            	        	        			    	switch (alt45) 
+            	        	        			    	switch (alt48) 
             	        	        			    	{
             	        	        			    	    case 1 :
             	        	        			    	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:105:89: signedNumber
             	        	        			    	        {
-            	        	        			    	        	PushFollow(FOLLOW_signedNumber_in_integerType719);
+            	        	        			    	        	PushFollow(FOLLOW_signedNumber_in_integerType730);
             	        	        			    	        	signedNumber();
             	        	        			    	        	followingStackPointer_--;
 
@@ -2421,7 +2520,7 @@ public class asn1Parser : Parser
             	        	        			    	    case 2 :
             	        	        			    	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:105:102: valuereference
             	        	        			    	        {
-            	        	        			    	        	PushFollow(FOLLOW_valuereference_in_integerType721);
+            	        	        			    	        	PushFollow(FOLLOW_valuereference_in_integerType732);
             	        	        			    	        	valuereference();
             	        	        			    	        	followingStackPointer_--;
 
@@ -2431,18 +2530,18 @@ public class asn1Parser : Parser
             	        	        			    	
             	        	        			    	}
 
-            	        	        			    	Match(input,77,FOLLOW_77_in_integerType724); 
+            	        	        			    	Match(input,77,FOLLOW_77_in_integerType735); 
             	        	        			    
             	        	        			    }
             	        	        			    break;
             	        	        	
             	        	        			default:
-            	        	        			    goto loop46;
+            	        	        			    goto loop49;
             	        	        	    }
             	        	        	} while (true);
             	        	        	
-            	        	        	loop46:
-            	        	        		;	// Stops C# compiler whinging that label 'loop46' has no statements
+            	        	        	loop49:
+            	        	        		;	// Stops C# compiler whinging that label 'loop49' has no statements
 
             	        	        
             	        	        }
@@ -2450,7 +2549,7 @@ public class asn1Parser : Parser
             	        	
             	        	}
 
-            	        	Match(input,75,FOLLOW_75_in_integerType730); 
+            	        	Match(input,75,FOLLOW_75_in_integerType741); 
             	        
             	        }
             	        break;
@@ -2483,7 +2582,7 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:109:4: ( REAL )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:109:4: REAL
             {
-            	Match(input,REAL,FOLLOW_REAL_in_realType745); 
+            	Match(input,REAL,FOLLOW_REAL_in_realType756); 
             
             }
     
@@ -2510,41 +2609,41 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:121:4: ( CHOICE '{' choiceList ( ',' '...' ( g_exceptionSpec )? ( choiceListExtension )? ( ',' '...' )? )? '}' )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:121:4: CHOICE '{' choiceList ( ',' '...' ( g_exceptionSpec )? ( choiceListExtension )? ( ',' '...' )? )? '}'
             {
-            	Match(input,CHOICE,FOLLOW_CHOICE_in_choiceType762); 
-            	Match(input,74,FOLLOW_74_in_choiceType764); 
-            	PushFollow(FOLLOW_choiceList_in_choiceType766);
+            	Match(input,CHOICE,FOLLOW_CHOICE_in_choiceType773); 
+            	Match(input,74,FOLLOW_74_in_choiceType775); 
+            	PushFollow(FOLLOW_choiceList_in_choiceType777);
             	choiceList();
             	followingStackPointer_--;
 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:121:26: ( ',' '...' ( g_exceptionSpec )? ( choiceListExtension )? ( ',' '...' )? )?
-            	int alt52 = 2;
-            	int LA52_0 = input.LA(1);
+            	int alt55 = 2;
+            	int LA55_0 = input.LA(1);
             	
-            	if ( (LA52_0 == 79) )
+            	if ( (LA55_0 == 79) )
             	{
-            	    alt52 = 1;
+            	    alt55 = 1;
             	}
-            	switch (alt52) 
+            	switch (alt55) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:121:27: ',' '...' ( g_exceptionSpec )? ( choiceListExtension )? ( ',' '...' )?
             	        {
-            	        	Match(input,79,FOLLOW_79_in_choiceType769); 
-            	        	Match(input,82,FOLLOW_82_in_choiceType771); 
+            	        	Match(input,79,FOLLOW_79_in_choiceType780); 
+            	        	Match(input,82,FOLLOW_82_in_choiceType782); 
             	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:121:37: ( g_exceptionSpec )?
-            	        	int alt49 = 2;
-            	        	int LA49_0 = input.LA(1);
+            	        	int alt52 = 2;
+            	        	int LA52_0 = input.LA(1);
             	        	
-            	        	if ( (LA49_0 == 90) )
+            	        	if ( (LA52_0 == 90) )
             	        	{
-            	        	    alt49 = 1;
+            	        	    alt52 = 1;
             	        	}
-            	        	switch (alt49) 
+            	        	switch (alt52) 
             	        	{
             	        	    case 1 :
             	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:121:37: g_exceptionSpec
             	        	        {
-            	        	        	PushFollow(FOLLOW_g_exceptionSpec_in_choiceType773);
+            	        	        	PushFollow(FOLLOW_g_exceptionSpec_in_choiceType784);
             	        	        	g_exceptionSpec();
             	        	        	followingStackPointer_--;
 
@@ -2555,24 +2654,24 @@ public class asn1Parser : Parser
             	        	}
 
             	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:121:55: ( choiceListExtension )?
-            	        	int alt50 = 2;
-            	        	int LA50_0 = input.LA(1);
+            	        	int alt53 = 2;
+            	        	int LA53_0 = input.LA(1);
             	        	
-            	        	if ( (LA50_0 == 79) )
+            	        	if ( (LA53_0 == 79) )
             	        	{
-            	        	    int LA50_1 = input.LA(2);
+            	        	    int LA53_1 = input.LA(2);
             	        	    
-            	        	    if ( (LA50_1 == LID || LA50_1 == 83) )
+            	        	    if ( (LA53_1 == LID || LA53_1 == 83) )
             	        	    {
-            	        	        alt50 = 1;
+            	        	        alt53 = 1;
             	        	    }
             	        	}
-            	        	switch (alt50) 
+            	        	switch (alt53) 
             	        	{
             	        	    case 1 :
             	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:121:55: choiceListExtension
             	        	        {
-            	        	        	PushFollow(FOLLOW_choiceListExtension_in_choiceType777);
+            	        	        	PushFollow(FOLLOW_choiceListExtension_in_choiceType788);
             	        	        	choiceListExtension();
             	        	        	followingStackPointer_--;
 
@@ -2583,20 +2682,20 @@ public class asn1Parser : Parser
             	        	}
 
             	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:121:78: ( ',' '...' )?
-            	        	int alt51 = 2;
-            	        	int LA51_0 = input.LA(1);
+            	        	int alt54 = 2;
+            	        	int LA54_0 = input.LA(1);
             	        	
-            	        	if ( (LA51_0 == 79) )
+            	        	if ( (LA54_0 == 79) )
             	        	{
-            	        	    alt51 = 1;
+            	        	    alt54 = 1;
             	        	}
-            	        	switch (alt51) 
+            	        	switch (alt54) 
             	        	{
             	        	    case 1 :
             	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:121:79: ',' '...'
             	        	        {
-            	        	        	Match(input,79,FOLLOW_79_in_choiceType783); 
-            	        	        	Match(input,82,FOLLOW_82_in_choiceType785); 
+            	        	        	Match(input,79,FOLLOW_79_in_choiceType794); 
+            	        	        	Match(input,82,FOLLOW_82_in_choiceType796); 
             	        	        
             	        	        }
             	        	        break;
@@ -2609,7 +2708,7 @@ public class asn1Parser : Parser
             	
             	}
 
-            	Match(input,75,FOLLOW_75_in_choiceType793); 
+            	Match(input,75,FOLLOW_75_in_choiceType804); 
             
             }
     
@@ -2636,44 +2735,44 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:125:4: ( identifier type ( ',' identifier type )* )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:125:4: identifier type ( ',' identifier type )*
             {
-            	PushFollow(FOLLOW_identifier_in_choiceList804);
+            	PushFollow(FOLLOW_identifier_in_choiceList815);
             	identifier();
             	followingStackPointer_--;
 
-            	PushFollow(FOLLOW_type_in_choiceList806);
+            	PushFollow(FOLLOW_type_in_choiceList817);
             	type();
             	followingStackPointer_--;
 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:125:20: ( ',' identifier type )*
             	do 
             	{
-            	    int alt53 = 2;
-            	    int LA53_0 = input.LA(1);
+            	    int alt56 = 2;
+            	    int LA56_0 = input.LA(1);
             	    
-            	    if ( (LA53_0 == 79) )
+            	    if ( (LA56_0 == 79) )
             	    {
-            	        int LA53_1 = input.LA(2);
+            	        int LA56_1 = input.LA(2);
             	        
-            	        if ( (LA53_1 == LID) )
+            	        if ( (LA56_1 == LID) )
             	        {
-            	            alt53 = 1;
+            	            alt56 = 1;
             	        }
             	        
             	    
             	    }
             	    
             	
-            	    switch (alt53) 
+            	    switch (alt56) 
             		{
             			case 1 :
             			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:125:21: ',' identifier type
             			    {
-            			    	Match(input,79,FOLLOW_79_in_choiceList809); 
-            			    	PushFollow(FOLLOW_identifier_in_choiceList811);
+            			    	Match(input,79,FOLLOW_79_in_choiceList820); 
+            			    	PushFollow(FOLLOW_identifier_in_choiceList822);
             			    	identifier();
             			    	followingStackPointer_--;
 
-            			    	PushFollow(FOLLOW_type_in_choiceList813);
+            			    	PushFollow(FOLLOW_type_in_choiceList824);
             			    	type();
             			    	followingStackPointer_--;
 
@@ -2682,12 +2781,12 @@ public class asn1Parser : Parser
             			    break;
             	
             			default:
-            			    goto loop53;
+            			    goto loop56;
             	    }
             	} while (true);
             	
-            	loop53:
-            		;	// Stops C# compiler whinging that label 'loop53' has no statements
+            	loop56:
+            		;	// Stops C# compiler whinging that label 'loop56' has no statements
 
             
             }
@@ -2715,37 +2814,37 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:129:4: ( ',' extensionAdditionAlternative ( ',' extensionAdditionAlternative )* )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:129:4: ',' extensionAdditionAlternative ( ',' extensionAdditionAlternative )*
             {
-            	Match(input,79,FOLLOW_79_in_choiceListExtension826); 
-            	PushFollow(FOLLOW_extensionAdditionAlternative_in_choiceListExtension828);
+            	Match(input,79,FOLLOW_79_in_choiceListExtension837); 
+            	PushFollow(FOLLOW_extensionAdditionAlternative_in_choiceListExtension839);
             	extensionAdditionAlternative();
             	followingStackPointer_--;
 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:129:37: ( ',' extensionAdditionAlternative )*
             	do 
             	{
-            	    int alt54 = 2;
-            	    int LA54_0 = input.LA(1);
+            	    int alt57 = 2;
+            	    int LA57_0 = input.LA(1);
             	    
-            	    if ( (LA54_0 == 79) )
+            	    if ( (LA57_0 == 79) )
             	    {
-            	        int LA54_1 = input.LA(2);
+            	        int LA57_1 = input.LA(2);
             	        
-            	        if ( (LA54_1 == LID || LA54_1 == 83) )
+            	        if ( (LA57_1 == LID || LA57_1 == 83) )
             	        {
-            	            alt54 = 1;
+            	            alt57 = 1;
             	        }
             	        
             	    
             	    }
             	    
             	
-            	    switch (alt54) 
+            	    switch (alt57) 
             		{
             			case 1 :
             			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:129:38: ',' extensionAdditionAlternative
             			    {
-            			    	Match(input,79,FOLLOW_79_in_choiceListExtension831); 
-            			    	PushFollow(FOLLOW_extensionAdditionAlternative_in_choiceListExtension833);
+            			    	Match(input,79,FOLLOW_79_in_choiceListExtension842); 
+            			    	PushFollow(FOLLOW_extensionAdditionAlternative_in_choiceListExtension844);
             			    	extensionAdditionAlternative();
             			    	followingStackPointer_--;
 
@@ -2754,12 +2853,12 @@ public class asn1Parser : Parser
             			    break;
             	
             			default:
-            			    goto loop54;
+            			    goto loop57;
             	    }
             	} while (true);
             	
-            	loop54:
-            		;	// Stops C# compiler whinging that label 'loop54' has no statements
+            	loop57:
+            		;	// Stops C# compiler whinging that label 'loop57' has no statements
 
             
             }
@@ -2785,44 +2884,44 @@ public class asn1Parser : Parser
         try 
     	{
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:132:5: ( '[[' ( versionNumber )? choiceList ']]' | identifier type )
-            int alt56 = 2;
-            int LA56_0 = input.LA(1);
+            int alt59 = 2;
+            int LA59_0 = input.LA(1);
             
-            if ( (LA56_0 == 83) )
+            if ( (LA59_0 == 83) )
             {
-                alt56 = 1;
+                alt59 = 1;
             }
-            else if ( (LA56_0 == LID) )
+            else if ( (LA59_0 == LID) )
             {
-                alt56 = 2;
+                alt59 = 2;
             }
             else 
             {
-                NoViableAltException nvae_d56s0 =
-                    new NoViableAltException("131:1: extensionAdditionAlternative : ( '[[' ( versionNumber )? choiceList ']]' | identifier type );", 56, 0, input);
+                NoViableAltException nvae_d59s0 =
+                    new NoViableAltException("131:1: extensionAdditionAlternative : ( '[[' ( versionNumber )? choiceList ']]' | identifier type );", 59, 0, input);
             
-                throw nvae_d56s0;
+                throw nvae_d59s0;
             }
-            switch (alt56) 
+            switch (alt59) 
             {
                 case 1 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:132:5: '[[' ( versionNumber )? choiceList ']]'
                     {
-                    	Match(input,83,FOLLOW_83_in_extensionAdditionAlternative847); 
+                    	Match(input,83,FOLLOW_83_in_extensionAdditionAlternative858); 
                     	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:132:10: ( versionNumber )?
-                    	int alt55 = 2;
-                    	int LA55_0 = input.LA(1);
+                    	int alt58 = 2;
+                    	int LA58_0 = input.LA(1);
                     	
-                    	if ( (LA55_0 == INT) )
+                    	if ( (LA58_0 == INT) )
                     	{
-                    	    alt55 = 1;
+                    	    alt58 = 1;
                     	}
-                    	switch (alt55) 
+                    	switch (alt58) 
                     	{
                     	    case 1 :
                     	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:132:10: versionNumber
                     	        {
-                    	        	PushFollow(FOLLOW_versionNumber_in_extensionAdditionAlternative849);
+                    	        	PushFollow(FOLLOW_versionNumber_in_extensionAdditionAlternative860);
                     	        	versionNumber();
                     	        	followingStackPointer_--;
 
@@ -2832,22 +2931,22 @@ public class asn1Parser : Parser
                     	
                     	}
 
-                    	PushFollow(FOLLOW_choiceList_in_extensionAdditionAlternative852);
+                    	PushFollow(FOLLOW_choiceList_in_extensionAdditionAlternative863);
                     	choiceList();
                     	followingStackPointer_--;
 
-                    	Match(input,84,FOLLOW_84_in_extensionAdditionAlternative854); 
+                    	Match(input,84,FOLLOW_84_in_extensionAdditionAlternative865); 
                     
                     }
                     break;
                 case 2 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:133:5: identifier type
                     {
-                    	PushFollow(FOLLOW_identifier_in_extensionAdditionAlternative860);
+                    	PushFollow(FOLLOW_identifier_in_extensionAdditionAlternative871);
                     	identifier();
                     	followingStackPointer_--;
 
-                    	PushFollow(FOLLOW_type_in_extensionAdditionAlternative862);
+                    	PushFollow(FOLLOW_type_in_extensionAdditionAlternative873);
                     	type();
                     	followingStackPointer_--;
 
@@ -2879,22 +2978,22 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:137:4: ( SEQUENCE '{' ( sequenceOrSetBody )? '}' )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:137:4: SEQUENCE '{' ( sequenceOrSetBody )? '}'
             {
-            	Match(input,SEQUENCE,FOLLOW_SEQUENCE_in_sequenceType874); 
-            	Match(input,74,FOLLOW_74_in_sequenceType876); 
+            	Match(input,SEQUENCE,FOLLOW_SEQUENCE_in_sequenceType885); 
+            	Match(input,74,FOLLOW_74_in_sequenceType887); 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:137:17: ( sequenceOrSetBody )?
-            	int alt57 = 2;
-            	int LA57_0 = input.LA(1);
+            	int alt60 = 2;
+            	int LA60_0 = input.LA(1);
             	
-            	if ( (LA57_0 == LID || LA57_0 == 82) )
+            	if ( (LA60_0 == LID || LA60_0 == 82) )
             	{
-            	    alt57 = 1;
+            	    alt60 = 1;
             	}
-            	switch (alt57) 
+            	switch (alt60) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:137:17: sequenceOrSetBody
             	        {
-            	        	PushFollow(FOLLOW_sequenceOrSetBody_in_sequenceType878);
+            	        	PushFollow(FOLLOW_sequenceOrSetBody_in_sequenceType889);
             	        	sequenceOrSetBody();
             	        	followingStackPointer_--;
 
@@ -2904,7 +3003,7 @@ public class asn1Parser : Parser
             	
             	}
 
-            	Match(input,75,FOLLOW_75_in_sequenceType882); 
+            	Match(input,75,FOLLOW_75_in_sequenceType893); 
             
             }
     
@@ -2931,22 +3030,22 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:140:11: ( SET '{' ( sequenceOrSetBody )? '}' )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:140:11: SET '{' ( sequenceOrSetBody )? '}'
             {
-            	Match(input,SET,FOLLOW_SET_in_setType894); 
-            	Match(input,74,FOLLOW_74_in_setType896); 
+            	Match(input,SET,FOLLOW_SET_in_setType905); 
+            	Match(input,74,FOLLOW_74_in_setType907); 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:140:19: ( sequenceOrSetBody )?
-            	int alt58 = 2;
-            	int LA58_0 = input.LA(1);
+            	int alt61 = 2;
+            	int LA61_0 = input.LA(1);
             	
-            	if ( (LA58_0 == LID || LA58_0 == 82) )
+            	if ( (LA61_0 == LID || LA61_0 == 82) )
             	{
-            	    alt58 = 1;
+            	    alt61 = 1;
             	}
-            	switch (alt58) 
+            	switch (alt61) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:140:19: sequenceOrSetBody
             	        {
-            	        	PushFollow(FOLLOW_sequenceOrSetBody_in_setType898);
+            	        	PushFollow(FOLLOW_sequenceOrSetBody_in_setType909);
             	        	sequenceOrSetBody();
             	        	followingStackPointer_--;
 
@@ -2956,7 +3055,7 @@ public class asn1Parser : Parser
             	
             	}
 
-            	Match(input,75,FOLLOW_75_in_setType902); 
+            	Match(input,75,FOLLOW_75_in_setType913); 
             
             }
     
@@ -2981,48 +3080,48 @@ public class asn1Parser : Parser
         try 
     	{
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:144:5: ( componentTypeList ( ',' seqOrSetExtBody )? | seqOrSetExtBody )
-            int alt60 = 2;
-            int LA60_0 = input.LA(1);
+            int alt63 = 2;
+            int LA63_0 = input.LA(1);
             
-            if ( (LA60_0 == LID) )
+            if ( (LA63_0 == LID) )
             {
-                alt60 = 1;
+                alt63 = 1;
             }
-            else if ( (LA60_0 == 82) )
+            else if ( (LA63_0 == 82) )
             {
-                alt60 = 2;
+                alt63 = 2;
             }
             else 
             {
-                NoViableAltException nvae_d60s0 =
-                    new NoViableAltException("143:1: sequenceOrSetBody : ( componentTypeList ( ',' seqOrSetExtBody )? | seqOrSetExtBody );", 60, 0, input);
+                NoViableAltException nvae_d63s0 =
+                    new NoViableAltException("143:1: sequenceOrSetBody : ( componentTypeList ( ',' seqOrSetExtBody )? | seqOrSetExtBody );", 63, 0, input);
             
-                throw nvae_d60s0;
+                throw nvae_d63s0;
             }
-            switch (alt60) 
+            switch (alt63) 
             {
                 case 1 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:144:5: componentTypeList ( ',' seqOrSetExtBody )?
                     {
-                    	PushFollow(FOLLOW_componentTypeList_in_sequenceOrSetBody919);
+                    	PushFollow(FOLLOW_componentTypeList_in_sequenceOrSetBody930);
                     	componentTypeList();
                     	followingStackPointer_--;
 
                     	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:144:23: ( ',' seqOrSetExtBody )?
-                    	int alt59 = 2;
-                    	int LA59_0 = input.LA(1);
+                    	int alt62 = 2;
+                    	int LA62_0 = input.LA(1);
                     	
-                    	if ( (LA59_0 == 79) )
+                    	if ( (LA62_0 == 79) )
                     	{
-                    	    alt59 = 1;
+                    	    alt62 = 1;
                     	}
-                    	switch (alt59) 
+                    	switch (alt62) 
                     	{
                     	    case 1 :
                     	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:144:25: ',' seqOrSetExtBody
                     	        {
-                    	        	Match(input,79,FOLLOW_79_in_sequenceOrSetBody923); 
-                    	        	PushFollow(FOLLOW_seqOrSetExtBody_in_sequenceOrSetBody925);
+                    	        	Match(input,79,FOLLOW_79_in_sequenceOrSetBody934); 
+                    	        	PushFollow(FOLLOW_seqOrSetExtBody_in_sequenceOrSetBody936);
                     	        	seqOrSetExtBody();
                     	        	followingStackPointer_--;
 
@@ -3038,7 +3137,7 @@ public class asn1Parser : Parser
                 case 2 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:145:5: seqOrSetExtBody
                     {
-                    	PushFollow(FOLLOW_seqOrSetExtBody_in_sequenceOrSetBody933);
+                    	PushFollow(FOLLOW_seqOrSetExtBody_in_sequenceOrSetBody944);
                     	seqOrSetExtBody();
                     	followingStackPointer_--;
 
@@ -3070,21 +3169,21 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:149:4: ( '...' ( g_exceptionSpec )? ( ',' extensionAdditionList )? ( ',' '...' ( ',' componentTypeList )? )? )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:149:4: '...' ( g_exceptionSpec )? ( ',' extensionAdditionList )? ( ',' '...' ( ',' componentTypeList )? )?
             {
-            	Match(input,82,FOLLOW_82_in_seqOrSetExtBody945); 
+            	Match(input,82,FOLLOW_82_in_seqOrSetExtBody956); 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:149:10: ( g_exceptionSpec )?
-            	int alt61 = 2;
-            	int LA61_0 = input.LA(1);
+            	int alt64 = 2;
+            	int LA64_0 = input.LA(1);
             	
-            	if ( (LA61_0 == 90) )
+            	if ( (LA64_0 == 90) )
             	{
-            	    alt61 = 1;
+            	    alt64 = 1;
             	}
-            	switch (alt61) 
+            	switch (alt64) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:149:10: g_exceptionSpec
             	        {
-            	        	PushFollow(FOLLOW_g_exceptionSpec_in_seqOrSetExtBody947);
+            	        	PushFollow(FOLLOW_g_exceptionSpec_in_seqOrSetExtBody958);
             	        	g_exceptionSpec();
             	        	followingStackPointer_--;
 
@@ -3095,25 +3194,25 @@ public class asn1Parser : Parser
             	}
 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:149:27: ( ',' extensionAdditionList )?
-            	int alt62 = 2;
-            	int LA62_0 = input.LA(1);
+            	int alt65 = 2;
+            	int LA65_0 = input.LA(1);
             	
-            	if ( (LA62_0 == 79) )
+            	if ( (LA65_0 == 79) )
             	{
-            	    int LA62_1 = input.LA(2);
+            	    int LA65_1 = input.LA(2);
             	    
-            	    if ( (LA62_1 == LID || LA62_1 == 83) )
+            	    if ( (LA65_1 == LID || LA65_1 == 83) )
             	    {
-            	        alt62 = 1;
+            	        alt65 = 1;
             	    }
             	}
-            	switch (alt62) 
+            	switch (alt65) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:149:28: ',' extensionAdditionList
             	        {
-            	        	Match(input,79,FOLLOW_79_in_seqOrSetExtBody951); 
-            	        	PushFollow(FOLLOW_extensionAdditionList_in_seqOrSetExtBody953);
+            	        	Match(input,79,FOLLOW_79_in_seqOrSetExtBody962); 
+            	        	PushFollow(FOLLOW_extensionAdditionList_in_seqOrSetExtBody964);
             	        	extensionAdditionList();
             	        	followingStackPointer_--;
 
@@ -3124,35 +3223,35 @@ public class asn1Parser : Parser
             	}
 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:149:56: ( ',' '...' ( ',' componentTypeList )? )?
-            	int alt64 = 2;
-            	int LA64_0 = input.LA(1);
+            	int alt67 = 2;
+            	int LA67_0 = input.LA(1);
             	
-            	if ( (LA64_0 == 79) )
+            	if ( (LA67_0 == 79) )
             	{
-            	    alt64 = 1;
+            	    alt67 = 1;
             	}
-            	switch (alt64) 
+            	switch (alt67) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:149:57: ',' '...' ( ',' componentTypeList )?
             	        {
-            	        	Match(input,79,FOLLOW_79_in_seqOrSetExtBody958); 
-            	        	Match(input,82,FOLLOW_82_in_seqOrSetExtBody960); 
+            	        	Match(input,79,FOLLOW_79_in_seqOrSetExtBody969); 
+            	        	Match(input,82,FOLLOW_82_in_seqOrSetExtBody971); 
             	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:149:69: ( ',' componentTypeList )?
-            	        	int alt63 = 2;
-            	        	int LA63_0 = input.LA(1);
+            	        	int alt66 = 2;
+            	        	int LA66_0 = input.LA(1);
             	        	
-            	        	if ( (LA63_0 == 79) )
+            	        	if ( (LA66_0 == 79) )
             	        	{
-            	        	    alt63 = 1;
+            	        	    alt66 = 1;
             	        	}
-            	        	switch (alt63) 
+            	        	switch (alt66) 
             	        	{
             	        	    case 1 :
             	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:149:70: ',' componentTypeList
             	        	        {
-            	        	        	Match(input,79,FOLLOW_79_in_seqOrSetExtBody965); 
-            	        	        	PushFollow(FOLLOW_componentTypeList_in_seqOrSetExtBody967);
+            	        	        	Match(input,79,FOLLOW_79_in_seqOrSetExtBody976); 
+            	        	        	PushFollow(FOLLOW_componentTypeList_in_seqOrSetExtBody978);
             	        	        	componentTypeList();
             	        	        	followingStackPointer_--;
 
@@ -3194,36 +3293,36 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:153:4: ( extensionAddition ( ',' extensionAddition )* )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:153:4: extensionAddition ( ',' extensionAddition )*
             {
-            	PushFollow(FOLLOW_extensionAddition_in_extensionAdditionList986);
+            	PushFollow(FOLLOW_extensionAddition_in_extensionAdditionList997);
             	extensionAddition();
             	followingStackPointer_--;
 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:153:22: ( ',' extensionAddition )*
             	do 
             	{
-            	    int alt65 = 2;
-            	    int LA65_0 = input.LA(1);
+            	    int alt68 = 2;
+            	    int LA68_0 = input.LA(1);
             	    
-            	    if ( (LA65_0 == 79) )
+            	    if ( (LA68_0 == 79) )
             	    {
-            	        int LA65_1 = input.LA(2);
+            	        int LA68_1 = input.LA(2);
             	        
-            	        if ( (LA65_1 == LID || LA65_1 == 83) )
+            	        if ( (LA68_1 == LID || LA68_1 == 83) )
             	        {
-            	            alt65 = 1;
+            	            alt68 = 1;
             	        }
             	        
             	    
             	    }
             	    
             	
-            	    switch (alt65) 
+            	    switch (alt68) 
             		{
             			case 1 :
             			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:153:23: ',' extensionAddition
             			    {
-            			    	Match(input,79,FOLLOW_79_in_extensionAdditionList989); 
-            			    	PushFollow(FOLLOW_extensionAddition_in_extensionAdditionList991);
+            			    	Match(input,79,FOLLOW_79_in_extensionAdditionList1000); 
+            			    	PushFollow(FOLLOW_extensionAddition_in_extensionAdditionList1002);
             			    	extensionAddition();
             			    	followingStackPointer_--;
 
@@ -3232,12 +3331,12 @@ public class asn1Parser : Parser
             			    break;
             	
             			default:
-            			    goto loop65;
+            			    goto loop68;
             	    }
             	} while (true);
             	
-            	loop65:
-            		;	// Stops C# compiler whinging that label 'loop65' has no statements
+            	loop68:
+            		;	// Stops C# compiler whinging that label 'loop68' has no statements
 
             
             }
@@ -3263,30 +3362,30 @@ public class asn1Parser : Parser
         try 
     	{
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:157:4: ( componentType | extensionAdditionGroup )
-            int alt66 = 2;
-            int LA66_0 = input.LA(1);
+            int alt69 = 2;
+            int LA69_0 = input.LA(1);
             
-            if ( (LA66_0 == LID) )
+            if ( (LA69_0 == LID) )
             {
-                alt66 = 1;
+                alt69 = 1;
             }
-            else if ( (LA66_0 == 83) )
+            else if ( (LA69_0 == 83) )
             {
-                alt66 = 2;
+                alt69 = 2;
             }
             else 
             {
-                NoViableAltException nvae_d66s0 =
-                    new NoViableAltException("156:1: extensionAddition : ( componentType | extensionAdditionGroup );", 66, 0, input);
+                NoViableAltException nvae_d69s0 =
+                    new NoViableAltException("156:1: extensionAddition : ( componentType | extensionAdditionGroup );", 69, 0, input);
             
-                throw nvae_d66s0;
+                throw nvae_d69s0;
             }
-            switch (alt66) 
+            switch (alt69) 
             {
                 case 1 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:157:4: componentType
                     {
-                    	PushFollow(FOLLOW_componentType_in_extensionAddition1005);
+                    	PushFollow(FOLLOW_componentType_in_extensionAddition1016);
                     	componentType();
                     	followingStackPointer_--;
 
@@ -3296,7 +3395,7 @@ public class asn1Parser : Parser
                 case 2 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:158:10: extensionAdditionGroup
                     {
-                    	PushFollow(FOLLOW_extensionAdditionGroup_in_extensionAddition1016);
+                    	PushFollow(FOLLOW_extensionAdditionGroup_in_extensionAddition1027);
                     	extensionAdditionGroup();
                     	followingStackPointer_--;
 
@@ -3328,21 +3427,21 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:161:4: ( '[[' ( versionNumber )? componentTypeList ']]' )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:161:4: '[[' ( versionNumber )? componentTypeList ']]'
             {
-            	Match(input,83,FOLLOW_83_in_extensionAdditionGroup1026); 
+            	Match(input,83,FOLLOW_83_in_extensionAdditionGroup1037); 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:161:9: ( versionNumber )?
-            	int alt67 = 2;
-            	int LA67_0 = input.LA(1);
+            	int alt70 = 2;
+            	int LA70_0 = input.LA(1);
             	
-            	if ( (LA67_0 == INT) )
+            	if ( (LA70_0 == INT) )
             	{
-            	    alt67 = 1;
+            	    alt70 = 1;
             	}
-            	switch (alt67) 
+            	switch (alt70) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:161:9: versionNumber
             	        {
-            	        	PushFollow(FOLLOW_versionNumber_in_extensionAdditionGroup1028);
+            	        	PushFollow(FOLLOW_versionNumber_in_extensionAdditionGroup1039);
             	        	versionNumber();
             	        	followingStackPointer_--;
 
@@ -3352,11 +3451,11 @@ public class asn1Parser : Parser
             	
             	}
 
-            	PushFollow(FOLLOW_componentTypeList_in_extensionAdditionGroup1031);
+            	PushFollow(FOLLOW_componentTypeList_in_extensionAdditionGroup1042);
             	componentTypeList();
             	followingStackPointer_--;
 
-            	Match(input,84,FOLLOW_84_in_extensionAdditionGroup1033); 
+            	Match(input,84,FOLLOW_84_in_extensionAdditionGroup1044); 
             
             }
     
@@ -3383,36 +3482,36 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:165:4: ( componentType ( ',' componentType )* )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:165:4: componentType ( ',' componentType )*
             {
-            	PushFollow(FOLLOW_componentType_in_componentTypeList1045);
+            	PushFollow(FOLLOW_componentType_in_componentTypeList1056);
             	componentType();
             	followingStackPointer_--;
 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:165:19: ( ',' componentType )*
             	do 
             	{
-            	    int alt68 = 2;
-            	    int LA68_0 = input.LA(1);
+            	    int alt71 = 2;
+            	    int LA71_0 = input.LA(1);
             	    
-            	    if ( (LA68_0 == 79) )
+            	    if ( (LA71_0 == 79) )
             	    {
-            	        int LA68_1 = input.LA(2);
+            	        int LA71_1 = input.LA(2);
             	        
-            	        if ( (LA68_1 == LID) )
+            	        if ( (LA71_1 == LID) )
             	        {
-            	            alt68 = 1;
+            	            alt71 = 1;
             	        }
             	        
             	    
             	    }
             	    
             	
-            	    switch (alt68) 
+            	    switch (alt71) 
             		{
             			case 1 :
             			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:165:20: ',' componentType
             			    {
-            			    	Match(input,79,FOLLOW_79_in_componentTypeList1049); 
-            			    	PushFollow(FOLLOW_componentType_in_componentTypeList1051);
+            			    	Match(input,79,FOLLOW_79_in_componentTypeList1060); 
+            			    	PushFollow(FOLLOW_componentType_in_componentTypeList1062);
             			    	componentType();
             			    	followingStackPointer_--;
 
@@ -3421,12 +3520,12 @@ public class asn1Parser : Parser
             			    break;
             	
             			default:
-            			    goto loop68;
+            			    goto loop71;
             	    }
             	} while (true);
             	
-            	loop68:
-            		;	// Stops C# compiler whinging that label 'loop68' has no statements
+            	loop71:
+            		;	// Stops C# compiler whinging that label 'loop71' has no statements
 
             
             }
@@ -3454,40 +3553,40 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:169:4: ( identifier type ( OPTIONAL | DEFAULT value )? )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:169:4: identifier type ( OPTIONAL | DEFAULT value )?
             {
-            	PushFollow(FOLLOW_identifier_in_componentType1066);
+            	PushFollow(FOLLOW_identifier_in_componentType1077);
             	identifier();
             	followingStackPointer_--;
 
-            	PushFollow(FOLLOW_type_in_componentType1068);
+            	PushFollow(FOLLOW_type_in_componentType1079);
             	type();
             	followingStackPointer_--;
 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:169:20: ( OPTIONAL | DEFAULT value )?
-            	int alt69 = 3;
-            	int LA69_0 = input.LA(1);
+            	int alt72 = 3;
+            	int LA72_0 = input.LA(1);
             	
-            	if ( (LA69_0 == OPTIONAL) )
+            	if ( (LA72_0 == OPTIONAL) )
             	{
-            	    alt69 = 1;
+            	    alt72 = 1;
             	}
-            	else if ( (LA69_0 == DEFAULT) )
+            	else if ( (LA72_0 == DEFAULT) )
             	{
-            	    alt69 = 2;
+            	    alt72 = 2;
             	}
-            	switch (alt69) 
+            	switch (alt72) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:169:21: OPTIONAL
             	        {
-            	        	Match(input,OPTIONAL,FOLLOW_OPTIONAL_in_componentType1071); 
+            	        	Match(input,OPTIONAL,FOLLOW_OPTIONAL_in_componentType1082); 
             	        
             	        }
             	        break;
             	    case 2 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:169:32: DEFAULT value
             	        {
-            	        	Match(input,DEFAULT,FOLLOW_DEFAULT_in_componentType1075); 
-            	        	PushFollow(FOLLOW_value_in_componentType1077);
+            	        	Match(input,DEFAULT,FOLLOW_DEFAULT_in_componentType1086); 
+            	        	PushFollow(FOLLOW_value_in_componentType1088);
             	        	value();
             	        	followingStackPointer_--;
 
@@ -3515,62 +3614,62 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start sequenceOfType
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:172:1: sequenceOfType : ( SEQUENCE ( sizeConstraint )? OF type | SEQUENCE SIZE valueConstraint OF type );
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:172:1: sequenceOfType : ( SEQUENCE ( sizeConstraint )? OF ( identifier )? type | SEQUENCE SIZE valueConstraint OF ( identifier )? type );
     public void sequenceOfType() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:173:4: ( SEQUENCE ( sizeConstraint )? OF type | SEQUENCE SIZE valueConstraint OF type )
-            int alt71 = 2;
-            int LA71_0 = input.LA(1);
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:173:4: ( SEQUENCE ( sizeConstraint )? OF ( identifier )? type | SEQUENCE SIZE valueConstraint OF ( identifier )? type )
+            int alt76 = 2;
+            int LA76_0 = input.LA(1);
             
-            if ( (LA71_0 == SEQUENCE) )
+            if ( (LA76_0 == SEQUENCE) )
             {
-                int LA71_1 = input.LA(2);
+                int LA76_1 = input.LA(2);
                 
-                if ( (LA71_1 == SIZE) )
+                if ( (LA76_1 == SIZE) )
                 {
-                    alt71 = 2;
+                    alt76 = 2;
                 }
-                else if ( (LA71_1 == OF || LA71_1 == 76) )
+                else if ( (LA76_1 == OF || LA76_1 == 76) )
                 {
-                    alt71 = 1;
+                    alt76 = 1;
                 }
                 else 
                 {
-                    NoViableAltException nvae_d71s1 =
-                        new NoViableAltException("172:1: sequenceOfType : ( SEQUENCE ( sizeConstraint )? OF type | SEQUENCE SIZE valueConstraint OF type );", 71, 1, input);
+                    NoViableAltException nvae_d76s1 =
+                        new NoViableAltException("172:1: sequenceOfType : ( SEQUENCE ( sizeConstraint )? OF ( identifier )? type | SEQUENCE SIZE valueConstraint OF ( identifier )? type );", 76, 1, input);
                 
-                    throw nvae_d71s1;
+                    throw nvae_d76s1;
                 }
             }
             else 
             {
-                NoViableAltException nvae_d71s0 =
-                    new NoViableAltException("172:1: sequenceOfType : ( SEQUENCE ( sizeConstraint )? OF type | SEQUENCE SIZE valueConstraint OF type );", 71, 0, input);
+                NoViableAltException nvae_d76s0 =
+                    new NoViableAltException("172:1: sequenceOfType : ( SEQUENCE ( sizeConstraint )? OF ( identifier )? type | SEQUENCE SIZE valueConstraint OF ( identifier )? type );", 76, 0, input);
             
-                throw nvae_d71s0;
+                throw nvae_d76s0;
             }
-            switch (alt71) 
+            switch (alt76) 
             {
                 case 1 :
-                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:173:4: SEQUENCE ( sizeConstraint )? OF type
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:173:4: SEQUENCE ( sizeConstraint )? OF ( identifier )? type
                     {
-                    	Match(input,SEQUENCE,FOLLOW_SEQUENCE_in_sequenceOfType1092); 
+                    	Match(input,SEQUENCE,FOLLOW_SEQUENCE_in_sequenceOfType1103); 
                     	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:173:13: ( sizeConstraint )?
-                    	int alt70 = 2;
-                    	int LA70_0 = input.LA(1);
+                    	int alt73 = 2;
+                    	int LA73_0 = input.LA(1);
                     	
-                    	if ( (LA70_0 == 76) )
+                    	if ( (LA73_0 == 76) )
                     	{
-                    	    alt70 = 1;
+                    	    alt73 = 1;
                     	}
-                    	switch (alt70) 
+                    	switch (alt73) 
                     	{
                     	    case 1 :
                     	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:173:13: sizeConstraint
                     	        {
-                    	        	PushFollow(FOLLOW_sizeConstraint_in_sequenceOfType1094);
+                    	        	PushFollow(FOLLOW_sizeConstraint_in_sequenceOfType1105);
                     	        	sizeConstraint();
                     	        	followingStackPointer_--;
 
@@ -3580,8 +3679,31 @@ public class asn1Parser : Parser
                     	
                     	}
 
-                    	Match(input,OF,FOLLOW_OF_in_sequenceOfType1097); 
-                    	PushFollow(FOLLOW_type_in_sequenceOfType1099);
+                    	Match(input,OF,FOLLOW_OF_in_sequenceOfType1108); 
+                    	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:173:32: ( identifier )?
+                    	int alt74 = 2;
+                    	int LA74_0 = input.LA(1);
+                    	
+                    	if ( (LA74_0 == LID) )
+                    	{
+                    	    alt74 = 1;
+                    	}
+                    	switch (alt74) 
+                    	{
+                    	    case 1 :
+                    	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:173:33: identifier
+                    	        {
+                    	        	PushFollow(FOLLOW_identifier_in_sequenceOfType1111);
+                    	        	identifier();
+                    	        	followingStackPointer_--;
+
+                    	        
+                    	        }
+                    	        break;
+                    	
+                    	}
+
+                    	PushFollow(FOLLOW_type_in_sequenceOfType1115);
                     	type();
                     	followingStackPointer_--;
 
@@ -3589,16 +3711,39 @@ public class asn1Parser : Parser
                     }
                     break;
                 case 2 :
-                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:174:4: SEQUENCE SIZE valueConstraint OF type
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:174:4: SEQUENCE SIZE valueConstraint OF ( identifier )? type
                     {
-                    	Match(input,SEQUENCE,FOLLOW_SEQUENCE_in_sequenceOfType1104); 
-                    	Match(input,SIZE,FOLLOW_SIZE_in_sequenceOfType1106); 
-                    	PushFollow(FOLLOW_valueConstraint_in_sequenceOfType1108);
+                    	Match(input,SEQUENCE,FOLLOW_SEQUENCE_in_sequenceOfType1120); 
+                    	Match(input,SIZE,FOLLOW_SIZE_in_sequenceOfType1122); 
+                    	PushFollow(FOLLOW_valueConstraint_in_sequenceOfType1124);
                     	valueConstraint();
                     	followingStackPointer_--;
 
-                    	Match(input,OF,FOLLOW_OF_in_sequenceOfType1110); 
-                    	PushFollow(FOLLOW_type_in_sequenceOfType1112);
+                    	Match(input,OF,FOLLOW_OF_in_sequenceOfType1126); 
+                    	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:174:37: ( identifier )?
+                    	int alt75 = 2;
+                    	int LA75_0 = input.LA(1);
+                    	
+                    	if ( (LA75_0 == LID) )
+                    	{
+                    	    alt75 = 1;
+                    	}
+                    	switch (alt75) 
+                    	{
+                    	    case 1 :
+                    	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:174:38: identifier
+                    	        {
+                    	        	PushFollow(FOLLOW_identifier_in_sequenceOfType1129);
+                    	        	identifier();
+                    	        	followingStackPointer_--;
+
+                    	        
+                    	        }
+                    	        break;
+                    	
+                    	}
+
+                    	PushFollow(FOLLOW_type_in_sequenceOfType1133);
                     	type();
                     	followingStackPointer_--;
 
@@ -3622,62 +3767,62 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start setOfType
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:177:1: setOfType : ( SET ( sizeConstraint )? OF type | SET SIZE valueConstraint OF type );
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:177:1: setOfType : ( SET ( sizeConstraint )? OF ( identifier )? type | SET SIZE valueConstraint OF ( identifier )? type );
     public void setOfType() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:178:4: ( SET ( sizeConstraint )? OF type | SET SIZE valueConstraint OF type )
-            int alt73 = 2;
-            int LA73_0 = input.LA(1);
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:178:4: ( SET ( sizeConstraint )? OF ( identifier )? type | SET SIZE valueConstraint OF ( identifier )? type )
+            int alt80 = 2;
+            int LA80_0 = input.LA(1);
             
-            if ( (LA73_0 == SET) )
+            if ( (LA80_0 == SET) )
             {
-                int LA73_1 = input.LA(2);
+                int LA80_1 = input.LA(2);
                 
-                if ( (LA73_1 == SIZE) )
+                if ( (LA80_1 == SIZE) )
                 {
-                    alt73 = 2;
+                    alt80 = 2;
                 }
-                else if ( (LA73_1 == OF || LA73_1 == 76) )
+                else if ( (LA80_1 == OF || LA80_1 == 76) )
                 {
-                    alt73 = 1;
+                    alt80 = 1;
                 }
                 else 
                 {
-                    NoViableAltException nvae_d73s1 =
-                        new NoViableAltException("177:1: setOfType : ( SET ( sizeConstraint )? OF type | SET SIZE valueConstraint OF type );", 73, 1, input);
+                    NoViableAltException nvae_d80s1 =
+                        new NoViableAltException("177:1: setOfType : ( SET ( sizeConstraint )? OF ( identifier )? type | SET SIZE valueConstraint OF ( identifier )? type );", 80, 1, input);
                 
-                    throw nvae_d73s1;
+                    throw nvae_d80s1;
                 }
             }
             else 
             {
-                NoViableAltException nvae_d73s0 =
-                    new NoViableAltException("177:1: setOfType : ( SET ( sizeConstraint )? OF type | SET SIZE valueConstraint OF type );", 73, 0, input);
+                NoViableAltException nvae_d80s0 =
+                    new NoViableAltException("177:1: setOfType : ( SET ( sizeConstraint )? OF ( identifier )? type | SET SIZE valueConstraint OF ( identifier )? type );", 80, 0, input);
             
-                throw nvae_d73s0;
+                throw nvae_d80s0;
             }
-            switch (alt73) 
+            switch (alt80) 
             {
                 case 1 :
-                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:178:4: SET ( sizeConstraint )? OF type
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:178:4: SET ( sizeConstraint )? OF ( identifier )? type
                     {
-                    	Match(input,SET,FOLLOW_SET_in_setOfType1124); 
+                    	Match(input,SET,FOLLOW_SET_in_setOfType1145); 
                     	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:178:8: ( sizeConstraint )?
-                    	int alt72 = 2;
-                    	int LA72_0 = input.LA(1);
+                    	int alt77 = 2;
+                    	int LA77_0 = input.LA(1);
                     	
-                    	if ( (LA72_0 == 76) )
+                    	if ( (LA77_0 == 76) )
                     	{
-                    	    alt72 = 1;
+                    	    alt77 = 1;
                     	}
-                    	switch (alt72) 
+                    	switch (alt77) 
                     	{
                     	    case 1 :
                     	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:178:8: sizeConstraint
                     	        {
-                    	        	PushFollow(FOLLOW_sizeConstraint_in_setOfType1126);
+                    	        	PushFollow(FOLLOW_sizeConstraint_in_setOfType1147);
                     	        	sizeConstraint();
                     	        	followingStackPointer_--;
 
@@ -3687,8 +3832,31 @@ public class asn1Parser : Parser
                     	
                     	}
 
-                    	Match(input,OF,FOLLOW_OF_in_setOfType1129); 
-                    	PushFollow(FOLLOW_type_in_setOfType1131);
+                    	Match(input,OF,FOLLOW_OF_in_setOfType1150); 
+                    	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:178:27: ( identifier )?
+                    	int alt78 = 2;
+                    	int LA78_0 = input.LA(1);
+                    	
+                    	if ( (LA78_0 == LID) )
+                    	{
+                    	    alt78 = 1;
+                    	}
+                    	switch (alt78) 
+                    	{
+                    	    case 1 :
+                    	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:178:28: identifier
+                    	        {
+                    	        	PushFollow(FOLLOW_identifier_in_setOfType1153);
+                    	        	identifier();
+                    	        	followingStackPointer_--;
+
+                    	        
+                    	        }
+                    	        break;
+                    	
+                    	}
+
+                    	PushFollow(FOLLOW_type_in_setOfType1157);
                     	type();
                     	followingStackPointer_--;
 
@@ -3696,16 +3864,39 @@ public class asn1Parser : Parser
                     }
                     break;
                 case 2 :
-                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:179:4: SET SIZE valueConstraint OF type
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:179:4: SET SIZE valueConstraint OF ( identifier )? type
                     {
-                    	Match(input,SET,FOLLOW_SET_in_setOfType1136); 
-                    	Match(input,SIZE,FOLLOW_SIZE_in_setOfType1138); 
-                    	PushFollow(FOLLOW_valueConstraint_in_setOfType1140);
+                    	Match(input,SET,FOLLOW_SET_in_setOfType1162); 
+                    	Match(input,SIZE,FOLLOW_SIZE_in_setOfType1164); 
+                    	PushFollow(FOLLOW_valueConstraint_in_setOfType1166);
                     	valueConstraint();
                     	followingStackPointer_--;
 
-                    	Match(input,OF,FOLLOW_OF_in_setOfType1142); 
-                    	PushFollow(FOLLOW_type_in_setOfType1144);
+                    	Match(input,OF,FOLLOW_OF_in_setOfType1168); 
+                    	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:179:32: ( identifier )?
+                    	int alt79 = 2;
+                    	int LA79_0 = input.LA(1);
+                    	
+                    	if ( (LA79_0 == LID) )
+                    	{
+                    	    alt79 = 1;
+                    	}
+                    	switch (alt79) 
+                    	{
+                    	    case 1 :
+                    	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:179:33: identifier
+                    	        {
+                    	        	PushFollow(FOLLOW_identifier_in_setOfType1171);
+                    	        	identifier();
+                    	        	followingStackPointer_--;
+
+                    	        
+                    	        }
+                    	        break;
+                    	
+                    	}
+
+                    	PushFollow(FOLLOW_type_in_setOfType1175);
                     	type();
                     	followingStackPointer_--;
 
@@ -3735,160 +3926,160 @@ public class asn1Parser : Parser
         try 
     	{
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:184:3: ( OCTET STRING | NumericString | PrintableString | VisibleString | IA5String | TeletexString | VideotexString | GraphicString | GeneralString | UniversalString | BMPString | UTF8String )
-            int alt74 = 12;
+            int alt81 = 12;
             switch ( input.LA(1) ) 
             {
             case OCTET:
             	{
-                alt74 = 1;
+                alt81 = 1;
                 }
                 break;
             case NumericString:
             	{
-                alt74 = 2;
+                alt81 = 2;
                 }
                 break;
             case PrintableString:
             	{
-                alt74 = 3;
+                alt81 = 3;
                 }
                 break;
             case VisibleString:
             	{
-                alt74 = 4;
+                alt81 = 4;
                 }
                 break;
             case IA5String:
             	{
-                alt74 = 5;
+                alt81 = 5;
                 }
                 break;
             case TeletexString:
             	{
-                alt74 = 6;
+                alt81 = 6;
                 }
                 break;
             case VideotexString:
             	{
-                alt74 = 7;
+                alt81 = 7;
                 }
                 break;
             case GraphicString:
             	{
-                alt74 = 8;
+                alt81 = 8;
                 }
                 break;
             case GeneralString:
             	{
-                alt74 = 9;
+                alt81 = 9;
                 }
                 break;
             case UniversalString:
             	{
-                alt74 = 10;
+                alt81 = 10;
                 }
                 break;
             case BMPString:
             	{
-                alt74 = 11;
+                alt81 = 11;
                 }
                 break;
             case UTF8String:
             	{
-                alt74 = 12;
+                alt81 = 12;
                 }
                 break;
             	default:
-            	    NoViableAltException nvae_d74s0 =
-            	        new NoViableAltException("183:1: stringType : ( OCTET STRING | NumericString | PrintableString | VisibleString | IA5String | TeletexString | VideotexString | GraphicString | GeneralString | UniversalString | BMPString | UTF8String );", 74, 0, input);
+            	    NoViableAltException nvae_d81s0 =
+            	        new NoViableAltException("183:1: stringType : ( OCTET STRING | NumericString | PrintableString | VisibleString | IA5String | TeletexString | VideotexString | GraphicString | GeneralString | UniversalString | BMPString | UTF8String );", 81, 0, input);
             
-            	    throw nvae_d74s0;
+            	    throw nvae_d81s0;
             }
             
-            switch (alt74) 
+            switch (alt81) 
             {
                 case 1 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:184:3: OCTET STRING
                     {
-                    	Match(input,OCTET,FOLLOW_OCTET_in_stringType1160); 
-                    	Match(input,STRING,FOLLOW_STRING_in_stringType1162); 
+                    	Match(input,OCTET,FOLLOW_OCTET_in_stringType1191); 
+                    	Match(input,STRING,FOLLOW_STRING_in_stringType1193); 
                     
                     }
                     break;
                 case 2 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:185:3: NumericString
                     {
-                    	Match(input,NumericString,FOLLOW_NumericString_in_stringType1166); 
+                    	Match(input,NumericString,FOLLOW_NumericString_in_stringType1197); 
                     
                     }
                     break;
                 case 3 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:186:3: PrintableString
                     {
-                    	Match(input,PrintableString,FOLLOW_PrintableString_in_stringType1170); 
+                    	Match(input,PrintableString,FOLLOW_PrintableString_in_stringType1201); 
                     
                     }
                     break;
                 case 4 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:187:3: VisibleString
                     {
-                    	Match(input,VisibleString,FOLLOW_VisibleString_in_stringType1174); 
+                    	Match(input,VisibleString,FOLLOW_VisibleString_in_stringType1205); 
                     
                     }
                     break;
                 case 5 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:188:3: IA5String
                     {
-                    	Match(input,IA5String,FOLLOW_IA5String_in_stringType1178); 
+                    	Match(input,IA5String,FOLLOW_IA5String_in_stringType1209); 
                     
                     }
                     break;
                 case 6 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:189:3: TeletexString
                     {
-                    	Match(input,TeletexString,FOLLOW_TeletexString_in_stringType1182); 
+                    	Match(input,TeletexString,FOLLOW_TeletexString_in_stringType1213); 
                     
                     }
                     break;
                 case 7 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:190:3: VideotexString
                     {
-                    	Match(input,VideotexString,FOLLOW_VideotexString_in_stringType1186); 
+                    	Match(input,VideotexString,FOLLOW_VideotexString_in_stringType1217); 
                     
                     }
                     break;
                 case 8 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:191:3: GraphicString
                     {
-                    	Match(input,GraphicString,FOLLOW_GraphicString_in_stringType1190); 
+                    	Match(input,GraphicString,FOLLOW_GraphicString_in_stringType1221); 
                     
                     }
                     break;
                 case 9 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:192:3: GeneralString
                     {
-                    	Match(input,GeneralString,FOLLOW_GeneralString_in_stringType1194); 
+                    	Match(input,GeneralString,FOLLOW_GeneralString_in_stringType1225); 
                     
                     }
                     break;
                 case 10 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:193:3: UniversalString
                     {
-                    	Match(input,UniversalString,FOLLOW_UniversalString_in_stringType1198); 
+                    	Match(input,UniversalString,FOLLOW_UniversalString_in_stringType1229); 
                     
                     }
                     break;
                 case 11 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:194:3: BMPString
                     {
-                    	Match(input,BMPString,FOLLOW_BMPString_in_stringType1202); 
+                    	Match(input,BMPString,FOLLOW_BMPString_in_stringType1233); 
                     
                     }
                     break;
                 case 12 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:195:3: UTF8String
                     {
-                    	Match(input,UTF8String,FOLLOW_UTF8String_in_stringType1206); 
+                    	Match(input,UTF8String,FOLLOW_UTF8String_in_stringType1237); 
                     
                     }
                     break;
@@ -3917,22 +4108,22 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:199:4: ( UID ( '.' UID )? )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:199:4: UID ( '.' UID )?
             {
-            	Match(input,UID,FOLLOW_UID_in_referencedType1218); 
+            	Match(input,UID,FOLLOW_UID_in_referencedType1249); 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:199:8: ( '.' UID )?
-            	int alt75 = 2;
-            	int LA75_0 = input.LA(1);
+            	int alt82 = 2;
+            	int LA82_0 = input.LA(1);
             	
-            	if ( (LA75_0 == 85) )
+            	if ( (LA82_0 == 85) )
             	{
-            	    alt75 = 1;
+            	    alt82 = 1;
             	}
-            	switch (alt75) 
+            	switch (alt82) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:199:9: '.' UID
             	        {
-            	        	Match(input,85,FOLLOW_85_in_referencedType1221); 
-            	        	Match(input,UID,FOLLOW_UID_in_referencedType1223); 
+            	        	Match(input,85,FOLLOW_85_in_referencedType1252); 
+            	        	Match(input,UID,FOLLOW_UID_in_referencedType1254); 
             	        
             	        }
             	        break;
@@ -3965,8 +4156,8 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:203:4: ( OBJECT IDENTIFIER )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:203:4: OBJECT IDENTIFIER
             {
-            	Match(input,OBJECT,FOLLOW_OBJECT_in_objectIdentifier1237); 
-            	Match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_objectIdentifier1239); 
+            	Match(input,OBJECT,FOLLOW_OBJECT_in_objectIdentifier1268); 
+            	Match(input,IDENTIFIER,FOLLOW_IDENTIFIER_in_objectIdentifier1270); 
             
             }
     
@@ -3993,7 +4184,7 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:205:15: ( RELATIVE_OID )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:205:15: RELATIVE_OID
             {
-            	Match(input,RELATIVE_OID,FOLLOW_RELATIVE_OID_in_relativeOID1247); 
+            	Match(input,RELATIVE_OID,FOLLOW_RELATIVE_OID_in_relativeOID1278); 
             
             }
     
@@ -4021,14 +4212,14 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:209:4: ( '+' | '-' )? INT
             {
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:209:4: ( '+' | '-' )?
-            	int alt76 = 2;
-            	int LA76_0 = input.LA(1);
+            	int alt83 = 2;
+            	int LA83_0 = input.LA(1);
             	
-            	if ( ((LA76_0 >= 86 && LA76_0 <= 87)) )
+            	if ( ((LA83_0 >= 86 && LA83_0 <= 87)) )
             	{
-            	    alt76 = 1;
+            	    alt83 = 1;
             	}
-            	switch (alt76) 
+            	switch (alt83) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:
@@ -4042,7 +4233,7 @@ public class asn1Parser : Parser
             	        	{
             	        	    MismatchedSetException mse =
             	        	        new MismatchedSetException(null,input);
-            	        	    RecoverFromMismatchedSet(input,mse,FOLLOW_set_in_signedNumber1258);    throw mse;
+            	        	    RecoverFromMismatchedSet(input,mse,FOLLOW_set_in_signedNumber1289);    throw mse;
             	        	}
 
             	        
@@ -4051,7 +4242,7 @@ public class asn1Parser : Parser
             	
             	}
 
-            	Match(input,INT,FOLLOW_INT_in_signedNumber1265); 
+            	Match(input,INT,FOLLOW_INT_in_signedNumber1296); 
             
             }
     
@@ -4076,21 +4267,37 @@ public class asn1Parser : Parser
         try 
     	{
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:213:4: ( valueConstraint | sizeConstraint | withComponentsConstraint | subTypeConstraint )
-            int alt77 = 4;
-            int LA77_0 = input.LA(1);
+            int alt84 = 4;
+            int LA84_0 = input.LA(1);
             
-            if ( (LA77_0 == 76) )
+            if ( (LA84_0 == 76) )
             {
                 switch ( input.LA(2) ) 
                 {
-                case WITH:
-                	{
-                    alt77 = 3;
-                    }
-                    break;
                 case SIZE:
                 	{
-                    alt77 = 2;
+                    alt84 = 2;
+                    }
+                    break;
+                case WITH:
+                	{
+                    alt84 = 3;
+                    }
+                    break;
+                case INT:
+                case BitStringLiteral:
+                case OctectStringLiteral:
+                case TRUE:
+                case FALSE:
+                case StringLiteral:
+                case MIN:
+                case MAX:
+                case LID:
+                case 74:
+                case 86:
+                case 87:
+                	{
+                    alt84 = 1;
                     }
                     break;
                 case NULL:
@@ -4119,46 +4326,30 @@ public class asn1Parser : Parser
                 case RELATIVE_OID:
                 case 80:
                 	{
-                    alt77 = 4;
-                    }
-                    break;
-                case INT:
-                case BitStringLiteral:
-                case OctectStringLiteral:
-                case TRUE:
-                case FALSE:
-                case StringLiteral:
-                case MIN:
-                case MAX:
-                case LID:
-                case 74:
-                case 86:
-                case 87:
-                	{
-                    alt77 = 1;
+                    alt84 = 4;
                     }
                     break;
                 	default:
-                	    NoViableAltException nvae_d77s1 =
-                	        new NoViableAltException("212:1: constraint : ( valueConstraint | sizeConstraint | withComponentsConstraint | subTypeConstraint );", 77, 1, input);
+                	    NoViableAltException nvae_d84s1 =
+                	        new NoViableAltException("212:1: constraint : ( valueConstraint | sizeConstraint | withComponentsConstraint | subTypeConstraint );", 84, 1, input);
                 
-                	    throw nvae_d77s1;
+                	    throw nvae_d84s1;
                 }
             
             }
             else 
             {
-                NoViableAltException nvae_d77s0 =
-                    new NoViableAltException("212:1: constraint : ( valueConstraint | sizeConstraint | withComponentsConstraint | subTypeConstraint );", 77, 0, input);
+                NoViableAltException nvae_d84s0 =
+                    new NoViableAltException("212:1: constraint : ( valueConstraint | sizeConstraint | withComponentsConstraint | subTypeConstraint );", 84, 0, input);
             
-                throw nvae_d77s0;
+                throw nvae_d84s0;
             }
-            switch (alt77) 
+            switch (alt84) 
             {
                 case 1 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:213:4: valueConstraint
                     {
-                    	PushFollow(FOLLOW_valueConstraint_in_constraint1276);
+                    	PushFollow(FOLLOW_valueConstraint_in_constraint1307);
                     	valueConstraint();
                     	followingStackPointer_--;
 
@@ -4168,7 +4359,7 @@ public class asn1Parser : Parser
                 case 2 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:214:4: sizeConstraint
                     {
-                    	PushFollow(FOLLOW_sizeConstraint_in_constraint1281);
+                    	PushFollow(FOLLOW_sizeConstraint_in_constraint1312);
                     	sizeConstraint();
                     	followingStackPointer_--;
 
@@ -4178,7 +4369,7 @@ public class asn1Parser : Parser
                 case 3 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:215:4: withComponentsConstraint
                     {
-                    	PushFollow(FOLLOW_withComponentsConstraint_in_constraint1286);
+                    	PushFollow(FOLLOW_withComponentsConstraint_in_constraint1317);
                     	withComponentsConstraint();
                     	followingStackPointer_--;
 
@@ -4188,7 +4379,7 @@ public class asn1Parser : Parser
                 case 4 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:216:4: subTypeConstraint
                     {
-                    	PushFollow(FOLLOW_subTypeConstraint_in_constraint1291);
+                    	PushFollow(FOLLOW_subTypeConstraint_in_constraint1322);
                     	subTypeConstraint();
                     	followingStackPointer_--;
 
@@ -4220,66 +4411,66 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:222:4: ( '(' value ( ( '<' )? '..' ( '<' )? value )? ')' )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:222:4: '(' value ( ( '<' )? '..' ( '<' )? value )? ')'
             {
-            	Match(input,76,FOLLOW_76_in_valueConstraint1307); 
-            	PushFollow(FOLLOW_value_in_valueConstraint1309);
+            	Match(input,76,FOLLOW_76_in_valueConstraint1338); 
+            	PushFollow(FOLLOW_value_in_valueConstraint1340);
             	value();
             	followingStackPointer_--;
 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:222:14: ( ( '<' )? '..' ( '<' )? value )?
-            	int alt80 = 2;
-            	int LA80_0 = input.LA(1);
+            	int alt87 = 2;
+            	int LA87_0 = input.LA(1);
             	
-            	if ( ((LA80_0 >= 88 && LA80_0 <= 89)) )
+            	if ( ((LA87_0 >= 88 && LA87_0 <= 89)) )
             	{
-            	    alt80 = 1;
+            	    alt87 = 1;
             	}
-            	switch (alt80) 
+            	switch (alt87) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:222:16: ( '<' )? '..' ( '<' )? value
             	        {
             	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:222:16: ( '<' )?
-            	        	int alt78 = 2;
-            	        	int LA78_0 = input.LA(1);
+            	        	int alt85 = 2;
+            	        	int LA85_0 = input.LA(1);
             	        	
-            	        	if ( (LA78_0 == 88) )
+            	        	if ( (LA85_0 == 88) )
             	        	{
-            	        	    alt78 = 1;
+            	        	    alt85 = 1;
             	        	}
-            	        	switch (alt78) 
+            	        	switch (alt85) 
             	        	{
             	        	    case 1 :
             	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:222:17: '<'
             	        	        {
-            	        	        	Match(input,88,FOLLOW_88_in_valueConstraint1314); 
+            	        	        	Match(input,88,FOLLOW_88_in_valueConstraint1345); 
             	        	        
             	        	        }
             	        	        break;
             	        	
             	        	}
 
-            	        	Match(input,89,FOLLOW_89_in_valueConstraint1318); 
+            	        	Match(input,89,FOLLOW_89_in_valueConstraint1349); 
             	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:222:28: ( '<' )?
-            	        	int alt79 = 2;
-            	        	int LA79_0 = input.LA(1);
+            	        	int alt86 = 2;
+            	        	int LA86_0 = input.LA(1);
             	        	
-            	        	if ( (LA79_0 == 88) )
+            	        	if ( (LA86_0 == 88) )
             	        	{
-            	        	    alt79 = 1;
+            	        	    alt86 = 1;
             	        	}
-            	        	switch (alt79) 
+            	        	switch (alt86) 
             	        	{
             	        	    case 1 :
             	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:222:29: '<'
             	        	        {
-            	        	        	Match(input,88,FOLLOW_88_in_valueConstraint1321); 
+            	        	        	Match(input,88,FOLLOW_88_in_valueConstraint1352); 
             	        	        
             	        	        }
             	        	        break;
             	        	
             	        	}
 
-            	        	PushFollow(FOLLOW_value_in_valueConstraint1325);
+            	        	PushFollow(FOLLOW_value_in_valueConstraint1356);
             	        	value();
             	        	followingStackPointer_--;
 
@@ -4289,7 +4480,7 @@ public class asn1Parser : Parser
             	
             	}
 
-            	Match(input,77,FOLLOW_77_in_valueConstraint1329); 
+            	Match(input,77,FOLLOW_77_in_valueConstraint1360); 
             
             }
     
@@ -4316,13 +4507,13 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:226:4: ( '(' SIZE valueConstraint ')' )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:226:4: '(' SIZE valueConstraint ')'
             {
-            	Match(input,76,FOLLOW_76_in_sizeConstraint1340); 
-            	Match(input,SIZE,FOLLOW_SIZE_in_sizeConstraint1342); 
-            	PushFollow(FOLLOW_valueConstraint_in_sizeConstraint1344);
+            	Match(input,76,FOLLOW_76_in_sizeConstraint1371); 
+            	Match(input,SIZE,FOLLOW_SIZE_in_sizeConstraint1373); 
+            	PushFollow(FOLLOW_valueConstraint_in_sizeConstraint1375);
             	valueConstraint();
             	followingStackPointer_--;
 
-            	Match(input,77,FOLLOW_77_in_sizeConstraint1346); 
+            	Match(input,77,FOLLOW_77_in_sizeConstraint1377); 
             
             }
     
@@ -4349,13 +4540,13 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:230:4: ( '(' FROM valueConstraint ')' )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:230:4: '(' FROM valueConstraint ')'
             {
-            	Match(input,76,FOLLOW_76_in_permittedAlphabetConstraint1359); 
-            	Match(input,FROM,FOLLOW_FROM_in_permittedAlphabetConstraint1361); 
-            	PushFollow(FOLLOW_valueConstraint_in_permittedAlphabetConstraint1363);
+            	Match(input,76,FOLLOW_76_in_permittedAlphabetConstraint1390); 
+            	Match(input,FROM,FOLLOW_FROM_in_permittedAlphabetConstraint1392); 
+            	PushFollow(FOLLOW_valueConstraint_in_permittedAlphabetConstraint1394);
             	valueConstraint();
             	followingStackPointer_--;
 
-            	Match(input,77,FOLLOW_77_in_permittedAlphabetConstraint1365); 
+            	Match(input,77,FOLLOW_77_in_permittedAlphabetConstraint1396); 
             
             }
     
@@ -4382,12 +4573,12 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:234:4: ( '(' type ')' )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:234:4: '(' type ')'
             {
-            	Match(input,76,FOLLOW_76_in_subTypeConstraint1378); 
-            	PushFollow(FOLLOW_type_in_subTypeConstraint1380);
+            	Match(input,76,FOLLOW_76_in_subTypeConstraint1409); 
+            	PushFollow(FOLLOW_type_in_subTypeConstraint1411);
             	type();
             	followingStackPointer_--;
 
-            	Match(input,77,FOLLOW_77_in_subTypeConstraint1382); 
+            	Match(input,77,FOLLOW_77_in_subTypeConstraint1413); 
             
             }
     
@@ -4414,54 +4605,54 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:238:4: ( '(' WITH COMPONENTS '{' ( '...' ',' )? namedConstraint ( ',' namedConstraint )* '}' ')' )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:238:4: '(' WITH COMPONENTS '{' ( '...' ',' )? namedConstraint ( ',' namedConstraint )* '}' ')'
             {
-            	Match(input,76,FOLLOW_76_in_withComponentsConstraint1397); 
-            	Match(input,WITH,FOLLOW_WITH_in_withComponentsConstraint1400); 
-            	Match(input,COMPONENTS,FOLLOW_COMPONENTS_in_withComponentsConstraint1402); 
-            	Match(input,74,FOLLOW_74_in_withComponentsConstraint1404); 
+            	Match(input,76,FOLLOW_76_in_withComponentsConstraint1428); 
+            	Match(input,WITH,FOLLOW_WITH_in_withComponentsConstraint1431); 
+            	Match(input,COMPONENTS,FOLLOW_COMPONENTS_in_withComponentsConstraint1433); 
+            	Match(input,74,FOLLOW_74_in_withComponentsConstraint1435); 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:239:4: ( '...' ',' )?
-            	int alt81 = 2;
-            	int LA81_0 = input.LA(1);
+            	int alt88 = 2;
+            	int LA88_0 = input.LA(1);
             	
-            	if ( (LA81_0 == 82) )
+            	if ( (LA88_0 == 82) )
             	{
-            	    alt81 = 1;
+            	    alt88 = 1;
             	}
-            	switch (alt81) 
+            	switch (alt88) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:239:6: '...' ','
             	        {
-            	        	Match(input,82,FOLLOW_82_in_withComponentsConstraint1411); 
-            	        	Match(input,79,FOLLOW_79_in_withComponentsConstraint1413); 
+            	        	Match(input,82,FOLLOW_82_in_withComponentsConstraint1442); 
+            	        	Match(input,79,FOLLOW_79_in_withComponentsConstraint1444); 
             	        
             	        }
             	        break;
             	
             	}
 
-            	PushFollow(FOLLOW_namedConstraint_in_withComponentsConstraint1420);
+            	PushFollow(FOLLOW_namedConstraint_in_withComponentsConstraint1451);
             	namedConstraint();
             	followingStackPointer_--;
 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:240:21: ( ',' namedConstraint )*
             	do 
             	{
-            	    int alt82 = 2;
-            	    int LA82_0 = input.LA(1);
+            	    int alt89 = 2;
+            	    int LA89_0 = input.LA(1);
             	    
-            	    if ( (LA82_0 == 79) )
+            	    if ( (LA89_0 == 79) )
             	    {
-            	        alt82 = 1;
+            	        alt89 = 1;
             	    }
             	    
             	
-            	    switch (alt82) 
+            	    switch (alt89) 
             		{
             			case 1 :
             			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:240:22: ',' namedConstraint
             			    {
-            			    	Match(input,79,FOLLOW_79_in_withComponentsConstraint1424); 
-            			    	PushFollow(FOLLOW_namedConstraint_in_withComponentsConstraint1426);
+            			    	Match(input,79,FOLLOW_79_in_withComponentsConstraint1455); 
+            			    	PushFollow(FOLLOW_namedConstraint_in_withComponentsConstraint1457);
             			    	namedConstraint();
             			    	followingStackPointer_--;
 
@@ -4470,15 +4661,15 @@ public class asn1Parser : Parser
             			    break;
             	
             			default:
-            			    goto loop82;
+            			    goto loop89;
             	    }
             	} while (true);
             	
-            	loop82:
-            		;	// Stops C# compiler whinging that label 'loop82' has no statements
+            	loop89:
+            		;	// Stops C# compiler whinging that label 'loop89' has no statements
 
-            	Match(input,75,FOLLOW_75_in_withComponentsConstraint1432); 
-            	Match(input,77,FOLLOW_77_in_withComponentsConstraint1436); 
+            	Match(input,75,FOLLOW_75_in_withComponentsConstraint1463); 
+            	Match(input,77,FOLLOW_77_in_withComponentsConstraint1467); 
             
             }
     
@@ -4505,24 +4696,24 @@ public class asn1Parser : Parser
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:246:4: ( identifier ( valueConstraint )? ( PRESENT | ABSENT | OPTIONAL )? )
             // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:246:4: identifier ( valueConstraint )? ( PRESENT | ABSENT | OPTIONAL )?
             {
-            	PushFollow(FOLLOW_identifier_in_namedConstraint1448);
+            	PushFollow(FOLLOW_identifier_in_namedConstraint1479);
             	identifier();
             	followingStackPointer_--;
 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:246:15: ( valueConstraint )?
-            	int alt83 = 2;
-            	int LA83_0 = input.LA(1);
+            	int alt90 = 2;
+            	int LA90_0 = input.LA(1);
             	
-            	if ( (LA83_0 == 76) )
+            	if ( (LA90_0 == 76) )
             	{
-            	    alt83 = 1;
+            	    alt90 = 1;
             	}
-            	switch (alt83) 
+            	switch (alt90) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:246:16: valueConstraint
             	        {
-            	        	PushFollow(FOLLOW_valueConstraint_in_namedConstraint1451);
+            	        	PushFollow(FOLLOW_valueConstraint_in_namedConstraint1482);
             	        	valueConstraint();
             	        	followingStackPointer_--;
 
@@ -4533,14 +4724,14 @@ public class asn1Parser : Parser
             	}
 
             	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:246:34: ( PRESENT | ABSENT | OPTIONAL )?
-            	int alt84 = 2;
-            	int LA84_0 = input.LA(1);
+            	int alt91 = 2;
+            	int LA91_0 = input.LA(1);
             	
-            	if ( (LA84_0 == OPTIONAL || (LA84_0 >= PRESENT && LA84_0 <= ABSENT)) )
+            	if ( (LA91_0 == OPTIONAL || (LA91_0 >= PRESENT && LA91_0 <= ABSENT)) )
             	{
-            	    alt84 = 1;
+            	    alt91 = 1;
             	}
-            	switch (alt84) 
+            	switch (alt91) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:
@@ -4554,7 +4745,7 @@ public class asn1Parser : Parser
             	        	{
             	        	    MismatchedSetException mse =
             	        	        new MismatchedSetException(null,input);
-            	        	    RecoverFromMismatchedSet(input,mse,FOLLOW_set_in_namedConstraint1455);    throw mse;
+            	        	    RecoverFromMismatchedSet(input,mse,FOLLOW_set_in_namedConstraint1486);    throw mse;
             	        	}
 
             	        
@@ -4581,87 +4772,129 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start value
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:248:1: value : ( BitStringLiteral | bitStringValue | OctectStringLiteral | TRUE | FALSE | StringLiteral | valuereference | ( '+' | '-' )? INT ( '.' ( INT )? )? | MIN | MAX );
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:248:1: value : ( BitStringLiteral | bitStringValue | OctectStringLiteral | TRUE | FALSE | StringLiteral | valuereference | ( '+' | '-' )? INT ( '.' ( INT )? )? | MIN | MAX | objectIdentifierValue );
     public void value() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:249:3: ( BitStringLiteral | bitStringValue | OctectStringLiteral | TRUE | FALSE | StringLiteral | valuereference | ( '+' | '-' )? INT ( '.' ( INT )? )? | MIN | MAX )
-            int alt88 = 10;
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:249:3: ( BitStringLiteral | bitStringValue | OctectStringLiteral | TRUE | FALSE | StringLiteral | valuereference | ( '+' | '-' )? INT ( '.' ( INT )? )? | MIN | MAX | objectIdentifierValue )
+            int alt95 = 11;
             switch ( input.LA(1) ) 
             {
             case BitStringLiteral:
             	{
-                alt88 = 1;
+                alt95 = 1;
                 }
                 break;
             case 74:
             	{
-                alt88 = 2;
+                int LA95_2 = input.LA(2);
+                
+                if ( (LA95_2 == LID) )
+                {
+                    switch ( input.LA(3) ) 
+                    {
+                    case 79:
+                    	{
+                        alt95 = 2;
+                        }
+                        break;
+                    case 75:
+                    	{
+                        alt95 = 2;
+                        }
+                        break;
+                    case INT:
+                    case UID:
+                    case LID:
+                    case 76:
+                    	{
+                        alt95 = 11;
+                        }
+                        break;
+                    	default:
+                    	    NoViableAltException nvae_d95s11 =
+                    	        new NoViableAltException("248:1: value : ( BitStringLiteral | bitStringValue | OctectStringLiteral | TRUE | FALSE | StringLiteral | valuereference | ( '+' | '-' )? INT ( '.' ( INT )? )? | MIN | MAX | objectIdentifierValue );", 95, 11, input);
+                    
+                    	    throw nvae_d95s11;
+                    }
+                
+                }
+                else if ( (LA95_2 == INT || LA95_2 == UID) )
+                {
+                    alt95 = 11;
+                }
+                else 
+                {
+                    NoViableAltException nvae_d95s2 =
+                        new NoViableAltException("248:1: value : ( BitStringLiteral | bitStringValue | OctectStringLiteral | TRUE | FALSE | StringLiteral | valuereference | ( '+' | '-' )? INT ( '.' ( INT )? )? | MIN | MAX | objectIdentifierValue );", 95, 2, input);
+                
+                    throw nvae_d95s2;
+                }
                 }
                 break;
             case OctectStringLiteral:
             	{
-                alt88 = 3;
+                alt95 = 3;
                 }
                 break;
             case TRUE:
             	{
-                alt88 = 4;
+                alt95 = 4;
                 }
                 break;
             case FALSE:
             	{
-                alt88 = 5;
+                alt95 = 5;
                 }
                 break;
             case StringLiteral:
             	{
-                alt88 = 6;
+                alt95 = 6;
                 }
                 break;
             case LID:
             	{
-                alt88 = 7;
+                alt95 = 7;
                 }
                 break;
             case INT:
             case 86:
             case 87:
             	{
-                alt88 = 8;
+                alt95 = 8;
                 }
                 break;
             case MIN:
             	{
-                alt88 = 9;
+                alt95 = 9;
                 }
                 break;
             case MAX:
             	{
-                alt88 = 10;
+                alt95 = 10;
                 }
                 break;
             	default:
-            	    NoViableAltException nvae_d88s0 =
-            	        new NoViableAltException("248:1: value : ( BitStringLiteral | bitStringValue | OctectStringLiteral | TRUE | FALSE | StringLiteral | valuereference | ( '+' | '-' )? INT ( '.' ( INT )? )? | MIN | MAX );", 88, 0, input);
+            	    NoViableAltException nvae_d95s0 =
+            	        new NoViableAltException("248:1: value : ( BitStringLiteral | bitStringValue | OctectStringLiteral | TRUE | FALSE | StringLiteral | valuereference | ( '+' | '-' )? INT ( '.' ( INT )? )? | MIN | MAX | objectIdentifierValue );", 95, 0, input);
             
-            	    throw nvae_d88s0;
+            	    throw nvae_d95s0;
             }
             
-            switch (alt88) 
+            switch (alt95) 
             {
                 case 1 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:249:3: BitStringLiteral
                     {
-                    	Match(input,BitStringLiteral,FOLLOW_BitStringLiteral_in_value1475); 
+                    	Match(input,BitStringLiteral,FOLLOW_BitStringLiteral_in_value1506); 
                     
                     }
                     break;
                 case 2 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:250:4: bitStringValue
                     {
-                    	PushFollow(FOLLOW_bitStringValue_in_value1480);
+                    	PushFollow(FOLLOW_bitStringValue_in_value1511);
                     	bitStringValue();
                     	followingStackPointer_--;
 
@@ -4671,35 +4904,35 @@ public class asn1Parser : Parser
                 case 3 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:251:4: OctectStringLiteral
                     {
-                    	Match(input,OctectStringLiteral,FOLLOW_OctectStringLiteral_in_value1485); 
+                    	Match(input,OctectStringLiteral,FOLLOW_OctectStringLiteral_in_value1516); 
                     
                     }
                     break;
                 case 4 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:252:4: TRUE
                     {
-                    	Match(input,TRUE,FOLLOW_TRUE_in_value1490); 
+                    	Match(input,TRUE,FOLLOW_TRUE_in_value1521); 
                     
                     }
                     break;
                 case 5 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:253:4: FALSE
                     {
-                    	Match(input,FALSE,FOLLOW_FALSE_in_value1495); 
+                    	Match(input,FALSE,FOLLOW_FALSE_in_value1526); 
                     
                     }
                     break;
                 case 6 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:254:4: StringLiteral
                     {
-                    	Match(input,StringLiteral,FOLLOW_StringLiteral_in_value1500); 
+                    	Match(input,StringLiteral,FOLLOW_StringLiteral_in_value1531); 
                     
                     }
                     break;
                 case 7 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:255:4: valuereference
                     {
-                    	PushFollow(FOLLOW_valuereference_in_value1505);
+                    	PushFollow(FOLLOW_valuereference_in_value1536);
                     	valuereference();
                     	followingStackPointer_--;
 
@@ -4710,14 +4943,14 @@ public class asn1Parser : Parser
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:256:4: ( '+' | '-' )? INT ( '.' ( INT )? )?
                     {
                     	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:256:4: ( '+' | '-' )?
-                    	int alt85 = 2;
-                    	int LA85_0 = input.LA(1);
+                    	int alt92 = 2;
+                    	int LA92_0 = input.LA(1);
                     	
-                    	if ( ((LA85_0 >= 86 && LA85_0 <= 87)) )
+                    	if ( ((LA92_0 >= 86 && LA92_0 <= 87)) )
                     	{
-                    	    alt85 = 1;
+                    	    alt92 = 1;
                     	}
-                    	switch (alt85) 
+                    	switch (alt92) 
                     	{
                     	    case 1 :
                     	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:
@@ -4731,7 +4964,7 @@ public class asn1Parser : Parser
                     	        	{
                     	        	    MismatchedSetException mse =
                     	        	        new MismatchedSetException(null,input);
-                    	        	    RecoverFromMismatchedSet(input,mse,FOLLOW_set_in_value1512);    throw mse;
+                    	        	    RecoverFromMismatchedSet(input,mse,FOLLOW_set_in_value1543);    throw mse;
                     	        	}
 
                     	        
@@ -4740,35 +4973,35 @@ public class asn1Parser : Parser
                     	
                     	}
 
-                    	Match(input,INT,FOLLOW_INT_in_value1519); 
+                    	Match(input,INT,FOLLOW_INT_in_value1550); 
                     	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:256:19: ( '.' ( INT )? )?
-                    	int alt87 = 2;
-                    	int LA87_0 = input.LA(1);
+                    	int alt94 = 2;
+                    	int LA94_0 = input.LA(1);
                     	
-                    	if ( (LA87_0 == 85) )
+                    	if ( (LA94_0 == 85) )
                     	{
-                    	    alt87 = 1;
+                    	    alt94 = 1;
                     	}
-                    	switch (alt87) 
+                    	switch (alt94) 
                     	{
                     	    case 1 :
                     	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:256:20: '.' ( INT )?
                     	        {
-                    	        	Match(input,85,FOLLOW_85_in_value1522); 
+                    	        	Match(input,85,FOLLOW_85_in_value1553); 
                     	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:256:24: ( INT )?
-                    	        	int alt86 = 2;
-                    	        	int LA86_0 = input.LA(1);
+                    	        	int alt93 = 2;
+                    	        	int LA93_0 = input.LA(1);
                     	        	
-                    	        	if ( (LA86_0 == INT) )
+                    	        	if ( (LA93_0 == INT) )
                     	        	{
-                    	        	    alt86 = 1;
+                    	        	    alt93 = 1;
                     	        	}
-                    	        	switch (alt86) 
+                    	        	switch (alt93) 
                     	        	{
                     	        	    case 1 :
                     	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:256:24: INT
                     	        	        {
-                    	        	        	Match(input,INT,FOLLOW_INT_in_value1524); 
+                    	        	        	Match(input,INT,FOLLOW_INT_in_value1555); 
                     	        	        
                     	        	        }
                     	        	        break;
@@ -4787,14 +5020,24 @@ public class asn1Parser : Parser
                 case 9 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:258:4: MIN
                     {
-                    	Match(input,MIN,FOLLOW_MIN_in_value1534); 
+                    	Match(input,MIN,FOLLOW_MIN_in_value1565); 
                     
                     }
                     break;
                 case 10 :
                     // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:259:4: MAX
                     {
-                    	Match(input,MAX,FOLLOW_MAX_in_value1539); 
+                    	Match(input,MAX,FOLLOW_MAX_in_value1570); 
+                    
+                    }
+                    break;
+                case 11 :
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:260:4: objectIdentifierValue
+                    {
+                    	PushFollow(FOLLOW_objectIdentifierValue_in_value1575);
+                    	objectIdentifierValue();
+                    	followingStackPointer_--;
+
                     
                     }
                     break;
@@ -4815,38 +5058,38 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start bitStringValue
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:262:1: bitStringValue : '{' identifier ( ',' identifier )* '}' ;
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:263:1: bitStringValue : '{' identifier ( ',' identifier )* '}' ;
     public void bitStringValue() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:263:4: ( '{' identifier ( ',' identifier )* '}' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:263:4: '{' identifier ( ',' identifier )* '}'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:264:4: ( '{' identifier ( ',' identifier )* '}' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:264:4: '{' identifier ( ',' identifier )* '}'
             {
-            	Match(input,74,FOLLOW_74_in_bitStringValue1552); 
-            	PushFollow(FOLLOW_identifier_in_bitStringValue1554);
+            	Match(input,74,FOLLOW_74_in_bitStringValue1588); 
+            	PushFollow(FOLLOW_identifier_in_bitStringValue1590);
             	identifier();
             	followingStackPointer_--;
 
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:263:19: ( ',' identifier )*
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:264:19: ( ',' identifier )*
             	do 
             	{
-            	    int alt89 = 2;
-            	    int LA89_0 = input.LA(1);
+            	    int alt96 = 2;
+            	    int LA96_0 = input.LA(1);
             	    
-            	    if ( (LA89_0 == 79) )
+            	    if ( (LA96_0 == 79) )
             	    {
-            	        alt89 = 1;
+            	        alt96 = 1;
             	    }
             	    
             	
-            	    switch (alt89) 
+            	    switch (alt96) 
             		{
             			case 1 :
-            			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:263:20: ',' identifier
+            			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:264:20: ',' identifier
             			    {
-            			    	Match(input,79,FOLLOW_79_in_bitStringValue1557); 
-            			    	PushFollow(FOLLOW_identifier_in_bitStringValue1559);
+            			    	Match(input,79,FOLLOW_79_in_bitStringValue1593); 
+            			    	PushFollow(FOLLOW_identifier_in_bitStringValue1595);
             			    	identifier();
             			    	followingStackPointer_--;
 
@@ -4855,14 +5098,14 @@ public class asn1Parser : Parser
             			    break;
             	
             			default:
-            			    goto loop89;
+            			    goto loop96;
             	    }
             	} while (true);
             	
-            	loop89:
-            		;	// Stops C# compiler whinging that label 'loop89' has no statements
+            	loop96:
+            		;	// Stops C# compiler whinging that label 'loop96' has no statements
 
-            	Match(input,75,FOLLOW_75_in_bitStringValue1563); 
+            	Match(input,75,FOLLOW_75_in_bitStringValue1599); 
             
             }
     
@@ -4880,16 +5123,294 @@ public class asn1Parser : Parser
     // $ANTLR end bitStringValue
 
     
+    // $ANTLR start objectIdentifierValue
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:267:1: objectIdentifierValue : '{' ( objectIdentifierComponent )+ '}' ;
+    public void objectIdentifierValue() // throws RecognitionException [1]
+    {   
+        try 
+    	{
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:268:4: ( '{' ( objectIdentifierComponent )+ '}' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:268:4: '{' ( objectIdentifierComponent )+ '}'
+            {
+            	Match(input,74,FOLLOW_74_in_objectIdentifierValue1611); 
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:268:8: ( objectIdentifierComponent )+
+            	int cnt97 = 0;
+            	do 
+            	{
+            	    int alt97 = 2;
+            	    int LA97_0 = input.LA(1);
+            	    
+            	    if ( (LA97_0 == INT || LA97_0 == UID || LA97_0 == LID) )
+            	    {
+            	        alt97 = 1;
+            	    }
+            	    
+            	
+            	    switch (alt97) 
+            		{
+            			case 1 :
+            			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:268:8: objectIdentifierComponent
+            			    {
+            			    	PushFollow(FOLLOW_objectIdentifierComponent_in_objectIdentifierValue1613);
+            			    	objectIdentifierComponent();
+            			    	followingStackPointer_--;
+
+            			    
+            			    }
+            			    break;
+            	
+            			default:
+            			    if ( cnt97 >= 1 ) goto loop97;
+            		            EarlyExitException eee =
+            		                new EarlyExitException(97, input);
+            		            throw eee;
+            	    }
+            	    cnt97++;
+            	} while (true);
+            	
+            	loop97:
+            		;	// Stops C# compiler whinging that label 'loop97' has no statements
+
+            	Match(input,75,FOLLOW_75_in_objectIdentifierValue1617); 
+            
+            }
+    
+        }
+        catch (RecognitionException re) 
+    	{
+            ReportError(re);
+            Recover(input,re);
+        }
+        finally 
+    	{
+        }
+        return ;
+    }
+    // $ANTLR end objectIdentifierValue
+
+    
+    // $ANTLR start objectIdentifierComponent
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:270:1: objectIdentifierComponent : ( identifier ( '(' ( INT | definedValue ) ')' )? | INT | modulereference '.' valuereference );
+    public void objectIdentifierComponent() // throws RecognitionException [1]
+    {   
+        try 
+    	{
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:271:4: ( identifier ( '(' ( INT | definedValue ) ')' )? | INT | modulereference '.' valuereference )
+            int alt100 = 3;
+            switch ( input.LA(1) ) 
+            {
+            case LID:
+            	{
+                alt100 = 1;
+                }
+                break;
+            case INT:
+            	{
+                alt100 = 2;
+                }
+                break;
+            case UID:
+            	{
+                alt100 = 3;
+                }
+                break;
+            	default:
+            	    NoViableAltException nvae_d100s0 =
+            	        new NoViableAltException("270:1: objectIdentifierComponent : ( identifier ( '(' ( INT | definedValue ) ')' )? | INT | modulereference '.' valuereference );", 100, 0, input);
+            
+            	    throw nvae_d100s0;
+            }
+            
+            switch (alt100) 
+            {
+                case 1 :
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:271:4: identifier ( '(' ( INT | definedValue ) ')' )?
+                    {
+                    	PushFollow(FOLLOW_identifier_in_objectIdentifierComponent1628);
+                    	identifier();
+                    	followingStackPointer_--;
+
+                    	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:271:15: ( '(' ( INT | definedValue ) ')' )?
+                    	int alt99 = 2;
+                    	int LA99_0 = input.LA(1);
+                    	
+                    	if ( (LA99_0 == 76) )
+                    	{
+                    	    alt99 = 1;
+                    	}
+                    	switch (alt99) 
+                    	{
+                    	    case 1 :
+                    	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:271:16: '(' ( INT | definedValue ) ')'
+                    	        {
+                    	        	Match(input,76,FOLLOW_76_in_objectIdentifierComponent1631); 
+                    	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:271:20: ( INT | definedValue )
+                    	        	int alt98 = 2;
+                    	        	int LA98_0 = input.LA(1);
+                    	        	
+                    	        	if ( (LA98_0 == INT) )
+                    	        	{
+                    	        	    alt98 = 1;
+                    	        	}
+                    	        	else if ( (LA98_0 == UID || LA98_0 == LID) )
+                    	        	{
+                    	        	    alt98 = 2;
+                    	        	}
+                    	        	else 
+                    	        	{
+                    	        	    NoViableAltException nvae_d98s0 =
+                    	        	        new NoViableAltException("271:20: ( INT | definedValue )", 98, 0, input);
+                    	        	
+                    	        	    throw nvae_d98s0;
+                    	        	}
+                    	        	switch (alt98) 
+                    	        	{
+                    	        	    case 1 :
+                    	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:271:21: INT
+                    	        	        {
+                    	        	        	Match(input,INT,FOLLOW_INT_in_objectIdentifierComponent1634); 
+                    	        	        
+                    	        	        }
+                    	        	        break;
+                    	        	    case 2 :
+                    	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:271:27: definedValue
+                    	        	        {
+                    	        	        	PushFollow(FOLLOW_definedValue_in_objectIdentifierComponent1638);
+                    	        	        	definedValue();
+                    	        	        	followingStackPointer_--;
+
+                    	        	        
+                    	        	        }
+                    	        	        break;
+                    	        	
+                    	        	}
+
+                    	        	Match(input,77,FOLLOW_77_in_objectIdentifierComponent1641); 
+                    	        
+                    	        }
+                    	        break;
+                    	
+                    	}
+
+                    
+                    }
+                    break;
+                case 2 :
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:272:5: INT
+                    {
+                    	Match(input,INT,FOLLOW_INT_in_objectIdentifierComponent1651); 
+                    
+                    }
+                    break;
+                case 3 :
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:273:4: modulereference '.' valuereference
+                    {
+                    	PushFollow(FOLLOW_modulereference_in_objectIdentifierComponent1656);
+                    	modulereference();
+                    	followingStackPointer_--;
+
+                    	Match(input,85,FOLLOW_85_in_objectIdentifierComponent1658); 
+                    	PushFollow(FOLLOW_valuereference_in_objectIdentifierComponent1660);
+                    	valuereference();
+                    	followingStackPointer_--;
+
+                    
+                    }
+                    break;
+            
+            }
+        }
+        catch (RecognitionException re) 
+    	{
+            ReportError(re);
+            Recover(input,re);
+        }
+        finally 
+    	{
+        }
+        return ;
+    }
+    // $ANTLR end objectIdentifierComponent
+
+    
+    // $ANTLR start definedValue
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:277:1: definedValue : ( valuereference | modulereference '.' valuereference );
+    public void definedValue() // throws RecognitionException [1]
+    {   
+        try 
+    	{
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:278:4: ( valuereference | modulereference '.' valuereference )
+            int alt101 = 2;
+            int LA101_0 = input.LA(1);
+            
+            if ( (LA101_0 == LID) )
+            {
+                alt101 = 1;
+            }
+            else if ( (LA101_0 == UID) )
+            {
+                alt101 = 2;
+            }
+            else 
+            {
+                NoViableAltException nvae_d101s0 =
+                    new NoViableAltException("277:1: definedValue : ( valuereference | modulereference '.' valuereference );", 101, 0, input);
+            
+                throw nvae_d101s0;
+            }
+            switch (alt101) 
+            {
+                case 1 :
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:278:4: valuereference
+                    {
+                    	PushFollow(FOLLOW_valuereference_in_definedValue1673);
+                    	valuereference();
+                    	followingStackPointer_--;
+
+                    
+                    }
+                    break;
+                case 2 :
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:279:5: modulereference '.' valuereference
+                    {
+                    	PushFollow(FOLLOW_modulereference_in_definedValue1679);
+                    	modulereference();
+                    	followingStackPointer_--;
+
+                    	Match(input,85,FOLLOW_85_in_definedValue1681); 
+                    	PushFollow(FOLLOW_valuereference_in_definedValue1683);
+                    	valuereference();
+                    	followingStackPointer_--;
+
+                    
+                    }
+                    break;
+            
+            }
+        }
+        catch (RecognitionException re) 
+    	{
+            ReportError(re);
+            Recover(input,re);
+        }
+        finally 
+    	{
+        }
+        return ;
+    }
+    // $ANTLR end definedValue
+
+    
     // $ANTLR start lID
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:267:1: lID : LID ;
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:282:1: lID : LID ;
     public void lID() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:267:7: ( LID )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:267:7: LID
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:282:7: ( LID )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:282:7: LID
             {
-            	Match(input,LID,FOLLOW_LID_in_lID1576); 
+            	Match(input,LID,FOLLOW_LID_in_lID1693); 
             
             }
     
@@ -4908,15 +5429,15 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start modulereference
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:269:1: modulereference : UID ;
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:284:1: modulereference : UID ;
     public void modulereference() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:269:19: ( UID )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:269:19: UID
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:284:19: ( UID )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:284:19: UID
             {
-            	Match(input,UID,FOLLOW_UID_in_modulereference1584); 
+            	Match(input,UID,FOLLOW_UID_in_modulereference1701); 
             
             }
     
@@ -4935,15 +5456,15 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start typereference
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:271:1: typereference : UID ;
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:286:1: typereference : UID ;
     public void typereference() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:271:17: ( UID )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:271:17: UID
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:286:17: ( UID )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:286:17: UID
             {
-            	Match(input,UID,FOLLOW_UID_in_typereference1592); 
+            	Match(input,UID,FOLLOW_UID_in_typereference1709); 
             
             }
     
@@ -4962,15 +5483,15 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start valuereference
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:273:1: valuereference : LID ;
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:288:1: valuereference : LID ;
     public void valuereference() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:273:19: ( LID )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:273:19: LID
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:288:19: ( LID )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:288:19: LID
             {
-            	Match(input,LID,FOLLOW_LID_in_valuereference1602); 
+            	Match(input,LID,FOLLOW_LID_in_valuereference1719); 
             
             }
     
@@ -4989,15 +5510,15 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start identifier
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:275:1: identifier : LID ;
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:290:1: identifier : LID ;
     public void identifier() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:275:14: ( LID )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:275:14: LID
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:290:14: ( LID )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:290:14: LID
             {
-            	Match(input,LID,FOLLOW_LID_in_identifier1612); 
+            	Match(input,LID,FOLLOW_LID_in_identifier1729); 
             
             }
     
@@ -5016,15 +5537,15 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start versionNumber
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:277:1: versionNumber : INT ;
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:292:1: versionNumber : INT ;
     public void versionNumber() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:277:17: ( INT )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:277:17: INT
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:292:17: ( INT )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:292:17: INT
             {
-            	Match(input,INT,FOLLOW_INT_in_versionNumber1620); 
+            	Match(input,INT,FOLLOW_INT_in_versionNumber1737); 
             
             }
     
@@ -5043,33 +5564,33 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start g_constraint
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:285:1: g_constraint : '(' g_subtypeConstraint ( g_exceptionSpec )? ')' ;
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:300:1: g_constraint : '(' g_subtypeConstraint ( g_exceptionSpec )? ')' ;
     public void g_constraint() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:286:4: ( '(' g_subtypeConstraint ( g_exceptionSpec )? ')' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:286:4: '(' g_subtypeConstraint ( g_exceptionSpec )? ')'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:301:4: ( '(' g_subtypeConstraint ( g_exceptionSpec )? ')' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:301:4: '(' g_subtypeConstraint ( g_exceptionSpec )? ')'
             {
-            	Match(input,76,FOLLOW_76_in_g_constraint1640); 
-            	PushFollow(FOLLOW_g_subtypeConstraint_in_g_constraint1642);
+            	Match(input,76,FOLLOW_76_in_g_constraint1757); 
+            	PushFollow(FOLLOW_g_subtypeConstraint_in_g_constraint1759);
             	g_subtypeConstraint();
             	followingStackPointer_--;
 
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:286:29: ( g_exceptionSpec )?
-            	int alt90 = 2;
-            	int LA90_0 = input.LA(1);
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:301:29: ( g_exceptionSpec )?
+            	int alt102 = 2;
+            	int LA102_0 = input.LA(1);
             	
-            	if ( (LA90_0 == 90) )
+            	if ( (LA102_0 == 90) )
             	{
-            	    alt90 = 1;
+            	    alt102 = 1;
             	}
-            	switch (alt90) 
+            	switch (alt102) 
             	{
             	    case 1 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:286:29: g_exceptionSpec
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:301:29: g_exceptionSpec
             	        {
-            	        	PushFollow(FOLLOW_g_exceptionSpec_in_g_constraint1645);
+            	        	PushFollow(FOLLOW_g_exceptionSpec_in_g_constraint1762);
             	        	g_exceptionSpec();
             	        	followingStackPointer_--;
 
@@ -5079,7 +5600,7 @@ public class asn1Parser : Parser
             	
             	}
 
-            	Match(input,77,FOLLOW_77_in_g_constraint1648); 
+            	Match(input,77,FOLLOW_77_in_g_constraint1765); 
             
             }
     
@@ -5098,29 +5619,29 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start g_exceptionSpec
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:289:1: g_exceptionSpec : '!' ( signedNumber | valuereference | type ':' value ) ;
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:304:1: g_exceptionSpec : '!' ( signedNumber | valuereference | type ':' value ) ;
     public void g_exceptionSpec() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:290:4: ( '!' ( signedNumber | valuereference | type ':' value ) )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:290:4: '!' ( signedNumber | valuereference | type ':' value )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:305:4: ( '!' ( signedNumber | valuereference | type ':' value ) )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:305:4: '!' ( signedNumber | valuereference | type ':' value )
             {
-            	Match(input,90,FOLLOW_90_in_g_exceptionSpec1660); 
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:291:2: ( signedNumber | valuereference | type ':' value )
-            	int alt91 = 3;
+            	Match(input,90,FOLLOW_90_in_g_exceptionSpec1777); 
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:306:2: ( signedNumber | valuereference | type ':' value )
+            	int alt103 = 3;
             	switch ( input.LA(1) ) 
             	{
             	case INT:
             	case 86:
             	case 87:
             		{
-            	    alt91 = 1;
+            	    alt103 = 1;
             	    }
             	    break;
             	case LID:
             		{
-            	    alt91 = 2;
+            	    alt103 = 2;
             	    }
             	    break;
             	case NULL:
@@ -5149,22 +5670,22 @@ public class asn1Parser : Parser
             	case RELATIVE_OID:
             	case 80:
             		{
-            	    alt91 = 3;
+            	    alt103 = 3;
             	    }
             	    break;
             		default:
-            		    NoViableAltException nvae_d91s0 =
-            		        new NoViableAltException("291:2: ( signedNumber | valuereference | type ':' value )", 91, 0, input);
+            		    NoViableAltException nvae_d103s0 =
+            		        new NoViableAltException("306:2: ( signedNumber | valuereference | type ':' value )", 103, 0, input);
             	
-            		    throw nvae_d91s0;
+            		    throw nvae_d103s0;
             	}
             	
-            	switch (alt91) 
+            	switch (alt103) 
             	{
             	    case 1 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:292:4: signedNumber
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:307:4: signedNumber
             	        {
-            	        	PushFollow(FOLLOW_signedNumber_in_g_exceptionSpec1669);
+            	        	PushFollow(FOLLOW_signedNumber_in_g_exceptionSpec1786);
             	        	signedNumber();
             	        	followingStackPointer_--;
 
@@ -5172,9 +5693,9 @@ public class asn1Parser : Parser
             	        }
             	        break;
             	    case 2 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:293:4: valuereference
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:308:4: valuereference
             	        {
-            	        	PushFollow(FOLLOW_valuereference_in_g_exceptionSpec1674);
+            	        	PushFollow(FOLLOW_valuereference_in_g_exceptionSpec1791);
             	        	valuereference();
             	        	followingStackPointer_--;
 
@@ -5182,14 +5703,14 @@ public class asn1Parser : Parser
             	        }
             	        break;
             	    case 3 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:294:6: type ':' value
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:309:6: type ':' value
             	        {
-            	        	PushFollow(FOLLOW_type_in_g_exceptionSpec1681);
+            	        	PushFollow(FOLLOW_type_in_g_exceptionSpec1798);
             	        	type();
             	        	followingStackPointer_--;
 
-            	        	Match(input,91,FOLLOW_91_in_g_exceptionSpec1683); 
-            	        	PushFollow(FOLLOW_value_in_g_exceptionSpec1685);
+            	        	Match(input,91,FOLLOW_91_in_g_exceptionSpec1800); 
+            	        	PushFollow(FOLLOW_value_in_g_exceptionSpec1802);
             	        	value();
             	        	followingStackPointer_--;
 
@@ -5217,15 +5738,15 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start g_subtypeConstraint
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:299:1: g_subtypeConstraint : g_elementSetSpecs ;
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:314:1: g_subtypeConstraint : g_elementSetSpecs ;
     public void g_subtypeConstraint() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:300:4: ( g_elementSetSpecs )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:300:4: g_elementSetSpecs
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:315:4: ( g_elementSetSpecs )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:315:4: g_elementSetSpecs
             {
-            	PushFollow(FOLLOW_g_elementSetSpecs_in_g_subtypeConstraint1700);
+            	PushFollow(FOLLOW_g_elementSetSpecs_in_g_subtypeConstraint1817);
             	g_elementSetSpecs();
             	followingStackPointer_--;
 
@@ -5247,48 +5768,48 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start g_elementSetSpecs
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:302:1: g_elementSetSpecs : g_unionElement ( ',' '...' ( ',' g_unionElement )? )? ;
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:317:1: g_elementSetSpecs : g_unionElement ( ',' '...' ( ',' g_unionElement )? )? ;
     public void g_elementSetSpecs() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:303:4: ( g_unionElement ( ',' '...' ( ',' g_unionElement )? )? )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:303:4: g_unionElement ( ',' '...' ( ',' g_unionElement )? )?
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:318:4: ( g_unionElement ( ',' '...' ( ',' g_unionElement )? )? )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:318:4: g_unionElement ( ',' '...' ( ',' g_unionElement )? )?
             {
-            	PushFollow(FOLLOW_g_unionElement_in_g_elementSetSpecs1709);
+            	PushFollow(FOLLOW_g_unionElement_in_g_elementSetSpecs1826);
             	g_unionElement();
             	followingStackPointer_--;
 
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:303:19: ( ',' '...' ( ',' g_unionElement )? )?
-            	int alt93 = 2;
-            	int LA93_0 = input.LA(1);
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:318:19: ( ',' '...' ( ',' g_unionElement )? )?
+            	int alt105 = 2;
+            	int LA105_0 = input.LA(1);
             	
-            	if ( (LA93_0 == 79) )
+            	if ( (LA105_0 == 79) )
             	{
-            	    alt93 = 1;
+            	    alt105 = 1;
             	}
-            	switch (alt93) 
+            	switch (alt105) 
             	{
             	    case 1 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:303:20: ',' '...' ( ',' g_unionElement )?
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:318:20: ',' '...' ( ',' g_unionElement )?
             	        {
-            	        	Match(input,79,FOLLOW_79_in_g_elementSetSpecs1712); 
-            	        	Match(input,82,FOLLOW_82_in_g_elementSetSpecs1714); 
-            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:303:30: ( ',' g_unionElement )?
-            	        	int alt92 = 2;
-            	        	int LA92_0 = input.LA(1);
+            	        	Match(input,79,FOLLOW_79_in_g_elementSetSpecs1829); 
+            	        	Match(input,82,FOLLOW_82_in_g_elementSetSpecs1831); 
+            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:318:30: ( ',' g_unionElement )?
+            	        	int alt104 = 2;
+            	        	int LA104_0 = input.LA(1);
             	        	
-            	        	if ( (LA92_0 == 79) )
+            	        	if ( (LA104_0 == 79) )
             	        	{
-            	        	    alt92 = 1;
+            	        	    alt104 = 1;
             	        	}
-            	        	switch (alt92) 
+            	        	switch (alt104) 
             	        	{
             	        	    case 1 :
-            	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:303:32: ',' g_unionElement
+            	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:318:32: ',' g_unionElement
             	        	        {
-            	        	        	Match(input,79,FOLLOW_79_in_g_elementSetSpecs1718); 
-            	        	        	PushFollow(FOLLOW_g_unionElement_in_g_elementSetSpecs1720);
+            	        	        	Match(input,79,FOLLOW_79_in_g_elementSetSpecs1835); 
+            	        	        	PushFollow(FOLLOW_g_unionElement_in_g_elementSetSpecs1837);
             	        	        	g_unionElement();
             	        	        	followingStackPointer_--;
 
@@ -5322,58 +5843,58 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start g_unionElement
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:305:1: g_unionElement : ( g_intersectionElement ( UnionMark g_intersectionElement )* | ALL EXCEPT g_elementSetSpec );
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:320:1: g_unionElement : ( g_intersectionElement ( UnionMark g_intersectionElement )* | ALL EXCEPT g_elementSetSpec );
     public void g_unionElement() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:306:4: ( g_intersectionElement ( UnionMark g_intersectionElement )* | ALL EXCEPT g_elementSetSpec )
-            int alt95 = 2;
-            int LA95_0 = input.LA(1);
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:321:4: ( g_intersectionElement ( UnionMark g_intersectionElement )* | ALL EXCEPT g_elementSetSpec )
+            int alt107 = 2;
+            int LA107_0 = input.LA(1);
             
-            if ( (LA95_0 == INT || LA95_0 == FROM || (LA95_0 >= NULL && LA95_0 <= BIT) || (LA95_0 >= BOOLEAN && LA95_0 <= SET) || (LA95_0 >= SIZE && LA95_0 <= OBJECT) || (LA95_0 >= RELATIVE_OID && LA95_0 <= WITH) || (LA95_0 >= BitStringLiteral && LA95_0 <= LID) || LA95_0 == INCLUDES || LA95_0 == PATTERN || LA95_0 == 74 || LA95_0 == 76 || LA95_0 == 80 || (LA95_0 >= 86 && LA95_0 <= 87)) )
+            if ( (LA107_0 == INT || LA107_0 == FROM || (LA107_0 >= NULL && LA107_0 <= BIT) || (LA107_0 >= BOOLEAN && LA107_0 <= SET) || (LA107_0 >= SIZE && LA107_0 <= OBJECT) || (LA107_0 >= RELATIVE_OID && LA107_0 <= WITH) || (LA107_0 >= BitStringLiteral && LA107_0 <= LID) || LA107_0 == INCLUDES || LA107_0 == PATTERN || LA107_0 == 74 || LA107_0 == 76 || LA107_0 == 80 || (LA107_0 >= 86 && LA107_0 <= 87)) )
             {
-                alt95 = 1;
+                alt107 = 1;
             }
-            else if ( (LA95_0 == ALL) )
+            else if ( (LA107_0 == ALL) )
             {
-                alt95 = 2;
+                alt107 = 2;
             }
             else 
             {
-                NoViableAltException nvae_d95s0 =
-                    new NoViableAltException("305:1: g_unionElement : ( g_intersectionElement ( UnionMark g_intersectionElement )* | ALL EXCEPT g_elementSetSpec );", 95, 0, input);
+                NoViableAltException nvae_d107s0 =
+                    new NoViableAltException("320:1: g_unionElement : ( g_intersectionElement ( UnionMark g_intersectionElement )* | ALL EXCEPT g_elementSetSpec );", 107, 0, input);
             
-                throw nvae_d95s0;
+                throw nvae_d107s0;
             }
-            switch (alt95) 
+            switch (alt107) 
             {
                 case 1 :
-                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:306:4: g_intersectionElement ( UnionMark g_intersectionElement )*
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:321:4: g_intersectionElement ( UnionMark g_intersectionElement )*
                     {
-                    	PushFollow(FOLLOW_g_intersectionElement_in_g_unionElement1734);
+                    	PushFollow(FOLLOW_g_intersectionElement_in_g_unionElement1851);
                     	g_intersectionElement();
                     	followingStackPointer_--;
 
-                    	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:306:26: ( UnionMark g_intersectionElement )*
+                    	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:321:26: ( UnionMark g_intersectionElement )*
                     	do 
                     	{
-                    	    int alt94 = 2;
-                    	    int LA94_0 = input.LA(1);
+                    	    int alt106 = 2;
+                    	    int LA106_0 = input.LA(1);
                     	    
-                    	    if ( (LA94_0 == UnionMark) )
+                    	    if ( (LA106_0 == UnionMark) )
                     	    {
-                    	        alt94 = 1;
+                    	        alt106 = 1;
                     	    }
                     	    
                     	
-                    	    switch (alt94) 
+                    	    switch (alt106) 
                     		{
                     			case 1 :
-                    			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:306:27: UnionMark g_intersectionElement
+                    			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:321:27: UnionMark g_intersectionElement
                     			    {
-                    			    	Match(input,UnionMark,FOLLOW_UnionMark_in_g_unionElement1737); 
-                    			    	PushFollow(FOLLOW_g_intersectionElement_in_g_unionElement1739);
+                    			    	Match(input,UnionMark,FOLLOW_UnionMark_in_g_unionElement1854); 
+                    			    	PushFollow(FOLLOW_g_intersectionElement_in_g_unionElement1856);
                     			    	g_intersectionElement();
                     			    	followingStackPointer_--;
 
@@ -5382,22 +5903,22 @@ public class asn1Parser : Parser
                     			    break;
                     	
                     			default:
-                    			    goto loop94;
+                    			    goto loop106;
                     	    }
                     	} while (true);
                     	
-                    	loop94:
-                    		;	// Stops C# compiler whinging that label 'loop94' has no statements
+                    	loop106:
+                    		;	// Stops C# compiler whinging that label 'loop106' has no statements
 
                     
                     }
                     break;
                 case 2 :
-                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:307:4: ALL EXCEPT g_elementSetSpec
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:322:4: ALL EXCEPT g_elementSetSpec
                     {
-                    	Match(input,ALL,FOLLOW_ALL_in_g_unionElement1746); 
-                    	Match(input,EXCEPT,FOLLOW_EXCEPT_in_g_unionElement1748); 
-                    	PushFollow(FOLLOW_g_elementSetSpec_in_g_unionElement1750);
+                    	Match(input,ALL,FOLLOW_ALL_in_g_unionElement1863); 
+                    	Match(input,EXCEPT,FOLLOW_EXCEPT_in_g_unionElement1865); 
+                    	PushFollow(FOLLOW_g_elementSetSpec_in_g_unionElement1867);
                     	g_elementSetSpec();
                     	followingStackPointer_--;
 
@@ -5421,33 +5942,33 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start g_intersectionElement
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:310:1: g_intersectionElement : g_elementSetSpec ( EXCEPT g_elementSetSpec )? ( IntersectionMark g_elementSetSpec ( EXCEPT g_elementSetSpec )? )* ;
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:325:1: g_intersectionElement : g_elementSetSpec ( EXCEPT g_elementSetSpec )? ( IntersectionMark g_elementSetSpec ( EXCEPT g_elementSetSpec )? )* ;
     public void g_intersectionElement() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:311:4: ( g_elementSetSpec ( EXCEPT g_elementSetSpec )? ( IntersectionMark g_elementSetSpec ( EXCEPT g_elementSetSpec )? )* )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:311:4: g_elementSetSpec ( EXCEPT g_elementSetSpec )? ( IntersectionMark g_elementSetSpec ( EXCEPT g_elementSetSpec )? )*
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:326:4: ( g_elementSetSpec ( EXCEPT g_elementSetSpec )? ( IntersectionMark g_elementSetSpec ( EXCEPT g_elementSetSpec )? )* )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:326:4: g_elementSetSpec ( EXCEPT g_elementSetSpec )? ( IntersectionMark g_elementSetSpec ( EXCEPT g_elementSetSpec )? )*
             {
-            	PushFollow(FOLLOW_g_elementSetSpec_in_g_intersectionElement1763);
+            	PushFollow(FOLLOW_g_elementSetSpec_in_g_intersectionElement1880);
             	g_elementSetSpec();
             	followingStackPointer_--;
 
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:311:21: ( EXCEPT g_elementSetSpec )?
-            	int alt96 = 2;
-            	int LA96_0 = input.LA(1);
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:326:21: ( EXCEPT g_elementSetSpec )?
+            	int alt108 = 2;
+            	int LA108_0 = input.LA(1);
             	
-            	if ( (LA96_0 == EXCEPT) )
+            	if ( (LA108_0 == EXCEPT) )
             	{
-            	    alt96 = 1;
+            	    alt108 = 1;
             	}
-            	switch (alt96) 
+            	switch (alt108) 
             	{
             	    case 1 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:311:22: EXCEPT g_elementSetSpec
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:326:22: EXCEPT g_elementSetSpec
             	        {
-            	        	Match(input,EXCEPT,FOLLOW_EXCEPT_in_g_intersectionElement1766); 
-            	        	PushFollow(FOLLOW_g_elementSetSpec_in_g_intersectionElement1768);
+            	        	Match(input,EXCEPT,FOLLOW_EXCEPT_in_g_intersectionElement1883); 
+            	        	PushFollow(FOLLOW_g_elementSetSpec_in_g_intersectionElement1885);
             	        	g_elementSetSpec();
             	        	followingStackPointer_--;
 
@@ -5457,43 +5978,43 @@ public class asn1Parser : Parser
             	
             	}
 
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:311:48: ( IntersectionMark g_elementSetSpec ( EXCEPT g_elementSetSpec )? )*
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:326:48: ( IntersectionMark g_elementSetSpec ( EXCEPT g_elementSetSpec )? )*
             	do 
             	{
-            	    int alt98 = 2;
-            	    int LA98_0 = input.LA(1);
+            	    int alt110 = 2;
+            	    int LA110_0 = input.LA(1);
             	    
-            	    if ( (LA98_0 == IntersectionMark) )
+            	    if ( (LA110_0 == IntersectionMark) )
             	    {
-            	        alt98 = 1;
+            	        alt110 = 1;
             	    }
             	    
             	
-            	    switch (alt98) 
+            	    switch (alt110) 
             		{
             			case 1 :
-            			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:311:49: IntersectionMark g_elementSetSpec ( EXCEPT g_elementSetSpec )?
+            			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:326:49: IntersectionMark g_elementSetSpec ( EXCEPT g_elementSetSpec )?
             			    {
-            			    	Match(input,IntersectionMark,FOLLOW_IntersectionMark_in_g_intersectionElement1773); 
-            			    	PushFollow(FOLLOW_g_elementSetSpec_in_g_intersectionElement1775);
+            			    	Match(input,IntersectionMark,FOLLOW_IntersectionMark_in_g_intersectionElement1890); 
+            			    	PushFollow(FOLLOW_g_elementSetSpec_in_g_intersectionElement1892);
             			    	g_elementSetSpec();
             			    	followingStackPointer_--;
 
-            			    	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:311:83: ( EXCEPT g_elementSetSpec )?
-            			    	int alt97 = 2;
-            			    	int LA97_0 = input.LA(1);
+            			    	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:326:83: ( EXCEPT g_elementSetSpec )?
+            			    	int alt109 = 2;
+            			    	int LA109_0 = input.LA(1);
             			    	
-            			    	if ( (LA97_0 == EXCEPT) )
+            			    	if ( (LA109_0 == EXCEPT) )
             			    	{
-            			    	    alt97 = 1;
+            			    	    alt109 = 1;
             			    	}
-            			    	switch (alt97) 
+            			    	switch (alt109) 
             			    	{
             			    	    case 1 :
-            			    	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:311:84: EXCEPT g_elementSetSpec
+            			    	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:326:84: EXCEPT g_elementSetSpec
             			    	        {
-            			    	        	Match(input,EXCEPT,FOLLOW_EXCEPT_in_g_intersectionElement1778); 
-            			    	        	PushFollow(FOLLOW_g_elementSetSpec_in_g_intersectionElement1780);
+            			    	        	Match(input,EXCEPT,FOLLOW_EXCEPT_in_g_intersectionElement1895); 
+            			    	        	PushFollow(FOLLOW_g_elementSetSpec_in_g_intersectionElement1897);
             			    	        	g_elementSetSpec();
             			    	        	followingStackPointer_--;
 
@@ -5508,12 +6029,12 @@ public class asn1Parser : Parser
             			    break;
             	
             			default:
-            			    goto loop98;
+            			    goto loop110;
             	    }
             	} while (true);
             	
-            	loop98:
-            		;	// Stops C# compiler whinging that label 'loop98' has no statements
+            	loop110:
+            		;	// Stops C# compiler whinging that label 'loop110' has no statements
 
             
             }
@@ -5533,13 +6054,13 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start g_elementSetSpec
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:314:1: g_elementSetSpec : ( g_valueElement | g_containedSubtype | g_SizeConstraint | g_permittedAlphabet | g_innerTypeConstraints | g_patternConstraint | '(' g_elementSetSpecs ')' );
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:329:1: g_elementSetSpec : ( g_valueElement | g_containedSubtype | g_SizeConstraint | g_permittedAlphabet | g_innerTypeConstraints | g_patternConstraint | '(' g_elementSetSpecs ')' );
     public void g_elementSetSpec() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:315:4: ( g_valueElement | g_containedSubtype | g_SizeConstraint | g_permittedAlphabet | g_innerTypeConstraints | g_patternConstraint | '(' g_elementSetSpecs ')' )
-            int alt99 = 7;
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:330:4: ( g_valueElement | g_containedSubtype | g_SizeConstraint | g_permittedAlphabet | g_innerTypeConstraints | g_patternConstraint | '(' g_elementSetSpecs ')' )
+            int alt111 = 7;
             switch ( input.LA(1) ) 
             {
             case INT:
@@ -5555,7 +6076,7 @@ public class asn1Parser : Parser
             case 86:
             case 87:
             	{
-                alt99 = 1;
+                alt111 = 1;
                 }
                 break;
             case NULL:
@@ -5585,47 +6106,47 @@ public class asn1Parser : Parser
             case INCLUDES:
             case 80:
             	{
-                alt99 = 2;
+                alt111 = 2;
                 }
                 break;
             case SIZE:
             	{
-                alt99 = 3;
+                alt111 = 3;
                 }
                 break;
             case FROM:
             	{
-                alt99 = 4;
+                alt111 = 4;
                 }
                 break;
             case WITH:
             	{
-                alt99 = 5;
+                alt111 = 5;
                 }
                 break;
             case PATTERN:
             	{
-                alt99 = 6;
+                alt111 = 6;
                 }
                 break;
             case 76:
             	{
-                alt99 = 7;
+                alt111 = 7;
                 }
                 break;
             	default:
-            	    NoViableAltException nvae_d99s0 =
-            	        new NoViableAltException("314:1: g_elementSetSpec : ( g_valueElement | g_containedSubtype | g_SizeConstraint | g_permittedAlphabet | g_innerTypeConstraints | g_patternConstraint | '(' g_elementSetSpecs ')' );", 99, 0, input);
+            	    NoViableAltException nvae_d111s0 =
+            	        new NoViableAltException("329:1: g_elementSetSpec : ( g_valueElement | g_containedSubtype | g_SizeConstraint | g_permittedAlphabet | g_innerTypeConstraints | g_patternConstraint | '(' g_elementSetSpecs ')' );", 111, 0, input);
             
-            	    throw nvae_d99s0;
+            	    throw nvae_d111s0;
             }
             
-            switch (alt99) 
+            switch (alt111) 
             {
                 case 1 :
-                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:315:4: g_valueElement
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:330:4: g_valueElement
                     {
-                    	PushFollow(FOLLOW_g_valueElement_in_g_elementSetSpec1796);
+                    	PushFollow(FOLLOW_g_valueElement_in_g_elementSetSpec1913);
                     	g_valueElement();
                     	followingStackPointer_--;
 
@@ -5633,9 +6154,9 @@ public class asn1Parser : Parser
                     }
                     break;
                 case 2 :
-                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:316:4: g_containedSubtype
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:331:4: g_containedSubtype
                     {
-                    	PushFollow(FOLLOW_g_containedSubtype_in_g_elementSetSpec1801);
+                    	PushFollow(FOLLOW_g_containedSubtype_in_g_elementSetSpec1918);
                     	g_containedSubtype();
                     	followingStackPointer_--;
 
@@ -5643,9 +6164,9 @@ public class asn1Parser : Parser
                     }
                     break;
                 case 3 :
-                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:317:4: g_SizeConstraint
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:332:4: g_SizeConstraint
                     {
-                    	PushFollow(FOLLOW_g_SizeConstraint_in_g_elementSetSpec1806);
+                    	PushFollow(FOLLOW_g_SizeConstraint_in_g_elementSetSpec1923);
                     	g_SizeConstraint();
                     	followingStackPointer_--;
 
@@ -5653,9 +6174,9 @@ public class asn1Parser : Parser
                     }
                     break;
                 case 4 :
-                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:318:4: g_permittedAlphabet
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:333:4: g_permittedAlphabet
                     {
-                    	PushFollow(FOLLOW_g_permittedAlphabet_in_g_elementSetSpec1811);
+                    	PushFollow(FOLLOW_g_permittedAlphabet_in_g_elementSetSpec1928);
                     	g_permittedAlphabet();
                     	followingStackPointer_--;
 
@@ -5663,9 +6184,9 @@ public class asn1Parser : Parser
                     }
                     break;
                 case 5 :
-                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:319:4: g_innerTypeConstraints
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:334:4: g_innerTypeConstraints
                     {
-                    	PushFollow(FOLLOW_g_innerTypeConstraints_in_g_elementSetSpec1816);
+                    	PushFollow(FOLLOW_g_innerTypeConstraints_in_g_elementSetSpec1933);
                     	g_innerTypeConstraints();
                     	followingStackPointer_--;
 
@@ -5673,9 +6194,9 @@ public class asn1Parser : Parser
                     }
                     break;
                 case 6 :
-                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:320:4: g_patternConstraint
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:335:4: g_patternConstraint
                     {
-                    	PushFollow(FOLLOW_g_patternConstraint_in_g_elementSetSpec1821);
+                    	PushFollow(FOLLOW_g_patternConstraint_in_g_elementSetSpec1938);
                     	g_patternConstraint();
                     	followingStackPointer_--;
 
@@ -5683,14 +6204,14 @@ public class asn1Parser : Parser
                     }
                     break;
                 case 7 :
-                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:321:4: '(' g_elementSetSpecs ')'
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:336:4: '(' g_elementSetSpecs ')'
                     {
-                    	Match(input,76,FOLLOW_76_in_g_elementSetSpec1826); 
-                    	PushFollow(FOLLOW_g_elementSetSpecs_in_g_elementSetSpec1828);
+                    	Match(input,76,FOLLOW_76_in_g_elementSetSpec1943); 
+                    	PushFollow(FOLLOW_g_elementSetSpecs_in_g_elementSetSpec1945);
                     	g_elementSetSpecs();
                     	followingStackPointer_--;
 
-                    	Match(input,77,FOLLOW_77_in_g_elementSetSpec1830); 
+                    	Match(input,77,FOLLOW_77_in_g_elementSetSpec1947); 
                     
                     }
                     break;
@@ -5711,73 +6232,73 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start g_valueElement
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:324:1: g_valueElement : value ( ( '<' )? '..' ( '<' )? value )? ;
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:339:1: g_valueElement : value ( ( '<' )? '..' ( '<' )? value )? ;
     public void g_valueElement() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:325:4: ( value ( ( '<' )? '..' ( '<' )? value )? )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:325:4: value ( ( '<' )? '..' ( '<' )? value )?
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:340:4: ( value ( ( '<' )? '..' ( '<' )? value )? )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:340:4: value ( ( '<' )? '..' ( '<' )? value )?
             {
-            	PushFollow(FOLLOW_value_in_g_valueElement1843);
+            	PushFollow(FOLLOW_value_in_g_valueElement1960);
             	value();
             	followingStackPointer_--;
 
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:325:10: ( ( '<' )? '..' ( '<' )? value )?
-            	int alt102 = 2;
-            	int LA102_0 = input.LA(1);
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:340:10: ( ( '<' )? '..' ( '<' )? value )?
+            	int alt114 = 2;
+            	int LA114_0 = input.LA(1);
             	
-            	if ( ((LA102_0 >= 88 && LA102_0 <= 89)) )
+            	if ( ((LA114_0 >= 88 && LA114_0 <= 89)) )
             	{
-            	    alt102 = 1;
+            	    alt114 = 1;
             	}
-            	switch (alt102) 
+            	switch (alt114) 
             	{
             	    case 1 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:325:12: ( '<' )? '..' ( '<' )? value
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:340:12: ( '<' )? '..' ( '<' )? value
             	        {
-            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:325:12: ( '<' )?
-            	        	int alt100 = 2;
-            	        	int LA100_0 = input.LA(1);
+            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:340:12: ( '<' )?
+            	        	int alt112 = 2;
+            	        	int LA112_0 = input.LA(1);
             	        	
-            	        	if ( (LA100_0 == 88) )
+            	        	if ( (LA112_0 == 88) )
             	        	{
-            	        	    alt100 = 1;
+            	        	    alt112 = 1;
             	        	}
-            	        	switch (alt100) 
+            	        	switch (alt112) 
             	        	{
             	        	    case 1 :
-            	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:325:13: '<'
+            	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:340:13: '<'
             	        	        {
-            	        	        	Match(input,88,FOLLOW_88_in_g_valueElement1848); 
+            	        	        	Match(input,88,FOLLOW_88_in_g_valueElement1965); 
             	        	        
             	        	        }
             	        	        break;
             	        	
             	        	}
 
-            	        	Match(input,89,FOLLOW_89_in_g_valueElement1852); 
-            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:325:24: ( '<' )?
-            	        	int alt101 = 2;
-            	        	int LA101_0 = input.LA(1);
+            	        	Match(input,89,FOLLOW_89_in_g_valueElement1969); 
+            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:340:24: ( '<' )?
+            	        	int alt113 = 2;
+            	        	int LA113_0 = input.LA(1);
             	        	
-            	        	if ( (LA101_0 == 88) )
+            	        	if ( (LA113_0 == 88) )
             	        	{
-            	        	    alt101 = 1;
+            	        	    alt113 = 1;
             	        	}
-            	        	switch (alt101) 
+            	        	switch (alt113) 
             	        	{
             	        	    case 1 :
-            	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:325:25: '<'
+            	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:340:25: '<'
             	        	        {
-            	        	        	Match(input,88,FOLLOW_88_in_g_valueElement1855); 
+            	        	        	Match(input,88,FOLLOW_88_in_g_valueElement1972); 
             	        	        
             	        	        }
             	        	        break;
             	        	
             	        	}
 
-            	        	PushFollow(FOLLOW_value_in_g_valueElement1859);
+            	        	PushFollow(FOLLOW_value_in_g_valueElement1976);
             	        	value();
             	        	followingStackPointer_--;
 
@@ -5805,35 +6326,35 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start g_containedSubtype
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:327:1: g_containedSubtype : ( INCLUDES )? type ;
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:342:1: g_containedSubtype : ( INCLUDES )? type ;
     public void g_containedSubtype() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:327:21: ( ( INCLUDES )? type )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:327:21: ( INCLUDES )? type
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:342:21: ( ( INCLUDES )? type )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:342:21: ( INCLUDES )? type
             {
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:327:21: ( INCLUDES )?
-            	int alt103 = 2;
-            	int LA103_0 = input.LA(1);
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:342:21: ( INCLUDES )?
+            	int alt115 = 2;
+            	int LA115_0 = input.LA(1);
             	
-            	if ( (LA103_0 == INCLUDES) )
+            	if ( (LA115_0 == INCLUDES) )
             	{
-            	    alt103 = 1;
+            	    alt115 = 1;
             	}
-            	switch (alt103) 
+            	switch (alt115) 
             	{
             	    case 1 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:327:21: INCLUDES
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:342:21: INCLUDES
             	        {
-            	        	Match(input,INCLUDES,FOLLOW_INCLUDES_in_g_containedSubtype1870); 
+            	        	Match(input,INCLUDES,FOLLOW_INCLUDES_in_g_containedSubtype1987); 
             	        
             	        }
             	        break;
             	
             	}
 
-            	PushFollow(FOLLOW_type_in_g_containedSubtype1873);
+            	PushFollow(FOLLOW_type_in_g_containedSubtype1990);
             	type();
             	followingStackPointer_--;
 
@@ -5855,16 +6376,16 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start g_SizeConstraint
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:329:1: g_SizeConstraint : SIZE g_constraint ;
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:344:1: g_SizeConstraint : SIZE g_constraint ;
     public void g_SizeConstraint() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:329:20: ( SIZE g_constraint )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:329:20: SIZE g_constraint
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:344:20: ( SIZE g_constraint )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:344:20: SIZE g_constraint
             {
-            	Match(input,SIZE,FOLLOW_SIZE_in_g_SizeConstraint1881); 
-            	PushFollow(FOLLOW_g_constraint_in_g_SizeConstraint1883);
+            	Match(input,SIZE,FOLLOW_SIZE_in_g_SizeConstraint1998); 
+            	PushFollow(FOLLOW_g_constraint_in_g_SizeConstraint2000);
             	g_constraint();
             	followingStackPointer_--;
 
@@ -5886,16 +6407,16 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start g_permittedAlphabet
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:331:1: g_permittedAlphabet : FROM g_constraint ;
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:346:1: g_permittedAlphabet : FROM g_constraint ;
     public void g_permittedAlphabet() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:331:23: ( FROM g_constraint )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:331:23: FROM g_constraint
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:346:23: ( FROM g_constraint )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:346:23: FROM g_constraint
             {
-            	Match(input,FROM,FOLLOW_FROM_in_g_permittedAlphabet1891); 
-            	PushFollow(FOLLOW_g_constraint_in_g_permittedAlphabet1893);
+            	Match(input,FROM,FOLLOW_FROM_in_g_permittedAlphabet2008); 
+            	PushFollow(FOLLOW_g_constraint_in_g_permittedAlphabet2010);
             	g_constraint();
             	followingStackPointer_--;
 
@@ -5917,50 +6438,50 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start g_innerTypeConstraints
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:333:1: g_innerTypeConstraints : ( WITH COMPONENT g_constraint | WITH COMPONENTS '{' ( '...' ',' )? g_namedConstraint ( ',' g_namedConstraint )* '}' );
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:348:1: g_innerTypeConstraints : ( WITH COMPONENT g_constraint | WITH COMPONENTS '{' ( '...' ',' )? g_namedConstraint ( ',' g_namedConstraint )* '}' );
     public void g_innerTypeConstraints() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:334:4: ( WITH COMPONENT g_constraint | WITH COMPONENTS '{' ( '...' ',' )? g_namedConstraint ( ',' g_namedConstraint )* '}' )
-            int alt106 = 2;
-            int LA106_0 = input.LA(1);
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:349:4: ( WITH COMPONENT g_constraint | WITH COMPONENTS '{' ( '...' ',' )? g_namedConstraint ( ',' g_namedConstraint )* '}' )
+            int alt118 = 2;
+            int LA118_0 = input.LA(1);
             
-            if ( (LA106_0 == WITH) )
+            if ( (LA118_0 == WITH) )
             {
-                int LA106_1 = input.LA(2);
+                int LA118_1 = input.LA(2);
                 
-                if ( (LA106_1 == COMPONENTS) )
+                if ( (LA118_1 == COMPONENT) )
                 {
-                    alt106 = 2;
+                    alt118 = 1;
                 }
-                else if ( (LA106_1 == COMPONENT) )
+                else if ( (LA118_1 == COMPONENTS) )
                 {
-                    alt106 = 1;
+                    alt118 = 2;
                 }
                 else 
                 {
-                    NoViableAltException nvae_d106s1 =
-                        new NoViableAltException("333:1: g_innerTypeConstraints : ( WITH COMPONENT g_constraint | WITH COMPONENTS '{' ( '...' ',' )? g_namedConstraint ( ',' g_namedConstraint )* '}' );", 106, 1, input);
+                    NoViableAltException nvae_d118s1 =
+                        new NoViableAltException("348:1: g_innerTypeConstraints : ( WITH COMPONENT g_constraint | WITH COMPONENTS '{' ( '...' ',' )? g_namedConstraint ( ',' g_namedConstraint )* '}' );", 118, 1, input);
                 
-                    throw nvae_d106s1;
+                    throw nvae_d118s1;
                 }
             }
             else 
             {
-                NoViableAltException nvae_d106s0 =
-                    new NoViableAltException("333:1: g_innerTypeConstraints : ( WITH COMPONENT g_constraint | WITH COMPONENTS '{' ( '...' ',' )? g_namedConstraint ( ',' g_namedConstraint )* '}' );", 106, 0, input);
+                NoViableAltException nvae_d118s0 =
+                    new NoViableAltException("348:1: g_innerTypeConstraints : ( WITH COMPONENT g_constraint | WITH COMPONENTS '{' ( '...' ',' )? g_namedConstraint ( ',' g_namedConstraint )* '}' );", 118, 0, input);
             
-                throw nvae_d106s0;
+                throw nvae_d118s0;
             }
-            switch (alt106) 
+            switch (alt118) 
             {
                 case 1 :
-                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:334:4: WITH COMPONENT g_constraint
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:349:4: WITH COMPONENT g_constraint
                     {
-                    	Match(input,WITH,FOLLOW_WITH_in_g_innerTypeConstraints1903); 
-                    	Match(input,COMPONENT,FOLLOW_COMPONENT_in_g_innerTypeConstraints1905); 
-                    	PushFollow(FOLLOW_g_constraint_in_g_innerTypeConstraints1907);
+                    	Match(input,WITH,FOLLOW_WITH_in_g_innerTypeConstraints2020); 
+                    	Match(input,COMPONENT,FOLLOW_COMPONENT_in_g_innerTypeConstraints2022); 
+                    	PushFollow(FOLLOW_g_constraint_in_g_innerTypeConstraints2024);
                     	g_constraint();
                     	followingStackPointer_--;
 
@@ -5968,55 +6489,55 @@ public class asn1Parser : Parser
                     }
                     break;
                 case 2 :
-                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:335:4: WITH COMPONENTS '{' ( '...' ',' )? g_namedConstraint ( ',' g_namedConstraint )* '}'
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:350:4: WITH COMPONENTS '{' ( '...' ',' )? g_namedConstraint ( ',' g_namedConstraint )* '}'
                     {
-                    	Match(input,WITH,FOLLOW_WITH_in_g_innerTypeConstraints1912); 
-                    	Match(input,COMPONENTS,FOLLOW_COMPONENTS_in_g_innerTypeConstraints1914); 
-                    	Match(input,74,FOLLOW_74_in_g_innerTypeConstraints1916); 
-                    	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:336:4: ( '...' ',' )?
-                    	int alt104 = 2;
-                    	int LA104_0 = input.LA(1);
+                    	Match(input,WITH,FOLLOW_WITH_in_g_innerTypeConstraints2029); 
+                    	Match(input,COMPONENTS,FOLLOW_COMPONENTS_in_g_innerTypeConstraints2031); 
+                    	Match(input,74,FOLLOW_74_in_g_innerTypeConstraints2033); 
+                    	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:351:4: ( '...' ',' )?
+                    	int alt116 = 2;
+                    	int LA116_0 = input.LA(1);
                     	
-                    	if ( (LA104_0 == 82) )
+                    	if ( (LA116_0 == 82) )
                     	{
-                    	    alt104 = 1;
+                    	    alt116 = 1;
                     	}
-                    	switch (alt104) 
+                    	switch (alt116) 
                     	{
                     	    case 1 :
-                    	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:336:6: '...' ','
+                    	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:351:6: '...' ','
                     	        {
-                    	        	Match(input,82,FOLLOW_82_in_g_innerTypeConstraints1923); 
-                    	        	Match(input,79,FOLLOW_79_in_g_innerTypeConstraints1925); 
+                    	        	Match(input,82,FOLLOW_82_in_g_innerTypeConstraints2040); 
+                    	        	Match(input,79,FOLLOW_79_in_g_innerTypeConstraints2042); 
                     	        
                     	        }
                     	        break;
                     	
                     	}
 
-                    	PushFollow(FOLLOW_g_namedConstraint_in_g_innerTypeConstraints1932);
+                    	PushFollow(FOLLOW_g_namedConstraint_in_g_innerTypeConstraints2049);
                     	g_namedConstraint();
                     	followingStackPointer_--;
 
-                    	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:337:23: ( ',' g_namedConstraint )*
+                    	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:352:23: ( ',' g_namedConstraint )*
                     	do 
                     	{
-                    	    int alt105 = 2;
-                    	    int LA105_0 = input.LA(1);
+                    	    int alt117 = 2;
+                    	    int LA117_0 = input.LA(1);
                     	    
-                    	    if ( (LA105_0 == 79) )
+                    	    if ( (LA117_0 == 79) )
                     	    {
-                    	        alt105 = 1;
+                    	        alt117 = 1;
                     	    }
                     	    
                     	
-                    	    switch (alt105) 
+                    	    switch (alt117) 
                     		{
                     			case 1 :
-                    			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:337:24: ',' g_namedConstraint
+                    			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:352:24: ',' g_namedConstraint
                     			    {
-                    			    	Match(input,79,FOLLOW_79_in_g_innerTypeConstraints1936); 
-                    			    	PushFollow(FOLLOW_g_namedConstraint_in_g_innerTypeConstraints1938);
+                    			    	Match(input,79,FOLLOW_79_in_g_innerTypeConstraints2053); 
+                    			    	PushFollow(FOLLOW_g_namedConstraint_in_g_innerTypeConstraints2055);
                     			    	g_namedConstraint();
                     			    	followingStackPointer_--;
 
@@ -6025,14 +6546,14 @@ public class asn1Parser : Parser
                     			    break;
                     	
                     			default:
-                    			    goto loop105;
+                    			    goto loop117;
                     	    }
                     	} while (true);
                     	
-                    	loop105:
-                    		;	// Stops C# compiler whinging that label 'loop105' has no statements
+                    	loop117:
+                    		;	// Stops C# compiler whinging that label 'loop117' has no statements
 
-                    	Match(input,75,FOLLOW_75_in_g_innerTypeConstraints1944); 
+                    	Match(input,75,FOLLOW_75_in_g_innerTypeConstraints2061); 
                     
                     }
                     break;
@@ -6053,32 +6574,32 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start g_namedConstraint
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:342:1: g_namedConstraint : identifier ( g_constraint )? ( PRESENT | ABSENT | OPTIONAL )? ;
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:357:1: g_namedConstraint : identifier ( g_constraint )? ( PRESENT | ABSENT | OPTIONAL )? ;
     public void g_namedConstraint() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:343:4: ( identifier ( g_constraint )? ( PRESENT | ABSENT | OPTIONAL )? )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:343:4: identifier ( g_constraint )? ( PRESENT | ABSENT | OPTIONAL )?
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:358:4: ( identifier ( g_constraint )? ( PRESENT | ABSENT | OPTIONAL )? )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:358:4: identifier ( g_constraint )? ( PRESENT | ABSENT | OPTIONAL )?
             {
-            	PushFollow(FOLLOW_identifier_in_g_namedConstraint1956);
+            	PushFollow(FOLLOW_identifier_in_g_namedConstraint2073);
             	identifier();
             	followingStackPointer_--;
 
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:343:15: ( g_constraint )?
-            	int alt107 = 2;
-            	int LA107_0 = input.LA(1);
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:358:15: ( g_constraint )?
+            	int alt119 = 2;
+            	int LA119_0 = input.LA(1);
             	
-            	if ( (LA107_0 == 76) )
+            	if ( (LA119_0 == 76) )
             	{
-            	    alt107 = 1;
+            	    alt119 = 1;
             	}
-            	switch (alt107) 
+            	switch (alt119) 
             	{
             	    case 1 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:343:16: g_constraint
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:358:16: g_constraint
             	        {
-            	        	PushFollow(FOLLOW_g_constraint_in_g_namedConstraint1959);
+            	        	PushFollow(FOLLOW_g_constraint_in_g_namedConstraint2076);
             	        	g_constraint();
             	        	followingStackPointer_--;
 
@@ -6088,15 +6609,15 @@ public class asn1Parser : Parser
             	
             	}
 
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:343:31: ( PRESENT | ABSENT | OPTIONAL )?
-            	int alt108 = 2;
-            	int LA108_0 = input.LA(1);
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:358:31: ( PRESENT | ABSENT | OPTIONAL )?
+            	int alt120 = 2;
+            	int LA120_0 = input.LA(1);
             	
-            	if ( (LA108_0 == OPTIONAL || (LA108_0 >= PRESENT && LA108_0 <= ABSENT)) )
+            	if ( (LA120_0 == OPTIONAL || (LA120_0 >= PRESENT && LA120_0 <= ABSENT)) )
             	{
-            	    alt108 = 1;
+            	    alt120 = 1;
             	}
-            	switch (alt108) 
+            	switch (alt120) 
             	{
             	    case 1 :
             	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:
@@ -6110,7 +6631,7 @@ public class asn1Parser : Parser
             	        	{
             	        	    MismatchedSetException mse =
             	        	        new MismatchedSetException(null,input);
-            	        	    RecoverFromMismatchedSet(input,mse,FOLLOW_set_in_g_namedConstraint1963);    throw mse;
+            	        	    RecoverFromMismatchedSet(input,mse,FOLLOW_set_in_g_namedConstraint2080);    throw mse;
             	        	}
 
             	        
@@ -6137,16 +6658,16 @@ public class asn1Parser : Parser
 
     
     // $ANTLR start g_patternConstraint
-    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:345:1: g_patternConstraint : PATTERN value ;
+    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:360:1: g_patternConstraint : PATTERN value ;
     public void g_patternConstraint() // throws RecognitionException [1]
     {   
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:345:23: ( PATTERN value )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:345:23: PATTERN value
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:360:23: ( PATTERN value )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:360:23: PATTERN value
             {
-            	Match(input,PATTERN,FOLLOW_PATTERN_in_g_patternConstraint1981); 
-            	PushFollow(FOLLOW_value_in_g_patternConstraint1983);
+            	Match(input,PATTERN,FOLLOW_PATTERN_in_g_patternConstraint2098); 
+            	PushFollow(FOLLOW_value_in_g_patternConstraint2100);
             	value();
             	followingStackPointer_--;
 
@@ -6240,303 +6761,327 @@ public class asn1Parser : Parser
     public static readonly BitSet FOLLOW_81_in_type380 = new BitSet(new ulong[]{0x0005FFF87F6000A0UL});
     public static readonly BitSet FOLLOW_set_in_type382 = new BitSet(new ulong[]{0x0005FFF87F600000UL});
     public static readonly BitSet FOLLOW_NULL_in_type400 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_bitStringType_in_type404 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_booleanType_in_type408 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_g_constraint_in_type410 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_enumeratedType_in_type415 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_g_constraint_in_type417 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_integerType_in_type426 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_g_constraint_in_type428 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_realType_in_type440 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_g_constraint_in_type442 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_stringType_in_type447 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_g_constraint_in_type449 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_referencedType_in_type454 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_g_constraint_in_type456 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_sequenceOfType_in_type461 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_choiceType_in_type465 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_sequenceType_in_type476 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_setType_in_type488 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_setOfType_in_type500 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_objectIdentifier_in_type512 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_relativeOID_in_type523 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_BIT_in_bitStringType537 = new BitSet(new ulong[]{0x0000000000800000UL});
-    public static readonly BitSet FOLLOW_STRING_in_bitStringType539 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000400UL});
-    public static readonly BitSet FOLLOW_74_in_bitStringType542 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000000800UL});
-    public static readonly BitSet FOLLOW_identifier_in_bitStringType545 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_76_in_bitStringType547 = new BitSet(new ulong[]{0x4000000000002000UL});
-    public static readonly BitSet FOLLOW_INT_in_bitStringType550 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_valuereference_in_bitStringType552 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_77_in_bitStringType555 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
-    public static readonly BitSet FOLLOW_79_in_bitStringType558 = new BitSet(new ulong[]{0x4000000000000000UL});
-    public static readonly BitSet FOLLOW_identifier_in_bitStringType560 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_76_in_bitStringType562 = new BitSet(new ulong[]{0x4000000000002000UL});
-    public static readonly BitSet FOLLOW_INT_in_bitStringType565 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_valuereference_in_bitStringType567 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_77_in_bitStringType570 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
-    public static readonly BitSet FOLLOW_75_in_bitStringType578 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_BOOLEAN_in_booleanType593 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_ENUMERATED_in_enumeratedType606 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000400UL});
-    public static readonly BitSet FOLLOW_74_in_enumeratedType608 = new BitSet(new ulong[]{0x4000000000000000UL});
-    public static readonly BitSet FOLLOW_enumeratedTypeItems_in_enumeratedType610 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
-    public static readonly BitSet FOLLOW_79_in_enumeratedType615 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000040000UL});
-    public static readonly BitSet FOLLOW_82_in_enumeratedType617 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000004008800UL});
-    public static readonly BitSet FOLLOW_g_exceptionSpec_in_enumeratedType619 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
-    public static readonly BitSet FOLLOW_79_in_enumeratedType623 = new BitSet(new ulong[]{0x4000000000000000UL});
-    public static readonly BitSet FOLLOW_enumeratedTypeItems_in_enumeratedType625 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000800UL});
-    public static readonly BitSet FOLLOW_75_in_enumeratedType632 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_identifier_in_enumeratedTypeItems644 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000009000UL});
-    public static readonly BitSet FOLLOW_76_in_enumeratedTypeItems648 = new BitSet(new ulong[]{0x4000000000002000UL,0x0000000000C00000UL});
-    public static readonly BitSet FOLLOW_signedNumber_in_enumeratedTypeItems651 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_valuereference_in_enumeratedTypeItems653 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_77_in_enumeratedTypeItems656 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
-    public static readonly BitSet FOLLOW_79_in_enumeratedTypeItems661 = new BitSet(new ulong[]{0x4000000000000000UL});
-    public static readonly BitSet FOLLOW_identifier_in_enumeratedTypeItems663 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000009000UL});
-    public static readonly BitSet FOLLOW_76_in_enumeratedTypeItems667 = new BitSet(new ulong[]{0x4000000000002000UL,0x0000000000C00000UL});
-    public static readonly BitSet FOLLOW_signedNumber_in_enumeratedTypeItems670 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_valuereference_in_enumeratedTypeItems672 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_77_in_enumeratedTypeItems675 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
-    public static readonly BitSet FOLLOW_INTEGER_in_integerType692 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000400UL});
-    public static readonly BitSet FOLLOW_74_in_integerType696 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000000800UL});
-    public static readonly BitSet FOLLOW_identifier_in_integerType699 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_76_in_integerType701 = new BitSet(new ulong[]{0x4000000000002000UL,0x0000000000C00000UL});
-    public static readonly BitSet FOLLOW_signedNumber_in_integerType704 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_valuereference_in_integerType706 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_77_in_integerType709 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
-    public static readonly BitSet FOLLOW_79_in_integerType712 = new BitSet(new ulong[]{0x4000000000000000UL});
-    public static readonly BitSet FOLLOW_identifier_in_integerType714 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_76_in_integerType716 = new BitSet(new ulong[]{0x4000000000002000UL,0x0000000000C00000UL});
-    public static readonly BitSet FOLLOW_signedNumber_in_integerType719 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_valuereference_in_integerType721 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_77_in_integerType724 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
-    public static readonly BitSet FOLLOW_75_in_integerType730 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_REAL_in_realType745 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_CHOICE_in_choiceType762 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000400UL});
-    public static readonly BitSet FOLLOW_74_in_choiceType764 = new BitSet(new ulong[]{0x4000000000000000UL});
-    public static readonly BitSet FOLLOW_choiceList_in_choiceType766 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
-    public static readonly BitSet FOLLOW_79_in_choiceType769 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000040000UL});
-    public static readonly BitSet FOLLOW_82_in_choiceType771 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000004008800UL});
-    public static readonly BitSet FOLLOW_g_exceptionSpec_in_choiceType773 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
-    public static readonly BitSet FOLLOW_choiceListExtension_in_choiceType777 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
-    public static readonly BitSet FOLLOW_79_in_choiceType783 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000040000UL});
-    public static readonly BitSet FOLLOW_82_in_choiceType785 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000800UL});
-    public static readonly BitSet FOLLOW_75_in_choiceType793 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_identifier_in_choiceList804 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
-    public static readonly BitSet FOLLOW_type_in_choiceList806 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
-    public static readonly BitSet FOLLOW_79_in_choiceList809 = new BitSet(new ulong[]{0x4000000000000000UL});
-    public static readonly BitSet FOLLOW_identifier_in_choiceList811 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
-    public static readonly BitSet FOLLOW_type_in_choiceList813 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
-    public static readonly BitSet FOLLOW_79_in_choiceListExtension826 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000080000UL});
-    public static readonly BitSet FOLLOW_extensionAdditionAlternative_in_choiceListExtension828 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
-    public static readonly BitSet FOLLOW_79_in_choiceListExtension831 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000080000UL});
-    public static readonly BitSet FOLLOW_extensionAdditionAlternative_in_choiceListExtension833 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
-    public static readonly BitSet FOLLOW_83_in_extensionAdditionAlternative847 = new BitSet(new ulong[]{0x4000000000002000UL});
-    public static readonly BitSet FOLLOW_versionNumber_in_extensionAdditionAlternative849 = new BitSet(new ulong[]{0x4000000000000000UL});
-    public static readonly BitSet FOLLOW_choiceList_in_extensionAdditionAlternative852 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000100000UL});
-    public static readonly BitSet FOLLOW_84_in_extensionAdditionAlternative854 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_identifier_in_extensionAdditionAlternative860 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
-    public static readonly BitSet FOLLOW_type_in_extensionAdditionAlternative862 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_SEQUENCE_in_sequenceType874 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000400UL});
-    public static readonly BitSet FOLLOW_74_in_sequenceType876 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000040800UL});
-    public static readonly BitSet FOLLOW_sequenceOrSetBody_in_sequenceType878 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000800UL});
-    public static readonly BitSet FOLLOW_75_in_sequenceType882 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_SET_in_setType894 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000400UL});
-    public static readonly BitSet FOLLOW_74_in_setType896 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000040800UL});
-    public static readonly BitSet FOLLOW_sequenceOrSetBody_in_setType898 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000800UL});
-    public static readonly BitSet FOLLOW_75_in_setType902 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_componentTypeList_in_sequenceOrSetBody919 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
-    public static readonly BitSet FOLLOW_79_in_sequenceOrSetBody923 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000040000UL});
-    public static readonly BitSet FOLLOW_seqOrSetExtBody_in_sequenceOrSetBody925 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_seqOrSetExtBody_in_sequenceOrSetBody933 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_82_in_seqOrSetExtBody945 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000004008000UL});
-    public static readonly BitSet FOLLOW_g_exceptionSpec_in_seqOrSetExtBody947 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
-    public static readonly BitSet FOLLOW_79_in_seqOrSetExtBody951 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000080000UL});
-    public static readonly BitSet FOLLOW_extensionAdditionList_in_seqOrSetExtBody953 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
-    public static readonly BitSet FOLLOW_79_in_seqOrSetExtBody958 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000040000UL});
-    public static readonly BitSet FOLLOW_82_in_seqOrSetExtBody960 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
-    public static readonly BitSet FOLLOW_79_in_seqOrSetExtBody965 = new BitSet(new ulong[]{0x4000000000000000UL});
-    public static readonly BitSet FOLLOW_componentTypeList_in_seqOrSetExtBody967 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_extensionAddition_in_extensionAdditionList986 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
-    public static readonly BitSet FOLLOW_79_in_extensionAdditionList989 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000080000UL});
-    public static readonly BitSet FOLLOW_extensionAddition_in_extensionAdditionList991 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
-    public static readonly BitSet FOLLOW_componentType_in_extensionAddition1005 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_extensionAdditionGroup_in_extensionAddition1016 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_83_in_extensionAdditionGroup1026 = new BitSet(new ulong[]{0x4000000000002000UL});
-    public static readonly BitSet FOLLOW_versionNumber_in_extensionAdditionGroup1028 = new BitSet(new ulong[]{0x4000000000000000UL});
-    public static readonly BitSet FOLLOW_componentTypeList_in_extensionAdditionGroup1031 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000100000UL});
-    public static readonly BitSet FOLLOW_84_in_extensionAdditionGroup1033 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_componentType_in_componentTypeList1045 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
-    public static readonly BitSet FOLLOW_79_in_componentTypeList1049 = new BitSet(new ulong[]{0x4000000000000000UL});
-    public static readonly BitSet FOLLOW_componentType_in_componentTypeList1051 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
-    public static readonly BitSet FOLLOW_identifier_in_componentType1066 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
-    public static readonly BitSet FOLLOW_type_in_componentType1068 = new BitSet(new ulong[]{0x0000000180000002UL});
-    public static readonly BitSet FOLLOW_OPTIONAL_in_componentType1071 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_DEFAULT_in_componentType1075 = new BitSet(new ulong[]{0x7F80000000002000UL,0x0000000000C00400UL});
-    public static readonly BitSet FOLLOW_value_in_componentType1077 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_SEQUENCE_in_sequenceOfType1092 = new BitSet(new ulong[]{0x0000000200000000UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_sizeConstraint_in_sequenceOfType1094 = new BitSet(new ulong[]{0x0000000200000000UL});
-    public static readonly BitSet FOLLOW_OF_in_sequenceOfType1097 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
-    public static readonly BitSet FOLLOW_type_in_sequenceOfType1099 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_SEQUENCE_in_sequenceOfType1104 = new BitSet(new ulong[]{0x0000000400000000UL});
-    public static readonly BitSet FOLLOW_SIZE_in_sequenceOfType1106 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_valueConstraint_in_sequenceOfType1108 = new BitSet(new ulong[]{0x0000000200000000UL});
-    public static readonly BitSet FOLLOW_OF_in_sequenceOfType1110 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
-    public static readonly BitSet FOLLOW_type_in_sequenceOfType1112 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_SET_in_setOfType1124 = new BitSet(new ulong[]{0x0000000200000000UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_sizeConstraint_in_setOfType1126 = new BitSet(new ulong[]{0x0000000200000000UL});
-    public static readonly BitSet FOLLOW_OF_in_setOfType1129 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
-    public static readonly BitSet FOLLOW_type_in_setOfType1131 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_SET_in_setOfType1136 = new BitSet(new ulong[]{0x0000000400000000UL});
-    public static readonly BitSet FOLLOW_SIZE_in_setOfType1138 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_valueConstraint_in_setOfType1140 = new BitSet(new ulong[]{0x0000000200000000UL});
-    public static readonly BitSet FOLLOW_OF_in_setOfType1142 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
-    public static readonly BitSet FOLLOW_type_in_setOfType1144 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_OCTET_in_stringType1160 = new BitSet(new ulong[]{0x0000000000800000UL});
-    public static readonly BitSet FOLLOW_STRING_in_stringType1162 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_NumericString_in_stringType1166 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_PrintableString_in_stringType1170 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_VisibleString_in_stringType1174 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_IA5String_in_stringType1178 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_TeletexString_in_stringType1182 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_VideotexString_in_stringType1186 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_GraphicString_in_stringType1190 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_GeneralString_in_stringType1194 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_UniversalString_in_stringType1198 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_BMPString_in_stringType1202 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_UTF8String_in_stringType1206 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_UID_in_referencedType1218 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000200000UL});
-    public static readonly BitSet FOLLOW_85_in_referencedType1221 = new BitSet(new ulong[]{0x0000800000000000UL});
-    public static readonly BitSet FOLLOW_UID_in_referencedType1223 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_OBJECT_in_objectIdentifier1237 = new BitSet(new ulong[]{0x0002000000000000UL});
-    public static readonly BitSet FOLLOW_IDENTIFIER_in_objectIdentifier1239 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_RELATIVE_OID_in_relativeOID1247 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_set_in_signedNumber1258 = new BitSet(new ulong[]{0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_INT_in_signedNumber1265 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_valueConstraint_in_constraint1276 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_sizeConstraint_in_constraint1281 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_withComponentsConstraint_in_constraint1286 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_subTypeConstraint_in_constraint1291 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_76_in_valueConstraint1307 = new BitSet(new ulong[]{0x7F80000000002000UL,0x0000000000C00400UL});
-    public static readonly BitSet FOLLOW_value_in_valueConstraint1309 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000003002000UL});
-    public static readonly BitSet FOLLOW_88_in_valueConstraint1314 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000002000000UL});
-    public static readonly BitSet FOLLOW_89_in_valueConstraint1318 = new BitSet(new ulong[]{0x7F80000000002000UL,0x0000000001C00400UL});
-    public static readonly BitSet FOLLOW_88_in_valueConstraint1321 = new BitSet(new ulong[]{0x7F80000000002000UL,0x0000000000C00400UL});
-    public static readonly BitSet FOLLOW_value_in_valueConstraint1325 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_77_in_valueConstraint1329 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_76_in_sizeConstraint1340 = new BitSet(new ulong[]{0x0000000400000000UL});
-    public static readonly BitSet FOLLOW_SIZE_in_sizeConstraint1342 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_valueConstraint_in_sizeConstraint1344 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_77_in_sizeConstraint1346 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_76_in_permittedAlphabetConstraint1359 = new BitSet(new ulong[]{0x0000000000020000UL});
-    public static readonly BitSet FOLLOW_FROM_in_permittedAlphabetConstraint1361 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_valueConstraint_in_permittedAlphabetConstraint1363 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_77_in_permittedAlphabetConstraint1365 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_76_in_subTypeConstraint1378 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
-    public static readonly BitSet FOLLOW_type_in_subTypeConstraint1380 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_77_in_subTypeConstraint1382 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_76_in_withComponentsConstraint1397 = new BitSet(new ulong[]{0x0008000000000000UL});
-    public static readonly BitSet FOLLOW_WITH_in_withComponentsConstraint1400 = new BitSet(new ulong[]{0x0010000000000000UL});
-    public static readonly BitSet FOLLOW_COMPONENTS_in_withComponentsConstraint1402 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000400UL});
-    public static readonly BitSet FOLLOW_74_in_withComponentsConstraint1404 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000040000UL});
-    public static readonly BitSet FOLLOW_82_in_withComponentsConstraint1411 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008000UL});
-    public static readonly BitSet FOLLOW_79_in_withComponentsConstraint1413 = new BitSet(new ulong[]{0x4000000000000000UL});
-    public static readonly BitSet FOLLOW_namedConstraint_in_withComponentsConstraint1420 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
-    public static readonly BitSet FOLLOW_79_in_withComponentsConstraint1424 = new BitSet(new ulong[]{0x4000000000000000UL});
-    public static readonly BitSet FOLLOW_namedConstraint_in_withComponentsConstraint1426 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
-    public static readonly BitSet FOLLOW_75_in_withComponentsConstraint1432 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_77_in_withComponentsConstraint1436 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_identifier_in_namedConstraint1448 = new BitSet(new ulong[]{0x0060000080000002UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_valueConstraint_in_namedConstraint1451 = new BitSet(new ulong[]{0x0060000080000002UL});
-    public static readonly BitSet FOLLOW_set_in_namedConstraint1455 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_BitStringLiteral_in_value1475 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_bitStringValue_in_value1480 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_OctectStringLiteral_in_value1485 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_TRUE_in_value1490 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_FALSE_in_value1495 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_StringLiteral_in_value1500 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_valuereference_in_value1505 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_set_in_value1512 = new BitSet(new ulong[]{0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_INT_in_value1519 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000200000UL});
-    public static readonly BitSet FOLLOW_85_in_value1522 = new BitSet(new ulong[]{0x0000000000002002UL});
-    public static readonly BitSet FOLLOW_INT_in_value1524 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_MIN_in_value1534 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_MAX_in_value1539 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_74_in_bitStringValue1552 = new BitSet(new ulong[]{0x4000000000000000UL});
-    public static readonly BitSet FOLLOW_identifier_in_bitStringValue1554 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
-    public static readonly BitSet FOLLOW_79_in_bitStringValue1557 = new BitSet(new ulong[]{0x4000000000000000UL});
-    public static readonly BitSet FOLLOW_identifier_in_bitStringValue1559 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
-    public static readonly BitSet FOLLOW_75_in_bitStringValue1563 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_LID_in_lID1576 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_UID_in_modulereference1584 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_UID_in_typereference1592 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_LID_in_valuereference1602 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_LID_in_identifier1612 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_INT_in_versionNumber1620 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_76_in_g_constraint1640 = new BitSet(new ulong[]{0x7F8DFFFC7F62A000UL,0x0000000000C11414UL});
-    public static readonly BitSet FOLLOW_g_subtypeConstraint_in_g_constraint1642 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000004002000UL});
-    public static readonly BitSet FOLLOW_g_exceptionSpec_in_g_constraint1645 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_77_in_g_constraint1648 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_90_in_g_exceptionSpec1660 = new BitSet(new ulong[]{0x4005FFF87F602000UL,0x0000000000C10000UL});
-    public static readonly BitSet FOLLOW_signedNumber_in_g_exceptionSpec1669 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_valuereference_in_g_exceptionSpec1674 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_type_in_g_exceptionSpec1681 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000008000000UL});
-    public static readonly BitSet FOLLOW_91_in_g_exceptionSpec1683 = new BitSet(new ulong[]{0x7F80000000002000UL,0x0000000000C00400UL});
-    public static readonly BitSet FOLLOW_value_in_g_exceptionSpec1685 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_g_elementSetSpecs_in_g_subtypeConstraint1700 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_g_unionElement_in_g_elementSetSpecs1709 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
-    public static readonly BitSet FOLLOW_79_in_g_elementSetSpecs1712 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000040000UL});
-    public static readonly BitSet FOLLOW_82_in_g_elementSetSpecs1714 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
-    public static readonly BitSet FOLLOW_79_in_g_elementSetSpecs1718 = new BitSet(new ulong[]{0x7F8DFFFC7F62A000UL,0x0000000000C11414UL});
-    public static readonly BitSet FOLLOW_g_unionElement_in_g_elementSetSpecs1720 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_g_intersectionElement_in_g_unionElement1734 = new BitSet(new ulong[]{0x8000000000000002UL});
-    public static readonly BitSet FOLLOW_UnionMark_in_g_unionElement1737 = new BitSet(new ulong[]{0x7F8DFFFC7F622000UL,0x0000000000C11414UL});
-    public static readonly BitSet FOLLOW_g_intersectionElement_in_g_unionElement1739 = new BitSet(new ulong[]{0x8000000000000002UL});
-    public static readonly BitSet FOLLOW_ALL_in_g_unionElement1746 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000001UL});
-    public static readonly BitSet FOLLOW_EXCEPT_in_g_unionElement1748 = new BitSet(new ulong[]{0x7F8DFFFC7F622000UL,0x0000000000C11414UL});
-    public static readonly BitSet FOLLOW_g_elementSetSpec_in_g_unionElement1750 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_g_elementSetSpec_in_g_intersectionElement1763 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000003UL});
-    public static readonly BitSet FOLLOW_EXCEPT_in_g_intersectionElement1766 = new BitSet(new ulong[]{0x7F8DFFFC7F622000UL,0x0000000000C11414UL});
-    public static readonly BitSet FOLLOW_g_elementSetSpec_in_g_intersectionElement1768 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_IntersectionMark_in_g_intersectionElement1773 = new BitSet(new ulong[]{0x7F8DFFFC7F622000UL,0x0000000000C11414UL});
-    public static readonly BitSet FOLLOW_g_elementSetSpec_in_g_intersectionElement1775 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000003UL});
-    public static readonly BitSet FOLLOW_EXCEPT_in_g_intersectionElement1778 = new BitSet(new ulong[]{0x7F8DFFFC7F622000UL,0x0000000000C11414UL});
-    public static readonly BitSet FOLLOW_g_elementSetSpec_in_g_intersectionElement1780 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_g_valueElement_in_g_elementSetSpec1796 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_g_containedSubtype_in_g_elementSetSpec1801 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_g_SizeConstraint_in_g_elementSetSpec1806 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_g_permittedAlphabet_in_g_elementSetSpec1811 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_g_innerTypeConstraints_in_g_elementSetSpec1816 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_g_patternConstraint_in_g_elementSetSpec1821 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_76_in_g_elementSetSpec1826 = new BitSet(new ulong[]{0x7F8DFFFC7F62A000UL,0x0000000000C11414UL});
-    public static readonly BitSet FOLLOW_g_elementSetSpecs_in_g_elementSetSpec1828 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
-    public static readonly BitSet FOLLOW_77_in_g_elementSetSpec1830 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_value_in_g_valueElement1843 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000003000000UL});
-    public static readonly BitSet FOLLOW_88_in_g_valueElement1848 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000002000000UL});
-    public static readonly BitSet FOLLOW_89_in_g_valueElement1852 = new BitSet(new ulong[]{0x7F80000000002000UL,0x0000000001C00400UL});
-    public static readonly BitSet FOLLOW_88_in_g_valueElement1855 = new BitSet(new ulong[]{0x7F80000000002000UL,0x0000000000C00400UL});
-    public static readonly BitSet FOLLOW_value_in_g_valueElement1859 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_INCLUDES_in_g_containedSubtype1870 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
-    public static readonly BitSet FOLLOW_type_in_g_containedSubtype1873 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_SIZE_in_g_SizeConstraint1881 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_g_constraint_in_g_SizeConstraint1883 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_FROM_in_g_permittedAlphabet1891 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_g_constraint_in_g_permittedAlphabet1893 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_WITH_in_g_innerTypeConstraints1903 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000008UL});
-    public static readonly BitSet FOLLOW_COMPONENT_in_g_innerTypeConstraints1905 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_g_constraint_in_g_innerTypeConstraints1907 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_WITH_in_g_innerTypeConstraints1912 = new BitSet(new ulong[]{0x0010000000000000UL});
-    public static readonly BitSet FOLLOW_COMPONENTS_in_g_innerTypeConstraints1914 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000400UL});
-    public static readonly BitSet FOLLOW_74_in_g_innerTypeConstraints1916 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000040000UL});
-    public static readonly BitSet FOLLOW_82_in_g_innerTypeConstraints1923 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008000UL});
-    public static readonly BitSet FOLLOW_79_in_g_innerTypeConstraints1925 = new BitSet(new ulong[]{0x4000000000000000UL});
-    public static readonly BitSet FOLLOW_g_namedConstraint_in_g_innerTypeConstraints1932 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
-    public static readonly BitSet FOLLOW_79_in_g_innerTypeConstraints1936 = new BitSet(new ulong[]{0x4000000000000000UL});
-    public static readonly BitSet FOLLOW_g_namedConstraint_in_g_innerTypeConstraints1938 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
-    public static readonly BitSet FOLLOW_75_in_g_innerTypeConstraints1944 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_identifier_in_g_namedConstraint1956 = new BitSet(new ulong[]{0x0060000080000002UL,0x0000000000001000UL});
-    public static readonly BitSet FOLLOW_g_constraint_in_g_namedConstraint1959 = new BitSet(new ulong[]{0x0060000080000002UL});
-    public static readonly BitSet FOLLOW_set_in_g_namedConstraint1963 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_PATTERN_in_g_patternConstraint1981 = new BitSet(new ulong[]{0x7F80000000002000UL,0x0000000000C00400UL});
-    public static readonly BitSet FOLLOW_value_in_g_patternConstraint1983 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_bitStringType_in_type404 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_g_constraint_in_type406 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_booleanType_in_type411 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_g_constraint_in_type413 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_enumeratedType_in_type418 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_g_constraint_in_type420 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_integerType_in_type429 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_g_constraint_in_type431 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_realType_in_type443 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_g_constraint_in_type445 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_stringType_in_type450 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_g_constraint_in_type452 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_referencedType_in_type457 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_g_constraint_in_type459 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_sequenceOfType_in_type464 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_choiceType_in_type469 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_sequenceType_in_type480 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_g_constraint_in_type482 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_setType_in_type496 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_setOfType_in_type508 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_objectIdentifier_in_type520 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_g_constraint_in_type522 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_relativeOID_in_type534 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_BIT_in_bitStringType548 = new BitSet(new ulong[]{0x0000000000800000UL});
+    public static readonly BitSet FOLLOW_STRING_in_bitStringType550 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000400UL});
+    public static readonly BitSet FOLLOW_74_in_bitStringType553 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000000800UL});
+    public static readonly BitSet FOLLOW_identifier_in_bitStringType556 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_76_in_bitStringType558 = new BitSet(new ulong[]{0x4000000000002000UL});
+    public static readonly BitSet FOLLOW_INT_in_bitStringType561 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_valuereference_in_bitStringType563 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_77_in_bitStringType566 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
+    public static readonly BitSet FOLLOW_79_in_bitStringType569 = new BitSet(new ulong[]{0x4000000000000000UL});
+    public static readonly BitSet FOLLOW_identifier_in_bitStringType571 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_76_in_bitStringType573 = new BitSet(new ulong[]{0x4000000000002000UL});
+    public static readonly BitSet FOLLOW_INT_in_bitStringType576 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_valuereference_in_bitStringType578 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_77_in_bitStringType581 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
+    public static readonly BitSet FOLLOW_75_in_bitStringType589 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_BOOLEAN_in_booleanType604 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_ENUMERATED_in_enumeratedType617 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000400UL});
+    public static readonly BitSet FOLLOW_74_in_enumeratedType619 = new BitSet(new ulong[]{0x4000000000000000UL});
+    public static readonly BitSet FOLLOW_enumeratedTypeItems_in_enumeratedType621 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
+    public static readonly BitSet FOLLOW_79_in_enumeratedType626 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000040000UL});
+    public static readonly BitSet FOLLOW_82_in_enumeratedType628 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000004008800UL});
+    public static readonly BitSet FOLLOW_g_exceptionSpec_in_enumeratedType630 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
+    public static readonly BitSet FOLLOW_79_in_enumeratedType634 = new BitSet(new ulong[]{0x4000000000000000UL});
+    public static readonly BitSet FOLLOW_enumeratedTypeItems_in_enumeratedType636 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000800UL});
+    public static readonly BitSet FOLLOW_75_in_enumeratedType643 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_identifier_in_enumeratedTypeItems655 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000009000UL});
+    public static readonly BitSet FOLLOW_76_in_enumeratedTypeItems659 = new BitSet(new ulong[]{0x4000000000002000UL,0x0000000000C00000UL});
+    public static readonly BitSet FOLLOW_signedNumber_in_enumeratedTypeItems662 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_valuereference_in_enumeratedTypeItems664 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_77_in_enumeratedTypeItems667 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
+    public static readonly BitSet FOLLOW_79_in_enumeratedTypeItems672 = new BitSet(new ulong[]{0x4000000000000000UL});
+    public static readonly BitSet FOLLOW_identifier_in_enumeratedTypeItems674 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000009000UL});
+    public static readonly BitSet FOLLOW_76_in_enumeratedTypeItems678 = new BitSet(new ulong[]{0x4000000000002000UL,0x0000000000C00000UL});
+    public static readonly BitSet FOLLOW_signedNumber_in_enumeratedTypeItems681 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_valuereference_in_enumeratedTypeItems683 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_77_in_enumeratedTypeItems686 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
+    public static readonly BitSet FOLLOW_INTEGER_in_integerType703 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000400UL});
+    public static readonly BitSet FOLLOW_74_in_integerType707 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000000800UL});
+    public static readonly BitSet FOLLOW_identifier_in_integerType710 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_76_in_integerType712 = new BitSet(new ulong[]{0x4000000000002000UL,0x0000000000C00000UL});
+    public static readonly BitSet FOLLOW_signedNumber_in_integerType715 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_valuereference_in_integerType717 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_77_in_integerType720 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
+    public static readonly BitSet FOLLOW_79_in_integerType723 = new BitSet(new ulong[]{0x4000000000000000UL});
+    public static readonly BitSet FOLLOW_identifier_in_integerType725 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_76_in_integerType727 = new BitSet(new ulong[]{0x4000000000002000UL,0x0000000000C00000UL});
+    public static readonly BitSet FOLLOW_signedNumber_in_integerType730 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_valuereference_in_integerType732 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_77_in_integerType735 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
+    public static readonly BitSet FOLLOW_75_in_integerType741 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_REAL_in_realType756 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_CHOICE_in_choiceType773 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000400UL});
+    public static readonly BitSet FOLLOW_74_in_choiceType775 = new BitSet(new ulong[]{0x4000000000000000UL});
+    public static readonly BitSet FOLLOW_choiceList_in_choiceType777 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
+    public static readonly BitSet FOLLOW_79_in_choiceType780 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000040000UL});
+    public static readonly BitSet FOLLOW_82_in_choiceType782 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000004008800UL});
+    public static readonly BitSet FOLLOW_g_exceptionSpec_in_choiceType784 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
+    public static readonly BitSet FOLLOW_choiceListExtension_in_choiceType788 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
+    public static readonly BitSet FOLLOW_79_in_choiceType794 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000040000UL});
+    public static readonly BitSet FOLLOW_82_in_choiceType796 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000800UL});
+    public static readonly BitSet FOLLOW_75_in_choiceType804 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_identifier_in_choiceList815 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
+    public static readonly BitSet FOLLOW_type_in_choiceList817 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
+    public static readonly BitSet FOLLOW_79_in_choiceList820 = new BitSet(new ulong[]{0x4000000000000000UL});
+    public static readonly BitSet FOLLOW_identifier_in_choiceList822 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
+    public static readonly BitSet FOLLOW_type_in_choiceList824 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
+    public static readonly BitSet FOLLOW_79_in_choiceListExtension837 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000080000UL});
+    public static readonly BitSet FOLLOW_extensionAdditionAlternative_in_choiceListExtension839 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
+    public static readonly BitSet FOLLOW_79_in_choiceListExtension842 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000080000UL});
+    public static readonly BitSet FOLLOW_extensionAdditionAlternative_in_choiceListExtension844 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
+    public static readonly BitSet FOLLOW_83_in_extensionAdditionAlternative858 = new BitSet(new ulong[]{0x4000000000002000UL});
+    public static readonly BitSet FOLLOW_versionNumber_in_extensionAdditionAlternative860 = new BitSet(new ulong[]{0x4000000000000000UL});
+    public static readonly BitSet FOLLOW_choiceList_in_extensionAdditionAlternative863 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000100000UL});
+    public static readonly BitSet FOLLOW_84_in_extensionAdditionAlternative865 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_identifier_in_extensionAdditionAlternative871 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
+    public static readonly BitSet FOLLOW_type_in_extensionAdditionAlternative873 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_SEQUENCE_in_sequenceType885 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000400UL});
+    public static readonly BitSet FOLLOW_74_in_sequenceType887 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000040800UL});
+    public static readonly BitSet FOLLOW_sequenceOrSetBody_in_sequenceType889 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000800UL});
+    public static readonly BitSet FOLLOW_75_in_sequenceType893 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_SET_in_setType905 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000400UL});
+    public static readonly BitSet FOLLOW_74_in_setType907 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000040800UL});
+    public static readonly BitSet FOLLOW_sequenceOrSetBody_in_setType909 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000800UL});
+    public static readonly BitSet FOLLOW_75_in_setType913 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_componentTypeList_in_sequenceOrSetBody930 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
+    public static readonly BitSet FOLLOW_79_in_sequenceOrSetBody934 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000040000UL});
+    public static readonly BitSet FOLLOW_seqOrSetExtBody_in_sequenceOrSetBody936 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_seqOrSetExtBody_in_sequenceOrSetBody944 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_82_in_seqOrSetExtBody956 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000004008000UL});
+    public static readonly BitSet FOLLOW_g_exceptionSpec_in_seqOrSetExtBody958 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
+    public static readonly BitSet FOLLOW_79_in_seqOrSetExtBody962 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000080000UL});
+    public static readonly BitSet FOLLOW_extensionAdditionList_in_seqOrSetExtBody964 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
+    public static readonly BitSet FOLLOW_79_in_seqOrSetExtBody969 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000040000UL});
+    public static readonly BitSet FOLLOW_82_in_seqOrSetExtBody971 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
+    public static readonly BitSet FOLLOW_79_in_seqOrSetExtBody976 = new BitSet(new ulong[]{0x4000000000000000UL});
+    public static readonly BitSet FOLLOW_componentTypeList_in_seqOrSetExtBody978 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_extensionAddition_in_extensionAdditionList997 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
+    public static readonly BitSet FOLLOW_79_in_extensionAdditionList1000 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000080000UL});
+    public static readonly BitSet FOLLOW_extensionAddition_in_extensionAdditionList1002 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
+    public static readonly BitSet FOLLOW_componentType_in_extensionAddition1016 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_extensionAdditionGroup_in_extensionAddition1027 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_83_in_extensionAdditionGroup1037 = new BitSet(new ulong[]{0x4000000000002000UL});
+    public static readonly BitSet FOLLOW_versionNumber_in_extensionAdditionGroup1039 = new BitSet(new ulong[]{0x4000000000000000UL});
+    public static readonly BitSet FOLLOW_componentTypeList_in_extensionAdditionGroup1042 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000100000UL});
+    public static readonly BitSet FOLLOW_84_in_extensionAdditionGroup1044 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_componentType_in_componentTypeList1056 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
+    public static readonly BitSet FOLLOW_79_in_componentTypeList1060 = new BitSet(new ulong[]{0x4000000000000000UL});
+    public static readonly BitSet FOLLOW_componentType_in_componentTypeList1062 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
+    public static readonly BitSet FOLLOW_identifier_in_componentType1077 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
+    public static readonly BitSet FOLLOW_type_in_componentType1079 = new BitSet(new ulong[]{0x0000000180000002UL});
+    public static readonly BitSet FOLLOW_OPTIONAL_in_componentType1082 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_DEFAULT_in_componentType1086 = new BitSet(new ulong[]{0x7F80000000002000UL,0x0000000000C00400UL});
+    public static readonly BitSet FOLLOW_value_in_componentType1088 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_SEQUENCE_in_sequenceOfType1103 = new BitSet(new ulong[]{0x0000000200000000UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_sizeConstraint_in_sequenceOfType1105 = new BitSet(new ulong[]{0x0000000200000000UL});
+    public static readonly BitSet FOLLOW_OF_in_sequenceOfType1108 = new BitSet(new ulong[]{0x4005FFF87F600000UL,0x0000000000010000UL});
+    public static readonly BitSet FOLLOW_identifier_in_sequenceOfType1111 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
+    public static readonly BitSet FOLLOW_type_in_sequenceOfType1115 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_SEQUENCE_in_sequenceOfType1120 = new BitSet(new ulong[]{0x0000000400000000UL});
+    public static readonly BitSet FOLLOW_SIZE_in_sequenceOfType1122 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_valueConstraint_in_sequenceOfType1124 = new BitSet(new ulong[]{0x0000000200000000UL});
+    public static readonly BitSet FOLLOW_OF_in_sequenceOfType1126 = new BitSet(new ulong[]{0x4005FFF87F600000UL,0x0000000000010000UL});
+    public static readonly BitSet FOLLOW_identifier_in_sequenceOfType1129 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
+    public static readonly BitSet FOLLOW_type_in_sequenceOfType1133 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_SET_in_setOfType1145 = new BitSet(new ulong[]{0x0000000200000000UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_sizeConstraint_in_setOfType1147 = new BitSet(new ulong[]{0x0000000200000000UL});
+    public static readonly BitSet FOLLOW_OF_in_setOfType1150 = new BitSet(new ulong[]{0x4005FFF87F600000UL,0x0000000000010000UL});
+    public static readonly BitSet FOLLOW_identifier_in_setOfType1153 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
+    public static readonly BitSet FOLLOW_type_in_setOfType1157 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_SET_in_setOfType1162 = new BitSet(new ulong[]{0x0000000400000000UL});
+    public static readonly BitSet FOLLOW_SIZE_in_setOfType1164 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_valueConstraint_in_setOfType1166 = new BitSet(new ulong[]{0x0000000200000000UL});
+    public static readonly BitSet FOLLOW_OF_in_setOfType1168 = new BitSet(new ulong[]{0x4005FFF87F600000UL,0x0000000000010000UL});
+    public static readonly BitSet FOLLOW_identifier_in_setOfType1171 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
+    public static readonly BitSet FOLLOW_type_in_setOfType1175 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_OCTET_in_stringType1191 = new BitSet(new ulong[]{0x0000000000800000UL});
+    public static readonly BitSet FOLLOW_STRING_in_stringType1193 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_NumericString_in_stringType1197 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_PrintableString_in_stringType1201 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_VisibleString_in_stringType1205 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_IA5String_in_stringType1209 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_TeletexString_in_stringType1213 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_VideotexString_in_stringType1217 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_GraphicString_in_stringType1221 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_GeneralString_in_stringType1225 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_UniversalString_in_stringType1229 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_BMPString_in_stringType1233 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_UTF8String_in_stringType1237 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_UID_in_referencedType1249 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000200000UL});
+    public static readonly BitSet FOLLOW_85_in_referencedType1252 = new BitSet(new ulong[]{0x0000800000000000UL});
+    public static readonly BitSet FOLLOW_UID_in_referencedType1254 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_OBJECT_in_objectIdentifier1268 = new BitSet(new ulong[]{0x0002000000000000UL});
+    public static readonly BitSet FOLLOW_IDENTIFIER_in_objectIdentifier1270 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_RELATIVE_OID_in_relativeOID1278 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_set_in_signedNumber1289 = new BitSet(new ulong[]{0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_INT_in_signedNumber1296 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_valueConstraint_in_constraint1307 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_sizeConstraint_in_constraint1312 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_withComponentsConstraint_in_constraint1317 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_subTypeConstraint_in_constraint1322 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_76_in_valueConstraint1338 = new BitSet(new ulong[]{0x7F80000000002000UL,0x0000000000C00400UL});
+    public static readonly BitSet FOLLOW_value_in_valueConstraint1340 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000003002000UL});
+    public static readonly BitSet FOLLOW_88_in_valueConstraint1345 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000002000000UL});
+    public static readonly BitSet FOLLOW_89_in_valueConstraint1349 = new BitSet(new ulong[]{0x7F80000000002000UL,0x0000000001C00400UL});
+    public static readonly BitSet FOLLOW_88_in_valueConstraint1352 = new BitSet(new ulong[]{0x7F80000000002000UL,0x0000000000C00400UL});
+    public static readonly BitSet FOLLOW_value_in_valueConstraint1356 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_77_in_valueConstraint1360 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_76_in_sizeConstraint1371 = new BitSet(new ulong[]{0x0000000400000000UL});
+    public static readonly BitSet FOLLOW_SIZE_in_sizeConstraint1373 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_valueConstraint_in_sizeConstraint1375 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_77_in_sizeConstraint1377 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_76_in_permittedAlphabetConstraint1390 = new BitSet(new ulong[]{0x0000000000020000UL});
+    public static readonly BitSet FOLLOW_FROM_in_permittedAlphabetConstraint1392 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_valueConstraint_in_permittedAlphabetConstraint1394 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_77_in_permittedAlphabetConstraint1396 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_76_in_subTypeConstraint1409 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
+    public static readonly BitSet FOLLOW_type_in_subTypeConstraint1411 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_77_in_subTypeConstraint1413 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_76_in_withComponentsConstraint1428 = new BitSet(new ulong[]{0x0008000000000000UL});
+    public static readonly BitSet FOLLOW_WITH_in_withComponentsConstraint1431 = new BitSet(new ulong[]{0x0010000000000000UL});
+    public static readonly BitSet FOLLOW_COMPONENTS_in_withComponentsConstraint1433 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000400UL});
+    public static readonly BitSet FOLLOW_74_in_withComponentsConstraint1435 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000040000UL});
+    public static readonly BitSet FOLLOW_82_in_withComponentsConstraint1442 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008000UL});
+    public static readonly BitSet FOLLOW_79_in_withComponentsConstraint1444 = new BitSet(new ulong[]{0x4000000000000000UL});
+    public static readonly BitSet FOLLOW_namedConstraint_in_withComponentsConstraint1451 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
+    public static readonly BitSet FOLLOW_79_in_withComponentsConstraint1455 = new BitSet(new ulong[]{0x4000000000000000UL});
+    public static readonly BitSet FOLLOW_namedConstraint_in_withComponentsConstraint1457 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
+    public static readonly BitSet FOLLOW_75_in_withComponentsConstraint1463 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_77_in_withComponentsConstraint1467 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_identifier_in_namedConstraint1479 = new BitSet(new ulong[]{0x0060000080000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_valueConstraint_in_namedConstraint1482 = new BitSet(new ulong[]{0x0060000080000002UL});
+    public static readonly BitSet FOLLOW_set_in_namedConstraint1486 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_BitStringLiteral_in_value1506 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_bitStringValue_in_value1511 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_OctectStringLiteral_in_value1516 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_TRUE_in_value1521 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_FALSE_in_value1526 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_StringLiteral_in_value1531 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_valuereference_in_value1536 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_set_in_value1543 = new BitSet(new ulong[]{0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_INT_in_value1550 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000200000UL});
+    public static readonly BitSet FOLLOW_85_in_value1553 = new BitSet(new ulong[]{0x0000000000002002UL});
+    public static readonly BitSet FOLLOW_INT_in_value1555 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_MIN_in_value1565 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_MAX_in_value1570 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_objectIdentifierValue_in_value1575 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_74_in_bitStringValue1588 = new BitSet(new ulong[]{0x4000000000000000UL});
+    public static readonly BitSet FOLLOW_identifier_in_bitStringValue1590 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
+    public static readonly BitSet FOLLOW_79_in_bitStringValue1593 = new BitSet(new ulong[]{0x4000000000000000UL});
+    public static readonly BitSet FOLLOW_identifier_in_bitStringValue1595 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
+    public static readonly BitSet FOLLOW_75_in_bitStringValue1599 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_74_in_objectIdentifierValue1611 = new BitSet(new ulong[]{0x4000800000002000UL});
+    public static readonly BitSet FOLLOW_objectIdentifierComponent_in_objectIdentifierValue1613 = new BitSet(new ulong[]{0x4000800000002000UL,0x0000000000000800UL});
+    public static readonly BitSet FOLLOW_75_in_objectIdentifierValue1617 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_identifier_in_objectIdentifierComponent1628 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_76_in_objectIdentifierComponent1631 = new BitSet(new ulong[]{0x4000800000002000UL});
+    public static readonly BitSet FOLLOW_INT_in_objectIdentifierComponent1634 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_definedValue_in_objectIdentifierComponent1638 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_77_in_objectIdentifierComponent1641 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_INT_in_objectIdentifierComponent1651 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_modulereference_in_objectIdentifierComponent1656 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000200000UL});
+    public static readonly BitSet FOLLOW_85_in_objectIdentifierComponent1658 = new BitSet(new ulong[]{0x4000000000000000UL});
+    public static readonly BitSet FOLLOW_valuereference_in_objectIdentifierComponent1660 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_valuereference_in_definedValue1673 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_modulereference_in_definedValue1679 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000200000UL});
+    public static readonly BitSet FOLLOW_85_in_definedValue1681 = new BitSet(new ulong[]{0x4000000000000000UL});
+    public static readonly BitSet FOLLOW_valuereference_in_definedValue1683 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_LID_in_lID1693 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_UID_in_modulereference1701 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_UID_in_typereference1709 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_LID_in_valuereference1719 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_LID_in_identifier1729 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_INT_in_versionNumber1737 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_76_in_g_constraint1757 = new BitSet(new ulong[]{0x7F8DFFFC7F62A000UL,0x0000000000C11414UL});
+    public static readonly BitSet FOLLOW_g_subtypeConstraint_in_g_constraint1759 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000004002000UL});
+    public static readonly BitSet FOLLOW_g_exceptionSpec_in_g_constraint1762 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_77_in_g_constraint1765 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_90_in_g_exceptionSpec1777 = new BitSet(new ulong[]{0x4005FFF87F602000UL,0x0000000000C10000UL});
+    public static readonly BitSet FOLLOW_signedNumber_in_g_exceptionSpec1786 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_valuereference_in_g_exceptionSpec1791 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_type_in_g_exceptionSpec1798 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000008000000UL});
+    public static readonly BitSet FOLLOW_91_in_g_exceptionSpec1800 = new BitSet(new ulong[]{0x7F80000000002000UL,0x0000000000C00400UL});
+    public static readonly BitSet FOLLOW_value_in_g_exceptionSpec1802 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_g_elementSetSpecs_in_g_subtypeConstraint1817 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_g_unionElement_in_g_elementSetSpecs1826 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
+    public static readonly BitSet FOLLOW_79_in_g_elementSetSpecs1829 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000040000UL});
+    public static readonly BitSet FOLLOW_82_in_g_elementSetSpecs1831 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000008000UL});
+    public static readonly BitSet FOLLOW_79_in_g_elementSetSpecs1835 = new BitSet(new ulong[]{0x7F8DFFFC7F62A000UL,0x0000000000C11414UL});
+    public static readonly BitSet FOLLOW_g_unionElement_in_g_elementSetSpecs1837 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_g_intersectionElement_in_g_unionElement1851 = new BitSet(new ulong[]{0x8000000000000002UL});
+    public static readonly BitSet FOLLOW_UnionMark_in_g_unionElement1854 = new BitSet(new ulong[]{0x7F8DFFFC7F622000UL,0x0000000000C11414UL});
+    public static readonly BitSet FOLLOW_g_intersectionElement_in_g_unionElement1856 = new BitSet(new ulong[]{0x8000000000000002UL});
+    public static readonly BitSet FOLLOW_ALL_in_g_unionElement1863 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000001UL});
+    public static readonly BitSet FOLLOW_EXCEPT_in_g_unionElement1865 = new BitSet(new ulong[]{0x7F8DFFFC7F622000UL,0x0000000000C11414UL});
+    public static readonly BitSet FOLLOW_g_elementSetSpec_in_g_unionElement1867 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_g_elementSetSpec_in_g_intersectionElement1880 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000003UL});
+    public static readonly BitSet FOLLOW_EXCEPT_in_g_intersectionElement1883 = new BitSet(new ulong[]{0x7F8DFFFC7F622000UL,0x0000000000C11414UL});
+    public static readonly BitSet FOLLOW_g_elementSetSpec_in_g_intersectionElement1885 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_IntersectionMark_in_g_intersectionElement1890 = new BitSet(new ulong[]{0x7F8DFFFC7F622000UL,0x0000000000C11414UL});
+    public static readonly BitSet FOLLOW_g_elementSetSpec_in_g_intersectionElement1892 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000003UL});
+    public static readonly BitSet FOLLOW_EXCEPT_in_g_intersectionElement1895 = new BitSet(new ulong[]{0x7F8DFFFC7F622000UL,0x0000000000C11414UL});
+    public static readonly BitSet FOLLOW_g_elementSetSpec_in_g_intersectionElement1897 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_g_valueElement_in_g_elementSetSpec1913 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_g_containedSubtype_in_g_elementSetSpec1918 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_g_SizeConstraint_in_g_elementSetSpec1923 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_g_permittedAlphabet_in_g_elementSetSpec1928 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_g_innerTypeConstraints_in_g_elementSetSpec1933 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_g_patternConstraint_in_g_elementSetSpec1938 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_76_in_g_elementSetSpec1943 = new BitSet(new ulong[]{0x7F8DFFFC7F62A000UL,0x0000000000C11414UL});
+    public static readonly BitSet FOLLOW_g_elementSetSpecs_in_g_elementSetSpec1945 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000002000UL});
+    public static readonly BitSet FOLLOW_77_in_g_elementSetSpec1947 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_value_in_g_valueElement1960 = new BitSet(new ulong[]{0x0000000000000002UL,0x0000000003000000UL});
+    public static readonly BitSet FOLLOW_88_in_g_valueElement1965 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000002000000UL});
+    public static readonly BitSet FOLLOW_89_in_g_valueElement1969 = new BitSet(new ulong[]{0x7F80000000002000UL,0x0000000001C00400UL});
+    public static readonly BitSet FOLLOW_88_in_g_valueElement1972 = new BitSet(new ulong[]{0x7F80000000002000UL,0x0000000000C00400UL});
+    public static readonly BitSet FOLLOW_value_in_g_valueElement1976 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_INCLUDES_in_g_containedSubtype1987 = new BitSet(new ulong[]{0x0005FFF87F600000UL,0x0000000000010000UL});
+    public static readonly BitSet FOLLOW_type_in_g_containedSubtype1990 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_SIZE_in_g_SizeConstraint1998 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_g_constraint_in_g_SizeConstraint2000 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_FROM_in_g_permittedAlphabet2008 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_g_constraint_in_g_permittedAlphabet2010 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_WITH_in_g_innerTypeConstraints2020 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000008UL});
+    public static readonly BitSet FOLLOW_COMPONENT_in_g_innerTypeConstraints2022 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_g_constraint_in_g_innerTypeConstraints2024 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_WITH_in_g_innerTypeConstraints2029 = new BitSet(new ulong[]{0x0010000000000000UL});
+    public static readonly BitSet FOLLOW_COMPONENTS_in_g_innerTypeConstraints2031 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000000400UL});
+    public static readonly BitSet FOLLOW_74_in_g_innerTypeConstraints2033 = new BitSet(new ulong[]{0x4000000000000000UL,0x0000000000040000UL});
+    public static readonly BitSet FOLLOW_82_in_g_innerTypeConstraints2040 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008000UL});
+    public static readonly BitSet FOLLOW_79_in_g_innerTypeConstraints2042 = new BitSet(new ulong[]{0x4000000000000000UL});
+    public static readonly BitSet FOLLOW_g_namedConstraint_in_g_innerTypeConstraints2049 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
+    public static readonly BitSet FOLLOW_79_in_g_innerTypeConstraints2053 = new BitSet(new ulong[]{0x4000000000000000UL});
+    public static readonly BitSet FOLLOW_g_namedConstraint_in_g_innerTypeConstraints2055 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000008800UL});
+    public static readonly BitSet FOLLOW_75_in_g_innerTypeConstraints2061 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_identifier_in_g_namedConstraint2073 = new BitSet(new ulong[]{0x0060000080000002UL,0x0000000000001000UL});
+    public static readonly BitSet FOLLOW_g_constraint_in_g_namedConstraint2076 = new BitSet(new ulong[]{0x0060000080000002UL});
+    public static readonly BitSet FOLLOW_set_in_g_namedConstraint2080 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_PATTERN_in_g_patternConstraint2098 = new BitSet(new ulong[]{0x7F80000000002000UL,0x0000000000C00400UL});
+    public static readonly BitSet FOLLOW_value_in_g_patternConstraint2100 = new BitSet(new ulong[]{0x0000000000000002UL});
 
 }

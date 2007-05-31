@@ -1,4 +1,4 @@
-// $ANTLR 3.0 C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g 2007-05-31 14:30:31
+// $ANTLR 3.0 C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g 2007-05-31 16:10:53
 
 using System;
 using Antlr.Runtime;
@@ -526,7 +526,7 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = UnionMark;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:356:15: ( '|' | 'UNION' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:371:15: ( '|' | 'UNION' )
             int alt1 = 2;
             int LA1_0 = input.LA(1);
             
@@ -541,21 +541,21 @@ public class asn1Lexer : Lexer
             else 
             {
                 NoViableAltException nvae_d1s0 =
-                    new NoViableAltException("356:1: UnionMark : ( '|' | 'UNION' );", 1, 0, input);
+                    new NoViableAltException("371:1: UnionMark : ( '|' | 'UNION' );", 1, 0, input);
             
                 throw nvae_d1s0;
             }
             switch (alt1) 
             {
                 case 1 :
-                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:356:15: '|'
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:371:15: '|'
                     {
                     	Match('|'); 
                     
                     }
                     break;
                 case 2 :
-                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:356:19: 'UNION'
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:371:19: 'UNION'
                     {
                     	Match("UNION"); 
 
@@ -578,7 +578,7 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = IntersectionMark;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:358:21: ( '^' | 'INTERSECTION' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:373:21: ( '^' | 'INTERSECTION' )
             int alt2 = 2;
             int LA2_0 = input.LA(1);
             
@@ -593,21 +593,21 @@ public class asn1Lexer : Lexer
             else 
             {
                 NoViableAltException nvae_d2s0 =
-                    new NoViableAltException("358:1: IntersectionMark : ( '^' | 'INTERSECTION' );", 2, 0, input);
+                    new NoViableAltException("373:1: IntersectionMark : ( '^' | 'INTERSECTION' );", 2, 0, input);
             
                 throw nvae_d2s0;
             }
             switch (alt2) 
             {
                 case 1 :
-                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:358:21: '^'
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:373:21: '^'
                     {
                     	Match('^'); 
                     
                     }
                     break;
                 case 2 :
-                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:358:27: 'INTERSECTION'
+                    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:373:27: 'INTERSECTION'
                     {
                     	Match("INTERSECTION"); 
 
@@ -630,8 +630,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = DEFINITIONS;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:361:16: ( 'DEFINITIONS' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:361:16: 'DEFINITIONS'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:376:16: ( 'DEFINITIONS' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:376:16: 'DEFINITIONS'
             {
             	Match("DEFINITIONS"); 
 
@@ -652,8 +652,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = EXPLICIT;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:363:12: ( 'EXPLICIT' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:363:12: 'EXPLICIT'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:378:12: ( 'EXPLICIT' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:378:12: 'EXPLICIT'
             {
             	Match("EXPLICIT"); 
 
@@ -674,8 +674,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = TAGS;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:365:9: ( 'TAGS' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:365:9: 'TAGS'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:380:9: ( 'TAGS' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:380:9: 'TAGS'
             {
             	Match("TAGS"); 
 
@@ -696,8 +696,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = IMPLICIT;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:367:11: ( 'IMPLICIT' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:367:11: 'IMPLICIT'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:382:11: ( 'IMPLICIT' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:382:11: 'IMPLICIT'
             {
             	Match("IMPLICIT"); 
 
@@ -718,8 +718,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = AUTOMATIC;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:369:13: ( 'AUTOMATIC' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:369:13: 'AUTOMATIC'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:384:13: ( 'AUTOMATIC' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:384:13: 'AUTOMATIC'
             {
             	Match("AUTOMATIC"); 
 
@@ -740,8 +740,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = EXTENSIBILITY;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:371:17: ( 'EXTENSIBILITY' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:371:17: 'EXTENSIBILITY'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:386:17: ( 'EXTENSIBILITY' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:386:17: 'EXTENSIBILITY'
             {
             	Match("EXTENSIBILITY"); 
 
@@ -762,8 +762,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = IMPLIED;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:373:11: ( 'IMPLIED' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:373:11: 'IMPLIED'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:388:11: ( 'IMPLIED' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:388:11: 'IMPLIED'
             {
             	Match("IMPLIED"); 
 
@@ -784,8 +784,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = BEGIN;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:375:9: ( 'BEGIN' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:375:9: 'BEGIN'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:390:9: ( 'BEGIN' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:390:9: 'BEGIN'
             {
             	Match("BEGIN"); 
 
@@ -806,8 +806,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = END;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:376:7: ( 'END' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:376:7: 'END'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:391:7: ( 'END' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:391:7: 'END'
             {
             	Match("END"); 
 
@@ -828,8 +828,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = EXPORTS;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:378:11: ( 'EXPORTS' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:378:11: 'EXPORTS'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:393:11: ( 'EXPORTS' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:393:11: 'EXPORTS'
             {
             	Match("EXPORTS"); 
 
@@ -850,8 +850,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = ALL;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:380:8: ( 'ALL' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:380:8: 'ALL'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:395:8: ( 'ALL' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:395:8: 'ALL'
             {
             	Match("ALL"); 
 
@@ -872,8 +872,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = IMPORTS;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:382:11: ( 'IMPORTS' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:382:11: 'IMPORTS'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:397:11: ( 'IMPORTS' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:397:11: 'IMPORTS'
             {
             	Match("IMPORTS"); 
 
@@ -894,8 +894,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = FROM;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:384:8: ( 'FROM' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:384:8: 'FROM'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:399:8: ( 'FROM' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:399:8: 'FROM'
             {
             	Match("FROM"); 
 
@@ -916,8 +916,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = UNIVERSAL;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:386:13: ( 'UNIVERSAL' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:386:13: 'UNIVERSAL'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:401:13: ( 'UNIVERSAL' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:401:13: 'UNIVERSAL'
             {
             	Match("UNIVERSAL"); 
 
@@ -938,8 +938,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = APPLICATION;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:387:15: ( 'APPLICATION' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:387:15: 'APPLICATION'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:402:15: ( 'APPLICATION' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:402:15: 'APPLICATION'
             {
             	Match("APPLICATION"); 
 
@@ -960,8 +960,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = PRIVATE;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:388:11: ( 'PRIVATE' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:388:11: 'PRIVATE'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:403:11: ( 'PRIVATE' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:403:11: 'PRIVATE'
             {
             	Match("PRIVATE"); 
 
@@ -982,8 +982,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = BIT;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:389:7: ( 'BIT' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:389:7: 'BIT'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:404:7: ( 'BIT' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:404:7: 'BIT'
             {
             	Match("BIT"); 
 
@@ -1004,8 +1004,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = STRING;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:391:10: ( 'STRING' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:391:10: 'STRING'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:406:10: ( 'STRING' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:406:10: 'STRING'
             {
             	Match("STRING"); 
 
@@ -1026,8 +1026,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = BOOLEAN;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:393:11: ( 'BOOLEAN' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:393:11: 'BOOLEAN'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:408:11: ( 'BOOLEAN' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:408:11: 'BOOLEAN'
             {
             	Match("BOOLEAN"); 
 
@@ -1048,8 +1048,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = ENUMERATED;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:395:13: ( 'ENUMERATED' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:395:13: 'ENUMERATED'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:410:13: ( 'ENUMERATED' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:410:13: 'ENUMERATED'
             {
             	Match("ENUMERATED"); 
 
@@ -1070,8 +1070,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = INTEGER;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:397:11: ( 'INTEGER' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:397:11: 'INTEGER'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:412:11: ( 'INTEGER' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:412:11: 'INTEGER'
             {
             	Match("INTEGER"); 
 
@@ -1092,8 +1092,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = REAL;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:399:8: ( 'REAL' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:399:8: 'REAL'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:414:8: ( 'REAL' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:414:8: 'REAL'
             {
             	Match("REAL"); 
 
@@ -1114,8 +1114,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = CHOICE;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:401:10: ( 'CHOICE' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:401:10: 'CHOICE'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:416:10: ( 'CHOICE' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:416:10: 'CHOICE'
             {
             	Match("CHOICE"); 
 
@@ -1136,8 +1136,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = SEQUENCE;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:403:11: ( 'SEQUENCE' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:403:11: 'SEQUENCE'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:418:11: ( 'SEQUENCE' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:418:11: 'SEQUENCE'
             {
             	Match("SEQUENCE"); 
 
@@ -1158,8 +1158,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = OPTIONAL;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:405:11: ( 'OPTIONAL' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:405:11: 'OPTIONAL'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:420:11: ( 'OPTIONAL' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:420:11: 'OPTIONAL'
             {
             	Match("OPTIONAL"); 
 
@@ -1180,8 +1180,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = SIZE;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:407:8: ( 'SIZE' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:407:8: 'SIZE'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:422:8: ( 'SIZE' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:422:8: 'SIZE'
             {
             	Match("SIZE"); 
 
@@ -1202,8 +1202,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = OF;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:409:6: ( 'OF' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:409:6: 'OF'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:424:6: ( 'OF' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:424:6: 'OF'
             {
             	Match("OF"); 
 
@@ -1224,8 +1224,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = OCTET;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:411:9: ( 'OCTET' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:411:9: 'OCTET'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:426:9: ( 'OCTET' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:426:9: 'OCTET'
             {
             	Match("OCTET"); 
 
@@ -1246,8 +1246,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = MIN;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:413:8: ( 'MIN' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:413:8: 'MIN'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:428:8: ( 'MIN' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:428:8: 'MIN'
             {
             	Match("MIN"); 
 
@@ -1268,8 +1268,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = MAX;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:415:7: ( 'MAX' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:415:7: 'MAX'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:430:7: ( 'MAX' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:430:7: 'MAX'
             {
             	Match("MAX"); 
 
@@ -1290,8 +1290,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = TRUE;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:417:8: ( 'TRUE' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:417:8: 'TRUE'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:432:8: ( 'TRUE' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:432:8: 'TRUE'
             {
             	Match("TRUE"); 
 
@@ -1312,8 +1312,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = FALSE;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:419:9: ( 'FALSE' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:419:9: 'FALSE'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:434:9: ( 'FALSE' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:434:9: 'FALSE'
             {
             	Match("FALSE"); 
 
@@ -1334,8 +1334,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = ABSENT;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:421:10: ( 'ABSENT' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:421:10: 'ABSENT'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:436:10: ( 'ABSENT' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:436:10: 'ABSENT'
             {
             	Match("ABSENT"); 
 
@@ -1356,8 +1356,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = PRESENT;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:423:11: ( 'PRESENT' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:423:11: 'PRESENT'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:438:11: ( 'PRESENT' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:438:11: 'PRESENT'
             {
             	Match("PRESENT"); 
 
@@ -1378,8 +1378,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = WITH;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:425:9: ( 'WITH' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:425:9: 'WITH'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:440:9: ( 'WITH' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:440:9: 'WITH'
             {
             	Match("WITH"); 
 
@@ -1400,8 +1400,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = COMPONENT;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:426:13: ( 'COMPONENT' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:426:13: 'COMPONENT'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:441:13: ( 'COMPONENT' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:441:13: 'COMPONENT'
             {
             	Match("COMPONENT"); 
 
@@ -1422,8 +1422,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = COMPONENTS;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:427:15: ( 'COMPONENTS' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:427:15: 'COMPONENTS'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:442:15: ( 'COMPONENTS' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:442:15: 'COMPONENTS'
             {
             	Match("COMPONENTS"); 
 
@@ -1444,8 +1444,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = DEFAULT;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:428:12: ( 'DEFAULT' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:428:12: 'DEFAULT'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:443:12: ( 'DEFAULT' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:443:12: 'DEFAULT'
             {
             	Match("DEFAULT"); 
 
@@ -1466,8 +1466,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = NULL;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:429:8: ( 'NULL' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:429:8: 'NULL'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:444:8: ( 'NULL' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:444:8: 'NULL'
             {
             	Match("NULL"); 
 
@@ -1488,8 +1488,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = PATTERN;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:430:11: ( 'PATTERN' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:430:11: 'PATTERN'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:445:11: ( 'PATTERN' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:445:11: 'PATTERN'
             {
             	Match("PATTERN"); 
 
@@ -1510,8 +1510,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = OBJECT;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:431:11: ( 'OBJECT' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:431:11: 'OBJECT'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:446:11: ( 'OBJECT' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:446:11: 'OBJECT'
             {
             	Match("OBJECT"); 
 
@@ -1532,8 +1532,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = IDENTIFIER;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:432:13: ( 'IDENTIFIER' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:432:13: 'IDENTIFIER'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:447:13: ( 'IDENTIFIER' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:447:13: 'IDENTIFIER'
             {
             	Match("IDENTIFIER"); 
 
@@ -1554,8 +1554,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = RELATIVE_OID;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:433:15: ( 'RELATIVE-OID' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:433:15: 'RELATIVE-OID'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:448:15: ( 'RELATIVE-OID' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:448:15: 'RELATIVE-OID'
             {
             	Match("RELATIVE-OID"); 
 
@@ -1576,8 +1576,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = NumericString;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:434:16: ( 'NumericString' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:434:16: 'NumericString'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:449:16: ( 'NumericString' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:449:16: 'NumericString'
             {
             	Match("NumericString"); 
 
@@ -1598,8 +1598,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = PrintableString;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:435:18: ( 'PrintableString' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:435:18: 'PrintableString'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:450:18: ( 'PrintableString' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:450:18: 'PrintableString'
             {
             	Match("PrintableString"); 
 
@@ -1620,8 +1620,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = VisibleString;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:436:16: ( 'VisibleString' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:436:16: 'VisibleString'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:451:16: ( 'VisibleString' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:451:16: 'VisibleString'
             {
             	Match("VisibleString"); 
 
@@ -1642,8 +1642,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = IA5String;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:437:12: ( 'IA5String' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:437:12: 'IA5String'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:452:12: ( 'IA5String' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:452:12: 'IA5String'
             {
             	Match("IA5String"); 
 
@@ -1664,8 +1664,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = TeletexString;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:438:16: ( 'TeletexString' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:438:16: 'TeletexString'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:453:16: ( 'TeletexString' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:453:16: 'TeletexString'
             {
             	Match("TeletexString"); 
 
@@ -1686,8 +1686,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = VideotexString;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:439:17: ( 'VideotexString' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:439:17: 'VideotexString'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:454:17: ( 'VideotexString' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:454:17: 'VideotexString'
             {
             	Match("VideotexString"); 
 
@@ -1708,8 +1708,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = GraphicString;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:440:16: ( 'GraphicString' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:440:16: 'GraphicString'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:455:16: ( 'GraphicString' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:455:16: 'GraphicString'
             {
             	Match("GraphicString"); 
 
@@ -1730,8 +1730,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = GeneralString;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:441:16: ( 'GeneralString' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:441:16: 'GeneralString'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:456:16: ( 'GeneralString' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:456:16: 'GeneralString'
             {
             	Match("GeneralString"); 
 
@@ -1752,8 +1752,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = UniversalString;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:442:18: ( 'UniversalString' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:442:18: 'UniversalString'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:457:18: ( 'UniversalString' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:457:18: 'UniversalString'
             {
             	Match("UniversalString"); 
 
@@ -1774,8 +1774,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = BMPString;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:443:12: ( 'BMPString' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:443:12: 'BMPString'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:458:12: ( 'BMPString' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:458:12: 'BMPString'
             {
             	Match("BMPString"); 
 
@@ -1796,8 +1796,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = UTF8String;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:444:13: ( 'UTF8String' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:444:13: 'UTF8String'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:459:13: ( 'UTF8String' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:459:13: 'UTF8String'
             {
             	Match("UTF8String"); 
 
@@ -1818,8 +1818,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = INCLUDES;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:445:11: ( 'INCLUDES' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:445:11: 'INCLUDES'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:460:11: ( 'INCLUDES' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:460:11: 'INCLUDES'
             {
             	Match("INCLUDES"); 
 
@@ -1840,8 +1840,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = EXCEPT;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:446:10: ( 'EXCEPT' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:446:10: 'EXCEPT'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:461:10: ( 'EXCEPT' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:461:10: 'EXCEPT'
             {
             	Match("EXCEPT"); 
 
@@ -1862,8 +1862,8 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = SET;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:448:7: ( 'SET' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:448:7: 'SET'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:463:7: ( 'SET' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:463:7: 'SET'
             {
             	Match("SET"); 
 
@@ -1884,11 +1884,11 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = BitStringLiteral;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:451:2: ( '\\'' ( '0' | '1' )* '\\'B' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:451:2: '\\'' ( '0' | '1' )* '\\'B'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:466:2: ( '\\'' ( '0' | '1' )* '\\'B' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:466:2: '\\'' ( '0' | '1' )* '\\'B'
             {
             	Match('\''); 
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:451:7: ( '0' | '1' )*
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:466:7: ( '0' | '1' )*
             	do 
             	{
             	    int alt3 = 2;
@@ -1948,11 +1948,11 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = OctectStringLiteral;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:454:2: ( '\\'' ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )* '\\'H' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:454:2: '\\'' ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )* '\\'H'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:469:2: ( '\\'' ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )* '\\'H' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:469:2: '\\'' ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )* '\\'H'
             {
             	Match('\''); 
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:454:7: ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )*
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:469:7: ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )*
             	do 
             	{
             	    int alt4 = 2;
@@ -2012,10 +2012,10 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = StringLiteral;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:458:19: ( ( STR )+ )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:458:19: ( STR )+
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:473:19: ( ( STR )+ )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:473:19: ( STR )+
             {
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:458:19: ( STR )+
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:473:19: ( STR )+
             	int cnt5 = 0;
             	do 
             	{
@@ -2031,7 +2031,7 @@ public class asn1Lexer : Lexer
             	    switch (alt5) 
             		{
             			case 1 :
-            			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:458:19: STR
+            			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:473:19: STR
             			    {
             			    	mSTR(); 
             			    
@@ -2066,11 +2066,11 @@ public class asn1Lexer : Lexer
     {
         try 
     	{
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:461:8: ( '\"' ( options {greedy=false; } : . )* '\"' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:461:8: '\"' ( options {greedy=false; } : . )* '\"'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:476:8: ( '\"' ( options {greedy=false; } : . )* '\"' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:476:8: '\"' ( options {greedy=false; } : . )* '\"'
             {
             	Match('\"'); 
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:461:12: ( options {greedy=false; } : . )*
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:476:12: ( options {greedy=false; } : . )*
             	do 
             	{
             	    int alt6 = 2;
@@ -2089,7 +2089,7 @@ public class asn1Lexer : Lexer
             	    switch (alt6) 
             		{
             			case 1 :
-            			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:461:40: .
+            			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:476:40: .
             			    {
             			    	MatchAny(); 
             			    
@@ -2121,17 +2121,17 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = UID;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:463:10: ( ( 'A' .. 'Z' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' )* )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:463:10: ( 'A' .. 'Z' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' )*
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:478:10: ( ( 'A' .. 'Z' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' )* )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:478:10: ( 'A' .. 'Z' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' )*
             {
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:463:10: ( 'A' .. 'Z' )
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:463:11: 'A' .. 'Z'
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:478:10: ( 'A' .. 'Z' )
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:478:11: 'A' .. 'Z'
             	{
             		MatchRange('A','Z'); 
             	
             	}
 
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:463:21: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' )*
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:478:21: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' )*
             	do 
             	{
             	    int alt7 = 2;
@@ -2189,17 +2189,17 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = LID;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:466:10: ( ( 'a' .. 'z' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' )* )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:466:10: ( 'a' .. 'z' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' )*
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:481:10: ( ( 'a' .. 'z' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' )* )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:481:10: ( 'a' .. 'z' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' )*
             {
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:466:10: ( 'a' .. 'z' )
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:466:11: 'a' .. 'z'
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:481:10: ( 'a' .. 'z' )
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:481:11: 'a' .. 'z'
             	{
             		MatchRange('a','z'); 
             	
             	}
 
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:466:21: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' )*
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:481:21: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '-' )*
             	do 
             	{
             	    int alt8 = 2;
@@ -2257,10 +2257,10 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = INT;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:469:7: ( ( '0' | ( '1' .. '9' ) ( '0' .. '9' )* ) )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:469:7: ( '0' | ( '1' .. '9' ) ( '0' .. '9' )* )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:484:7: ( ( '0' | ( '1' .. '9' ) ( '0' .. '9' )* ) )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:484:7: ( '0' | ( '1' .. '9' ) ( '0' .. '9' )* )
             {
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:469:7: ( '0' | ( '1' .. '9' ) ( '0' .. '9' )* )
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:484:7: ( '0' | ( '1' .. '9' ) ( '0' .. '9' )* )
             	int alt10 = 2;
             	int LA10_0 = input.LA(1);
             	
@@ -2275,30 +2275,30 @@ public class asn1Lexer : Lexer
             	else 
             	{
             	    NoViableAltException nvae_d10s0 =
-            	        new NoViableAltException("469:7: ( '0' | ( '1' .. '9' ) ( '0' .. '9' )* )", 10, 0, input);
+            	        new NoViableAltException("484:7: ( '0' | ( '1' .. '9' ) ( '0' .. '9' )* )", 10, 0, input);
             	
             	    throw nvae_d10s0;
             	}
             	switch (alt10) 
             	{
             	    case 1 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:469:9: '0'
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:484:9: '0'
             	        {
             	        	Match('0'); 
             	        
             	        }
             	        break;
             	    case 2 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:469:15: ( '1' .. '9' ) ( '0' .. '9' )*
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:484:15: ( '1' .. '9' ) ( '0' .. '9' )*
             	        {
-            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:469:15: ( '1' .. '9' )
-            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:469:16: '1' .. '9'
+            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:484:15: ( '1' .. '9' )
+            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:484:16: '1' .. '9'
             	        	{
             	        		MatchRange('1','9'); 
             	        	
             	        	}
 
-            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:469:26: ( '0' .. '9' )*
+            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:484:26: ( '0' .. '9' )*
             	        	do 
             	        	{
             	        	    int alt9 = 2;
@@ -2313,7 +2313,7 @@ public class asn1Lexer : Lexer
             	        	    switch (alt9) 
             	        		{
             	        			case 1 :
-            	        			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:469:27: '0' .. '9'
+            	        			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:484:27: '0' .. '9'
             	        			    {
             	        			    	MatchRange('0','9'); 
             	        			    
@@ -2351,10 +2351,10 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = WS;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:475:9: ( ( ' ' | '\\t' | '\\r' | '\\n' )+ )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:475:9: ( ' ' | '\\t' | '\\r' | '\\n' )+
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:490:9: ( ( ' ' | '\\t' | '\\r' | '\\n' )+ )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:490:9: ( ' ' | '\\t' | '\\r' | '\\n' )+
             {
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:475:9: ( ' ' | '\\t' | '\\r' | '\\n' )+
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:490:9: ( ' ' | '\\t' | '\\r' | '\\n' )+
             	int cnt11 = 0;
             	do 
             	{
@@ -2418,12 +2418,12 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = COMMENT;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:479:9: ( '/*' ( options {greedy=false; } : . )* '*/' )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:479:9: '/*' ( options {greedy=false; } : . )* '*/'
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:494:9: ( '/*' ( options {greedy=false; } : . )* '*/' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:494:9: '/*' ( options {greedy=false; } : . )* '*/'
             {
             	Match("/*"); 
 
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:479:14: ( options {greedy=false; } : . )*
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:494:14: ( options {greedy=false; } : . )*
             	do 
             	{
             	    int alt12 = 2;
@@ -2453,7 +2453,7 @@ public class asn1Lexer : Lexer
             	    switch (alt12) 
             		{
             			case 1 :
-            			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:479:42: .
+            			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:494:42: .
             			    {
             			    	MatchAny(); 
             			    
@@ -2488,12 +2488,12 @@ public class asn1Lexer : Lexer
         try 
     	{
             int _type = COMMENT2;
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:483:9: ( '--' ( options {greedy=false; } : . )* ( '--' | ( '\\r' )? '\\n' ) )
-            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:483:9: '--' ( options {greedy=false; } : . )* ( '--' | ( '\\r' )? '\\n' )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:498:9: ( '--' ( options {greedy=false; } : . )* ( '--' | ( '\\r' )? '\\n' ) )
+            // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:498:9: '--' ( options {greedy=false; } : . )* ( '--' | ( '\\r' )? '\\n' )
             {
             	Match("--"); 
 
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:483:14: ( options {greedy=false; } : . )*
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:498:14: ( options {greedy=false; } : . )*
             	do 
             	{
             	    int alt13 = 2;
@@ -2531,7 +2531,7 @@ public class asn1Lexer : Lexer
             	    switch (alt13) 
             		{
             			case 1 :
-            			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:483:42: .
+            			    // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:498:42: .
             			    {
             			    	MatchAny(); 
             			    
@@ -2546,7 +2546,7 @@ public class asn1Lexer : Lexer
             	loop13:
             		;	// Stops C# compiler whinging that label 'loop13' has no statements
 
-            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:483:47: ( '--' | ( '\\r' )? '\\n' )
+            	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:498:47: ( '--' | ( '\\r' )? '\\n' )
             	int alt15 = 2;
             	int LA15_0 = input.LA(1);
             	
@@ -2561,14 +2561,14 @@ public class asn1Lexer : Lexer
             	else 
             	{
             	    NoViableAltException nvae_d15s0 =
-            	        new NoViableAltException("483:47: ( '--' | ( '\\r' )? '\\n' )", 15, 0, input);
+            	        new NoViableAltException("498:47: ( '--' | ( '\\r' )? '\\n' )", 15, 0, input);
             	
             	    throw nvae_d15s0;
             	}
             	switch (alt15) 
             	{
             	    case 1 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:483:48: '--'
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:498:48: '--'
             	        {
             	        	Match("--"); 
 
@@ -2576,9 +2576,9 @@ public class asn1Lexer : Lexer
             	        }
             	        break;
             	    case 2 :
-            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:483:53: ( '\\r' )? '\\n'
+            	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:498:53: ( '\\r' )? '\\n'
             	        {
-            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:483:53: ( '\\r' )?
+            	        	// C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:498:53: ( '\\r' )?
             	        	int alt14 = 2;
             	        	int LA14_0 = input.LA(1);
             	        	
@@ -2589,7 +2589,7 @@ public class asn1Lexer : Lexer
             	        	switch (alt14) 
             	        	{
             	        	    case 1 :
-            	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:483:53: '\\r'
+            	        	        // C:\\prj\\DataModeling\\tinyAsn1\\tinyAsn1\\asn1.g:498:53: '\\r'
             	        	        {
             	        	        	Match('\r'); 
             	        	        
