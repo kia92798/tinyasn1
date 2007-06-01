@@ -14,6 +14,9 @@ public override void ReportError(RecognitionException e) {
 
 }
 
+/* ********************************************************************************************************************* */
+/* ************************************* MODULE DEFINITION ************************************************************* */
+/* ********************************************************************************************************************* */
 
 moduleDefinitions 
 	:	moduleDefinition*;
@@ -59,20 +62,21 @@ valueSetAssigment
 typeAssigment 
 	:	typereference '::=' type
 	;	
+	
+/* ********************************************************************************************************************* */
+/* *************************************** TYPE DEFINITION ************************************************************* */
+/* ********************************************************************************************************************* */
+	
 
 type	: ('[' (UNIVERSAL | APPLICATION | PRIVATE)? INT  ']' ( IMPLICIT | EXPLICIT)? )?
 (	
 	 NULL
-	|bitStringType g_constraint*
+	|bitStringType (SIZE valueConstraint| g_constraint)*
 	|booleanType g_constraint*
 	|enumeratedType g_constraint*
-//	|integerType valueConstraint*
-//        |realType (valueConstraint | withComponentsConstraint)*
-//	|stringType (sizeConstraint |permittedAlphabetConstraint)*
-//	|typereference	constraint*
 	|integerType g_constraint*
         |realType g_constraint*
-	|stringType g_constraint*
+	|stringType (SIZE valueConstraint| g_constraint)*
 	|referencedType	g_constraint*
 	|sequenceOfType 
 	|choiceType
@@ -109,13 +113,6 @@ realType
 	:	REAL
 	;
 	
-/*
-REAL 	::= [UNIVERSAL 10] SEQUENCE {
-	f mantissa INTEGER (ALL EXCEPT 0),
-	base INTEGER (2|10),
-	exponent INTEGER g
-	}
-*/	
 	
 choiceType
 	:	CHOICE '{' choiceList (',' '...' g_exceptionSpec?  choiceListExtension?   (',' '...')?  )? '}'
@@ -199,51 +196,10 @@ referencedType
 	:	UID ('.' UID)?
 	;	
 
-objectIdentifier
-	:	OBJECT IDENTIFIER;
-
-relativeOID	:	RELATIVE_OID;
-
 	
-signedNumber
-	:	('+'|'-')? INT;
-	
-
-constraint
-	:	valueConstraint
-	|	sizeConstraint
-	|	withComponentsConstraint
-	|	subTypeConstraint
-	;
-	
-
-	
-valueConstraint 
-	: '(' value ( ('<')? '..' ('<')? value)? ')'
-	;
-
-sizeConstraint
-	:	'(' SIZE valueConstraint ')'
-	;	
-	
-permittedAlphabetConstraint
-	:	'(' FROM valueConstraint ')'
-	;
-	
-subTypeConstraint 
-	:	'(' type ')'
-	;		
-	
-withComponentsConstraint 
-	:	'('  WITH COMPONENTS '{'
-			( '...' ',')?
-			namedConstraint  (',' namedConstraint)*
-		'}'
-		')'
-	;	
-
-namedConstraint
-	:	identifier (valueConstraint)? (PRESENT|ABSENT | OPTIONAL)?;	
+/* ********************************************************************************************************************* */
+/* *************************************** VALUES DEFINITION *********************************************************** */
+/* ********************************************************************************************************************* */
 
 value	:
 		BitStringLiteral
@@ -258,11 +214,16 @@ value	:
 	|	MIN
 	|	MAX
 	|	objectIdentifierValue
+	|	charSequenceValue
 	;	
 	
 bitStringValue
 	:	'{' identifier (',' identifier)* '}'
 	;
+
+charSequenceValue	: 
+	'{' INT (',' INT)* '}'
+;
 	
 objectIdentifierValue
 	:	'{' objectIdentifierComponent+  '}'
@@ -279,24 +240,9 @@ definedValue
 		| modulereference '.' valuereference
 	;
 
-lID	:	LID;
-
-modulereference	:	UID;
-
-typereference	:	UID;
-	
-valuereference 	:	LID;		
-
-identifier	:	LID;
-
-versionNumber	:	INT;
-
-
-
-/* ***************************************************************************************************************** */
-/* ***************************************************************************************************************** */
-/* ***************************************************************************************************************** */
-/* ***************************************************************************************************************** */
+/* ********************************************************************************************************************* */
+/* *************************************** Constraints DEFINITION ****************************************************** */
+/* ********************************************************************************************************************* */
 g_constraint 
 	:	'(' g_subtypeConstraint  g_exceptionSpec? ')'
 	;
@@ -354,11 +300,30 @@ g_innerTypeConstraints
 	;
 
 
+valueConstraint 
+	: '(' g_valueElement ')'
+	;
+
+sizeConstraint
+	:	'(' SIZE valueConstraint ')'
+	;	
+
 g_namedConstraint
 	:	identifier (g_constraint)? (PRESENT|ABSENT | OPTIONAL)?;	
 
 g_patternConstraint : PATTERN value;
 	
+
+
+lID	:	LID;
+modulereference	:	UID;
+typereference	:	UID;
+valuereference 	:	LID;		
+identifier	:	LID;
+versionNumber	:	INT;
+objectIdentifier	:	OBJECT IDENTIFIER;
+relativeOID	:	RELATIVE_OID;
+signedNumber	:	('+'|'-')? INT;
 
 /* ***************************************************************************************************************** */
 /* ***************************************************************************************************************** */
@@ -369,74 +334,41 @@ g_patternConstraint : PATTERN value;
 
 
 UnionMark  :  '|'|'UNION';
-
 IntersectionMark  :	'^' | 'INTERSECTION';
-	
-
 DEFINITIONS :	 'DEFINITIONS';
-
 EXPLICIT:	 'EXPLICIT';
-
 TAGS 	:	'TAGS';
-
 IMPLICIT:	'IMPLICIT';
-
 AUTOMATIC	:	'AUTOMATIC';
-
 EXTENSIBILITY	:	'EXTENSIBILITY';
-
 IMPLIED :	'IMPLIED';
-
 BEGIN	:	'BEGIN';
 END	:	'END';
-
 EXPORTS	:	'EXPORTS';
-
 ALL	: 	'ALL';
-
 IMPORTS	:	'IMPORTS';
-
 FROM	:	'FROM';
-
 UNIVERSAL	: 'UNIVERSAL';
 APPLICATION	: 'APPLICATION';
 PRIVATE		:'PRIVATE';
 BIT	: 'BIT';
-
 STRING	:	'STRING';
-
 BOOLEAN :	'BOOLEAN';
-
 ENUMERATED	:'ENUMERATED';
-
 INTEGER	:	'INTEGER';
-
 REAL	:	'REAL';
-
 CHOICE	:	'CHOICE';
-
 SEQUENCE	:'SEQUENCE';
-
 OPTIONAL	:'OPTIONAL';
-
 SIZE	:	'SIZE';
-
 OF	:	'OF';
-
 OCTET	:	'OCTET';
-
 MIN	: 	'MIN';
-
 MAX	:	'MAX';
-
 TRUE	:	'TRUE';
-
 FALSE	:	'FALSE';
-
 ABSENT	:	'ABSENT';
-
 PRESENT	:	'PRESENT';
-
 WITH 	:	'WITH';
 COMPONENT	: 'COMPONENT';		
 COMPONENTS 	: 'COMPONENTS';
@@ -459,16 +391,15 @@ BMPString	:'BMPString';
 UTF8String	:'UTF8String';
 INCLUDES	:'INCLUDES';
 EXCEPT		:'EXCEPT';
-
 SET		:'SET';
 
 BitStringLiteral	:
 	'\'' ('0'|'1')* '\'B'
 	;
+
 OctectStringLiteral	:
 	'\'' ('0'..'9'|'a'..'f'|'A'..'F')* '\'H'
 	;
-
 
 StringLiteral 	: 	STR+ ;
 
@@ -494,6 +425,4 @@ COMMENT
 COMMENT2
     :   '--' ( options {greedy=false;} : . )* ('--'|'\r'?'\n') {$channel=HIDDEN;}
     ;
-
-
 
