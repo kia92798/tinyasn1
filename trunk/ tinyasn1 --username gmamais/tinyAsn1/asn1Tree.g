@@ -7,6 +7,7 @@ options {
 }
 
 @header {
+	#pragma warning disable 0219
 }
 
 @members {
@@ -97,7 +98,7 @@ bitStringType
 	;
 
 bitStringItem 
-	:	^(BIT_STRING_ITEM INT? valuereference?)
+	:	^(BIT_STRING_ITEM identifier INT? valuereference?)
 	;	
 	
 booleanType

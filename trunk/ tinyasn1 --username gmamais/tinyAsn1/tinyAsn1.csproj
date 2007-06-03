@@ -52,6 +52,7 @@
     <Compile Include="Asn1AST.cs" />
     <Compile Include="asn1Lexer.cs" />
     <Compile Include="asn1Parser.cs" />
+    <Compile Include="asn1Tree.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

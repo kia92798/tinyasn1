@@ -57,6 +57,7 @@ tokens {
 
 
 @header {
+	#pragma warning disable 0219
 }
 
 @members {
@@ -166,7 +167,7 @@ bitStringType
 	;
 
 bitStringItem 
-	:	identifier '(' (INT|valuereference) ')'		->  ^(BIT_STRING_ITEM INT? valuereference?)
+	:	identifier '(' (INT|valuereference) ')'		->  ^(BIT_STRING_ITEM identifier INT? valuereference?)
 	;	
 	
 booleanType

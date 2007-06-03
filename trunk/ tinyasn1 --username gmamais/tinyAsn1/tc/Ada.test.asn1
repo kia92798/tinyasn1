@@ -1,10 +1,16 @@
-MY-MODULE DEFINITIONS ::= BEGIN
+MY-MODULE DEFINITIONS EXPLICIT TAGS EXTENSIBILITY IMPLIED ::= BEGIN
 
+EXPORTS a1, a2, B1, B2;
+IMPORTS
+	A1,a1 FROM A
+	B1,b1 FROM B
+	;
+	
 -- Original definition by Alain
 --T-POS ::= BOOLEAN
 
 
-TypeEnumerated ::= ENUMERATED {
+TypeEnumerated ::= [4] ENUMERATED {
     red(0),
     green(1),
     blue(2)
@@ -12,7 +18,7 @@ TypeEnumerated ::= ENUMERATED {
 
 
 SubType ::= SEQUENCE {
-    intValue	INTEGER(0 .. 10),
+    intValue	INTEGER(0 | 10),
     intArray	SEQUENCE (SIZE (10)) OF INTEGER (0 .. 3),
     enumValue	TypeEnumerated,
     label	OCTET STRING (SIZE(10..40)),
