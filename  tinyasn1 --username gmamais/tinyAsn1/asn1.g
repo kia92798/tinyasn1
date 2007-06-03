@@ -1,7 +1,60 @@
 grammar asn1;
 options {
+	output=AST;
 	language=CSharp;
 }
+
+tokens {
+	MODULE_DEF;
+	TYPE_ASSIG;
+	VAL_ASSIG;
+	VAL_SET_ASSIG;
+	TYPE_DEF;
+	TYPE_TAG;
+	BIT_STRING_TYPE;
+	BIT_STRING_ITEM;
+	ENUMERATED_LST_ITEM;
+	ENUMERATED_TYPE;
+	INTEGER_TYPE;
+	INTEGER_LST_ITEM;
+	CHOICE_TYPE;
+	CHOICE_EXT_BODY;
+	CHOICE_ITEM;
+	CHOICE_EXT_ITEM;
+	SEQUENCE_TYPE;
+	SET_TYPE;
+	SEQUENCE_BODY;
+	SEQUENCE_EXT_BODY;
+	SEQUENCE_ITEM;
+	SEQUENCE_EXT_GROUP;
+	SEQUENCE_OF_TYPE;
+	SET_OF_TYPE;
+	STRING_TYPE;
+	REFERENCED_TYPE;
+	OBJ_LST_ITEM;
+	DEFINED_VALUE;
+	NUMERIC_VALUE;
+	CONSTRAINT;
+	EXCEPTION_SPEC;
+	CONSTRAINT_BODY;
+	UNION_SET;
+	UNION_SET_ALL_EXCEPT;
+	INTERSECTION_ELEMENT;
+	VALUE_RANGE_EXPR;
+	SUBTYPE_EXPR;
+	SIZE_EXPR;
+	PERMITTED_ALPHABET_EXPR;
+	INNER_TYPE_EXPR;
+	NAME_CONSTRAINT_EXPR;
+	PATTERN_EXPR;
+	MIN_VAL_INCLUDED;
+	MAX_VAL_INCLUDED;
+	MAX_VAL_PRESENT;
+	BIT_STRING_VALUE;
+	CHAR_SEQUENCE_VALUE;
+}
+
+
 
 @header {
 }
@@ -21,93 +74,123 @@ public override void ReportError(RecognitionException e) {
 moduleDefinitions 
 	:	moduleDefinition*;
 
+
+definitiveIdentifier
+	:	'{' definitiveObjIdComponent* '}'
+	;
+
 moduleDefinition :  	modulereference	definitiveIdentifier?
 			DEFINITIONS
-			(EXPLICIT TAGS | IMPLICIT TAGS | AUTOMATIC TAGS)?
-			(EXTENSIBILITY IMPLIED)?
+			moduleTag?
+			(extImpl=EXTENSIBILITY IMPLIED)?
 			'::=' BEGIN
-			(exports)?
-			(imports)?
+			exports?
+			imports?
 			(
 				typeAssigment
 				|valueAssigment
 				|valueSetAssigment
 			)*
-			END;
-definitiveIdentifier
-	:	'{' definitiveObjIdComponent* '}'
-	;
+			END
+			->  ^(MODULE_DEF modulereference moduleTag? $extImpl? exports? imports? typeAssigment* valueAssigment* valueSetAssigment*)
+			;
+
+moduleTag 
+	:	EXPLICIT TAGS -> EXPLICIT
+	| 	IMPLICIT TAGS -> IMPLICIT
+	|   AUTOMATIC TAGS -> AUTOMATIC
+	;			
 		
 definitiveObjIdComponent
 	:	identifier ( '(' INT ')' )?
 	|	INT;		
 			
 exports :
-	 EXPORTS ALL ';'
-	| EXPORTS ((typereference | valuereference) (',' (typereference | valuereference))*)?  ';'
+	 EXPORTS ALL ';' -> ^(EXPORTS ALL)
+	| EXPORTS ((typereference | valuereference) (',' (typereference | valuereference))*)?  ';' -> ^(EXPORTS typereference* valuereference*)?
 ;			
 
 imports :
-	IMPORTS ((typereference | valuereference) (',' (typereference | valuereference))* FROM modulereference definitiveIdentifier?)*  ';'	
+	IMPORTS importFromModule*  ';'	-> importFromModule*
 	;
+	
+importFromModule
+	:	(typereference | valuereference) (',' (typereference | valuereference))* FROM modulereference definitiveIdentifier?
+		-> ^(IMPORTS typereference* valuereference* modulereference )
+	;	
 	
 	
 valueAssigment	
-	:	valuereference type '::=' value	
+	:	valuereference type '::=' value	 -> ^(VAL_ASSIG valuereference type value)
 	;		
 		
 valueSetAssigment
-	:	typereference type '::=' '{' g_elementSetSpecs '}'
+	:	typereference type '::=' '{' constraintBody '}'    -> ^(VAL_SET_ASSIG typereference type constraintBody)
 	;		
 typeAssigment 
-	:	typereference '::=' type
+	:	typereference '::=' type -> ^(TYPE_ASSIG typereference type)
 	;	
 	
 /* ********************************************************************************************************************* */
 /* *************************************** TYPE DEFINITION ************************************************************* */
 /* ********************************************************************************************************************* */
-	
 
-type	: ('[' (UNIVERSAL | APPLICATION | PRIVATE)? INT  ']' ( IMPLICIT | EXPLICIT)? )?
-(	
-	 NULL
-	|bitStringType (SIZE valueConstraint| g_constraint)*
-	|booleanType g_constraint*
-	|enumeratedType g_constraint*
-	|integerType g_constraint*
-        |realType g_constraint*
-	|stringType (SIZE valueConstraint| g_constraint)*
-	|referencedType	g_constraint*
-	|sequenceOfType 
-	|choiceType
-        |sequenceType g_constraint*	//WITH COMPONENTS
-        | setType
-        | setOfType
-        | objectIdentifier g_constraint*
-        |relativeOID
-)
+typeTag
+	:	'[' (t=UNIVERSAL | t=APPLICATION | t=PRIVATE)? INT  ']' ( impOrExp=IMPLICIT | impOrExp=EXPLICIT)? 	-> ^(TYPE_TAG $t? INT $impOrExp?)
 	;
+		
 
+type	: typeTag?
+(	 nULL													-> ^(TYPE_DEF typeTag? nULL)
+	|bitStringType (SIZE sc=constraint| gen=constraint)*	-> ^(TYPE_DEF typeTag? bitStringType ^(SIZE $sc)* $gen*)
+	|booleanType constraint*								-> ^(TYPE_DEF typeTag? booleanType constraint*)
+	|enumeratedType constraint*								-> ^(TYPE_DEF typeTag? enumeratedType constraint*)
+	|integerType constraint*								-> ^(TYPE_DEF typeTag? integerType constraint*)
+    |realType constraint*									-> ^(TYPE_DEF typeTag? realType constraint*)
+	|stringType (SIZE sc=constraint| gen=constraint)*		-> ^(TYPE_DEF typeTag? stringType ^(SIZE $sc)* $gen*)
+	|referencedType	constraint*								-> ^(TYPE_DEF typeTag? referencedType constraint*)
+	|sequenceOfType 										-> ^(TYPE_DEF typeTag? sequenceOfType)
+	|choiceType												-> ^(TYPE_DEF typeTag? choiceType)
+    |sequenceType constraint*								-> ^(TYPE_DEF typeTag? sequenceType constraint*)
+    |setType												-> ^(TYPE_DEF typeTag? setType)
+    |setOfType												-> ^(TYPE_DEF typeTag? setOfType)
+    |objectIdentifier constraint*							-> ^(TYPE_DEF typeTag? objectIdentifier constraint*)
+    |relativeOID											-> ^(TYPE_DEF typeTag? relativeOID)
+)
+;
+
+nULL:	NULL;
 
 bitStringType
-	:	BIT STRING ('{' (identifier '(' (INT|valuereference) ')' (',' identifier '(' (INT|valuereference) ')' )* )? '}' )?
+	:	BIT STRING ('{' (bitStringItem (',' bitStringItem )* )? '}' )?	-> ^(BIT_STRING_TYPE bitStringItem*)
 	;
+
+bitStringItem 
+	:	identifier '(' (INT|valuereference) ')'		->  ^(BIT_STRING_ITEM INT? valuereference?)
+	;	
 	
 booleanType
 	:	BOOLEAN
 	;
 	
 enumeratedType 
-	:	ENUMERATED '{' enumeratedTypeItems  ( ',' '...' g_exceptionSpec? (',' enumeratedTypeItems)? )? '}'
+	:	ENUMERATED '{' en1=enumeratedTypeItems  ( ',' ext='...' exceptionSpec? (',' en2=enumeratedTypeItems)? )? '}'
+	-> ^(ENUMERATED_TYPE $en1 ($ext exceptionSpec? $en2?) ?)
 	;
 
 enumeratedTypeItems 
-	:	identifier ( '(' (signedNumber|valuereference) ')')? (',' identifier ( '(' (signedNumber|valuereference) ')')?)*
+	:	 enumeratedLstItem (',' enumeratedLstItem)* ->enumeratedLstItem+
 	;		
-
+enumeratedLstItem	:	
+	identifier ( '(' (signedNumber|valuereference) ')')? -> ^(ENUMERATED_LST_ITEM identifier signedNumber? valuereference?)
+;
 integerType
-	:	INTEGER ( '{' (identifier '(' (signedNumber|valuereference) ')' (',' identifier '(' (signedNumber|valuereference) ')')*)? '}')?
+	:	INTEGER ( '{' (integerTypeListItem (',' integerTypeListItem)*)? '}')?	-> ^(INTEGER_TYPE integerTypeListItem*)
 	;
+	
+integerTypeListItem 
+	:	identifier '(' (signedNumber|valuereference) ')'	-> ^(INTEGER_LST_ITEM identifier signedNumber? valuereference?)
+	;	
 	
 realType 
 	:	REAL
@@ -115,39 +198,50 @@ realType
 	
 	
 choiceType
-	:	CHOICE '{' choiceList (',' '...' g_exceptionSpec?  choiceListExtension?   (',' '...')?  )? '}'
+	:	CHOICE '{' choiceItemsList choiceExtensionBody? '}'
+	-> ^(CHOICE_TYPE choiceItemsList choiceExtensionBody?)
 	;
+	
+choiceExtensionBody
+	:	',' '...' exceptionSpec?  choiceListExtension?   (',' extMark2='...')?  
+		-> ^(CHOICE_EXT_BODY exceptionSpec? choiceListExtension? $extMark2?)
+	;	
 
-choiceList
-	:	identifier type (',' identifier type)*
+choiceItemsList
+	:	choiceItem (',' choiceItem)*	-> choiceItem+
 	;
+choiceItem
+	:	identifier type				->  ^(CHOICE_ITEM identifier type)
+	;	
 
 choiceListExtension
-	:	',' extensionAdditionAlternative (',' extensionAdditionAlternative)*
+	:	',' extensionAdditionAlternative (',' extensionAdditionAlternative)*	->	extensionAdditionAlternative+
 	;	
+	
 extensionAdditionAlternative
-	:	 '[[' versionNumber? choiceList ']]'
-		| identifier type
+	:	 '[[' versionNumber? choiceItemsList ']]'	-> ^(CHOICE_EXT_ITEM versionNumber? choiceItemsList)
+		| choiceItem
 	;	
 
 sequenceType
-	:	SEQUENCE '{' sequenceOrSetBody?  '}' 
+	:	SEQUENCE '{' sequenceOrSetBody?  '}' -> ^(SEQUENCE_TYPE sequenceOrSetBody?)
 	;
 	
-setType	:	SET '{' sequenceOrSetBody?  '}' 
+setType	:	SET '{' sequenceOrSetBody?  '}' -> ^(SET_TYPE sequenceOrSetBody?)
 	;	
 	
 sequenceOrSetBody	:
-		  componentTypeList ( ',' seqOrSetExtBody)?
-		| seqOrSetExtBody
+		  componentTypeList ( ',' seqOrSetExtBody)?		-> ^(SEQUENCE_BODY componentTypeList seqOrSetExtBody?)
+		| seqOrSetExtBody								-> ^(SEQUENCE_BODY seqOrSetExtBody)
 	;
 	
 seqOrSetExtBody
-	:	'...' g_exceptionSpec? (',' extensionAdditionList)? (',' '...'   (',' componentTypeList )? )?
+	:	'...' exceptionSpec? (',' extensionAdditionList)? (',' extMark2='...'   (',' componentTypeList )? )?
+	->	^(SEQUENCE_EXT_BODY exceptionSpec? extensionAdditionList? $extMark2? componentTypeList?)
 	;	
 	
 extensionAdditionList
-	:	extensionAddition (',' extensionAddition)*
+	:	extensionAddition (',' extensionAddition)*		-> extensionAddition+
 	;	
 
 extensionAddition
@@ -155,25 +249,23 @@ extensionAddition
 	       |extensionAdditionGroup
 	;
 extensionAdditionGroup
-	:	'[[' versionNumber? componentTypeList ']]'
+	:	'[[' versionNumber? componentTypeList ']]'	-> ^(SEQUENCE_EXT_GROUP versionNumber? componentTypeList)
 	;
 
 componentTypeList 
-	:	componentType  (',' componentType )*
+	:	componentType  (',' componentType )*		-> componentType+
 	;
 	
 componentType
-	:	identifier type (OPTIONAL | DEFAULT value)?
+	:	identifier type (optOrDef=OPTIONAL | optOrDef=DEFAULT value)?	-> ^(SEQUENCE_ITEM identifier type $optOrDef? value?)
 	;	
 	
 sequenceOfType
-	:	SEQUENCE sizeConstraint? OF (identifier)? type
-	|	SEQUENCE SIZE valueConstraint OF (identifier)? type
+	:	SEQUENCE (SIZE sz=constraint | gen=constraint)? OF (identifier)? type			-> ^(SEQUENCE_OF_TYPE (SIZE $sz)? $gen? identifier? type)
 	;
 	
 setOfType
-	:	SET sizeConstraint? OF (identifier)? type
-	|	SET SIZE valueConstraint OF (identifier)? type
+	:	SET (SIZE sz=constraint | gen=constraint)? OF (identifier)? type				-> ^(SET_OF_TYPE (SIZE $sz)? $gen? identifier? type)
 	;		
 
 	
@@ -193,7 +285,7 @@ stringType	:
 	;
 	
 referencedType
-	:	UID ('.' UID)?
+	:	str1=UID ('.' str2=UID)?	-> ^(REFERENCED_TYPE $str1 $str2?)
 	;	
 
 	
@@ -209,7 +301,7 @@ value	:
 	|	FALSE
 	|	StringLiteral
 	|	valuereference		
-	|	('+'|'-')? INT ('.' INT?)? 
+	|	(s='+'|s='-')? intPart=INT ('.' decPart=INT?)? 					->^(NUMERIC_VALUE $s? $intPart $decPart?)
 //	|	('+'|'-')? INT ('.' INT?)? ( ('E'|'e') ('+'|'-')? INT)?
 	|	MIN
 	|	MAX
@@ -218,100 +310,103 @@ value	:
 	;	
 	
 bitStringValue
-	:	'{' identifier (',' identifier)* '}'
+	:	'{' identifier (',' identifier)* '}'		->^(BIT_STRING_VALUE identifier)+
 	;
 
 charSequenceValue	: 
-	'{' INT (',' INT)* '}'
+	'{' INT (',' INT)* '}'							->^(CHAR_SEQUENCE_VALUE INT)+
 ;
 	
 objectIdentifierValue
-	:	'{' objectIdentifierComponent+  '}'
+	:	'{' objectIdentifierComponent+  '}'			->objectIdentifierComponent+
 	;	
 objectIdentifierComponent
-	:	identifier ('(' (INT | definedValue) ')' )?	//3 cases identifier or valuereference or identifier(number)
-	| 	INT
-	|	modulereference '.' valuereference	//external ref
+	:	identifier ('(' (INT | definedValue) ')' )?	->^(OBJ_LST_ITEM identifier INT? definedValue?) //3 cases identifier or valuereference or identifier(number)
+	| 	INT											->^(OBJ_LST_ITEM INT)
+	|	modulereference '.' valuereference			->^(OBJ_LST_ITEM modulereference valuereference)
 	;
 
 
 definedValue
-	:	valuereference
-		| modulereference '.' valuereference
+	:	valuereference							-> ^(DEFINED_VALUE valuereference)
+		| modulereference '.' valuereference	-> ^(DEFINED_VALUE modulereference valuereference)
 	;
 
 /* ********************************************************************************************************************* */
 /* *************************************** Constraints DEFINITION ****************************************************** */
 /* ********************************************************************************************************************* */
-g_constraint 
-	:	'(' g_subtypeConstraint  g_exceptionSpec? ')'
+constraint 
+	:	'(' constraintBody  exceptionSpec? ')'			->^(CONSTRAINT constraintBody  exceptionSpec?)
 	;
 
-g_exceptionSpec 
+exceptionSpec 
 	:	'!' 
 	(
 		 signedNumber
 		|valuereference
 				|type ':' value
 	)
+														->^(EXCEPTION_SPEC signedNumber? valuereference? type? value?)
 	;
 
 
-g_subtypeConstraint
-	: g_elementSetSpecs;
-
-g_elementSetSpecs
-	:	g_unionElement (',' '...' ( ',' g_unionElement)?)?;
-	
-g_unionElement
-	:	g_intersectionElement (UnionMark g_intersectionElement)*
-	|	ALL EXCEPT g_elementSetSpec
-	;	
-	
-g_intersectionElement
-	:	g_elementSetSpec (EXCEPT g_elementSetSpec)? (IntersectionMark g_elementSetSpec (EXCEPT g_elementSetSpec)?)*
-	;	
-
-g_elementSetSpec
-	: g_valueElement
-	| g_containedSubtype
-	| g_SizeConstraint
-	| g_permittedAlphabet
-	| g_innerTypeConstraints
-	| g_patternConstraint
-	| '(' g_elementSetSpecs ')'
-	;	
-	
-g_valueElement
-	: value ( ('<')? '..' ('<')? value)?	
+constraintBody
+	:	uset1=unionSet (',' extMark='...' ( ',' uset2=unionSet)?)?			-> ^(CONSTRAINT_BODY $uset1 $extMark? $uset2?)
 	;
-g_containedSubtype: INCLUDES? type;
+	
+unionSet
+	:	intersectionSet (UnionMark intersectionSet)*						-> ^(UNION_SET intersectionSet)+
+	|	ALL EXCEPT constraintExpression										-> ^(UNION_SET_ALL_EXCEPT constraintExpression)
+	;	
+	
+intersectionSet
+	:	intersectionItem (IntersectionMark intersectionItem)*	->intersectionItem+
+	;	
+	
+intersectionItem 
+	:	ex1=constraintExpression (EXCEPT ex2=constraintExpression)?			-> ^(INTERSECTION_ELEMENT $ex1 $ex2?)		
+	;	
 
-g_SizeConstraint : SIZE g_constraint;
+constraintExpression
+	: valueRangeExpression
+	| subtypeExpression
+	| sizeExpression
+	| permittedAlphabetExpression
+	| innerTypeExpression
+	| patternExpression
+	| '(' constraintBody ')'	->	constraintBody
+	;	
+	
+valueRangeExpression
+	: minVal=value ( (minIncl='<')? '..' (maxIncl='<')? maxVal=value)?			
+		-> ^(VALUE_RANGE_EXPR $minVal ^(MAX_VAL_PRESENT $maxVal)? ^(MIN_VAL_INCLUDED $minIncl)? ^(MAX_VAL_INCLUDED $maxIncl)? )
+	;
 
-g_permittedAlphabet : FROM g_constraint;
 
-g_innerTypeConstraints 
-	: WITH COMPONENT g_constraint
+subtypeExpression: bInlc=INCLUDES? type		-> ^(SUBTYPE_EXPR type $bInlc?)
+	;
+
+sizeExpression : SIZE constraint			-> ^(SIZE_EXPR constraint)
+	;
+	
+permittedAlphabetExpression : FROM constraint	-> ^(PERMITTED_ALPHABET_EXPR constraint)
+	;
+
+innerTypeExpression 
+	: WITH COMPONENT constraint											-> ^(INNER_TYPE_EXPR constraint)
 	| WITH COMPONENTS '{'
 			( '...' ',')?
-			g_namedConstraint  (',' g_namedConstraint)*
+			namedConstraintExpression  (',' namedConstraintExpression)* 
 		'}'
+		-> ^(INNER_TYPE_EXPR namedConstraintExpression+)
 	;
 
-
-valueConstraint 
-	: '(' g_valueElement ')'
-	;
-
-sizeConstraint
-	:	'(' SIZE valueConstraint ')'
+namedConstraintExpression
+	:	identifier (constraint)? (eNum=PRESENT|eNum=ABSENT | eNum=OPTIONAL)?		-> ^(NAME_CONSTRAINT_EXPR identifier constraint? $eNum?)
 	;	
 
-g_namedConstraint
-	:	identifier (g_constraint)? (PRESENT|ABSENT | OPTIONAL)?;	
-
-g_patternConstraint : PATTERN value;
+patternExpression : PATTERN value		-> ^(PATTERN_EXPR value)
+	;
 	
 
 
