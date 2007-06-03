@@ -4,224 +4,185 @@ options {
 
 }
 
-T73 : '::=' ;
-T74 : '{' ;
-T75 : '}' ;
-T76 : '(' ;
-T77 : ')' ;
-T78 : ';' ;
-T79 : ',' ;
-T80 : '[' ;
-T81 : ']' ;
-T82 : '...' ;
-T83 : '[[' ;
-T84 : ']]' ;
-T85 : '.' ;
-T86 : '+' ;
-T87 : '-' ;
-T88 : '<' ;
-T89 : '..' ;
-T90 : '!' ;
-T91 : ':' ;
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 371
-UnionMark  :  '|'|'UNION';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 373
-IntersectionMark  :	'^' | 'INTERSECTION';
-	
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 376
-DEFINITIONS :	 'DEFINITIONS';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 378
-EXPLICIT:	 'EXPLICIT';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 380
-TAGS 	:	'TAGS';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 382
-IMPLICIT:	'IMPLICIT';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 384
-AUTOMATIC	:	'AUTOMATIC';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 386
-EXTENSIBILITY	:	'EXTENSIBILITY';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 388
-IMPLIED :	'IMPLIED';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 390
-BEGIN	:	'BEGIN';
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 391
-END	:	'END';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 393
-EXPORTS	:	'EXPORTS';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 395
-ALL	: 	'ALL';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 397
-IMPORTS	:	'IMPORTS';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 399
-FROM	:	'FROM';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 401
-UNIVERSAL	: 'UNIVERSAL';
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 402
-APPLICATION	: 'APPLICATION';
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 403
-PRIVATE		:'PRIVATE';
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 404
-BIT	: 'BIT';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 406
-STRING	:	'STRING';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 408
-BOOLEAN :	'BOOLEAN';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 410
-ENUMERATED	:'ENUMERATED';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 412
-INTEGER	:	'INTEGER';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 414
-REAL	:	'REAL';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 416
-CHOICE	:	'CHOICE';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 418
-SEQUENCE	:'SEQUENCE';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 420
-OPTIONAL	:'OPTIONAL';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 422
-SIZE	:	'SIZE';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 424
-OF	:	'OF';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 426
-OCTET	:	'OCTET';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 428
-MIN	: 	'MIN';
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 430
-MAX	:	'MAX';
+T120 : '{' ;
+T121 : '}' ;
+T122 : '::=' ;
+T123 : '(' ;
+T124 : ')' ;
+T125 : ';' ;
+T126 : ',' ;
+T127 : '[' ;
+T128 : ']' ;
+T129 : '...' ;
+T130 : '[[' ;
+T131 : ']]' ;
+T132 : '.' ;
+T133 : '+' ;
+T134 : '-' ;
+T135 : '!' ;
+T136 : ':' ;
+T137 : '<' ;
+T138 : '..' ;
 
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 432
-TRUE	:	'TRUE';
-
+UnionMark  :  '|'|'UNION';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 433
+IntersectionMark  :	'^' | 'INTERSECTION';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 434
-FALSE	:	'FALSE';
-
+DEFINITIONS :	 'DEFINITIONS';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 435
+EXPLICIT:	 'EXPLICIT';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 436
-ABSENT	:	'ABSENT';
-
+TAGS 	:	'TAGS';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 437
+IMPLICIT:	'IMPLICIT';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 438
-PRESENT	:	'PRESENT';
-
+AUTOMATIC	:	'AUTOMATIC';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 439
+EXTENSIBILITY	:	'EXTENSIBILITY';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 440
-WITH 	:	'WITH';
+IMPLIED :	'IMPLIED';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 441
-COMPONENT	: 'COMPONENT';		
+BEGIN	:	'BEGIN';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 442
-COMPONENTS 	: 'COMPONENTS';
+END	:	'END';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 443
-DEFAULT 	: 'DEFAULT';
+EXPORTS	:	'EXPORTS';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 444
-NULL		:'NULL';
+ALL	: 	'ALL';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 445
-PATTERN		:'PATTERN';
+IMPORTS	:	'IMPORTS';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 446
-OBJECT 		:'OBJECT';
+FROM	:	'FROM';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 447
-IDENTIFIER	:'IDENTIFIER';
+UNIVERSAL	: 'UNIVERSAL';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 448
-RELATIVE_OID	:'RELATIVE-OID';
+APPLICATION	: 'APPLICATION';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 449
-NumericString	:'NumericString';
+PRIVATE		:'PRIVATE';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 450
-PrintableString	:'PrintableString';
+BIT	: 'BIT';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 451
-VisibleString	:'VisibleString';
+STRING	:	'STRING';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 452
-IA5String	:'IA5String';
+BOOLEAN :	'BOOLEAN';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 453
-TeletexString	:'TeletexString';
+ENUMERATED	:'ENUMERATED';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 454
-VideotexString	:'VideotexString';
+INTEGER	:	'INTEGER';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 455
-GraphicString	:'GraphicString';
+REAL	:	'REAL';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 456
-GeneralString	:'GeneralString';
+CHOICE	:	'CHOICE';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 457
-UniversalString	:'UniversalString';
+SEQUENCE	:'SEQUENCE';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 458
-BMPString	:'BMPString';
+OPTIONAL	:'OPTIONAL';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 459
-UTF8String	:'UTF8String';
+SIZE	:	'SIZE';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 460
-INCLUDES	:'INCLUDES';
+OF	:	'OF';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 461
-EXCEPT		:'EXCEPT';
-
+OCTET	:	'OCTET';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 462
+MIN	: 	'MIN';
 // $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 463
+MAX	:	'MAX';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 464
+TRUE	:	'TRUE';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 465
+FALSE	:	'FALSE';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 466
+ABSENT	:	'ABSENT';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 467
+PRESENT	:	'PRESENT';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 468
+WITH 	:	'WITH';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 469
+COMPONENT	: 'COMPONENT';		
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 470
+COMPONENTS 	: 'COMPONENTS';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 471
+DEFAULT 	: 'DEFAULT';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 472
+NULL		:'NULL';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 473
+PATTERN		:'PATTERN';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 474
+OBJECT 		:'OBJECT';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 475
+IDENTIFIER	:'IDENTIFIER';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 476
+RELATIVE_OID	:'RELATIVE-OID';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 477
+NumericString	:'NumericString';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 478
+PrintableString	:'PrintableString';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 479
+VisibleString	:'VisibleString';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 480
+IA5String	:'IA5String';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 481
+TeletexString	:'TeletexString';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 482
+VideotexString	:'VideotexString';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 483
+GraphicString	:'GraphicString';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 484
+GeneralString	:'GeneralString';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 485
+UniversalString	:'UniversalString';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 486
+BMPString	:'BMPString';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 487
+UTF8String	:'UTF8String';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 488
+INCLUDES	:'INCLUDES';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 489
+EXCEPT		:'EXCEPT';
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 490
 SET		:'SET';
 
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 465
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 492
 BitStringLiteral	:
 	'\'' ('0'|'1')* '\'B'
 	;
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 468
+
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 496
 OctectStringLiteral	:
 	'\'' ('0'..'9'|'a'..'f'|'A'..'F')* '\'H'
 	;
 
-
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 473
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 500
 StringLiteral 	: 	STR+ ;
 
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 475
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 502
 fragment
 STR 	:	'"' ( options {greedy=false;} : .)* '"' ;
 			
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 478
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 505
 UID  :   ('A'..'Z') ('a'..'z'|'A'..'Z'|'0'..'9'|'-')*
     ;
 
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 481
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 508
 LID  :   ('a'..'z') ('a'..'z'|'A'..'Z'|'0'..'9'|'-')*
     ;
 
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 484
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 511
 INT	:	( '0' | ('1'..'9') ('0'..'9')*);
 
-//Real
-//    :   ('+'|'-')?('0'..'9')+ '.' ('0'..'9')+
-//	;
 
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 490
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 514
 WS  :   (' ' | '\t' | '\r' | '\n')+ {$channel=HIDDEN;}
     ;    
 
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 493
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 517
 COMMENT
     :   '/*' ( options {greedy=false;} : . )* '*/' {$channel=HIDDEN;}
     ;
 
-// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 497
+// $ANTLR src "C:\prj\DataModeling\tinyAsn1\tinyAsn1\asn1.g" 521
 COMMENT2
     :   '--' ( options {greedy=false;} : . )* ('--'|'\r'?'\n') {$channel=HIDDEN;}
     ;
-
-
 
