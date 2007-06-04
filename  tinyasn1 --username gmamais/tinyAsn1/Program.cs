@@ -29,7 +29,7 @@ namespace tinyAsn1
                 CommonTreeNodeStream nodes = new CommonTreeNodeStream(tree);
                 nodes.TokenStream = tokens;
 
-                int debug = 0;
+                int debug = 2;
                 if (debug == 1)
                 {
                     DOTTreeGenerator gen = new DOTTreeGenerator();
@@ -39,9 +39,12 @@ namespace tinyAsn1
                     Console.Write(tree.ToStringTree());
 
 
-                asn1Tree ast = new asn1Tree(nodes);
+                //Construct AST manually
+                Asn1File asnFile = Asn1File.CreateFromAntlrAst(tree);
 
-                ast.moduleDefinitions();
+//                asn1Tree ast = new asn1Tree(nodes);
+
+//                ast.moduleDefinitions();
 
                 return 0;
             } catch(RecognitionException ) {

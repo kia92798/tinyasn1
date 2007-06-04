@@ -37,8 +37,8 @@ tokens {
 	CONSTRAINT;
 	EXCEPTION_SPEC;
 	CONSTRAINT_BODY;
-	UNION_SET;
-	UNION_SET_ALL_EXCEPT;
+	UNION_ELEMENT;
+	UNION_ELEMENT_ALL_EXCEPT;
 	INTERSECTION_ELEMENT;
 	VALUE_RANGE_EXPR;
 	SUBTYPE_EXPR;
@@ -52,6 +52,13 @@ tokens {
 	MAX_VAL_PRESENT;
 	BIT_STRING_VALUE;
 	CHAR_SEQUENCE_VALUE;
+	EXPORTS_ALL;
+	IMPORTS_FROM_MODULE;
+	ASN1_FILE;
+	OCTECT_STING;
+	SIMPLIFIED_SIZE_CONSTRAINT;
+	OBJECT_TYPE;
+	NUMBER_LST_ITEM;
 }
 
 
@@ -73,7 +80,8 @@ public override void ReportError(RecognitionException e) {
 /* ********************************************************************************************************************* */
 
 moduleDefinitions 
-	:	moduleDefinition*;
+	:	moduleDefinition*	->^(ASN1_FILE moduleDefinition*)
+	;	
 
 
 definitiveIdentifier
@@ -83,7 +91,7 @@ definitiveIdentifier
 moduleDefinition :  	modulereference	definitiveIdentifier?
 			DEFINITIONS
 			moduleTag?
-			(extImpl=EXTENSIBILITY IMPLIED)?
+			EXTENSIBILITY IMPLIED?
 			'::=' BEGIN
 			exports?
 			imports?
@@ -93,7 +101,7 @@ moduleDefinition :  	modulereference	definitiveIdentifier?
 				|valueSetAssigment
 			)*
 			END
-			->  ^(MODULE_DEF modulereference moduleTag? $extImpl? exports? imports? typeAssigment* valueAssigment* valueSetAssigment*)
+			->  ^(MODULE_DEF modulereference moduleTag? EXTENSIBILITY? exports? imports? typeAssigment* valueAssigment* valueSetAssigment*)
 			;
 
 moduleTag 
@@ -107,8 +115,9 @@ definitiveObjIdComponent
 	|	INT;		
 			
 exports :
-	 EXPORTS ALL ';' -> ^(EXPORTS ALL)
-	| EXPORTS ((typereference | valuereference) (',' (typereference | valuereference))*)?  ';' -> ^(EXPORTS typereference* valuereference*)?
+	   EXPORTS ALL ';' -> EXPORTS_ALL
+	 | EXPORTS ((typereference | valuereference) (',' (typereference | valuereference))*)?  ';' 
+	 	-> ^(EXPORTS typereference* valuereference*)?
 ;			
 
 imports :
@@ -117,7 +126,7 @@ imports :
 	
 importFromModule
 	:	(typereference | valuereference) (',' (typereference | valuereference))* FROM modulereference definitiveIdentifier?
-		-> ^(IMPORTS typereference* valuereference* modulereference )
+		-> ^(IMPORTS_FROM_MODULE modulereference typereference* valuereference*  )
 	;	
 	
 	
@@ -137,18 +146,19 @@ typeAssigment
 /* ********************************************************************************************************************* */
 
 typeTag
-	:	'[' (t=UNIVERSAL | t=APPLICATION | t=PRIVATE)? INT  ']' ( impOrExp=IMPLICIT | impOrExp=EXPLICIT)? 	-> ^(TYPE_TAG $t? INT $impOrExp?)
+	:	'[' (t=UNIVERSAL | t=APPLICATION | t=PRIVATE)? INT  ']' ( impOrExp=IMPLICIT | impOrExp=EXPLICIT)? 	
+			-> ^(TYPE_TAG $t? INT $impOrExp?)
 	;
 		
 
 type	: typeTag?
-(	 nULL													-> ^(TYPE_DEF typeTag? nULL)
-	|bitStringType (SIZE sc=constraint| gen=constraint)*	-> ^(TYPE_DEF typeTag? bitStringType ^(SIZE $sc)* $gen*)
+(	 nULL							-> ^(TYPE_DEF typeTag? nULL)
+	|bitStringType (SIZE sc=constraint| gen=constraint)*	-> ^(TYPE_DEF typeTag? bitStringType ^(SIMPLIFIED_SIZE_CONSTRAINT $sc)* $gen*)
 	|booleanType constraint*								-> ^(TYPE_DEF typeTag? booleanType constraint*)
 	|enumeratedType constraint*								-> ^(TYPE_DEF typeTag? enumeratedType constraint*)
 	|integerType constraint*								-> ^(TYPE_DEF typeTag? integerType constraint*)
     |realType constraint*									-> ^(TYPE_DEF typeTag? realType constraint*)
-	|stringType (SIZE sc=constraint| gen=constraint)*		-> ^(TYPE_DEF typeTag? stringType ^(SIZE $sc)* $gen*)
+	|stringType (SIZE sc=constraint| gen=constraint)*		-> ^(TYPE_DEF typeTag? stringType ^(SIMPLIFIED_SIZE_CONSTRAINT $sc)* $gen*)
 	|referencedType	constraint*								-> ^(TYPE_DEF typeTag? referencedType constraint*)
 	|sequenceOfType 										-> ^(TYPE_DEF typeTag? sequenceOfType)
 	|choiceType												-> ^(TYPE_DEF typeTag? choiceType)
@@ -167,7 +177,7 @@ bitStringType
 	;
 
 bitStringItem 
-	:	identifier '(' (INT|valuereference) ')'		->  ^(BIT_STRING_ITEM identifier INT? valuereference?)
+	:	identifier '(' (INT|valuereference) ')'		->  ^(NUMBER_LST_ITEM identifier INT? valuereference?)
 	;	
 	
 booleanType
@@ -183,14 +193,14 @@ enumeratedTypeItems
 	:	 enumeratedLstItem (',' enumeratedLstItem)* ->enumeratedLstItem+
 	;		
 enumeratedLstItem	:	
-	identifier ( '(' (signedNumber|valuereference) ')')? -> ^(ENUMERATED_LST_ITEM identifier signedNumber? valuereference?)
+	identifier ( '(' (signedNumber|valuereference) ')')? -> ^(NUMBER_LST_ITEM identifier signedNumber? valuereference?)
 ;
 integerType
 	:	INTEGER ( '{' (integerTypeListItem (',' integerTypeListItem)*)? '}')?	-> ^(INTEGER_TYPE integerTypeListItem*)
 	;
 	
 integerTypeListItem 
-	:	identifier '(' (signedNumber|valuereference) ')'	-> ^(INTEGER_LST_ITEM identifier signedNumber? valuereference?)
+	:	identifier '(' (signedNumber|valuereference) ')'	-> ^(NUMBER_LST_ITEM identifier signedNumber? valuereference?)
 	;	
 	
 realType 
@@ -262,16 +272,16 @@ componentType
 	;	
 	
 sequenceOfType
-	:	SEQUENCE (SIZE sz=constraint | gen=constraint)? OF (identifier)? type			-> ^(SEQUENCE_OF_TYPE (SIZE $sz)? $gen? identifier? type)
+	:	SEQUENCE (SIZE sz=constraint | gen=constraint)? OF (identifier)? type			-> ^(SEQUENCE_OF_TYPE (SIMPLIFIED_SIZE_CONSTRAINT $sz)? $gen? identifier? type)
 	;
 	
 setOfType
-	:	SET (SIZE sz=constraint | gen=constraint)? OF (identifier)? type				-> ^(SET_OF_TYPE (SIZE $sz)? $gen? identifier? type)
+	:	SET (SIZE sz=constraint | gen=constraint)? OF (identifier)? type				-> ^(SET_OF_TYPE (SIMPLIFIED_SIZE_CONSTRAINT $sz)? $gen? identifier? type)
 	;		
 
 	
 stringType	:
-	 OCTET STRING
+	 OCTET STRING	->	OCTECT_STING
 	|NumericString
 	|PrintableString
 	|VisibleString
@@ -302,20 +312,20 @@ value	:
 	|	FALSE
 	|	StringLiteral
 	|	valuereference		
-	|	(s='+'|s='-')? intPart=INT ('.' decPart=INT?)? 					->^(NUMERIC_VALUE $s? $intPart $decPart?)
+	|	(s='+'|s='-')? intPart=INT ('.' decPart=INT?)? 					->^(NUMERIC_VALUE $intPart $s? $decPart?)
 //	|	('+'|'-')? INT ('.' INT?)? ( ('E'|'e') ('+'|'-')? INT)?
 	|	MIN
 	|	MAX
-	|	objectIdentifierValue
+//	|	objectIdentifierValue
 	|	charSequenceValue
 	;	
 	
 bitStringValue
-	:	'{' identifier (',' identifier)* '}'		->^(BIT_STRING_VALUE identifier)+
+	:	'{' identifier (',' identifier)* '}'		->^(BIT_STRING_VALUE identifier+)
 	;
 
 charSequenceValue	: 
-	'{' INT (',' INT)* '}'							->^(CHAR_SEQUENCE_VALUE INT)+
+	'{' INT (',' INT)* '}'							->^(CHAR_SEQUENCE_VALUE INT+)
 ;
 	
 objectIdentifierValue
@@ -352,15 +362,15 @@ exceptionSpec
 
 
 constraintBody
-	:	uset1=unionSet (',' extMark='...' ( ',' uset2=unionSet)?)?			-> ^(CONSTRAINT_BODY $uset1 $extMark? $uset2?)
+	:	uset1=unionElement (',' extMark='...' ( ',' uset2=unionElement)?)?			-> ^(CONSTRAINT_BODY $uset1 $extMark? $uset2?)
 	;
 	
-unionSet
-	:	intersectionSet (UnionMark intersectionSet)*						-> ^(UNION_SET intersectionSet)+
-	|	ALL EXCEPT constraintExpression										-> ^(UNION_SET_ALL_EXCEPT constraintExpression)
+unionElement
+	:	intersectionSetElements (UnionMark intersectionSetElements)*			-> ^(UNION_ELEMENT intersectionSetElements)+
+	|	ALL EXCEPT constraintExpression										-> ^(UNION_ELEMENT_ALL_EXCEPT constraintExpression)
 	;	
 	
-intersectionSet
+intersectionSetElements
 	:	intersectionItem (IntersectionMark intersectionItem)*	->intersectionItem+
 	;	
 	
@@ -417,9 +427,10 @@ typereference	:	UID;
 valuereference 	:	LID;		
 identifier	:	LID;
 versionNumber	:	INT;
-objectIdentifier	:	OBJECT IDENTIFIER;
+objectIdentifier	:	OBJECT IDENTIFIER	->OBJECT_TYPE;
 relativeOID	:	RELATIVE_OID;
-signedNumber	:	('+'|'-')? INT;
+signedNumber	:	(s='+'|s='-')? INT			->^(NUMERIC_VALUE INT $s?)
+	;
 
 /* ***************************************************************************************************************** */
 /* ***************************************************************************************************************** */
@@ -488,6 +499,8 @@ UTF8String	:'UTF8String';
 INCLUDES	:'INCLUDES';
 EXCEPT		:'EXCEPT';
 SET		:'SET';
+
+EXT_MARK	: '...';
 
 BitStringLiteral	:
 	'\'' ('0'|'1')* '\'B'
