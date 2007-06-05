@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Asn1AST.cs" />
     <Compile Include="Asn1ASTConstruction.cs" />
+    <Compile Include="Asn1AST_DEBUG.cs" />
     <Compile Include="asn1Lexer.cs" />
     <Compile Include="asn1Parser.cs" />
     <Compile Include="Program.cs" />

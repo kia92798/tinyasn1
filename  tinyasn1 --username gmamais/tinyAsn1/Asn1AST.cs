@@ -46,8 +46,6 @@ namespace tinyAsn1
         public Dictionary<string, TypeAssigment> typeAssigments = new Dictionary<string, TypeAssigment>();
         public Dictionary<string, ValueAssigment> valuesAssigments = new Dictionary<string, ValueAssigment>();
         public Dictionary<string, ValueSetAssigment> valueSetsAssigments = new Dictionary<string, ValueSetAssigment>();
-
-    
     }
 
 
@@ -68,12 +66,14 @@ namespace tinyAsn1
     {
         public string m_typeReference = "";
         public Asn1Type m_type;
-        //public ConstraintBody body;
+        public SetOfValues m_constr_body;
 
     }
 
     public partial class Asn1Type
     {
+
+        public Module m_module;
         public partial class Tag
         {
             public enum TagClass
@@ -92,16 +92,28 @@ namespace tinyAsn1
         public List<Constraint> m_constraints = new List<Constraint>();
     }
 
-    public class NullType : Asn1Type
-    {
-        //here I should set the correct tag for NULL
-    }
 
     public partial class NumberedItem
     {
         public string m_id = "";
         public string m_valueAsReference = "";
         public int? m_valueAsInt;
+        public bool m_extended = false;
+
+        public Object Value
+        {
+            get {
+                if (m_valueAsInt != null)
+                    return m_valueAsInt;
+                else
+                    return m_valueAsReference;
+            }
+        }
+    }
+
+    public partial class NullType : Asn1Type
+    {
+        //here I should set the correct tag for NULL
     }
 
     public partial class BitStringType : Asn1Type
@@ -109,11 +121,11 @@ namespace tinyAsn1
         public Dictionary<string, NumberedItem> m_namedBis = new Dictionary<string, NumberedItem>();
     }
 
-    public class BooleanType : Asn1Type
+    public partial class BooleanType : Asn1Type
     {
     }
 
-    public class RealType : Asn1Type
+    public partial class RealType : Asn1Type
     {
     }
 
@@ -123,7 +135,7 @@ namespace tinyAsn1
         public Dictionary<string, NumberedItem> m_enumValues = new Dictionary<string, NumberedItem>();
         public bool m_extMarkPresent = false;
         public ExceptionSpec m_exceptionSpec;
-        public Dictionary<string, NumberedItem> m_additionalEnumValues = new Dictionary<string, NumberedItem>();
+//        public Dictionary<string, NumberedItem> m_additionalEnumValues = new Dictionary<string, NumberedItem>();
     }
     
     public partial class IntegerType : Asn1Type
@@ -188,19 +200,35 @@ namespace tinyAsn1
         public Asn1Type type;
     }
 
-    public class OctetStringType : Asn1Type
+    public partial class OctetStringType : Asn1Type
     {
+        public int m_stringType;
+        public OctetStringType(int strType)
+        {
+            m_stringType = strType;
+        }
+    }
+
+    public partial class ReferencedType : Asn1Type
+    {
+        public string m_referencedTypeName="";
+        public string m_modName="";
+
+        Asn1Type Type
+        {
+            get
+            {
+                throw new Exception("Unimplemented feature");
+            }
+        }
     }
 
 /* ************ VALUES ***********************/
     public partial class Asn1Value
     {
-        public double m_dval;
-        public Int64 m_ival;
-        public string m_strVal;
-        public List<string> m_bitStrVal;
-        public List<int> m_charSeqVal;
+        public object m_value;
 
+        public Module m_module;
         public enum ValType
         {
             INT,
@@ -214,11 +242,18 @@ namespace tinyAsn1
             VALUE_REFERENCE,
             MIN,
             MAX,
-            CHAR_SEQUENCE_VALUE
+            CHAR_SEQUENCE_VALUE,
+            UNDEFINED
         }
 
-        public ValType m_valType = ValType.INT;
+        public ValType m_valType = ValType.UNDEFINED;
 
+        public override string ToString()
+        {
+            if (m_valType != ValType.UNDEFINED)
+                return m_value.ToString();
+            throw new Exception("Value is undifined type");
+        }
     }
 
 
@@ -230,10 +265,8 @@ namespace tinyAsn1
 
     public partial class Constraint
     {
-        public List<UnionElement> m_set1;
-        public bool m_extMarkPresent = false;
-        public List<UnionElement> m_set2;
-        public Exception m_exception;
+        public SetOfValues m_values;
+        public ExceptionSpec m_exception;
     }
 
     public partial class UnionElement
@@ -284,11 +317,20 @@ namespace tinyAsn1
         public Constraint m_permittedAlphabetConstraint;
     }
 
-    public partial class ConstraintBodyExpression : ConstraintExpression
+    public partial class SetOfValues : ConstraintExpression
     {
-        public List<UnionElement> m_set1;
+        public List<UnionElement> m_set1 = new List<UnionElement>();
         public bool m_extMarkPresent = false;
-        public List<UnionElement> m_set2;
+        public List<UnionElement> m_set2 = new List<UnionElement>();
+    }
+
+
+    public class SemanticErrorException : Exception
+    {
+        public SemanticErrorException(string ErrMsg)
+            : base(ErrMsg)
+        {
+        }
     }
 
 }
