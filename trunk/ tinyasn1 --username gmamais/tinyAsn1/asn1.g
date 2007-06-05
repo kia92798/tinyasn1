@@ -36,7 +36,7 @@ tokens {
 	NUMERIC_VALUE;
 	CONSTRAINT;
 	EXCEPTION_SPEC;
-	CONSTRAINT_BODY;
+	SET_OF_VALUES;
 	UNION_ELEMENT;
 	UNION_ELEMENT_ALL_EXCEPT;
 	INTERSECTION_ELEMENT;
@@ -59,6 +59,7 @@ tokens {
 	SIMPLIFIED_SIZE_CONSTRAINT;
 	OBJECT_TYPE;
 	NUMBER_LST_ITEM;
+	DEFAULT_VALUE;
 }
 
 
@@ -91,7 +92,7 @@ definitiveIdentifier
 moduleDefinition :  	modulereference	definitiveIdentifier?
 			DEFINITIONS
 			moduleTag?
-			EXTENSIBILITY IMPLIED?
+			(EXTENSIBILITY IMPLIED)?
 			'::=' BEGIN
 			exports?
 			imports?
@@ -135,7 +136,7 @@ valueAssigment
 	;		
 		
 valueSetAssigment
-	:	typereference type '::=' '{' constraintBody '}'    -> ^(VAL_SET_ASSIG typereference type constraintBody)
+	:	typereference type '::=' '{' setOfValues '}'    -> ^(VAL_SET_ASSIG typereference type setOfValues)
 	;		
 typeAssigment 
 	:	typereference '::=' type -> ^(TYPE_ASSIG typereference type)
@@ -158,7 +159,7 @@ type	: typeTag?
 	|enumeratedType constraint*								-> ^(TYPE_DEF typeTag? enumeratedType constraint*)
 	|integerType constraint*								-> ^(TYPE_DEF typeTag? integerType constraint*)
     |realType constraint*									-> ^(TYPE_DEF typeTag? realType constraint*)
-	|stringType (SIZE sc=constraint| gen=constraint)*		-> ^(TYPE_DEF typeTag? stringType ^(SIMPLIFIED_SIZE_CONSTRAINT $sc)* $gen*)
+	|stringType (SIZE sc=constraint| gen=constraint)*		-> ^(TYPE_DEF typeTag? stringType ^(SIMPLIFIED_SIZE_CONSTRAINT $sc)* $gen* )
 	|referencedType	constraint*								-> ^(TYPE_DEF typeTag? referencedType constraint*)
 	|sequenceOfType 										-> ^(TYPE_DEF typeTag? sequenceOfType)
 	|choiceType												-> ^(TYPE_DEF typeTag? choiceType)
@@ -268,15 +269,15 @@ componentTypeList
 	;
 	
 componentType
-	:	identifier type (optOrDef=OPTIONAL | optOrDef=DEFAULT value)?	-> ^(SEQUENCE_ITEM identifier type $optOrDef? value?)
+	:	identifier type (optOrDef=OPTIONAL | optOrDef=DEFAULT value)?	-> ^(SEQUENCE_ITEM identifier type $optOrDef? ^(DEFAULT_VALUE value)?)
 	;	
 	
 sequenceOfType
-	:	SEQUENCE (SIZE sz=constraint | gen=constraint)? OF (identifier)? type			-> ^(SEQUENCE_OF_TYPE (SIMPLIFIED_SIZE_CONSTRAINT $sz)? $gen? identifier? type)
+	:	SEQUENCE (SIZE sz=constraint | gen=constraint)? OF (identifier)? type			-> ^(SEQUENCE_OF_TYPE ^(SIMPLIFIED_SIZE_CONSTRAINT $sz)? $gen? identifier? type)
 	;
 	
 setOfType
-	:	SET (SIZE sz=constraint | gen=constraint)? OF (identifier)? type				-> ^(SET_OF_TYPE (SIMPLIFIED_SIZE_CONSTRAINT $sz)? $gen? identifier? type)
+	:	SET (SIZE sz=constraint | gen=constraint)? OF (identifier)? type				-> ^(SET_OF_TYPE ^(SIMPLIFIED_SIZE_CONSTRAINT $sz)? $gen? identifier? type)
 	;		
 
 	
@@ -311,7 +312,7 @@ value	:
 	|	TRUE
 	|	FALSE
 	|	StringLiteral
-	|	valuereference		
+	|	valuereference										//->^(VALUE_REFERENCE valuereference)
 	|	(s='+'|s='-')? intPart=INT ('.' decPart=INT?)? 					->^(NUMERIC_VALUE $intPart $s? $decPart?)
 //	|	('+'|'-')? INT ('.' INT?)? ( ('E'|'e') ('+'|'-')? INT)?
 	|	MIN
@@ -347,7 +348,7 @@ definedValue
 /* *************************************** Constraints DEFINITION ****************************************************** */
 /* ********************************************************************************************************************* */
 constraint 
-	:	'(' constraintBody  exceptionSpec? ')'			->^(CONSTRAINT constraintBody  exceptionSpec?)
+	:	'(' setOfValues  exceptionSpec? ')'			->^(CONSTRAINT setOfValues  exceptionSpec?)
 	;
 
 exceptionSpec 
@@ -361,8 +362,8 @@ exceptionSpec
 	;
 
 
-constraintBody
-	:	uset1=unionElement (',' extMark='...' ( ',' uset2=unionElement)?)?			-> ^(CONSTRAINT_BODY $uset1 $extMark? $uset2?)
+setOfValues
+	:	uset1=unionElement (',' extMark='...' ( ',' uset2=unionElement)?)?			-> ^(SET_OF_VALUES $uset1 $extMark? $uset2?)
 	;
 	
 unionElement
@@ -385,7 +386,7 @@ constraintExpression
 	| permittedAlphabetExpression
 	| innerTypeExpression
 	| patternExpression
-	| '(' constraintBody ')'	->	constraintBody
+	| '(' setOfValues ')'	->	setOfValues
 	;	
 	
 valueRangeExpression

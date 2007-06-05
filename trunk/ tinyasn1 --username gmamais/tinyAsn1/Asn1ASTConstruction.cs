@@ -5,9 +5,28 @@ using Antlr.Runtime.Tree;
 
 namespace tinyAsn1
 {
+    public class TreeVisitor
+    {
+        public delegate void OnTreeElementVisit(ITree curNode);
+
+        public event OnTreeElementVisit ElementVisited;
+
+        public void Visit(ITree root)
+        {
+            if (ElementVisited != null)
+                ElementVisited(root);
+            for (int i = 0; i < root.ChildCount; i++)
+            {
+                Visit(root.GetChild(i));
+            }
+
+        }
+    }
+
 
     public partial class Asn1File
     {
+
         //^(ASN1_FILE moduleDefinition*)
         static public Asn1File CreateFromAntlrAst(ITree tree)
         {
@@ -41,9 +60,13 @@ namespace tinyAsn1
                     switch (child.Type)
                     {
                         case asn1Parser.UID:
+                            if (ret.m_importedTypes.Contains(child.Text))
+                                throw new SemanticErrorException(child.Text + " has alrady been imported. Line: "+child.Line);
                             ret.m_importedTypes.Add(child.Text);
                             break;
                         case asn1Parser.LID:
+                            if (ret.m_importedVariables.Contains(child.Text))
+                                throw new SemanticErrorException(child.Text + " has alrady been imported. Line: " + child.Line);
                             ret.m_importedVariables.Add(child.Text);
                             break;
                         default:
@@ -60,6 +83,7 @@ namespace tinyAsn1
         //^(MODULE_DEF modulereference moduleTag? EXTENSIBILITY? exports? imports? typeAssigment* valueAssigment* valueSetAssigment*)
         static public Module CreateFromAntlrAst(ITree tree)
         {
+
             Module curModule;
 
             if (tree.Type != asn1Parser.MODULE_DEF)
@@ -99,11 +123,21 @@ namespace tinyAsn1
                         break;
                     case asn1Parser.TYPE_ASSIG:
                         TypeAssigment typeAssig = TypeAssigment.CreateFromAntlrAst(child);
+                        if (curModule.typeAssigments.ContainsKey(typeAssig.m_name))
+                            throw new SemanticErrorException(typeAssig.m_name + " has alrady been defined. Line: " + child.Line);
                         curModule.typeAssigments.Add(typeAssig.m_name, typeAssig);
                         break;
                     case asn1Parser.VAL_ASSIG:
                         ValueAssigment valAssig = ValueAssigment.CreateFromAntlrAst(child);
+                        if (curModule.valuesAssigments.ContainsKey(valAssig.m_name) )
+                            throw new SemanticErrorException(valAssig.m_name + " has alrady been defined. Line: " + child.Line);
                         curModule.valuesAssigments.Add(valAssig.m_name, valAssig);
+                        break;
+                    case asn1Parser.VAL_SET_ASSIG:
+                        ValueSetAssigment valSetAssig = ValueSetAssigment.CreateFromAntlrAst(child);
+                        if (curModule.valueSetsAssigments.ContainsKey(valSetAssig.m_typeReference))
+                            throw new SemanticErrorException(valSetAssig.m_typeReference + " has alrady been defined. Line: " + child.Line);
+                        curModule.valueSetsAssigments.Add(valSetAssig.m_typeReference, valSetAssig);
                         break;
                     default:
                         throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
@@ -112,6 +146,9 @@ namespace tinyAsn1
             }
             return curModule;
         }
+
+
+
 
         private static void handleExports(Module curMod, ITree tree)
         {
@@ -152,6 +189,8 @@ namespace tinyAsn1
         //^(TYPE_ASSIG typereference type)
         static public TypeAssigment CreateFromAntlrAst(ITree tree)
         {
+            Console.WriteLine(tree.ToStringTree());
+
             TypeAssigment ret = new TypeAssigment();
             ret.m_name = tree.GetChild(0).Text;
             ret.m_type = Asn1Type.CreateFromAntlrAst(tree.GetChild(1));
@@ -159,6 +198,21 @@ namespace tinyAsn1
         }
 
     }
+
+
+    public partial class ValueSetAssigment
+    {
+        static public ValueSetAssigment CreateFromAntlrAst(ITree tree)
+        {
+            ValueSetAssigment ret = new ValueSetAssigment();
+            ret.m_typeReference = tree.GetChild(0).Text;
+            ret.m_type = Asn1Type.CreateFromAntlrAst(tree.GetChild(1));
+            ret.m_constr_body = SetOfValues.CreateFromAntlrAst(tree.GetChild(2));
+            return ret;
+        }
+
+    }
+
 
     public partial class Asn1Type
     {
@@ -233,7 +287,7 @@ namespace tinyAsn1
                             ret = ChoiceType.CreateFromAntlrAst(child);
                             break;
                         case asn1Parser.SEQUENCE_TYPE:
-                            ret = SequenceOfType.CreateFromAntlrAst(child);
+                            ret = SequenceType.CreateFromAntlrAst(child);
                             break;
                         case asn1Parser.SET_TYPE:
                             ret = SetType.CreateFromAntlrAst(child);
@@ -245,6 +299,7 @@ namespace tinyAsn1
                             ret = SetOfType.CreateFromAntlrAst(child);
                             break;
                         case asn1Parser.REFERENCED_TYPE:
+                            ret = ReferencedType.CreateFromAntlrAst(child);
                             break;
                         case asn1Parser.OBJECT_TYPE:
                             break;
@@ -262,7 +317,7 @@ namespace tinyAsn1
                         case asn1Parser.UniversalString:
                         case asn1Parser.BMPString:
                         case asn1Parser.UTF8String:
-                            ret = new OctetStringType();
+                            ret = new OctetStringType(child.Type);
                             break;
                         case asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT:
                             if (ret != null)
@@ -277,8 +332,11 @@ namespace tinyAsn1
 
                     }
             }
-            if (ret!=null)
+            if (ret != null)
+            {
                 ret.m_tag = tag;
+                ret.m_module = Module.CurrentlyConstructModule;
+            }
             return ret;
         }
     }
@@ -300,7 +358,7 @@ namespace tinyAsn1
                         ret.m_valueAsInt = int.Parse(child.Text);
                         break;
                     case asn1Parser.NUMERIC_VALUE:
-                        ret.m_valueAsInt = Helper.GetValFrom_NUMERIC_VALUE_asInt(child);
+                        ret.m_valueAsInt = Asn1Value.GetValFrom_NUMERIC_VALUE_asInt(child);
                         break;
                     case asn1Parser.LID:
                         ret.m_valueAsReference = child.Text;
@@ -324,6 +382,9 @@ namespace tinyAsn1
             {
                 ITree child = tree.GetChild(i);
                 NumberedItem item = NumberedItem.CreateFromAntlrAst(child);
+                if (ret.m_namedBis.ContainsKey(item.m_id))
+                    throw new SemanticErrorException(item.m_id + " has alrady been defined. Line: " + child.Line);
+                    
                 ret.m_namedBis.Add(item.m_id, item);
             }
 
@@ -339,17 +400,18 @@ namespace tinyAsn1
         static public new EnumeratedType CreateFromAntlrAst(ITree tree)
         {
             EnumeratedType ret = new EnumeratedType();
-            for (int i = 1; i < tree.ChildCount; i++)
+            for (int i = 0; i < tree.ChildCount; i++)
             {
                 ITree child = tree.GetChild(i);
                 switch (child.Type)
                 {
-                    case asn1Parser.ENUMERATED_LST_ITEM:
+                    case asn1Parser.NUMBER_LST_ITEM:
                         NumberedItem item = NumberedItem.CreateFromAntlrAst(child);
                         if (ret.m_extMarkPresent)
-                            ret.m_additionalEnumValues.Add(item.m_id, item);
-                        else
-                            ret.m_enumValues.Add(item.m_id, item);
+                            item.m_extended = true;
+                        if (ret.m_enumValues.ContainsKey(item.m_id))
+                            throw new SemanticErrorException(item.m_id + " has alrady been defined. Line: " + child.Line);
+                        ret.m_enumValues.Add(item.m_id, item);
                         break;
                     case asn1Parser.EXT_MARK:
                         ret.m_extMarkPresent = true;
@@ -376,6 +438,8 @@ namespace tinyAsn1
             {
                 ITree child = tree.GetChild(i);
                 NumberedItem item = NumberedItem.CreateFromAntlrAst(child);
+                if (ret.m_namedValues.ContainsKey(item.m_id))
+                    throw new SemanticErrorException(item.m_id + " has alrady been defined. Line: " + child.Line);
                 ret.m_namedValues.Add(item.m_id, item);
             }
 
@@ -397,7 +461,7 @@ namespace tinyAsn1
                 ret.m_version = version;
                 ret.m_extended = extended;
 
-                for (int i = 1; i < tree.ChildCount; i++)
+                for (int i = 0; i < tree.ChildCount; i++)
                 {
                     ITree child = tree.GetChild(i);
                     switch (child.Type)
@@ -422,13 +486,15 @@ namespace tinyAsn1
         static public new ChoiceType CreateFromAntlrAst(ITree tree)
         {
             ChoiceType ret = new ChoiceType();
-            for (int i = 1; i < tree.ChildCount; i++)
+            for (int i = 0; i < tree.ChildCount; i++)
             {
                 ITree child = tree.GetChild(i);
                 switch (child.Type)
                 {
                     case asn1Parser.CHOICE_ITEM:
                         Child ch = Child.CreateFromAntlrAst(child, null, false);
+                        if (ret.m_children.ContainsKey(ch.m_childVarName))
+                            throw new SemanticErrorException(ch.m_childVarName + " has alrady been defined. Line: " + child.Line);
                         ret.m_children.Add(ch.m_childVarName, ch);
                         break;
                     case asn1Parser.CHOICE_EXT_BODY:
@@ -445,7 +511,7 @@ namespace tinyAsn1
         static void handleExtension(ChoiceType ret, ITree tree)
         {
             ret.m_extMarkPresent = true;
-            for (int i = 1; i < tree.ChildCount; i++)
+            for (int i = 0; i < tree.ChildCount; i++)
             {
                 ITree child = tree.GetChild(i);
                 switch (child.Type)
@@ -458,6 +524,8 @@ namespace tinyAsn1
                         break;
                     case asn1Parser.CHOICE_ITEM:
                         Child ch = Child.CreateFromAntlrAst(child, null, !ret.m_extMarkPresent2);
+                        if (ret.m_children.ContainsKey(ch.m_childVarName))
+                            throw new SemanticErrorException(ch.m_childVarName + " has alrady been defined. Line: " + child.Line);
                         ret.m_children.Add(ch.m_childVarName, ch);
                         break;
                     case asn1Parser.CHOICE_EXT_ITEM:
@@ -482,6 +550,8 @@ namespace tinyAsn1
                         break;
                     case asn1Parser.CHOICE_ITEM:
                         Child ch = Child.CreateFromAntlrAst(child, version, true);
+                        if (ret.m_children.ContainsKey(ch.m_childVarName))
+                            throw new SemanticErrorException(ch.m_childVarName + " has alrady been defined. Line: " + child.Line);
                         ret.m_children.Add(ch.m_childVarName, ch);
                         break;
                     default:
@@ -504,7 +574,7 @@ namespace tinyAsn1
                 ret.m_version = version;
                 ret.m_extended = extended;
 
-                for (int i = 1; i < tree.ChildCount; i++)
+                for (int i = 0; i < tree.ChildCount; i++)
                 {
                     ITree child = tree.GetChild(i);
                     switch (child.Type)
@@ -521,8 +591,8 @@ namespace tinyAsn1
                         case asn1Parser.DEFAULT:
                             ret.m_default = true;
                             break;
-                        case asn1Parser.VAL_ASSIG:
-                            ret.m_defaultValue = Asn1Value.CreateFromAntlrAst(child);
+                        case asn1Parser.DEFAULT_VALUE:
+                            ret.m_defaultValue = Asn1Value.CreateFromAntlrAst(child.GetChild(0));
                             break;
                         default:
                             throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
@@ -536,13 +606,15 @@ namespace tinyAsn1
 
         static public SequenceOrSetType CreateFromAntlrAst(SequenceOrSetType ret, ITree tree)
         {
-            for (int i = 1; i < tree.ChildCount; i++)
+            for (int i = 0; i < tree.ChildCount; i++)
             {
                 ITree child = tree.GetChild(i);
                 switch (child.Type)
                 {
                     case asn1Parser.SEQUENCE_ITEM:
                         Child ch = Child.CreateFromAntlrAst(child, null, false);
+                        if (ret.m_children.ContainsKey(ch.m_childVarName))
+                            throw new SemanticErrorException(ch.m_childVarName + " has alrady been defined. Line: " + child.Line);
                         ret.m_children.Add(ch.m_childVarName, ch);
                         break;
                     case asn1Parser.SEQUENCE_EXT_BODY:
@@ -570,6 +642,8 @@ namespace tinyAsn1
                         break;
                     case asn1Parser.SEQUENCE_ITEM:
                         Child ch = Child.CreateFromAntlrAst(child, null, !ret.m_extMarkPresent2);
+                        if (ret.m_children.ContainsKey(ch.m_childVarName))
+                            throw new SemanticErrorException(ch.m_childVarName + " has alrady been defined. Line: " + child.Line);
                         ret.m_children.Add(ch.m_childVarName, ch);
                         break;
                     case asn1Parser.SEQUENCE_EXT_GROUP:
@@ -595,6 +669,8 @@ namespace tinyAsn1
                         break;
                     case asn1Parser.SEQUENCE_ITEM:
                         Child ch = Child.CreateFromAntlrAst(child, version, true);
+                        if (ret.m_children.ContainsKey(ch.m_childVarName))
+                            throw new SemanticErrorException(ch.m_childVarName + " has alrady been defined. Line: " + child.Line);
                         ret.m_children.Add(ch.m_childVarName, ch);
                         break;
                     default:
@@ -631,6 +707,7 @@ namespace tinyAsn1
         //^(SEQUENCE_OF_TYPE (SIMPLIFIED_SIZE_CONSTRAINT $sz)? $gen? identifier? type)
         static public new SequenceOfType CreateFromAntlrAst(ITree tree)
         {
+
             SequenceOfType ret = new SequenceOfType();
             for (int i = 0; i < tree.ChildCount; i++)
             {
@@ -689,61 +766,93 @@ namespace tinyAsn1
         }
     }
 
-
-
+    public partial class ReferencedType : Asn1Type
+    {
+        static public new ReferencedType CreateFromAntlrAst(ITree tree)
+        {
+            ReferencedType ret = new ReferencedType();
+            if (tree.ChildCount == 1)
+                ret.m_referencedTypeName = tree.GetChild(0).Text;
+            else if (tree.ChildCount == 2)
+            {
+                ret.m_modName = tree.GetChild(0).Text;
+                ret.m_referencedTypeName = tree.GetChild(1).Text;
+            }
+            else
+                throw new Exception("Incorrect parse tree!");
+            return ret;
+        }
+    }
 
 
     public partial class Asn1Value
     {
+        //^(NUMERIC_VALUE $intPart $s? $decPart?)
+        public static int GetValFrom_NUMERIC_VALUE_asInt(ITree tree)
+        {
+            int ret = int.Parse(tree.GetChild(0).Text);
+            if (tree.ChildCount > 1 && tree.GetChild(1).Text == "-")
+                ret = -ret;
+            return ret;
+        }
+
         static public Asn1Value CreateFromAntlrAst(ITree tree)
         {
+
             Asn1Value ret = new Asn1Value();
+            ret.m_module = Module.CurrentlyConstructModule;
 
             switch (tree.Type)
             {
                 case asn1Parser.BitStringLiteral:
-                    ret.m_strVal = tree.Text;
+                    ret.m_value = tree.Text;
                     ret.m_valType = ValType.BIT_STRING_LITERAL;
                     break;
                 case asn1Parser.BIT_STRING_VALUE:
-                    ret.m_bitStrVal = new List<string>();
+                    ret.m_value = new List<string>();
                     ret.m_valType = ValType.BIT_STRING_VALUE;
                     for (int i = 0; i < tree.ChildCount; i++)
-                        ret.m_bitStrVal.Add(tree.GetChild(i).Text);
+                        ((List<string>)ret.m_value).Add(tree.GetChild(i).Text);
                     break;
                 case asn1Parser.OctectStringLiteral:
                     ret.m_valType = ValType.OCTECT_STRING_LITERAL;
-                    ret.m_strVal = tree.Text;
+                    ret.m_value = tree.Text;
                     break;
                 case asn1Parser.TRUE:
                     ret.m_valType = ValType.BOOLEAN_TRUE;
+                    ret.m_value = true;
                     break;
                 case asn1Parser.FALSE:
                     ret.m_valType = ValType.BOOLEAN_FALSE;
+                    ret.m_value = false;
                     break;
                 case asn1Parser.StringLiteral:
                     ret.m_valType = ValType.STRING_LITERAL;
-                    ret.m_strVal = tree.Text;
+                    ret.m_value = tree.Text;
                     break;
                 case asn1Parser.LID:
                     ret.m_valType = ValType.VALUE_REFERENCE;
-                    ret.m_strVal = tree.Text;
+                    ret.m_value = tree.Text;
                     break;
                 case asn1Parser.NUMERIC_VALUE:
                     handleNumeric(ret, tree);
                     break;
                 case asn1Parser.MIN:
                     ret.m_valType = ValType.MIN;
+                    ret.m_value = Int32.MinValue;
                     break;
                 case asn1Parser.MAX:
                     ret.m_valType = ValType.MAX;
+                    ret.m_value = Int32.MaxValue;
                     break;
                 case asn1Parser.CHAR_SEQUENCE_VALUE:
-                    ret.m_charSeqVal = new List<int>();
+                    ret.m_value = new List<int>();
                     ret.m_valType = ValType.CHAR_SEQUENCE_VALUE;
                     for (int i = 0; i < tree.ChildCount; i++)
-                        ret.m_charSeqVal.Add(int.Parse(tree.GetChild(i).Text));
+                        ((List<int>)ret.m_value).Add(int.Parse(tree.GetChild(i).Text));
                     break;
+                default:
+                    throw new Exception("Unkown child: " + tree.Text + " for node: VALUE" );
 
             }
 
@@ -752,39 +861,46 @@ namespace tinyAsn1
 
         static void handleNumeric(Asn1Value ret,ITree tree) 
         {
+            Int64 intVall;
             ret.m_valType = ValType.INT;
-            ret.m_ival = Int64.Parse(tree.GetChild(0).Text);
+            intVall = Int64.Parse(tree.GetChild(0).Text);
             bool negate = false;
             Int64 decPart = 0;
-            if (tree.ChildCount == 2)
+            if (tree.ChildCount == 1)
+            {
+                ret.m_value = intVall;
+                return;
+            }
+            else if (tree.ChildCount == 2)
             {
                 if (tree.GetChild(1).Text == "-")
                 {
-                    ret.m_ival = -ret.m_ival;
+                    intVall = -intVall;
+                    ret.m_value = intVall;
                     return;
                 }
                 else
                 {
                     ret.m_valType = ValType.REAL;
-                    ret.m_dval = ret.m_ival;
                     negate = false;
                     decPart = Int64.Parse(tree.GetChild(1).Text);
                 }
-            } else 
+            } else if (tree.ChildCount==3)
             {
                 ret.m_valType = ValType.REAL;
-                ret.m_dval = ret.m_ival;
                 negate = tree.GetChild(1).Text == "-";
-                decPart = Int64.Parse(tree.GetChild(1).Text);
+                decPart = Int64.Parse(tree.GetChild(2).Text);
             }
 
             double tmp = decPart;
             for (int i = 0; i < decPart.ToString().Length; i++)
                 tmp = tmp / 10.0;
+            double retVal = intVall+tmp;
 
-            ret.m_dval += tmp;
             if (negate)
-                ret.m_dval = -ret.m_dval;
+                retVal = -retVal;
+            
+            ret.m_value = -retVal;
         }
     }
 
@@ -800,27 +916,230 @@ namespace tinyAsn1
     {
         static public Constraint CreateFromAntlrAst(ITree tree)
         {
-            throw new Exception("Unimplemented feature!");
+            if (tree.Type != asn1Parser.CONSTRAINT)
+                throw new Exception(tree.Text + " is not a constraint");
+            Constraint ret = new Constraint();
+            for (int i = 0; i < tree.ChildCount; i++)
+            {
+                ITree child = tree.GetChild(i);
+                switch (child.Type)
+                {
+                    case asn1Parser.SET_OF_VALUES:
+                        ret.m_values = SetOfValues.CreateFromAntlrAst(child);
+                        break;
+                    case asn1Parser.EXCEPTION_SPEC:
+                        ret.m_exception = ExceptionSpec.CreateFromAntlrAst(child);
+                        break;
+                    default:
+                        throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
+                }
+            }
+
+            return ret;
         }
+
+        static public void HandleBody(Constraint ret, ITree tree)
+        {
+        }
+
         static public Constraint CreateConstraintFromSizeConstraint(ITree tree)
         {
-            throw new Exception("Unimplemented feature!");
-        }
-    }
 
 
+            Constraint ret = new Constraint();
+            ret.m_values = new SetOfValues();
+            UnionElementOfIntersectionItems un = new UnionElementOfIntersectionItems();
+            ret.m_values.m_set1.Add(un);
+            IntersectionElement ir = new IntersectionElement();
+            un.m_intersectionElements.Add(ir);
+            SizeExpression sz = new SizeExpression();
+            ir.m_exp = sz;
+            sz.m_sizeConstraint = Constraint.CreateFromAntlrAst(tree.GetChild(0));
 
-        
-    public static class Helper
-    {
-        //^(NUMERIC_VALUE $intPart $s? $decPart?)
-        public static int GetValFrom_NUMERIC_VALUE_asInt(ITree tree)
-        {
-            int ret = int.Parse(tree.GetChild(0).Text);
-            if (tree.ChildCount > 1 && tree.GetChild(1).Text == "-")
-                ret = -ret;
             return ret;
         }
     }
 
+
+    public partial class UnionElementOfIntersectionItems : UnionElement
+    {
+        static public UnionElementOfIntersectionItems CreateFromAntlrAst(ITree tree)
+        {
+            UnionElementOfIntersectionItems ret = new UnionElementOfIntersectionItems();
+            for (int i = 0; i < tree.ChildCount; i++)
+            {
+                ITree child = tree.GetChild(i);
+                switch (child.Type)
+                {
+                    case asn1Parser.INTERSECTION_ELEMENT:
+                        ret.m_intersectionElements.Add(IntersectionElement.CreateFromAntlrAst(child));
+                        break;
+                    default:
+                        throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
+                }
+            }
+            return ret;
+        }
+    }
+
+    public partial class UnionElementExceptOf : UnionElement
+    {
+        static public UnionElementExceptOf CreateFromAntlrAst(ITree tree)
+        {
+            UnionElementExceptOf ret = new UnionElementExceptOf();
+            ret.m_exceptOfThis = ConstraintExpression.CreateFromAntlrAst(tree.GetChild(0));
+            return ret;
+        }
+    }
+
+    public partial class IntersectionElement
+    {
+        static public IntersectionElement CreateFromAntlrAst(ITree tree)
+        {
+            IntersectionElement ret = new IntersectionElement();
+
+            ret.m_exp = ConstraintExpression.CreateFromAntlrAst(tree.GetChild(0));
+            if (tree.ChildCount>1)
+                ret.m_except_exp = ConstraintExpression.CreateFromAntlrAst(tree.GetChild(1));
+
+            return ret;
+        }
+    }
+
+    public partial class ConstraintExpression
+    {
+        static public ConstraintExpression CreateFromAntlrAst(ITree tree)
+        {
+            ConstraintExpression ret = null;
+
+            switch (tree.Type)
+            {
+                case asn1Parser.VALUE_RANGE_EXPR:
+                    ret = ValueRangeExpression.CreateFromAntlrAst(tree);
+                    break;
+                case asn1Parser.SIZE_EXPR:
+                    ret = SizeExpression.CreateFromAntlrAst(tree);
+                    break;
+                case asn1Parser.PERMITTED_ALPHABET_EXPR:
+                    ret = PermittedAlphabetExpression.CreateFromAntlrAst(tree);
+                    break;
+                case asn1Parser.SUBTYPE_EXPR:
+                    ret = SubtypeExpression.CreateFromAntlrAst(tree);
+                    break;
+                case asn1Parser.SET_OF_VALUES:
+                    ret = SetOfValues.CreateFromAntlrAst(tree);
+                    break;
+                default:
+                    throw new Exception("Unkown constraint expression: " + tree.Text);
+            }
+
+            return ret;
+        }
+    }
+
+
+    public partial class ValueRangeExpression : ConstraintExpression
+    {
+        static public new ValueRangeExpression CreateFromAntlrAst(ITree tree)
+        {
+            ValueRangeExpression ret = new ValueRangeExpression();
+            ret.m_minValue = Asn1Value.CreateFromAntlrAst(tree.GetChild(0));
+            int lineNo = tree.GetChild(0).Line;
+            for (int i = 1; i < tree.ChildCount; i++)
+            {
+                ITree child = tree.GetChild(i);
+                switch (child.Type)
+                {
+                    case asn1Parser.MAX_VAL_PRESENT:
+                        ret.m_maxValue = Asn1Value.CreateFromAntlrAst(child.GetChild(0));
+                        break;
+                    case asn1Parser.MIN_VAL_INCLUDED:
+                        ret.m_minValIsIncluded = true;
+                        break;
+                    case asn1Parser.MAX_VAL_INCLUDED:
+                        ret.m_maxValIsIncluded = true;
+                        break;
+                    default:
+                        throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
+                }
+            }
+
+            //if (ret.m_maxValue != null && ret.m_minValue.m_valType != ret.m_maxValue.m_valType)
+            //    throw new SemanticErrorException("Semantic Error: Both values in a range must be of the same type. Line:" +lineNo.ToString());
+
+            return ret;
+        }
+    }
+
+    public partial class SizeExpression : ConstraintExpression
+    {
+        static public new SizeExpression CreateFromAntlrAst(ITree tree)
+        {
+            SizeExpression ret = new SizeExpression();
+            ret.m_sizeConstraint = Constraint.CreateFromAntlrAst(tree.GetChild(0));
+            return ret;
+        }
+    }
+
+    public partial class SubtypeExpression : ConstraintExpression
+    {
+        static public new SubtypeExpression CreateFromAntlrAst(ITree tree)
+        {
+            SubtypeExpression ret = new SubtypeExpression();
+            ret.m_type = Asn1Type.CreateFromAntlrAst(tree.GetChild(0));
+            if (tree.ChildCount > 1)
+                ret.m_includes = true;
+            return ret;
+        }
+    }
+
+    public partial class PermittedAlphabetExpression : ConstraintExpression
+    {
+        static public new PermittedAlphabetExpression CreateFromAntlrAst(ITree tree)
+        {
+            PermittedAlphabetExpression ret = new PermittedAlphabetExpression();
+            ret.m_permittedAlphabetConstraint = Constraint.CreateFromAntlrAst(tree.GetChild(0));
+            return ret;
+        }
+    }
+
+    public partial class SetOfValues : ConstraintExpression
+    {
+        static public new SetOfValues CreateFromAntlrAst(ITree tree)
+        {
+            SetOfValues ret = new SetOfValues();
+            UnionElement element = null;
+            for (int i = 0; i < tree.ChildCount; i++)
+            {
+                ITree child = tree.GetChild(i);
+                switch (child.Type)
+                {
+                    case asn1Parser.UNION_ELEMENT:
+                        element = UnionElementOfIntersectionItems.CreateFromAntlrAst(child);
+                        if (!ret.m_extMarkPresent)
+                            ret.m_set1.Add(element);
+                        else
+                            ret.m_set2.Add(element);
+                        break;
+                    case asn1Parser.UNION_ELEMENT_ALL_EXCEPT:
+                        element = UnionElementExceptOf.CreateFromAntlrAst(child);
+                        if (ret.m_extMarkPresent)
+                            ret.m_set2.Add(element);
+                        else
+                            ret.m_set1.Add(element);
+                        break;
+                    case asn1Parser.EXT_MARK:
+                        ret.m_extMarkPresent = true;
+                        break;
+                    default:
+                        throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
+                }
+            }
+            return ret;
+        }
+
+    }
+
+        
+ 
 }
