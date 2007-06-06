@@ -214,11 +214,22 @@ namespace tinyAsn1
         public string m_referencedTypeName="";
         public string m_modName="";
 
-        Asn1Type Type
+        public Asn1Type Type
         {
             get
             {
-                throw new Exception("Unimplemented feature");
+                Asn1Type ret = this;
+
+                while (ret is ReferencedType)
+                {
+                    if (((ReferencedType)ret).m_modName != "")
+                        throw new Exception("Unimplemented feature ...");
+                    if (ret.m_module.typeAssigments.ContainsKey(((ReferencedType)ret).m_referencedTypeName))
+                        ret = ret.m_module.typeAssigments[((ReferencedType)ret).m_referencedTypeName].m_type;
+                    else
+                        throw new Exception("Unimplemented feature ...");
+                }
+                return ret;
             }
         }
     }
