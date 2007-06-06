@@ -19,6 +19,7 @@ namespace tinyAsn1
             List<Asn1File> ASTs = new List<Asn1File>();
 
             bool debug=false;
+            bool genOutput = false;
 
             for (int i=0;i<args.Length;i++)
             {
@@ -26,6 +27,8 @@ namespace tinyAsn1
                 {
                     if (args[i] == "-debug")
                         debug = true;
+                    else if (args[i] == "-o")
+                        genOutput = true;
                     else
                     {
                         Console.Error.WriteLine("Unrecognized option: " + args[i]);
@@ -113,6 +116,31 @@ namespace tinyAsn1
                         return 3;
                     }
                 }
+            }
+
+            if (genOutput)
+            {
+                for (int i = 0; i < inputFiles.Count; i++)
+                {
+                    try
+                    {
+                        System.IO.StreamWriter wr = new System.IO.StreamWriter(inputFiles[i] + ".icd");
+                        ASTs[i].GenerateICD(wr);
+                        wr.Flush();
+                        wr.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Error.WriteLine("Unkown exception ...");
+                        Console.Error.WriteLine(ex.Message);
+                        Console.Error.WriteLine(ex.StackTrace);
+                        return 3;
+                    }
+                }
+            }
+            if (ASTs[0].m_modules[0].typeAssigments.ContainsKey("DataInterchange"))
+            {
+                //ASTs[0].m_modules[0].typeAssigments["DataInterchange"].
             }
             
             return 0;            
