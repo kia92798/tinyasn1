@@ -189,7 +189,6 @@ namespace tinyAsn1
         //^(TYPE_ASSIG typereference type)
         static public TypeAssigment CreateFromAntlrAst(ITree tree)
         {
-            Console.WriteLine(tree.ToStringTree());
 
             TypeAssigment ret = new TypeAssigment();
             ret.m_name = tree.GetChild(0).Text;
@@ -788,9 +787,9 @@ namespace tinyAsn1
     public partial class Asn1Value
     {
         //^(NUMERIC_VALUE $intPart $s? $decPart?)
-        public static int GetValFrom_NUMERIC_VALUE_asInt(ITree tree)
+        public static Int64 GetValFrom_NUMERIC_VALUE_asInt(ITree tree)
         {
-            int ret = int.Parse(tree.GetChild(0).Text);
+            Int64 ret = Int64.Parse(tree.GetChild(0).Text);
             if (tree.ChildCount > 1 && tree.GetChild(1).Text == "-")
                 ret = -ret;
             return ret;
@@ -908,7 +907,8 @@ namespace tinyAsn1
     {
         static public ExceptionSpec CreateFromAntlrAst(ITree tree)
         {
-            throw new Exception("Unimplemented feature!");
+            Console.Error.WriteLine("Unimplemented feature ASN.1 Exception are parsed but ignored");
+            return new ExceptionSpec();
         }
     }
 
@@ -1029,6 +1029,13 @@ namespace tinyAsn1
                 case asn1Parser.SET_OF_VALUES:
                     ret = SetOfValues.CreateFromAntlrAst(tree);
                     break;
+                case asn1Parser.PATTERN_EXPR:
+                    ret = PatternExpression.CreateFromAntlrAst(tree);
+                    break;
+                case asn1Parser.INNER_TYPE_EXPR:
+                    Console.Error.WriteLine("Unimplemented feature, 'WITH COMPONENTS' is ignored");
+                    ret = new WithComponentsExpression();
+                    break;
                 default:
                     throw new Exception("Unkown constraint expression: " + tree.Text);
             }
@@ -1037,6 +1044,7 @@ namespace tinyAsn1
         }
     }
 
+    
 
     public partial class ValueRangeExpression : ConstraintExpression
     {
@@ -1099,6 +1107,16 @@ namespace tinyAsn1
         {
             PermittedAlphabetExpression ret = new PermittedAlphabetExpression();
             ret.m_permittedAlphabetConstraint = Constraint.CreateFromAntlrAst(tree.GetChild(0));
+            return ret;
+        }
+    }
+
+    public partial class PatternExpression : ConstraintExpression
+    {
+        static public new PatternExpression CreateFromAntlrAst(ITree tree)
+        {
+            PatternExpression ret = new PatternExpression();
+            ret.m_pattern = Asn1Value.CreateFromAntlrAst(tree.GetChild(0));
             return ret;
         }
     }

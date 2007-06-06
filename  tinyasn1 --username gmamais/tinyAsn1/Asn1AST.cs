@@ -97,7 +97,7 @@ namespace tinyAsn1
     {
         public string m_id = "";
         public string m_valueAsReference = "";
-        public int? m_valueAsInt;
+        public Int64? m_valueAsInt;
         public bool m_extended = false;
 
         public Object Value
@@ -261,6 +261,7 @@ namespace tinyAsn1
 
     public partial class ExceptionSpec
     {
+
     }
 
     public partial class Constraint
@@ -306,6 +307,10 @@ namespace tinyAsn1
         public Constraint m_sizeConstraint;
     }
 
+    public partial class WithComponentsExpression : ConstraintExpression
+    {
+    }
+
     public partial class SubtypeExpression : ConstraintExpression
     {
         public Asn1Type m_type;
@@ -315,6 +320,10 @@ namespace tinyAsn1
     public partial class PermittedAlphabetExpression : ConstraintExpression
     {
         public Constraint m_permittedAlphabetConstraint;
+    }
+    public partial class PatternExpression : ConstraintExpression
+    {
+        public Asn1Value m_pattern;
     }
 
     public partial class SetOfValues : ConstraintExpression
@@ -332,5 +341,6 @@ namespace tinyAsn1
         {
         }
     }
+
 
 }

@@ -91,7 +91,10 @@ definitiveIdentifier
 
 moduleDefinition :  	modulereference	definitiveIdentifier?
 			DEFINITIONS
-			moduleTag?
+			//			moduleTag?
+			(EXPLICIT TAGS
+			|IMPLICIT TAGS
+			| AUTOMATIC TAGS)?
 			(EXTENSIBILITY IMPLIED)?
 			'::=' BEGIN
 			exports?
@@ -102,14 +105,15 @@ moduleDefinition :  	modulereference	definitiveIdentifier?
 				|valueSetAssigment
 			)*
 			END
-			->  ^(MODULE_DEF modulereference moduleTag? EXTENSIBILITY? exports? imports? typeAssigment* valueAssigment* valueSetAssigment*)
+//			->  ^(MODULE_DEF modulereference moduleTag? EXTENSIBILITY? exports? imports? typeAssigment* valueAssigment* valueSetAssigment*)
+			->  ^(MODULE_DEF modulereference EXPLICIT? IMPLICIT? AUTOMATIC? EXTENSIBILITY? exports? imports? typeAssigment* valueAssigment* valueSetAssigment*)
 			;
 
-moduleTag 
-	:	EXPLICIT TAGS -> EXPLICIT
-	| 	IMPLICIT TAGS -> IMPLICIT
-	|   AUTOMATIC TAGS -> AUTOMATIC
-	;			
+//moduleTag 
+//	:	EXPLICIT TAGS -> EXPLICIT
+//	| 	IMPLICIT TAGS -> IMPLICIT
+//	|   AUTOMATIC TAGS -> AUTOMATIC
+//	;			
 		
 definitiveObjIdComponent
 	:	identifier ( '(' INT ')' )?
@@ -153,13 +157,13 @@ typeTag
 		
 
 type	: typeTag?
-(	 nULL							-> ^(TYPE_DEF typeTag? nULL)
-	|bitStringType (SIZE sc=constraint| gen=constraint)*	-> ^(TYPE_DEF typeTag? bitStringType ^(SIMPLIFIED_SIZE_CONSTRAINT $sc)* $gen*)
+(	 nULL													-> ^(TYPE_DEF typeTag? nULL)
+	|bitStringType (sizeShortConstraint| constraint)*		-> ^(TYPE_DEF typeTag? bitStringType sizeShortConstraint* constraint*)
 	|booleanType constraint*								-> ^(TYPE_DEF typeTag? booleanType constraint*)
 	|enumeratedType constraint*								-> ^(TYPE_DEF typeTag? enumeratedType constraint*)
 	|integerType constraint*								-> ^(TYPE_DEF typeTag? integerType constraint*)
     |realType constraint*									-> ^(TYPE_DEF typeTag? realType constraint*)
-	|stringType (SIZE sc=constraint| gen=constraint)*		-> ^(TYPE_DEF typeTag? stringType ^(SIMPLIFIED_SIZE_CONSTRAINT $sc)* $gen* )
+	|stringType (sizeShortConstraint| constraint)*			-> ^(TYPE_DEF typeTag? stringType sizeShortConstraint* constraint*)
 	|referencedType	constraint*								-> ^(TYPE_DEF typeTag? referencedType constraint*)
 	|sequenceOfType 										-> ^(TYPE_DEF typeTag? sequenceOfType)
 	|choiceType												-> ^(TYPE_DEF typeTag? choiceType)
@@ -170,6 +174,10 @@ type	: typeTag?
     |relativeOID											-> ^(TYPE_DEF typeTag? relativeOID)
 )
 ;
+
+sizeShortConstraint
+	:	SIZE constraint										-> ^(SIMPLIFIED_SIZE_CONSTRAINT constraint)
+	;
 
 nULL:	NULL;
 
@@ -273,11 +281,11 @@ componentType
 	;	
 	
 sequenceOfType
-	:	SEQUENCE (SIZE sz=constraint | gen=constraint)? OF (identifier)? type			-> ^(SEQUENCE_OF_TYPE ^(SIMPLIFIED_SIZE_CONSTRAINT $sz)? $gen? identifier? type)
+	:	SEQUENCE (sizeShortConstraint | constraint)? OF (identifier)? type			-> ^(SEQUENCE_OF_TYPE sizeShortConstraint? constraint? identifier? type)
 	;
 	
 setOfType
-	:	SET (SIZE sz=constraint | gen=constraint)? OF (identifier)? type				-> ^(SET_OF_TYPE ^(SIMPLIFIED_SIZE_CONSTRAINT $sz)? $gen? identifier? type)
+	:	SET (sizeShortConstraint | constraint)? OF (identifier)? type				-> ^(SET_OF_TYPE sizeShortConstraint? constraint? identifier? type)
 	;		
 
 	
