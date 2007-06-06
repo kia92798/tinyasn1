@@ -63,9 +63,13 @@ namespace tinyAsn1
 
                     asn1Parser.moduleDefinitions_return result = parser.moduleDefinitions();
 
+
                     CommonTree tree = (CommonTree)result.Tree;
                     CommonTreeNodeStream nodes = new CommonTreeNodeStream(tree);
                     nodes.TokenStream = tokens;
+
+//                    Console.WriteLine(tree.ToStringTree());
+
 
                     Asn1File asnFile = Asn1File.CreateFromAntlrAst(tree);
                     ASTs.Add(asnFile);
