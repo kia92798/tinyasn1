@@ -8,13 +8,9 @@ namespace tinyAsn1
     public class PER_PDU
     {
         public string m_name;
-
         public PER_PDU m_parentPDU;
-
         public List<PERField> m_fields = new List<PERField>();
-
         List<PER_PDU> m_childrenPDUs = new List<PER_PDU>();
-
         public List<PER_PDU> m_AllPDUs = new List<PER_PDU>();
 
 
@@ -41,7 +37,7 @@ namespace tinyAsn1
 
         public PER_PDU CreateChildPDU(string childName)
         {
-            PER_PDU ret = new PER_PDU(childName, this);
+            PER_PDU ret = new PER_PDU(m_name+"."+childName, this);
             m_childrenPDUs.Add(ret);
             return ret;
 
@@ -86,7 +82,7 @@ namespace tinyAsn1
 
         public virtual void GenerateICD(System.IO.TextWriter w)
         {
-            w.WriteLine("=============================");
+            w.WriteLine("=======PDU: {0} =======", m_name);
             foreach (PERField fld in m_fields)
             {
                 fld.GenerateICD(w);
@@ -173,7 +169,7 @@ namespace tinyAsn1
         public virtual List<PER_PDU> GetPDUs(string pduName)
         {
             PER_PDU ret = new PER_PDU(pduName);
-            CollectFields(ret, "Value", false);
+            CollectFields(ret, pduName, false);
             ret.Normalize();
             return ret.m_AllPDUs;
         }
@@ -238,7 +234,7 @@ namespace tinyAsn1
         {
             foreach (Child ch in m_children.Values)
             {
-                PER_PDU chPdu = curInst.CreateChildPDU(varName);
+                PER_PDU chPdu = curInst.CreateChildPDU(ch.m_childVarName);
                 chPdu.AddField(varName + "_choiceIndex", 0, 0, optional);
                 ch.m_type.CollectFields(chPdu, ch.m_childVarName, false);
             }
