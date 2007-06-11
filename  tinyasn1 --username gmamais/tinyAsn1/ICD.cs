@@ -5,77 +5,15 @@ using Antlr.Runtime.Tree;
 
 namespace tinyAsn1
 {
-    public class PER_PDU
+    public class PDUInstance
     {
         public string m_name;
-        public PER_PDU m_parentPDU;
-        public List<PERField> m_fields = new List<PERField>();
-        List<PER_PDU> m_childrenPDUs = new List<PER_PDU>();
-        public List<PER_PDU> m_AllPDUs = new List<PER_PDU>();
-
-
-        public PER_PDU(string name)
-        {
-            m_name = name;
-            m_parentPDU = null;
-        }
-        public PER_PDU(string name, PER_PDU parent)
-        {
-            m_name = name;
-            m_parentPDU = parent;
-        }
-
-        public void AddField(string name, int minSize, int maxSize, bool optional)
-        {
-            m_fields.Add(new PERField(name, minSize, maxSize, optional));
-        }
-
-        public void AddField(string name, int minSize, int maxSize, bool optional, int count)
-        {
-            m_fields.Add(new PERField(name, minSize, maxSize, optional,count));
-        }
-
-        public PER_PDU CreateChildPDU(string childName)
-        {
-            PER_PDU ret = new PER_PDU(m_name+"."+childName, this);
-            m_childrenPDUs.Add(ret);
-            return ret;
-
-        }
-
-
-        internal void Normalize()
-        {
-            MoveFieldsToChildren(this);
-            foreach (PER_PDU norm in m_AllPDUs)
-            {
-                norm.sortFields();
-            }
-        }
-
-        void MoveFieldsToChildren(PER_PDU root)
-        {
-            foreach (PER_PDU childPdu in m_childrenPDUs)
-            {
-                childPdu.AddFields(m_fields);
-                childPdu.MoveFieldsToChildren(root);
-            }
-            if (m_childrenPDUs.Count > 0)
-                m_fields.Clear();
-            else
-                root.m_AllPDUs.Add(this);
-        }
-
-        private void AddFields(List<PERField> fields)
-        {
-            m_fields.AddRange(fields);
-        }
-
-        void sortFields()
+        public List<SingleField> m_fields = new List<SingleField>();
+        public void sortFields()
         {
             m_fields.Sort(mycompare);
         }
-        private static int mycompare(PERField a1, PERField a2)
+        private static int mycompare(SingleField a1, SingleField a2)
         {
             return a1.m_order.CompareTo(a2.m_order);
         }
@@ -83,14 +21,149 @@ namespace tinyAsn1
         public virtual void GenerateICD(System.IO.TextWriter w)
         {
             w.WriteLine("=======PDU: {0} =======", m_name);
-            foreach (PERField fld in m_fields)
+            foreach (SingleField fld in m_fields)
             {
                 fld.GenerateICD(w);
             }
         }
     }
 
-    public class PERField
+    public class ChoiceNode
+    {
+        public string m_name;
+        public ChoiceAlternative m_parent;
+        List<ChoiceAlternative> m_choiceAlternatives = new List<ChoiceAlternative>();
+
+        public ChoiceNode (string name, ChoiceAlternative parent) 
+        {
+            m_parent = parent;
+            m_name = name;
+        }
+
+        public ChoiceAlternative CreateAlternative(string altName)
+        {
+            ChoiceAlternative ret = new ChoiceAlternative(m_name + "." + altName, this);
+            m_choiceAlternatives.Add(ret);
+            return ret;
+        }
+
+        private int m_intret = -1;
+        public int CalculateInstances()
+        {
+            if (m_intret == -1)
+            {
+                m_intret = 0;
+                foreach (ChoiceAlternative chAlt in m_choiceAlternatives)
+                {
+                    m_intret += chAlt.CalculateInstances();
+                }
+            }
+            return m_intret;
+        }
+
+        public void Visit(int pass, PDUInstance curInst)
+        {
+            int locTotal = 0;
+            for (int i = 0; i < m_choiceAlternatives.Count; i++)
+            {
+                int m1 = locTotal;
+                int m2 = locTotal + m_choiceAlternatives[i].CalculateInstances();
+
+                if (m1 <= pass && pass < m2)
+                {
+                    int newpass = pass % m_choiceAlternatives[i].CalculateInstances();
+                    m_choiceAlternatives[i].Visit(newpass, curInst);
+                    break;
+                }
+                locTotal = m2;
+            }
+
+        }
+    }
+
+    public class ChoiceAlternative
+    {
+        public string m_name;
+        public ChoiceNode m_parent;
+        public List<SingleField> m_fields = new List<SingleField>();
+        List<ChoiceNode> m_children = new List<ChoiceNode>();
+
+        public ChoiceAlternative(string name)
+        {
+            m_name = name;
+            m_parent = null;
+        }
+        public ChoiceAlternative(string name, ChoiceNode parent)
+        {
+            m_name = name;
+            m_parent = parent;
+        }
+
+        public void AddField(string name, int minSize, int maxSize, bool optional)
+        {
+            m_fields.Add(new SingleField(name, minSize, maxSize, optional));
+        }
+
+        public void AddField(string name, int minSize, int maxSize, bool optional, int count)
+        {
+            m_fields.Add(new SingleField(name, minSize, maxSize, optional,count));
+        }
+
+        public ChoiceNode CreateChoice(string childName)
+        {
+            ChoiceNode ret = new ChoiceNode(m_name + "." + childName, this);
+            m_children.Add(ret);
+            return ret;
+        }
+
+
+
+        private int m_intret = -1;
+        public int CalculateInstances()
+        {
+            if (m_intret == -1)
+            {
+                m_intret = 1;
+                foreach (ChoiceNode chNode in m_children)
+                {
+                    m_intret *= chNode.CalculateInstances();
+                }
+
+            }
+            return m_intret;
+        }
+
+        public List<PDUInstance> GetPDUInstances()
+        {
+            int nTotalInst = CalculateInstances();
+            List<PDUInstance> ret = new List<PDUInstance>();
+
+            for (int i = 0; i < nTotalInst; i++)
+            {
+                PDUInstance curPDUInstance = new PDUInstance();
+                ret.Add(curPDUInstance);
+                Visit(i, curPDUInstance);
+            }
+
+            return ret;
+        }
+
+        public void Visit(int pass, PDUInstance curInst)
+        {
+            curInst.m_fields.AddRange(m_fields);
+            curInst.m_name += "/"+m_name;
+            foreach (ChoiceNode curNode in m_children)
+            {
+                int weight = curNode.CalculateInstances();
+                curNode.Visit(pass % weight, curInst);
+            }
+        }
+
+    }
+
+
+
+    public class SingleField
     {
         public string m_name;
         public int m_mimSize;
@@ -101,7 +174,7 @@ namespace tinyAsn1
 
         public static int g_order = 1;
         
-        public PERField(string name, int minSize, int maxSize, bool optional)
+        public SingleField(string name, int minSize, int maxSize, bool optional)
         {
             m_name = name;
             m_mimSize = minSize;
@@ -111,7 +184,7 @@ namespace tinyAsn1
             g_order++;
         }
 
-        public PERField(string name, int minSize, int maxSize, bool optional, int count)
+        public SingleField(string name, int minSize, int maxSize, bool optional, int count)
         {
             m_name = name;
             m_mimSize = minSize;
@@ -123,7 +196,7 @@ namespace tinyAsn1
         }
         public virtual void GenerateICD(System.IO.TextWriter w)
         {
-            w.WriteLine(m_name);
+            w.WriteLine("{0} min bits= {1}, max bits={2} ", m_name,m_mimSize, m_maxSize);
         }
     }
 
@@ -148,8 +221,8 @@ namespace tinyAsn1
             
             foreach (TypeAssigment asig in typeAssigments.Values)
             {
-                List<PER_PDU> pdus = asig.m_type.GetPDUs("ROOT");
-                foreach (PER_PDU pdu in pdus)
+                List<PDUInstance> pdus = asig.m_type.GetPDUs("ROOT");
+                foreach (PDUInstance pdu in pdus)
                 {
                     pdu.GenerateICD(w);
                 }
@@ -161,23 +234,22 @@ namespace tinyAsn1
 
     public partial class Asn1Type
     {
-        public virtual void CollectFields(PER_PDU curInst, string varName, bool optional)
+        public virtual void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
             throw new Exception("Asbtract method called ...");
         }
 
-        public virtual List<PER_PDU> GetPDUs(string pduName)
+        public virtual List<PDUInstance> GetPDUs(string pduName)
         {
-            PER_PDU ret = new PER_PDU(pduName);
+            ChoiceAlternative ret = new ChoiceAlternative(pduName);
             CollectFields(ret, pduName, false);
-            ret.Normalize();
-            return ret.m_AllPDUs;
+            return ret.GetPDUInstances();
         }
     }
 
     public partial class NullType : Asn1Type
     {
-        public override void CollectFields(PER_PDU curInst, string varName, bool optional)
+        public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
             curInst.AddField(varName, 0, 0, optional);
         }
@@ -186,7 +258,7 @@ namespace tinyAsn1
 
     public partial class BitStringType : Asn1Type
     {
-        public override void CollectFields(PER_PDU curInst, string varName, bool optional)
+        public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
             curInst.AddField(varName, 0, 0, optional);
         }
@@ -194,7 +266,7 @@ namespace tinyAsn1
 
     public partial class BooleanType : Asn1Type
     {
-        public override void CollectFields(PER_PDU curInst, string varName, bool optional)
+        public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
             curInst.AddField(varName, 1, 1, optional);
         }
@@ -202,7 +274,7 @@ namespace tinyAsn1
 
     public partial class RealType : Asn1Type
     {
-        public override void CollectFields(PER_PDU curInst, string varName, bool optional)
+        public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
             curInst.AddField(varName, 0, 0, optional);
         }
@@ -214,7 +286,7 @@ namespace tinyAsn1
     public partial class EnumeratedType : Asn1Type
     {
 
-        public override void CollectFields(PER_PDU curInst, string varName, bool optional)
+        public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
             curInst.AddField(varName, 0, 0, optional);
         }
@@ -222,19 +294,21 @@ namespace tinyAsn1
 
     public partial class IntegerType : Asn1Type
     {
-        public override void CollectFields(PER_PDU curInst, string varName, bool optional)
+        public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
-            curInst.AddField(varName, 0, 0, optional);
+            IntRange r = IntRangeConstraint;
+            curInst.AddField(varName, r.getNumberOfEncodedBits(), r.getNumberOfEncodedBits(), optional);
         }
     }
 
     public partial class ChoiceType : Asn1Type
     {
-        public override void CollectFields(PER_PDU curInst, string varName, bool optional)
+        public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
+            ChoiceNode node = curInst.CreateChoice(varName);
             foreach (Child ch in m_children.Values)
             {
-                PER_PDU chPdu = curInst.CreateChildPDU(ch.m_childVarName);
+                ChoiceAlternative chPdu = node.CreateAlternative(ch.m_childVarName);
                 chPdu.AddField(varName + "_choiceIndex", 0, 0, optional);
                 ch.m_type.CollectFields(chPdu, ch.m_childVarName, false);
             }
@@ -244,7 +318,7 @@ namespace tinyAsn1
 
     public partial class SequenceOrSetType : Asn1Type
     {
-        public override void CollectFields(PER_PDU curInst, string varName, bool optional)
+        public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
             curInst.AddField(varName+"_preamble", 0, 0, false);
             foreach (Child ch in m_children.Values)
@@ -265,7 +339,7 @@ namespace tinyAsn1
 
     public partial class SequenceOfType : Asn1Type
     {
-        public override void CollectFields(PER_PDU curInst, string varName, bool optional)
+        public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
             curInst.AddField(varName+"_length", 0, 0, optional);
             type.CollectFields(curInst, "SEQUENCE_OF_ELEMENT", false);
@@ -278,7 +352,7 @@ namespace tinyAsn1
 
     public partial class OctetStringType : Asn1Type
     {
-        public override void CollectFields(PER_PDU curInst, string varName, bool optional)
+        public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
             curInst.AddField(varName, 0, 0, optional);
         }
@@ -286,7 +360,7 @@ namespace tinyAsn1
 
     public partial class ReferencedType : Asn1Type
     {
-        public override void CollectFields(PER_PDU curInst, string varName, bool optional)
+        public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
             Type.CollectFields(curInst, varName, optional);
         }

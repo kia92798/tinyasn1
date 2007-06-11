@@ -77,6 +77,19 @@ namespace tinyAsn1
                 return true;
             return false;
         }
+        
+        public int getNumberOfEncodedBits()
+        {
+            UInt64 size = (UInt64)(max - min);
+            int ret = 0;
+            while (size > 0)
+            {
+                size = size >> 1;
+                ret++;
+            }
+
+            return ret;
+        }
     }
 
     public partial class Asn1Type
@@ -138,7 +151,7 @@ namespace tinyAsn1
                     ret = IntRange.GetUnion(ret, cur);
                 }
 
-                if (m_set2 != null)
+                if (m_set2.Count != 0)
                     throw new Exception("Unimplemented feature ...");
                 return ret;
             }
