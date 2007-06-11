@@ -234,18 +234,15 @@ namespace tinyAsn1
                 IntRange ret = IntRange.INF;
                 if (m_minValue != null)
                 {
-                    if (m_minValue.m_valType == Asn1Value.ValType.INT)
-                        ret.min = (Int64)m_minValue.m_value;
-                    else
-                        throw new SemanticErrorException(m_minValue.m_valType.ToString() + " cannot appear on an integer range value");
+                    ret.min = m_minValue.getValueAsInt();
                 }
 
                 if (m_maxValue != null)
                 {
-                    if (m_maxValue.m_valType == Asn1Value.ValType.INT)
-                        ret.max = (Int64)m_maxValue.m_value;
-                    else
-                        throw new SemanticErrorException(m_minValue.m_valType.ToString() + " cannot appear on an integer range value");
+//                    if (m_maxValue.m_valType == Asn1Value.ValType.INT)
+                        ret.max = m_maxValue.getValueAsInt();
+//                    else
+//                        throw new SemanticErrorException(m_minValue.m_valType.ToString() + " cannot appear on an integer range value");
 
                 }
                 else

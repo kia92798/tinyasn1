@@ -259,6 +259,27 @@ namespace tinyAsn1
 
         public ValType m_valType = ValType.UNDEFINED;
 
+        public Int64 getValueAsInt()
+        {
+            if (m_valType == ValType.INT)
+                return (Int64)m_value;
+            else if (m_valType == ValType.VALUE_REFERENCE)
+            {
+
+                Asn1Value ret = this;
+
+                while (ret.m_valType == ValType.VALUE_REFERENCE)
+                {
+                    if (ret.m_module.valuesAssigments.ContainsKey(ret.m_value.ToString()))
+                        ret = ret.m_module.valuesAssigments[ret.m_value.ToString()].m_value;
+                    else
+                        throw new Exception("Unimplemented feature ...");
+                }
+                return ret.getValueAsInt();
+            }
+            else throw new SemanticErrorException(ToString() + " is not INTEGER");
+        }
+
         public override string ToString()
         {
             if (m_valType != ValType.UNDEFINED)
