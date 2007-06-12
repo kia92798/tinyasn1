@@ -20,11 +20,28 @@ namespace tinyAsn1
 
         public virtual void GenerateICD(System.IO.TextWriter w)
         {
-            w.WriteLine("=======PDU: {0} =======", m_name);
+            w.WriteLine("<h3>{0}</h3>", m_name);
+
+            w.WriteLine("<table border=\"1\">");
+            w.WriteLine("<tr>");
+            w.WriteLine("<td style=\"width: 44px; height: 21px\">");
+            w.WriteLine("<strong>#</strong></td>");
+            w.WriteLine("<td style=\"width: 291px; height: 21px\">");
+            w.WriteLine("<strong>Field</strong></td>");
+            w.WriteLine("<td style=\"width: 100px; height: 21px\">");
+            w.WriteLine("<strong>min size</strong></td>");
+            w.WriteLine("<td style=\"width: 100px; height: 21px\">");
+            w.WriteLine("<strong>max size</strong></td>");
+            w.WriteLine("</tr>");
+
+            int i = 0;
             foreach (SingleField fld in m_fields)
             {
-                fld.GenerateICD(w);
+                fld.GenerateICD(++i, w);
             }
+
+            w.WriteLine("</table>");
+
         }
     }
 
@@ -194,9 +211,25 @@ namespace tinyAsn1
             m_order = g_order;
             g_order++;
         }
-        public virtual void GenerateICD(System.IO.TextWriter w)
+        public virtual void GenerateICD(int i, System.IO.TextWriter w)
         {
-            w.WriteLine("{0} min bits= {1}, max bits={2} ", m_name,m_mimSize, m_maxSize);
+            w.WriteLine("<tr>");
+
+            w.WriteLine("<td style=\"width: 44px\">");
+            w.WriteLine(i.ToString("0000"));
+            w.WriteLine("</td>");
+
+            w.WriteLine("<td style=\"width: 291px\">");
+            w.WriteLine(m_name);
+            w.WriteLine("</td>");
+            w.WriteLine("<td style=\"width: 100px\">");
+            w.WriteLine(m_mimSize);
+            w.WriteLine("</td>");
+            w.WriteLine("<td style=\"width: 100px\">");
+            w.WriteLine(m_maxSize);
+            w.WriteLine("</td>");
+            w.WriteLine("<tr>");
+
         }
     }
 
@@ -206,8 +239,20 @@ namespace tinyAsn1
     {
         public virtual void GenerateICD(System.IO.TextWriter w)
         {
+            w.WriteLine("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
+            w.WriteLine("<html xmlns=\"http://www.w3.org/1999/xhtml\" >");
+            w.WriteLine("<head>");
+            w.WriteLine("<title>{0}Page</title>",m_fileName);
+            w.WriteLine("</head>");
+            w.WriteLine("<body bgcolor=\"floralwhite\" >");
+
+            w.WriteLine("<h1>{0}</h1>", m_fileName);
             foreach (Module m in m_modules)
                 m.GenerateICD(w);
+
+            w.WriteLine("</body>");
+            w.WriteLine("</html>");
+
         }
     }
 
@@ -216,7 +261,7 @@ namespace tinyAsn1
     {
         public virtual void GenerateICD(System.IO.TextWriter w)
         {
-            w.WriteLine("=======Module: {0} =======",m_moduleID);
+            w.WriteLine("<h2>{0}</h2>", m_moduleID);
 
             
             foreach (TypeAssigment asig in typeAssigments.Values)
@@ -260,7 +305,10 @@ namespace tinyAsn1
     {
         public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
-            curInst.AddField(varName, 0, 0, optional);
+            IntRange sz = SizeConstraint;
+            int nminbits = (int)sz.min;
+            int nmaxbits = (int)sz.max;
+            curInst.AddField(varName, nminbits, nmaxbits, optional);
         }
     }
 
@@ -306,10 +354,11 @@ namespace tinyAsn1
         public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
             ChoiceNode node = curInst.CreateChoice(varName);
+            int nbits = IntRange.getNumberOfEncodedBits((UInt64)m_children.Count-1);
             foreach (Child ch in m_children.Values)
             {
                 ChoiceAlternative chPdu = node.CreateAlternative(ch.m_childVarName);
-                chPdu.AddField(varName + "_choiceIndex", 0, 0, optional);
+                chPdu.AddField(varName + "_choiceIndex", nbits, nbits, false);
                 ch.m_type.CollectFields(chPdu, ch.m_childVarName, false);
             }
         }
@@ -320,7 +369,9 @@ namespace tinyAsn1
     {
         public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
-            curInst.AddField(varName+"_preamble", 0, 0, false);
+            int nOptFlds = GetNumberOfOptionalOrDefaultFields();
+            if (nOptFlds>0)
+                curInst.AddField(varName + "_preamble", nOptFlds, nOptFlds, false);
             foreach (Child ch in m_children.Values)
             {
                 ch.m_type.CollectFields(curInst, ch.m_childVarName, ch.m_optional||ch.m_default);
@@ -341,7 +392,9 @@ namespace tinyAsn1
     {
         public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
-            curInst.AddField(varName+"_length", 0, 0, optional);
+            IntRange sz = SizeConstraint;
+            int nmaxbits = IntRange.getNumberOfEncodedBits((UInt64)sz.max);
+            curInst.AddField(varName + "_length", nmaxbits, nmaxbits, optional);
             type.CollectFields(curInst, "SEQUENCE_OF_ELEMENT", false);
         }
     }
@@ -354,7 +407,10 @@ namespace tinyAsn1
     {
         public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
-            curInst.AddField(varName, 0, 0, optional);
+            IntRange sz = SizeConstraint;
+            int nminbits = (int)sz.min * 8;
+            int nmaxbits = (int)sz.max * 8;
+            curInst.AddField(varName, nminbits, nmaxbits, optional);
         }
     }
 

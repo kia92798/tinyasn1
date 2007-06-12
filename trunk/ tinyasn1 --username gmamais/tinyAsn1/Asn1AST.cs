@@ -8,6 +8,7 @@ namespace tinyAsn1
 
     public partial class Asn1File
     {
+        public string m_fileName = "";
         public List<Module> m_modules = new List<Module>();
     }
 
@@ -178,6 +179,16 @@ namespace tinyAsn1
         public bool m_extMarkPresent = false;
         public ExceptionSpec m_exceptionSpec;
         public bool m_extMarkPresent2 = false;
+
+        public int GetNumberOfOptionalOrDefaultFields()
+        {
+            int ret = 0;
+            foreach (Child ch in m_children.Values)
+                if (ch.m_optional || ch.m_default)
+                    ret++;
+
+            return ret;
+        }
     }
 
     public partial class SequenceType : SequenceOrSetType
