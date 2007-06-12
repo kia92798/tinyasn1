@@ -90,6 +90,18 @@ namespace tinyAsn1
 
             return ret;
         }
+
+        static public int getNumberOfEncodedBits(UInt64 size)
+        {
+            int ret = 0;
+            while (size > 0)
+            {
+                size = size >> 1;
+                ret++;
+            }
+
+            return ret;
+        }
     }
 
     public partial class Asn1Type
@@ -101,7 +113,23 @@ namespace tinyAsn1
                 throw new Exception("Abstract method called ...");
             }
         }
+
+        public virtual IntRange SizeConstraint
+        {
+            get
+            {
+
+                IntRange ret = IntRange.INF;
+                foreach (Constraint c in m_constraints)
+                {
+                    if (c.IsSizeConstraint())
+                        ret = c.SizeConstraint;
+                }
+                return ret;
+            }
+        }
     }
+
 
 
     public partial class IntegerType : Asn1Type
@@ -132,6 +160,52 @@ namespace tinyAsn1
             get
             {
                 return m_values.IntRange;
+            }
+        }
+
+        public bool IsSizeConstraint()
+        {
+            if (m_values == null)
+                return false;
+            if (m_values.m_set1 == null)
+                return false;
+            if (m_values.m_set1.Count == 0)
+                return false;
+            UnionElementOfIntersectionItems el1 = m_values.m_set1[0] as UnionElementOfIntersectionItems;
+            if (el1 == null)
+                return false;
+            if (el1.m_intersectionElements == null || el1.m_intersectionElements.Count == 0)
+                return false;
+            IntersectionElement in1 = el1.m_intersectionElements[0];
+            SizeExpression sz = in1.m_exp as SizeExpression;
+            if (sz == null)
+                return false;
+
+            return true;
+        }
+        
+        public IntRange SizeConstraint
+        {
+            get
+            {
+                if (m_values == null)
+                    throw new Exception();
+                if (m_values.m_set1 == null)
+                    throw new Exception();
+                if (m_values.m_set1.Count == 0)
+                    throw new Exception();
+                UnionElementOfIntersectionItems el1 = m_values.m_set1[0] as UnionElementOfIntersectionItems;
+                if (el1 == null)
+                    throw new Exception();
+                if (el1.m_intersectionElements == null || el1.m_intersectionElements.Count == 0)
+                    throw new Exception();
+                IntersectionElement in1 = el1.m_intersectionElements[0];
+                SizeExpression sz = in1.m_exp as SizeExpression;
+                if (sz == null)
+                    throw new Exception();
+
+                return sz.m_sizeConstraint.IntRange;
+
             }
         }
     }

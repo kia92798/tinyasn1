@@ -75,6 +75,7 @@ namespace tinyAsn1
 
 
                     Asn1File asnFile = Asn1File.CreateFromAntlrAst(tree);
+                    asnFile.m_fileName = inFileName;
                     ASTs.Add(asnFile);
                 }
                 catch (RecognitionException)
@@ -124,7 +125,7 @@ namespace tinyAsn1
                 {
                     try
                     {
-                        System.IO.StreamWriter wr = new System.IO.StreamWriter(inputFiles[i] + ".icd");
+                        System.IO.StreamWriter wr = new System.IO.StreamWriter(inputFiles[i] + ".html");
                         ASTs[i].GenerateICD(wr);
                         wr.Flush();
                         wr.Close();
