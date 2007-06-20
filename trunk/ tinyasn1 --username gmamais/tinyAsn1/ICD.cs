@@ -7,8 +7,9 @@ namespace tinyAsn1
 {
     public class PDUInstance
     {
-        public string m_name;
+        public string m_name="";
         public List<SingleField> m_fields = new List<SingleField>();
+        public List<string> m_selectedChoices = new List<string>();
         public void sortFields()
         {
             m_fields.Sort(mycompare);
@@ -20,7 +21,12 @@ namespace tinyAsn1
 
         public virtual void GenerateICD(System.IO.TextWriter w)
         {
-            w.WriteLine("<h3>{0}</h3>", m_name);
+            if (m_selectedChoices.Count > 0)
+            {
+                w.WriteLine("<b>selected choices</b><br>");
+                foreach (string str in m_selectedChoices)
+                    w.WriteLine("<b>{0}</b><br>", str);
+            }
 
             w.WriteLine("<table border=\"1\">");
             w.WriteLine("<tr>");
@@ -128,7 +134,11 @@ namespace tinyAsn1
 
         public ChoiceNode CreateChoice(string childName)
         {
-            ChoiceNode ret = new ChoiceNode(m_name + "." + childName, this);
+            ChoiceNode ret;
+            if (m_name!=childName)
+                ret = new ChoiceNode(m_name + "." + childName, this);
+            else
+                ret = new ChoiceNode(childName, this);
             m_children.Add(ret);
             return ret;
         }
@@ -168,7 +178,10 @@ namespace tinyAsn1
         public void Visit(int pass, PDUInstance curInst)
         {
             curInst.m_fields.AddRange(m_fields);
-            curInst.m_name += "/"+m_name;
+            if (curInst.m_name=="")     //top Alternative contains the PDU name
+                curInst.m_name = m_name;
+            else                       // child alternatives contain choice selected nodes
+                curInst.m_selectedChoices.Add(m_name);
             foreach (ChoiceNode curNode in m_children)
             {
                 int weight = curNode.CalculateInstances();
@@ -183,8 +196,8 @@ namespace tinyAsn1
     public class SingleField
     {
         public string m_name;
-        public int m_mimSize;
-        public int m_maxSize;
+        public int m_mimSize=-1;
+        public int m_maxSize=-1;
         public bool m_optional = false;
         public int m_count = 1; // For SEQUENCE OF and SET OF is the length of the item
         public int m_order;
@@ -223,10 +236,16 @@ namespace tinyAsn1
             w.WriteLine(m_name);
             w.WriteLine("</td>");
             w.WriteLine("<td style=\"width: 100px\">");
-            w.WriteLine(m_mimSize);
+            if (m_mimSize != -1)
+                w.WriteLine(m_mimSize);
+            else
+                w.WriteLine("-");
             w.WriteLine("</td>");
             w.WriteLine("<td style=\"width: 100px\">");
-            w.WriteLine(m_maxSize);
+            if (m_maxSize != -1)
+                w.WriteLine(m_maxSize);
+            else
+                w.WriteLine("-");
             w.WriteLine("</td>");
             w.WriteLine("<tr>");
 
@@ -266,12 +285,13 @@ namespace tinyAsn1
             
             foreach (TypeAssigment asig in typeAssigments.Values)
             {
-                List<PDUInstance> pdus = asig.m_type.GetPDUs("ROOT");
+                w.WriteLine("<h3>{0}</h3>", asig.m_name);
+                List<PDUInstance> pdus = asig.m_type.GetPDUs(asig.m_name);
                 foreach (PDUInstance pdu in pdus)
                 {
                     pdu.GenerateICD(w);
                 }
-                break; //for now print only the first type assigment
+//                break; //for now print only the first type assigment
             }
         }
     }
@@ -324,7 +344,7 @@ namespace tinyAsn1
     {
         public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
-            curInst.AddField(varName, 0, 0, optional);
+            curInst.AddField(varName, 8, 0, optional);
         }
     }
 
@@ -336,7 +356,8 @@ namespace tinyAsn1
 
         public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
-            curInst.AddField(varName, 0, 0, optional);
+            int nbits = IntRange.getNumberOfEncodedBits((UInt64)m_enumValues.Count - 1);
+            curInst.AddField(varName, nbits, nbits, optional);
         }
     }
 
@@ -393,8 +414,11 @@ namespace tinyAsn1
         public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
             IntRange sz = SizeConstraint;
-            int nmaxbits = IntRange.getNumberOfEncodedBits((UInt64)sz.max);
-            curInst.AddField(varName + "_length", nmaxbits, nmaxbits, optional);
+            if (sz.max != sz.min)
+            {
+                int nmaxbits = IntRange.getNumberOfEncodedBits((UInt64)sz.max);
+                curInst.AddField(varName + "_length", nmaxbits, nmaxbits, optional);
+            }
             type.CollectFields(curInst, "SEQUENCE_OF_ELEMENT", false);
         }
     }
@@ -408,8 +432,13 @@ namespace tinyAsn1
         public override void CollectFields(ChoiceAlternative curInst, string varName, bool optional)
         {
             IntRange sz = SizeConstraint;
-            int nminbits = (int)sz.min * 8;
-            int nmaxbits = (int)sz.max * 8;
+            int nminbits = -1;
+            int nmaxbits = -1;
+            if (sz.Inf)
+            {
+                nminbits = (int)sz.min * 8;
+                nmaxbits = (int)sz.max * 8;
+            }
             curInst.AddField(varName, nminbits, nmaxbits, optional);
         }
     }

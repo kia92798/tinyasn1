@@ -125,7 +125,7 @@ namespace tinyAsn1
                         TypeAssigment typeAssig = TypeAssigment.CreateFromAntlrAst(child);
                         if (curModule.typeAssigments.ContainsKey(typeAssig.m_name))
                             throw new SemanticErrorException(typeAssig.m_name + " has alrady been defined. Line: " + child.Line);
-                        curModule.typeAssigments.Add(typeAssig.m_name, typeAssig);
+                        curModule.typeAssigments.Add(typeAssig.m_name,typeAssig);
                         break;
                     case asn1Parser.VAL_ASSIG:
                         ValueAssigment valAssig = ValueAssigment.CreateFromAntlrAst(child);

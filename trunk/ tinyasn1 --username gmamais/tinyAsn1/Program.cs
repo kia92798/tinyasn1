@@ -27,7 +27,7 @@ namespace tinyAsn1
                 {
                     if (args[i] == "-debug")
                         debug = true;
-                    else if (args[i] == "-o")
+                    else if (args[i] == "-icd")
                         genOutput = true;
                     else
                     {
@@ -139,18 +139,15 @@ namespace tinyAsn1
                     }
                 }
             }
-            if (ASTs[0].m_modules[0].typeAssigments.ContainsKey("DataInterchange"))
-            {
-                //ASTs[0].m_modules[0].typeAssigments["DataInterchange"].
-            }
             
             return 0;            
         }
 
         static int Usage()
         {
-            Console.Error.WriteLine("tinyAsn1 -debug file1, file2, ..., fileN ");
+            Console.Error.WriteLine("tinyAsn1 -debug -icd file1, file2, ..., fileN ");
             Console.Error.WriteLine("\t -debug \t\tcreates an XML with AST representation");
+            Console.Error.WriteLine("\t -icd \t\tGenerate ICD Documents");
             return 4;
         }
     }

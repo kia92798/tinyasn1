@@ -44,9 +44,10 @@ namespace tinyAsn1
         public List<string> m_exportedTypes = new List<string>();
         public List<string> m_exportedVariables = new List<string>();
         public List<ImportedModule> m_imports = new List<ImportedModule>();
-        public Dictionary<string, TypeAssigment> typeAssigments = new Dictionary<string, TypeAssigment>();
-        public Dictionary<string, ValueAssigment> valuesAssigments = new Dictionary<string, ValueAssigment>();
-        public Dictionary<string, ValueSetAssigment> valueSetsAssigments = new Dictionary<string, ValueSetAssigment>();
+        public MyDictionary<string, TypeAssigment> typeAssigments = new MyDictionary<string, TypeAssigment>();
+//        public List<TypeAssigment> typeAssigments = new List<TypeAssigment>();
+        public MyDictionary<string, ValueAssigment> valuesAssigments = new MyDictionary<string, ValueAssigment>();
+        public MyDictionary<string, ValueSetAssigment> valueSetsAssigments = new MyDictionary<string, ValueSetAssigment>();
     }
 
 
@@ -119,7 +120,7 @@ namespace tinyAsn1
 
     public partial class BitStringType : Asn1Type
     {
-        public Dictionary<string, NumberedItem> m_namedBis = new Dictionary<string, NumberedItem>();
+        public MyDictionary<string, NumberedItem> m_namedBis = new MyDictionary<string, NumberedItem>();
     }
 
     public partial class BooleanType : Asn1Type
@@ -133,7 +134,7 @@ namespace tinyAsn1
     public partial class EnumeratedType : Asn1Type
     {
 
-        public Dictionary<string, NumberedItem> m_enumValues = new Dictionary<string, NumberedItem>();
+        public MyDictionary<string, NumberedItem> m_enumValues = new MyDictionary<string, NumberedItem>();
         public bool m_extMarkPresent = false;
         public ExceptionSpec m_exceptionSpec;
 //        public Dictionary<string, NumberedItem> m_additionalEnumValues = new Dictionary<string, NumberedItem>();
@@ -141,7 +142,7 @@ namespace tinyAsn1
     
     public partial class IntegerType : Asn1Type
     {
-        public Dictionary<string, NumberedItem> m_namedValues = new Dictionary<string, NumberedItem>();
+        public MyDictionary<string, NumberedItem> m_namedValues = new MyDictionary<string, NumberedItem>();
     }
 
     public partial class ChoiceType : Asn1Type
@@ -155,7 +156,7 @@ namespace tinyAsn1
             public int? m_version=null;
         }
 
-        public Dictionary<string, Child> m_children = new Dictionary<string, Child>();
+        public MyDictionary<string, Child> m_children = new MyDictionary<string, Child>();
         public bool m_extMarkPresent = false;
         public ExceptionSpec m_exceptionSpec;
         public bool m_extMarkPresent2 = false;
@@ -175,7 +176,7 @@ namespace tinyAsn1
             public int? m_version=null;
         }
 
-        public Dictionary<string, Child> m_children = new Dictionary<string, Child>();
+        public MyDictionary<string, Child> m_children = new MyDictionary<string, Child>();
         public bool m_extMarkPresent = false;
         public ExceptionSpec m_exceptionSpec;
         public bool m_extMarkPresent2 = false;
