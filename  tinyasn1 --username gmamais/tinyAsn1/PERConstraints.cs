@@ -10,6 +10,8 @@ namespace tinyAsn1
         public Int64 min;
         public Int64 max;
         public bool ignored = false;
+        public bool Null = false;
+        public bool Inf = false;
         static public IntRange NULL
         {
             get
@@ -17,6 +19,7 @@ namespace tinyAsn1
                 IntRange ret = new IntRange();
                 ret.min = Int64.MaxValue;
                 ret.max = Int64.MinValue;
+                ret.Null = true;
                 return ret;
             }
         }
@@ -27,6 +30,7 @@ namespace tinyAsn1
                 IntRange ret = new IntRange();
                 ret.min = Int64.MinValue;
                 ret.max = Int64.MaxValue;
+                ret.Inf = true;
                 return ret;
             }
         }
