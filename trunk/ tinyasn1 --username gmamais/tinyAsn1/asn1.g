@@ -561,3 +561,14 @@ COMMENT2
     :   '--' ( options {greedy=false;} : . )* ('--'|'\r'?'\n') {$channel=HIDDEN;}
     ;
 
+
+
+/*********************** UNSUPPORTED ASN.1 FEATURES **********************************/
+
+/*
+definitiveIdentifier in module definition
+
+
+
+
+*/
