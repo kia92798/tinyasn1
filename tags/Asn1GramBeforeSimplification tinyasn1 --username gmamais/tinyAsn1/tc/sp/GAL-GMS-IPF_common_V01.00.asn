@@ -1,0 +1,267 @@
+-- ============================================================================
+-- Copyright: GMV, S.A.
+-- Project..: IPF
+-- File.....: $RCSfile: GAL-GMS-IPF_common.asn,v $
+-- Version..: $Revision: 1.2 $
+-- Date.....: $Date: 2006/11/13 09:02:25 $
+-- Module...: GAL-GMS-IPF-common-V01-00
+-- Purpose..: 
+-- Language.: ASN.1
+-- Author...: $Author: jcgg $
+-- Full Id..: $Id: GAL-GMS-IPF_common.asn,v 1.2 2006/11/13 09:02:25 jcgg Exp $
+-- History..: 
+-- ============================================================================
+
+GAL-GMS-IPF-common-V01-00 DEFINITIONS
+
+    AUTOMATIC TAGS ::=
+
+BEGIN
+
+IMPORTS
+
+    SV-ID,
+    max-SV-ID,
+    GSTtimeStamp,
+    max-SV-inView,
+    GAL-GMS-GSS-GLAdType,
+    max-GSS-remote-Sites
+        FROM GMS-common-Version1;
+
+-- ============================================================================
+-- Message definitions for interface IPF_Constants
+-- ============================================================================
+
+-- max-GSS
+-- Maximum number of GSS used by IPF. The GCC-located GSS are not used by IPF
+max-GSS                            INTEGER ::= max-GSS-remote-Sites
+
+-- max-GSS-Channels
+-- Maximum number of channels
+-- (max-GSS-remote-Sites*3)
+max-GSS-Channels                   INTEGER ::= 150
+
+-- max-GSS-Channels
+-- Maximum number of channels processed by IPF
+-- (max-GSS-remote-Sites*2)
+max-IPF-GSS-Channels                   INTEGER ::= 100
+
+-- max-SV
+-- Maximum number satellites in constellation
+max-SV                             INTEGER ::= max-SV-ID
+
+-- max-SERV
+-- Maximun number of services for which nav. messages are generated 
+-- (i.e. OS & CS not included)
+-- Order is the one given by GalileoService: 1st:SoL, 2nd: PRS
+max-SERV                           INTEGER ::= 2
+
+-- max-SV-and-GSS
+-- (Defined as max_SERV*max_SV)
+max-SV-and-GSS                     INTEGER ::= 72
+
+-- max-BarriersNumber
+-- Number of defined barriers
+max-BarriersNumber                 INTEGER ::= 100
+
+-- max-AllanStDevIntervals
+-- Allan Std. Dev. Stability Intervals
+max-AllanStDevIntervals            INTEGER ::= 7
+
+-- max-SAT-VAL-NAV
+-- HSNF/PASNF for all Satellites
+-- (Defined as max_SV*max_VAL_NAV)
+max-SAT-VAL-NAV                    INTEGER ::= 72
+
+-- 2 messages per GSS chain per 50 sites (2*2*50)
+max-msgs-epoch                     INTEGER ::= 200
+ 
+max-chain                          INTEGER ::= 2
+
+max-element-code                   INTEGER ::= 256
+
+max-barrier-code                   INTEGER ::= 4096
+
+max-SV-On-Sight                    INTEGER ::= max-SV-inView
+
+
+-- GssChannelNum
+-- TBC GSS Channel Number
+GssChannelNum                 ::= INTEGER (0..max-GSS-Channels)
+
+-- TropoDelaySingleGss
+-- Tropospheric zenith delays for a single GSS
+TropoDelaySingleGss           ::= SEQUENCE {
+  
+  -- GSS Id (up to the chain definition)
+  gssId                             GAL-GMS-GSS-GLAdType,
+
+  -- Estimated zenith tropospheric delay for each station and for each 
+  -- interval [cm] 
+  gssTropDelay                      GssTropoDelay,
+
+  -- Tropo.Delay availability status
+  status                            BOOLEAN
+}
+
+-- GssTropoDelay
+-- GSS Trospospheric Delay
+-- Units: cm
+GssTropoDelay                 ::= INTEGER (-10000000..10000000)
+
+--    Galileo services
+GalileoService ::= ENUMERATED {
+  e-sol(1),
+  e-prs(2)
+}
+
+-- =====================================================
+-- Qos-Status as sent in the MGF and the MUCF interfaces
+--  ====================================================
+
+QoS-Status                    ::= ENUMERATED {
+
+  -- Failure, re-init necessary
+  qos-RedLight(0),
+
+  -- Nominal Mode, best accuracy
+  qos-GreenLight1(1),
+
+  -- Nominal Mode, second best accuracy
+  qos-GreenLight2(2),
+
+  -- Nominal Mode, third best accuracy
+  qos-GreenLight3(3),
+
+  -- Nominal Mode, fourth best accuracy
+  qos-GreenLight4(4),
+
+  -- Nominal Mode, fifth best accuracy
+  qos-GreenLight5(5),
+
+  -- Nominal Mode, worst accuracy
+  qos-GreenLight6(6),
+
+  -- Degraded mode or No Satellites Monitored
+  qos-YellowLight(7)
+}
+  
+-- ============================================================================
+-- Definitions related with clock info
+-- ============================================================================
+
+-- GST
+-- Galileo System Time
+GST-WeekSec                           ::= SEQUENCE {
+  -- Week Number [s]
+  wn                                INTEGER (0..4095),
+  -- Seconds in Week 
+  tow                               INTEGER (0..1048575)
+}
+
+-- Status-ThreeState
+-- Generic Three-State Status Type (OK/Not OK/Rejected)
+Status-ThreeState ::= ENUMERATED {
+  ok(0),
+  not-ok(1),
+  rejected(2)
+}
+
+-- SatClkGstData
+-- Deviation of SV w.r.t. GST, for each service
+SatClkGstData                 ::= SEQUENCE {
+  svId                              SV-ID,
+  sv-TimeStamp                      GSTtimeStamp,
+  sv-Gst-Offset                     ClockOffset,
+  sv-Clk-AllanStDev                 AllanStDevSet
+  }
+
+-- GssClkGstData
+-- Deviation of GSS w.r.t. GST, for each service
+GssClkGstData                 ::= SEQUENCE {
+  gssId                             GAL-GMS-GSS-GLAdType,
+  gss-TimeStamp                     GSTtimeStamp,
+  gss-Gst-Offset                    ClockOffset,
+  gss-Clk-AllanStDev                AllanStDevSet
+  }
+
+-- AllanStDevSet
+-- Set of Allan Std. Deviation and Stability Interval pairs
+AllanStDevSet                 ::= SEQUENCE (SIZE(1..max-AllanStDevIntervals))
+                                   OF AllanStDev
+
+-- AllanStDev
+-- Allan Std. Deviation and Stability Interval pairs
+AllanStDev                    ::= SEQUENCE {
+  stabilityTime                     AllanStabilityTime,
+  allanStDev                        AllanStandardDeviation
+  }
+
+-- AllanStabilityTime
+-- Definition of structure AllanStabilityTime (tau)
+AllanStabilityTime            ::= INTEGER (-100000000..100000000)
+
+-- AllanStandardDeviation
+-- Definition of structure AllanStandardDeviation
+AllanStandardDeviation        ::= INTEGER (-1000000..1000000)
+
+-- ClockOffset
+-- Definition of structure ClockOffset
+ClockOffset                   ::= SEQUENCE {
+  sec                               Seconds,
+  nsec                              Nanoseconds,
+  nsec-frac                         NanosecondsFrac
+}
+
+-- Day
+-- Definition of structure Day
+Day                           ::= INTEGER (0..365)
+
+-- Seconds
+-- Definition of structure Seconds
+Seconds                       ::= INTEGER (-3600..3600)
+
+-- Milliseconds
+-- Definition of structure Milliseconds
+Milliseconds                  ::= INTEGER (-1000..1000)
+
+-- Nanoseconds
+-- Definition of structure Nanoseconds
+Nanoseconds                   ::= INTEGER (-1000000000..1000000000)
+
+-- NanosecondsFrac
+-- Definition of structure fraction of Nanoseconds
+NanosecondsFrac               ::= INTEGER (-100..100)
+
+
+-- ============================================================================
+-- Other definitions
+-- ============================================================================
+
+-- Health
+-- Health Status
+Health                        ::= ENUMERATED {
+  healthy(0),
+  unhealthy(1)
+}
+
+END
+
+-- 
+-- $Log: GAL-GMS-IPF_common.asn,v $
+-- Revision 1.2  2006/11/13 09:02:25  jcgg
+-- *** empty log message ***
+--
+-- Revision 1.1.2.2  2006/10/30 14:15:21  jcgg
+-- Created after 5th ID WS, targeted for IDP 4.A
+--
+-- Revision 1.1.2.1  2006/10/27 07:33:42  jcgg
+-- Created after 5th ICD WS
+--
+-- Revision 1.1.2.1  2006/10/24 14:58:06  jcgg
+-- Initial revision
+--
+--
+--
+
+-- EOF

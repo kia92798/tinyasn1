@@ -1,0 +1,53 @@
+--
+-- The following ASN.1 specification defines the abstract syntax for 
+--
+--        Data Record Format Version 03 
+--                           Release 01
+--
+-- The specification is structured as follows:
+--   (1) structure of the Tap batch
+--   (2) defintition of the individual Tap 'records' 
+--   (3) Tap data items and groups of data items used within (2)
+--   (4) Common, non-Tap data types
+--
+-- It is mainly a translation from the logical structure
+-- diagrams. Where appropriate, names used within the 
+-- logical structure diagrams have been shortened.
+-- For repeating data items the name as used within the logical
+-- structure have been extended by adding 'list' or 'table'
+-- (in some instances).
+--
+
+
+TAP-0301  DEFINITIONS IMPLICIT TAGS  ::= 
+
+BEGIN 
+
+--
+-- Structure of a Tap batch 
+--
+
+DataInterChange ::= CHOICE 
+{
+    transferBatch TransferBatch, 
+    notification  Notification
+}
+
+TransferBatch ::= [APPLICATION 1] SEQUENCE
+{
+    e       BatchControlInfo            OPTIONAL, -- *m.m.
+    accountingInfo         AccountingInfo              OPTIONAL,
+    networkInfo            NetworkInfo                 OPTIONAL, -- *m.m.
+    vasInfo                VasInfo                     OPTIONAL,
+    messageDescriptionInfo MessageDescriptionInfo      OPTIONAL,
+    callEventDetails       CallEventDetailList         OPTIONAL, -- *m.m.
+    auditControlInfo       AuditControlInfo            OPTIONAL -- *m.m.
+}
+PercentageRate ::= INTEGER 
+
+
+BCDString ::= OCTET STRING
+
+
+END
+

@@ -1,0 +1,36 @@
+MY-MODULE DEFINITIONS EXPLICIT TAGS EXTENSIBILITY IMPLIED ::= BEGIN
+
+EXPORTS a1, a2, B1, B2;
+IMPORTS
+	A1,a1 FROM MODULE-A
+	B1,b1 FROM MODULE-B
+	;
+	
+-- Original definition by Alain
+--T-POS ::= BOOLEAN
+
+
+TypeEnumerated ::= [4] ENUMERATED {
+    red(0),
+    green(1),
+    blue(2)
+}
+
+
+SubType ::= SEQUENCE {
+    intValue	INTEGER(0 | 10),
+    intArray	SEQUENCE (SIZE (10)) OF INTEGER (0 .. 3),
+    enumValue	TypeEnumerated,
+    label	OCTET STRING (SIZE(10..40)),
+    label2 OCTET STRING  (SIZE (1..10)) (FROM ("A".."Z"))
+}
+
+-- A more realistic definition
+T-POS ::= SEQUENCE {
+    longitude	REAL(-180.0 .. 180.0),
+    latitude	REAL(-90.0 .. 90.0),
+    height	REAL(30000.0 .. 45000.0),
+    subTypeArray SEQUENCE (SIZE(10..15)) OF SubType
+}
+
+END
