@@ -108,13 +108,20 @@ moduleDefinition :  	modulereference	definitiveIdentifier?
 //			->  ^(MODULE_DEF modulereference moduleTag? EXTENSIBILITY? exports? imports? typeAssigment* valueAssigment* valueSetAssigment*)
 			->  ^(MODULE_DEF modulereference EXPLICIT? IMPLICIT? AUTOMATIC? EXTENSIBILITY? exports? imports? typeAssigment* valueAssigment* valueSetAssigment*)
 			;
+/*
+EXPLICIT TAGS (default)==> all tags in explicit mode (i.e. multiple tags per type are encoded in BER)
+IMPLICIT TAGS 	==>	all tags are implicit
+AUTOMATIC TAGS	==> the components of all its structured types (SEQUENCE,SET or CHOICE) are automatically tagged by the compiler starting 
+	from 0 by one-increment. By default, every component is tagged in the implicit mode except if it is a CHOICE type, an open type or a parameter 
+		that is a type.
 
-//moduleTag 
-//	:	EXPLICIT TAGS -> EXPLICIT
-//	| 	IMPLICIT TAGS -> IMPLICIT
-//	|   AUTOMATIC TAGS -> AUTOMATIC
-//	;			
-		
+EXTENSIBILITY ==> An ENUMERATED, SEQUENCE, SET or CHOICE type that does not include an
+	extension marker is extensible if the module includes the EXTENSIBILITY
+	IMPLIED clause in its header
+*/			
+			
+
+
 definitiveObjIdComponent
 	:	identifier ( '(' INT ')' )?
 	|	INT;		
@@ -154,7 +161,17 @@ typeTag
 	:	'[' (t=UNIVERSAL | t=APPLICATION | t=PRIVATE)? INT  ']' ( impOrExp=IMPLICIT | impOrExp=EXPLICIT)? 	
 			-> ^(TYPE_TAG $t? INT $impOrExp?)
 	;
-		
+/*
+* In a given context, two tags are considered to be diferent if they are of diferent classes or if their respective numbers are diferent.
+* If tagging class is missing (i.e. no UNIVERSAL, or  APPLICATION, or PRIVATE) are of context-specific class --> The tags make sense only inside the scope
+	of the Father (father may be SEQUENCE, SET etc) --> they do not polute the global space
+* UNIVERSAL   ==> used by people designing/extending ASN.1 
+* APPLICATION ==> to tag types that would be referenced several times in a speci?cation
+* PRIVATE ==> use of PRIVATE class tags is not recommended since 1994
+* EXPLICIT (Default)==> In BER, more than one tags are encoded. Eg in Afters ::= CHOICE { cheese [0] IA5String, dessert [1] IA5String }
+			the two tags [0] and [UNIVERSAL 22] are encoded if the alternative cheese is chosen
+* IMPLICIT ==> Only one tag is encoded ; a tag marked IMPLICIT overwrites the tag that follows it (recursively)
+*/		
 
 type	: typeTag?
 (	 nULL													-> ^(TYPE_DEF typeTag? nULL)
@@ -394,7 +411,7 @@ constraintExpression
 	| permittedAlphabetExpression
 	| innerTypeExpression
 	| patternExpression
-	| '(' setOfValues ')'	->	setOfValues
+	| '(' unionElement ')'	->	unionElement
 	;	
 	
 valueRangeExpression
@@ -435,7 +452,7 @@ modulereference	:	UID;
 typereference	:	UID;
 valuereference 	:	LID;		
 identifier	:	LID;
-versionNumber	:	INT;
+versionNumber	:	INT ':'	->	INT;
 objectIdentifier	:	OBJECT IDENTIFIER	->OBJECT_TYPE;
 relativeOID	:	RELATIVE_OID;
 signedNumber	:	(s='+'|s='-')? INT			->^(NUMERIC_VALUE INT $s?)
