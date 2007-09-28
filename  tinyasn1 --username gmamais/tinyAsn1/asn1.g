@@ -60,6 +60,7 @@ tokens {
 	OBJECT_TYPE;
 	NUMBER_LST_ITEM;
 	DEFAULT_VALUE;
+	VALUE_REFERENCE;
 }
 
 
@@ -102,11 +103,11 @@ moduleDefinition :  	modulereference	definitiveIdentifier?
 			(
 				typeAssigment
 				|valueAssigment
-				|valueSetAssigment
+//				|valueSetAssigment
 			)*
 			END
 //			->  ^(MODULE_DEF modulereference moduleTag? EXTENSIBILITY? exports? imports? typeAssigment* valueAssigment* valueSetAssigment*)
-			->  ^(MODULE_DEF modulereference EXPLICIT? IMPLICIT? AUTOMATIC? EXTENSIBILITY? exports? imports? typeAssigment* valueAssigment* valueSetAssigment*)
+			->  ^(MODULE_DEF modulereference EXPLICIT? IMPLICIT? AUTOMATIC? EXTENSIBILITY? exports? imports? typeAssigment* valueAssigment* /* valueSetAssigment* */)
 			;
 /*
 EXPLICIT TAGS (default)==> all tags in explicit mode (i.e. multiple tags per type are encoded in BER)
@@ -145,10 +146,12 @@ importFromModule
 valueAssigment	
 	:	valuereference type '::=' value	 -> ^(VAL_ASSIG valuereference type value)
 	;		
-		
+
+/*		
 valueSetAssigment
 	:	typereference type '::=' '{' setOfValues '}'    -> ^(VAL_SET_ASSIG typereference type setOfValues)
 	;		
+*/	
 typeAssigment 
 	:	typereference '::=' type -> ^(TYPE_ASSIG typereference type)
 	;	
@@ -337,7 +340,8 @@ value	:
 	|	TRUE
 	|	FALSE
 	|	StringLiteral
-	|	valuereference										//->^(VALUE_REFERENCE valuereference)
+//	|	valuereference										
+	|	val=valuereference										->^(VALUE_REFERENCE $val)
 	|	(s='+'|s='-')? intPart=INT ('.' decPart=INT?)? 					->^(NUMERIC_VALUE $intPart $s? $decPart?)
 //	|	('+'|'-')? INT ('.' INT?)? ( ('E'|'e') ('+'|'-')? INT)?
 	|	MIN
@@ -563,12 +567,11 @@ COMMENT2
 
 
 
-/*********************** UNSUPPORTED ASN.1 FEATURES **********************************/
+/* ********************** UNSUPPORTED ASN.1 FEATURES **********************************/
 
 /*
-definitiveIdentifier in module definition
-
-
-
+definitiveIdentifier in module definition. (parsed but ignored)
+valueSetAssigments
 
 */
+
