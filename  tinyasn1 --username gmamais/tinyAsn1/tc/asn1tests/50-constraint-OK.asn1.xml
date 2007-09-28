@@ -1,0 +1,1184 @@
+<ASN1FILE>
+  <Module name="ModuleNestedConstraintsCheck" Tags="NONE" ExportStatus="NONE" ExtensibilityImplied="False" >
+    <EXPORTS>
+    </EXPORTS>
+    <IMPORTS>
+      <ImportedModule module="IdentifierModule">
+        <ImportedType name="Identifier"/>
+      </ImportedModule>
+    </IMPORTS>
+    <TYPE_ASSIGMENTS>
+      <TYPE_ASSIGMENT name="Int1">
+        <INTEGER_TYPE >
+        </INTEGER_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Int2">
+        <REFERENCED_TYPE name="Int1" modName="" >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <RANGE min="0" max="2147483647" minValIsIncluded="False" maxValIsIncluded="False" />
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </REFERENCED_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Int3">
+        <REFERENCED_TYPE name="Int2" modName="" >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <RANGE min="-2147483648" max="ten" minValIsIncluded="False" maxValIsIncluded="False" />
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </REFERENCED_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Int4">
+        <REFERENCED_TYPE name="Int3" modName="" >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="True">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <RANGE min="5" max="2147483647" minValIsIncluded="False" maxValIsIncluded="False" />
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+                <UNION_SET2>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <RANGE min="1" max="4" minValIsIncluded="False" maxValIsIncluded="False" />
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET2>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </REFERENCED_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Int5">
+        <REFERENCED_TYPE name="Int4" modName="" >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <RANGE min="-2147483648" max="5" minValIsIncluded="False" maxValIsIncluded="False" />
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </REFERENCED_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="ExtensibleExtensions">
+        <INTEGER_TYPE >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <SET_OF_VALUES ExtensionPresent="True">
+                        <UNION_SET1>
+                          <UNION_ELEMENT>
+                            <INTERSECTION_ELEMENT>
+                              <RANGE min="1" max="256" minValIsIncluded="False" maxValIsIncluded="False" />
+                            </INTERSECTION_ELEMENT>
+                          </UNION_ELEMENT>
+                        </UNION_SET1>
+                      </SET_OF_VALUES>
+                    </INTERSECTION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <SET_OF_VALUES ExtensionPresent="False">
+                        <UNION_SET1>
+                          <UNION_ELEMENT>
+                            <INTERSECTION_ELEMENT>
+                              <RANGE min="1" max="256" minValIsIncluded="False" maxValIsIncluded="False" />
+                            </INTERSECTION_ELEMENT>
+                          </UNION_ELEMENT>
+                        </UNION_SET1>
+                      </SET_OF_VALUES>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </INTEGER_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Str1">
+        <OCTECT_STRING >
+        </OCTECT_STRING>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Str2">
+        <REFERENCED_TYPE name="Str1" modName="" >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <SIZE_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min="-2147483648" max="20" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min="25" max="30" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </SIZE_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </REFERENCED_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Str3">
+        <REFERENCED_TYPE name="Str2" modName="" >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <SIZE_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min="10" max="27" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </SIZE_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <PERMITTED_ALPHABET_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""ABC"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""def"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </PERMITTED_ALPHABET_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </REFERENCED_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Str4">
+        <OCTECT_STRING >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <RANGE min=""ABCD"" minValIsIncluded="False" maxValIsIncluded="False" />
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <SIZE_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min="4" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </SIZE_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </OCTECT_STRING>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="PER-Visible">
+        <OCTECT_STRING >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <PERMITTED_ALPHABET_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""A"" max=""F"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </PERMITTED_ALPHABET_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </OCTECT_STRING>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="PER-Visible-2">
+        <REFERENCED_TYPE name="PER-Visible" modName="" >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <PERMITTED_ALPHABET_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""E"" max=""F"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </PERMITTED_ALPHABET_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </REFERENCED_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Not-PER-Visible-1">
+        <REFERENCED_TYPE name="PER-Visible" modName="" >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <PERMITTED_ALPHABET_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""AB"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </PERMITTED_ALPHABET_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <SIZE_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min="1" max="2" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </SIZE_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </REFERENCED_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Not-PER-Visible-2">
+        <REFERENCED_TYPE name="PER-Visible" modName="" >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <PERMITTED_ALPHABET_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="True">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""AB"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </PERMITTED_ALPHABET_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </REFERENCED_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Not-PER-Visible-3">
+        <REFERENCED_TYPE name="PER-Visible" modName="" >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="True">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <PERMITTED_ALPHABET_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""AB"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </PERMITTED_ALPHABET_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </REFERENCED_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="SIZE-but-not-FROM">
+        <REFERENCED_TYPE name="PER-Visible" modName="" >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <SIZE_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min="1" max="4" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </SIZE_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <PERMITTED_ALPHABET_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="True">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""ABCD"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </PERMITTED_ALPHABET_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </REFERENCED_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="SIZE-and-FROM">
+        <REFERENCED_TYPE name="PER-Visible" modName="" >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <SIZE_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min="1" max="4" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </SIZE_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <PERMITTED_ALPHABET_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""ABCD"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </PERMITTED_ALPHABET_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </REFERENCED_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Neither-SIZE-nor-FROM">
+        <REFERENCED_TYPE name="PER-Visible" modName="" >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <SIZE_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min="1" max="4" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </SIZE_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <PERMITTED_ALPHABET_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="True">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""ABCD"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </PERMITTED_ALPHABET_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </REFERENCED_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Utf8-4">
+        <OCTECT_STRING >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <PERMITTED_ALPHABET_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""A"" max=""Z"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </PERMITTED_ALPHABET_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </OCTECT_STRING>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Utf8-3">
+        <REFERENCED_TYPE name="Utf8-2" modName="" >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <PERMITTED_ALPHABET_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""A"" max=""Z"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""a"" max=""z"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </PERMITTED_ALPHABET_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </REFERENCED_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Utf8-2">
+        <REFERENCED_TYPE name="Utf8-1" modName="" >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <SIZE_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min="1" max="2" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </SIZE_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </REFERENCED_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Utf8-1">
+        <OCTECT_STRING >
+        </OCTECT_STRING>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="VisibleIdentifier">
+        <REFERENCED_TYPE name="Identifier" modName="" >
+        </REFERENCED_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Sequence">
+        <SEQUENCE_TYPE >
+          <CHILD name="int1-c" optinal="False" default="True" >
+            <REFERENCED_TYPE name="Int1" modName="" >
+              <CONSTRAINTS_LIST>
+                <CONSTRAINT>
+                  <SET_OF_VALUES ExtensionPresent="False">
+                    <UNION_SET1>
+                      <UNION_ELEMENT>
+                        <INTERSECTION_ELEMENT>
+                          <RANGE min="-2" max="2147483647" minValIsIncluded="False" maxValIsIncluded="False" />
+                        </INTERSECTION_ELEMENT>
+                      </UNION_ELEMENT>
+                    </UNION_SET1>
+                  </SET_OF_VALUES>
+                </CONSTRAINT>
+              </CONSTRAINTS_LIST>
+            </REFERENCED_TYPE>
+            <VALUE>3</VALUE>
+          </CHILD>
+          <CHILD name="int4" optinal="False" default="False" >
+            <REFERENCED_TYPE name="Int4" modName="" Class="NONE" tag="2" ImplOrExpl="NONE" >
+            </REFERENCED_TYPE>
+          </CHILD>
+          <CHILD name="int4-c" optinal="False" default="False" >
+            <REFERENCED_TYPE name="Int4" modName="" >
+              <CONSTRAINTS_LIST>
+                <CONSTRAINT>
+                  <SET_OF_VALUES ExtensionPresent="False">
+                    <UNION_SET1>
+                      <UNION_ELEMENT>
+                        <INTERSECTION_ELEMENT>
+                          <RANGE min="-2147483648" max="7" minValIsIncluded="False" maxValIsIncluded="False" />
+                        </INTERSECTION_ELEMENT>
+                      </UNION_ELEMENT>
+                    </UNION_SET1>
+                  </SET_OF_VALUES>
+                </CONSTRAINT>
+              </CONSTRAINTS_LIST>
+            </REFERENCED_TYPE>
+          </CHILD>
+          <CHILD name="bool" optinal="False" default="True" >
+            <BOOLEAN_TYPE >
+            </BOOLEAN_TYPE>
+            <VALUE>1</VALUE>
+          </CHILD>
+          <CHILD name="enum-c" optinal="False" default="False" >
+            <ENUMERATED_TYPE >
+              <NUMBERD_ITEM name="one" value="1" />
+              <NUMBERD_ITEM name="two" value="2" />
+              <NUMBERD_ITEM name="three" value="3" />
+            </ENUMERATED_TYPE>
+          </CHILD>
+          <CHILD name="int5-c" optinal="True" default="False" >
+            <REFERENCED_TYPE name="Int5" modName="" >
+              <CONSTRAINTS_LIST>
+                <CONSTRAINT>
+                  <SET_OF_VALUES ExtensionPresent="False">
+                    <UNION_SET1>
+                      <UNION_ELEMENT>
+                        <INTERSECTION_ELEMENT>
+                          <RANGE min="5" minValIsIncluded="False" maxValIsIncluded="False" />
+                        </INTERSECTION_ELEMENT>
+                      </UNION_ELEMENT>
+                    </UNION_SET1>
+                  </SET_OF_VALUES>
+                </CONSTRAINT>
+              </CONSTRAINTS_LIST>
+            </REFERENCED_TYPE>
+          </CHILD>
+          <CHILD name="null" optinal="True" default="False" >
+            <NULL_TYPE >
+            </NULL_TYPE>
+          </CHILD>
+        </SEQUENCE_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="SequenceOf">
+        <SEQUENCE_OF_TYPE >
+          <REFERENCED_TYPE name="Sequence" modName="" >
+          </REFERENCED_TYPE>
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <SIZE_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min="1" max="2" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </SIZE_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </SEQUENCE_OF_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Enum0">
+        <ENUMERATED_TYPE >
+          <NUMBERD_ITEM name="one" value="" />
+          <NUMBERD_ITEM name="two" value="" />
+        </ENUMERATED_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Enum1">
+        <ENUMERATED_TYPE >
+          <NUMBERD_ITEM name="one" value="" />
+          <NUMBERD_ITEM name="two" value="" />
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <RANGE min="one" minValIsIncluded="False" maxValIsIncluded="False" />
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </ENUMERATED_TYPE>
+      </TYPE_ASSIGMENT>
+    </TYPE_ASSIGMENTS>
+    <VALUE_ASSIGMENTS>
+      <VALUE_ASSIGMENT name="ten">
+        <REFERENCED_TYPE name="Int1" modName="" >
+        </REFERENCED_TYPE>
+        <VALUE>other-ten</VALUE>
+      </VALUE_ASSIGMENT>
+      <VALUE_ASSIGMENT name="other-ten">
+        <REFERENCED_TYPE name="Int2" modName="" >
+        </REFERENCED_TYPE>
+        <VALUE>10</VALUE>
+      </VALUE_ASSIGMENT>
+    </VALUE_ASSIGMENTS>
+    <VALUE__SET_ASSIGMENTS>
+    </VALUE__SET_ASSIGMENTS>
+  </Module>
+  <Module name="IdentifierModule" Tags="NONE" ExportStatus="NONE" ExtensibilityImplied="False" >
+    <EXPORTS>
+      <EXPORT_TYPE>Identifier</EXPORT_TYPE>
+    </EXPORTS>
+    <IMPORTS>
+    </IMPORTS>
+    <TYPE_ASSIGMENTS>
+      <TYPE_ASSIGMENT name="Identifier">
+        <OCTECT_STRING >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <PERMITTED_ALPHABET_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""A"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""a"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""B"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""b"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""C"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""c"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""D"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""d"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""E"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""e"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""F"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""f"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""G"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""g"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""H"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""h"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""I"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""i"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""J"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""j"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""K"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""k"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""L"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""l"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""M"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""m"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""N"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""n"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""O"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""o"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""P"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""p"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""Q"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""q"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""R"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""r"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""S"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""s"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""T"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""t"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""U"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""u"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""V"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""v"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""W"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""w"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""X"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""x"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""Y"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""y"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""Z"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""z"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""$"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""_"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""0"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""1"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""2"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""3"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""4"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""5"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""6"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""7"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""8"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""9"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </PERMITTED_ALPHABET_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <SIZE_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min="1" max="maxIdentifier" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </SIZE_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </OCTECT_STRING>
+      </TYPE_ASSIGMENT>
+    </TYPE_ASSIGMENTS>
+    <VALUE_ASSIGMENTS>
+      <VALUE_ASSIGMENT name="maxIdentifier">
+        <INTEGER_TYPE >
+        </INTEGER_TYPE>
+        <VALUE>32</VALUE>
+      </VALUE_ASSIGMENT>
+    </VALUE_ASSIGMENTS>
+    <VALUE__SET_ASSIGMENTS>
+    </VALUE__SET_ASSIGMENTS>
+  </Module>
+</ASN1FILE>

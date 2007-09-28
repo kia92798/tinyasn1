@@ -1,0 +1,28 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+	MyInt ::=INTEGER
+	MyInt2 ::=INTEGER {
+		ab(1),
+		ac(3),
+		ad(4),
+		kala(1)
+	}
+	MyBitStr ::=BIT STRING {
+		a(1),
+		b(2),
+		c(4)
+	}
+	MyInt3 ::= MyInt2
+	MyEnum ::=ENUMERATED {
+		red(1),
+		blue(0),
+		green(4)
+	}
+	MyBitStr2 ::=BIT STRING {
+		aha(1)
+	}
+	myIntVal INTEGER ::= 4
+	myIntVal3 MyInt3 ::= 1
+	myEnumVar MyEnum ::= 0
+	myEnumVar2 MyEnum ::= 0
+END

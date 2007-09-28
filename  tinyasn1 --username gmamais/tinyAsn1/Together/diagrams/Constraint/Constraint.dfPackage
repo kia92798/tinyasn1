@@ -1,0 +1,33 @@
+package idvz7vf71o3frwf71w1iwd;
+
+/**
+@version 2.0
+@physicalPackage
+@__modelType diagram 
+*/
+class diagram {
+/**
+@__ref <oiref:design#Class#idvz7vf71o3frwf71w1iwd.node:oiref><oihard>
+@__modelType reference 
+*/
+class reference {
+}}/**
+@__tags
+@shapeType ClassDiagram 
+*/
+class __tags {
+}/**
+@__options 
+*/
+class __options {
+}/**
+@__positions <oigroup:<oiref:design#Class#idvz7vf71o3frwf71w1iwd.node:oiref>=416,127,83,82,1:oigroup> 
+*/
+class __positions {
+}/**
+@shapeType Class
+@__modelType node
+@name Constraint 
+*/
+class node {
+}

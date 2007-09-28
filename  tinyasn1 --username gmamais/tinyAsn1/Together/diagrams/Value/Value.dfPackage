@@ -1,0 +1,51 @@
+package id664sf71o3frwf73iqpg4;
+
+/**
+@version 2.0
+@physicalPackage
+@__modelType diagram 
+*/
+class diagram {
+/**
+@__ref <oiref:design#Class#id664sf71o3frwf73iqpg4.node:oiref><oihard>
+@__modelType reference 
+*/
+class reference {
+}}/**
+@__tags
+@shapeType ClassDiagram 
+*/
+class __tags {
+}/**
+@__options 
+*/
+class __options {
+}/**
+@__positions <oigroup:Composite#label#<oiref:design#Class#id664sf71o3frwf73iqpg4.node.link:oiref>=421,184,34,16,0:oigroup>
+<oigroup:<oiref:design#Class#id664sf71o3frwf73iqpg4.node.link:oiref>=545,280,289,129:oigroup>
+<oigroup:<oiref:design#Class#id664sf71o3frwf73iqpg4.node:oiref>=380,220,90,91,1:oigroup>
+ 
+*/
+class __positions {
+}/**
+@shapeType Class
+@__modelType node
+@name Asn1Value 
+*/
+class node {
+/**
+@shapeType Attribute
+@__modelType member
+@name Value
+@mod__type Object 
+*/
+class member {
+}/**
+@shapeType AssociatesLink
+@__modelType link
+@__ref <oiref:design#Class#id2lzyxf71o3frwf71vd4f7.node:oiref><oihard>
+@directed
+@label Type 
+*/
+class link {
+}}

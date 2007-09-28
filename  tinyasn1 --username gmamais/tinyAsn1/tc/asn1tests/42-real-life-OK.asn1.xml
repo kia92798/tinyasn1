@@ -1,0 +1,160 @@
+<ASN1FILE>
+  <Module name="ModuleLAPStorage" Tags="NONE" ExportStatus="NONE" ExtensibilityImplied="True" >
+    <EXPORTS>
+    </EXPORTS>
+    <IMPORTS>
+    </IMPORTS>
+    <TYPE_ASSIGMENTS>
+      <TYPE_ASSIGMENT name="LogLine">
+        <SEQUENCE_TYPE >
+          <CHILD name="line-digest" optinal="False" default="False" >
+            <OCTECT_STRING >
+            </OCTECT_STRING>
+          </CHILD>
+          <CHILD name="varsets" optinal="False" default="False" >
+            <SEQUENCE_OF_TYPE >
+              <REFERENCED_TYPE name="VariablePartSet" modName="" />
+              <CONSTRAINTS_LIST>
+                <CONSTRAINT>
+                  <SET_OF_VALUES ExtensionPresent="False">
+                    <UNION_SET1>
+                      <UNION_ELEMENT>
+                        <INTERSECTION_ELEMENT>
+                          <SIZE_CONSTRAINT>
+                            <CONSTRAINT>
+                              <SET_OF_VALUES ExtensionPresent="False">
+                                <UNION_SET1>
+                                  <UNION_ELEMENT>
+                                    <INTERSECTION_ELEMENT>
+                                      <RANGE min="1" max="2147483647" minValIsIncluded="False" maxValIsIncluded="False" />
+                                    </INTERSECTION_ELEMENT>
+                                  </UNION_ELEMENT>
+                                </UNION_SET1>
+                              </SET_OF_VALUES>
+                            </CONSTRAINT>
+                          </SIZE_CONSTRAINT>
+                        </INTERSECTION_ELEMENT>
+                      </UNION_ELEMENT>
+                    </UNION_SET1>
+                  </SET_OF_VALUES>
+                </CONSTRAINT>
+              </CONSTRAINTS_LIST>
+            </SEQUENCE_OF_TYPE>
+          </CHILD>
+        </SEQUENCE_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="VariablePartSet">
+        <SEQUENCE_TYPE >
+          <CHILD name="vparts" optinal="False" default="False" >
+            <SEQUENCE_OF_TYPE >
+              <REFERENCED_TYPE name="VariablePart" modName="" />
+              <CONSTRAINTS_LIST>
+                <CONSTRAINT>
+                  <SET_OF_VALUES ExtensionPresent="False">
+                    <UNION_SET1>
+                      <UNION_ELEMENT>
+                        <INTERSECTION_ELEMENT>
+                          <SIZE_CONSTRAINT>
+                            <CONSTRAINT>
+                              <SET_OF_VALUES ExtensionPresent="False">
+                                <UNION_SET1>
+                                  <UNION_ELEMENT>
+                                    <INTERSECTION_ELEMENT>
+                                      <RANGE min="0" max="2147483647" minValIsIncluded="False" maxValIsIncluded="False" />
+                                    </INTERSECTION_ELEMENT>
+                                  </UNION_ELEMENT>
+                                </UNION_SET1>
+                              </SET_OF_VALUES>
+                            </CONSTRAINT>
+                          </SIZE_CONSTRAINT>
+                        </INTERSECTION_ELEMENT>
+                      </UNION_ELEMENT>
+                    </UNION_SET1>
+                  </SET_OF_VALUES>
+                </CONSTRAINT>
+              </CONSTRAINTS_LIST>
+            </SEQUENCE_OF_TYPE>
+          </CHILD>
+          <CHILD name="resolution" optinal="False" default="False" >
+            <REFERENCED_TYPE name="ActionItem" modName="" />
+          </CHILD>
+        </SEQUENCE_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="VariablePart">
+        <CHOICE_TYPE >
+          <CHILD name="vset"  >
+            <SET__OF_TYPE >
+              <OCTECT_STRING >
+              </OCTECT_STRING>
+              <CONSTRAINTS_LIST>
+                <CONSTRAINT>
+                  <SET_OF_VALUES ExtensionPresent="False">
+                    <UNION_SET1>
+                      <UNION_ELEMENT>
+                        <INTERSECTION_ELEMENT>
+                          <SIZE_CONSTRAINT>
+                            <CONSTRAINT>
+                              <SET_OF_VALUES ExtensionPresent="False">
+                                <UNION_SET1>
+                                  <UNION_ELEMENT>
+                                    <INTERSECTION_ELEMENT>
+                                      <RANGE min="1" max="2147483647" minValIsIncluded="False" maxValIsIncluded="False" />
+                                    </INTERSECTION_ELEMENT>
+                                  </UNION_ELEMENT>
+                                </UNION_SET1>
+                              </SET_OF_VALUES>
+                            </CONSTRAINT>
+                          </SIZE_CONSTRAINT>
+                        </INTERSECTION_ELEMENT>
+                      </UNION_ELEMENT>
+                    </UNION_SET1>
+                  </SET_OF_VALUES>
+                </CONSTRAINT>
+              </CONSTRAINTS_LIST>
+            </SET__OF_TYPE>
+          </CHILD>
+          <CHILD name="vrange"  >
+            <SEQUENCE_TYPE >
+              <CHILD name="from" optinal="False" default="False" >
+                <OCTECT_STRING >
+                </OCTECT_STRING>
+              </CHILD>
+              <CHILD name="to" optinal="False" default="False" >
+                <OCTECT_STRING >
+                </OCTECT_STRING>
+              </CHILD>
+            </SEQUENCE_TYPE>
+          </CHILD>
+        <CHOICE_TYPE       </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="ActionItem">
+        <SEQUENCE_TYPE >
+          <CHILD name="accept-as" optinal="False" default="False" >
+            <ENUMERATED_TYPE >
+              <NUMBERD_ITEM name="unknown" value="" />
+              <NUMBERD_ITEM name="safe" value="" />
+              <NUMBERD_ITEM name="unsafe" value="" />
+            </ENUMERATED_TYPE>
+          </CHILD>
+          <CHILD name="notify" optinal="True" default="False" >
+            <SEQUENCE_TYPE >
+              <CHILD name="critical" optinal="False" default="False" >
+                <BOOLEAN_TYPE >
+                </BOOLEAN_TYPE>
+              </CHILD>
+              <CHILD name="email" optinal="False" default="False" >
+                <SET__OF_TYPE >
+                  <OCTECT_STRING >
+                  </OCTECT_STRING>
+                </SET__OF_TYPE>
+              </CHILD>
+            </SEQUENCE_TYPE>
+          </CHILD>
+        </SEQUENCE_TYPE>
+      </TYPE_ASSIGMENT>
+    </TYPE_ASSIGMENTS>
+    <VALUE_ASSIGMENTS>
+    </VALUE_ASSIGMENTS>
+    <VALUE__SET_ASSIGMENTS>
+    </VALUE__SET_ASSIGMENTS>
+  </Module>
+</ASN1FILE>

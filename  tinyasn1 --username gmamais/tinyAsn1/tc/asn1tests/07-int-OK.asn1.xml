@@ -1,0 +1,81 @@
+<ASN1FILE>
+  <Module name="ModuleTestInt1" Tags="NONE" ExportStatus="NONE" ExtensibilityImplied="False" >
+    <EXPORTS>
+    </EXPORTS>
+    <IMPORTS>
+    </IMPORTS>
+    <TYPE_ASSIGMENTS>
+      <TYPE_ASSIGMENT name="Interval">
+        <INTEGER_TYPE >
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <RANGE min="1" max="int123456" minValIsIncluded="False" maxValIsIncluded="False" />
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </INTEGER_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Reason">
+        <INTEGER_TYPE >
+          <NUMBERD_ITEM name="no-reason" value="0" />
+          <NUMBERD_ITEM name="negative-reason" value="-10" />
+          <NUMBERD_ITEM name="some-large-value" value="1324324" />
+        </INTEGER_TYPE>
+      </TYPE_ASSIGMENT>
+    </TYPE_ASSIGMENTS>
+    <VALUE_ASSIGMENTS>
+      <VALUE_ASSIGMENT name="int123456">
+        <INTEGER_TYPE >
+        </INTEGER_TYPE>
+        <VALUE>123456</VALUE>
+      </VALUE_ASSIGMENT>
+    </VALUE_ASSIGMENTS>
+    <VALUE__SET_ASSIGMENTS>
+      <VALUE_SET_ASSIGMENT name="SameInterval">
+        <INTEGER_TYPE >
+        </INTEGER_TYPE>
+        <SET_OF_VALUES ExtensionPresent="False">
+          <UNION_SET1>
+            <UNION_ELEMENT>
+              <INTERSECTION_ELEMENT>
+                <RANGE min="1" minValIsIncluded="False" maxValIsIncluded="False" />
+              </INTERSECTION_ELEMENT>
+            </UNION_ELEMENT>
+            <UNION_ELEMENT>
+              <INTERSECTION_ELEMENT>
+                <RANGE min="2" minValIsIncluded="False" maxValIsIncluded="False" />
+              </INTERSECTION_ELEMENT>
+            </UNION_ELEMENT>
+            <UNION_ELEMENT>
+              <INTERSECTION_ELEMENT>
+                <RANGE min="3" minValIsIncluded="False" maxValIsIncluded="False" />
+              </INTERSECTION_ELEMENT>
+            </UNION_ELEMENT>
+            <UNION_ELEMENT>
+              <INTERSECTION_ELEMENT>
+                <RANGE min="4" minValIsIncluded="False" maxValIsIncluded="False" />
+              </INTERSECTION_ELEMENT>
+            </UNION_ELEMENT>
+            <UNION_ELEMENT>
+              <INTERSECTION_ELEMENT>
+                <RANGE min="5" minValIsIncluded="False" maxValIsIncluded="False" />
+              </INTERSECTION_ELEMENT>
+            </UNION_ELEMENT>
+            <UNION_ELEMENT>
+              <INTERSECTION_ELEMENT>
+                <RANGE min="6" minValIsIncluded="False" maxValIsIncluded="False" />
+              </INTERSECTION_ELEMENT>
+            </UNION_ELEMENT>
+          </UNION_SET1>
+        </SET_OF_VALUES>
+      </VALUE_SET_ASSIGMENT>
+    </VALUE__SET_ASSIGMENTS>
+  </Module>
+</ASN1FILE>

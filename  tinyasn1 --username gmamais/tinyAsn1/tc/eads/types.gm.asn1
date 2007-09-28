@@ -1,0 +1,26 @@
+-- System Software Co-engineering: Data Modelling Technologies
+-- (Contract ESTEC 20467/06/NL/JD)
+
+-- Basic types used by ASN1 models
+-- Author: David Lesens
+-- Issue 1, revision 0
+
+TYPES DEFINITIONS ::= BEGIN
+
+EXPORTS OBIT, OBUT, FLOAT32;
+
+FLOAT32 ::= REAL
+
+-- On Board Internal Time
+OBIT ::= INTEGER( 0 .. 4294967296 )
+
+-- On Board Universal Time
+OBUT ::= SEQUENCE {
+-- The least significant bit (LSB) of the least significant octet of
+-- coarse time is set to 1 (second)
+  coarse-time OCTET STRING (SIZE( 4 )),
+  -- The LSB of the fine time octet is set to 2E-8 (seconds)
+  fine-time OCTET STRING (SIZE( 1 ))
+}
+
+END

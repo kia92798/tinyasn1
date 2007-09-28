@@ -1,0 +1,128 @@
+-- System Software Co-engineering: Data Modelling Technologies
+-- (Contract ESTEC 20467/06/NL/JD)
+
+-- Modelling of an internal software buffer
+-- Author: David Lesens
+-- Issue 1, revision 1
+--
+--*************************************
+-- Evolutions
+--*************************************
+--
+-- Issue 1, revision 1
+--
+-- Parenthesis have been added around the "SIZE" keyword
+--
+
+ORBITAL DEFINITIONS ::= BEGIN
+
+IMPORTS OBIT, OBUT, FLOAT32 FROM TYPES;
+
+--*******************************************
+-- TCC (Thermal Control Chain) orbital data
+--*******************************************
+
+-- Definition of power type 
+TCC-PWR ::= FLOAT32
+
+c-tcc-nb-of-heat-per-tcu INTEGER ::= 60
+
+-- Array to store Heater Lines average power consumption, during current orbit 
+-- Type defined for TCC_ORB_MAX_TEMP and TCC_ORB_MIN_TEMP variables 
+TCC-EQPT-ORB-AVG-PWR ::= SEQUENCE ( SIZE( c-tcc-nb-of-heat-per-tcu ) ) OF TCC-PWR
+
+c-tcc-nb-eqpt-id INTEGER ::= 4
+
+TCC-ORB-AVG-PWR-TABLE ::= SEQUENCE ( SIZE( c-tcc-nb-eqpt-id ) ) OF TCC-EQPT-ORB-AVG-PWR
+
+c-tcc-nb-of-therm-per-tcu INTEGER ::= 96
+
+TCC-TEMPERATURE ::= REAL
+
+TCC-EQPT-ORB-TEMP ::= SEQUENCE ( SIZE( c-tcc-nb-of-therm-per-tcu ) ) OF TCC-TEMPERATURE
+
+TCC-ORB-TEMP-TABLE ::= SEQUENCE ( SIZE( c-tcc-nb-eqpt-id ) ) OF TCC-EQPT-ORB-TEMP
+
+TCC-EQPT-ORB-TEMP-TIME ::= SEQUENCE ( SIZE( c-tcc-nb-of-therm-per-tcu ) ) OF OBIT
+
+TCC-ORB-TEMP-TIME-TABLE ::= SEQUENCE ( SIZE( c-tcc-nb-eqpt-id ) ) OF TCC-EQPT-ORB-TEMP-TIME
+
+TCC-ORBITAL-DATA ::= SEQUENCE {
+  tcc-orb-avg-pwr TCC-ORB-AVG-PWR-TABLE,
+  tcc-orb-min-temp TCC-ORB-TEMP-TABLE,
+  tcc-orb-min-temp-time TCC-ORB-TEMP-TIME-TABLE,
+  tcc-orb-max-temp TCC-ORB-TEMP-TABLE,
+  tcc-orb-max-temp-time TCC-ORB-TEMP-TIME-TABLE
+}
+
+--**********************************
+-- PWS (Power supply) orbital data
+--**********************************
+
+c-pws-eqpt-id INTEGER ::= 4
+
+TAB-1VAL-FLOAT32 ::= SEQUENCE ( SIZE( c-pws-eqpt-id ) ) OF REAL
+
+TAB-1VAL-NAT32 ::= SEQUENCE ( SIZE( c-pws-eqpt-id ) ) OF INTEGER
+
+TAB-DIAGNOSTIC-DATE ::= SEQUENCE ( SIZE( c-pws-eqpt-id ) ) OF OBIT
+
+PWS-DIAGNOSTIC-GRP ::= SEQUENCE {
+  pws-rb-orb-mean-dod TAB-1VAL-FLOAT32,
+  pws-rb-orb-trckl-time TAB-1VAL-NAT32,
+  pws-rb-orb-dod-max TAB-1VAL-FLOAT32,
+  pws-rb-orb-dod-max-date TAB-DIAGNOSTIC-DATE,
+  pws-rb-orb-dod-min TAB-1VAL-FLOAT32,
+  pws-rb-orb-dod-min-date TAB-DIAGNOSTIC-DATE,
+  pws-rb-orb-volt-min TAB-1VAL-FLOAT32,
+  pws-rb-orb-volt-min-date TAB-DIAGNOSTIC-DATE,
+  pws-rb-orb-volt-max TAB-1VAL-FLOAT32,
+  pws-rb-orb-volt-max-date TAB-DIAGNOSTIC-DATE,
+  pws-rb-orb-dchrg-curnt-max TAB-1VAL-FLOAT32,
+  pws-rb-orb-dchrg-curnt-max-dat TAB-DIAGNOSTIC-DATE,
+  pws-rb-orb-chrg-curnt-max TAB-1VAL-FLOAT32,
+  pws-rb-orb-chrg-curnt-max-date TAB-DIAGNOSTIC-DATE,
+  pws-rb-orb-chrg-volt-avg TAB-1VAL-FLOAT32,
+  pws-rb-orb-dchrg-volt-avg TAB-1VAL-FLOAT32,
+  pws-rb-orb-chrg-curnt-avg TAB-1VAL-FLOAT32,
+  pws-rb-orb-dchrg-curnt-avg TAB-1VAL-FLOAT32,
+  pws-rb-orb-temp-avg TAB-1VAL-FLOAT32,
+  pws-rb-orb-temp-max TAB-1VAL-FLOAT32,
+  pws-rb-orb-temp-max-date TAB-DIAGNOSTIC-DATE,
+  pws-rb-orb-temp-min TAB-1VAL-FLOAT32,
+  pws-rb-orb-temp-min-date TAB-DIAGNOSTIC-DATE,
+  pws-gs1-orb-curnt-avg TAB-1VAL-FLOAT32,
+  pws-gs2-orb-curnt-avg TAB-1VAL-FLOAT32,
+  pws-gs-orb-curnt-max TAB-1VAL-FLOAT32,
+  pws-gs-orb-curnt-max-date TAB-DIAGNOSTIC-DATE,
+  pws-iss-orb-curnt-avg TAB-1VAL-FLOAT32,
+  pws-orb-rbdr-curnt-avg TAB-1VAL-FLOAT32,
+  pws-orb-nreg-curnt-avg TAB-1VAL-FLOAT32
+}
+
+PWS-ORBITAL-DATA ::= SEQUENCE {
+  synth-tm-1 PWS-DIAGNOSTIC-GRP,
+  synth-tm-2 PWS-DIAGNOSTIC-GRP
+}
+
+--*****************
+-- Orbital buffer
+--*****************
+
+-- Constant to indicate the number of areas for synthesis telemetry recording.
+-- It represents the number of orbits recorded
+c-nb-of-recorded-orbits-data INTEGER ::= 4
+
+-- Type used to define the data stored in each orbit
+ORBITAL-DATA ::= SEQUENCE {
+  tmtc-orbital-tm-obut OBUT,
+  tcc-orbital-data TCC-ORBITAL-DATA,
+  pws-orbital-data PWS-ORBITAL-DATA
+}
+
+-- Type used for the orbital data pool. It stores data produced by each
+-- provider for nine orbits
+ORBITAL-BUFFER ::= SEQUENCE ( SIZE( c-nb-of-recorded-orbits-data ) ) OF 
+ORBITAL-DATA
+
+END
