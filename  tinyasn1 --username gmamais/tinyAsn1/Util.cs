@@ -9,11 +9,13 @@ namespace tinyAsn1
     {
         Dictionary<TKey, TValue> m_keyval = new Dictionary<TKey, TValue>();
         List<TValue> m_values = new List<TValue>();
+        List<TKey> m_keys = new List<TKey>();
 
         public void Add(TKey key, TValue value)
         {
             m_keyval.Add(key, value);
             m_values.Add(value);
+            m_keys.Add(key);
         }
 
         public TValue this[TKey key] {
@@ -28,8 +30,14 @@ namespace tinyAsn1
             return m_keyval.ContainsKey(key);
         }
 
-        public ICollection<TValue> Values {
+
+
+        public List<TValue> Values {
             get { return m_values; }
+        }
+        public List<TKey> Keys
+        {
+            get { return m_keys; }
         }
         public int Count { get { return m_values.Count; } }
     }

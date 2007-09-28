@@ -57,7 +57,7 @@ namespace tinyAsn1
             l++;
             w.Write("<Module name=\"" + m_moduleID +"\" ");
             w.Write("Tags=\"" + m_tags + "\" ");
-            w.Write("ExportStatus=\"" + m_exportStatus + "\" ");
+//            w.Write("ExportStatus=\"" + m_exportStatus + "\" ");
             w.Write("ExtensibilityImplied=\"" + m_extensibilityImplied + "\" ");
             w.WriteLine(">");
             W.TAB(w, l);
@@ -85,25 +85,25 @@ namespace tinyAsn1
 
             W.TAB(w, l);
             w.WriteLine("<TYPE_ASSIGMENTS>");
-            foreach (TypeAssigment assigment in typeAssigments.Values)
+            foreach (TypeAssigment assigment in m_typeAssigments.Values)
                 assigment.printAstAsXml(w, l + 1);
             W.TAB(w, l);
             w.WriteLine("</TYPE_ASSIGMENTS>");
 
             W.TAB(w, l);
             w.WriteLine("<VALUE_ASSIGMENTS>");
-            foreach (ValueAssigment assigment in valuesAssigments.Values)
+            foreach (ValueAssigment assigment in m_valuesAssigments.Values)
                 assigment.printAstAsXml(w, l + 1);
             W.TAB(w, l);
             w.WriteLine("</VALUE_ASSIGMENTS>");
 
-            W.TAB(w, l);
+/*            W.TAB(w, l);
             w.WriteLine("<VALUE__SET_ASSIGMENTS>");
-            foreach (ValueSetAssigment assigment in valueSetsAssigments.Values)
+            foreach (ValueSetAssigment assigment in m_valueSetsAssigments.Values)
                 assigment.printAstAsXml(w, l + 1);
             W.TAB(w, l);
             w.WriteLine("</VALUE__SET_ASSIGMENTS>");
-
+*/
             l--;
             W.TAB(w, l);
             w.WriteLine("</Module>");
@@ -134,7 +134,7 @@ namespace tinyAsn1
             w.WriteLine("</VALUE_ASSIGMENT>");
         }
     }
-
+/*
     public partial class ValueSetAssigment
     {
         public virtual void printAstAsXml(System.IO.TextWriter w, int l)
@@ -148,7 +148,7 @@ namespace tinyAsn1
         }
 
     }
-
+*/
 
     public partial class Asn1Type
     {
@@ -243,7 +243,7 @@ namespace tinyAsn1
             if (m_tag != null)
                 m_tag.printAstAsXml(w, l);
             w.WriteLine(">");
-            foreach (NumberedItem item in m_namedBis.Values)
+            foreach (NumberedItem item in m_namedBits.Values)
                 item.printAstAsXml(w, l + 1);
             printConstraints(w, l + 1);
             W.TAB(w, l);
@@ -427,12 +427,12 @@ namespace tinyAsn1
     }
 
 
-    public partial class ReferencedType : Asn1Type
+    public partial class ReferenceType : Asn1Type
     {
         public override void printAstAsXml(System.IO.TextWriter w, int l)
         {
             W.TAB(w, l);
-            w.Write("<REFERENCED_TYPE name=\"{0}\" modName=\"{1}\" ",m_referencedTypeName,m_modName);
+            w.Write("<REFERENCED_TYPE name=\"{0}\" modName=\"{1}\" ", m_referencedTypeName, m_referencedModName);
             if (m_tag != null)
                 m_tag.printAstAsXml(w, l);
             w.WriteLine(">");

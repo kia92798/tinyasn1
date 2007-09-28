@@ -26,6 +26,7 @@ namespace tinyAsn1
 
     public partial class Asn1File
     {
+        ITree tree;
 
         //^(ASN1_FILE moduleDefinition*)
         static public Asn1File CreateFromAntlrAst(ITree tree)
@@ -34,6 +35,7 @@ namespace tinyAsn1
                 throw new Exception("ASN1_FILE");
 
             Asn1File ret = new Asn1File();
+            ret.tree = tree;
 
             for (int i = 0; i < tree.ChildCount; i++)
                 ret.m_modules.Add(Module.CreateFromAntlrAst(tree.GetChild(i)));
@@ -44,12 +46,15 @@ namespace tinyAsn1
 
     partial class Module
     {
+        ITree tree;
         public partial class ImportedModule
         {
+            ITree tree;
             //^(IMPORTS_FROM_MODULE modulereference typereference* valuereference*  )
             static public ImportedModule CreateFromAntlrAst(ITree tree)
             {
                 ImportedModule ret = new ImportedModule();
+                ret.tree = tree;
 
                 ret.m_moduleID = tree.GetChild(0).Text;
 
@@ -81,6 +86,7 @@ namespace tinyAsn1
 
         internal static Module CurrentlyConstructModule = null;
         //^(MODULE_DEF modulereference moduleTag? EXTENSIBILITY? exports? imports? typeAssigment* valueAssigment* valueSetAssigment*)
+        internal bool bExportAll=false;
         static public Module CreateFromAntlrAst(ITree tree)
         {
 
@@ -90,6 +96,8 @@ namespace tinyAsn1
                 throw new Exception("MODULE_DEF");
 
             curModule = new Module();
+            curModule.tree = tree;
+
             CurrentlyConstructModule = curModule;
             for (int i = 0; i < tree.ChildCount; i++)
             {
@@ -113,7 +121,8 @@ namespace tinyAsn1
                         curModule.m_extensibilityImplied = true;
                         break;
                     case asn1Parser.EXPORTS_ALL:
-                        curModule.m_exportStatus = ExportStatus.ALL;
+                        curModule.bExportAll = true;
+//                        curModule.m_exportStatus = ExportStatus.ALL;
                         break;
                     case asn1Parser.EXPORTS:
                         handleExports(curModule, child);                        
@@ -123,31 +132,46 @@ namespace tinyAsn1
                         break;
                     case asn1Parser.TYPE_ASSIG:
                         TypeAssigment typeAssig = TypeAssigment.CreateFromAntlrAst(child);
-                        if (curModule.typeAssigments.ContainsKey(typeAssig.m_name))
+                        if (curModule.m_typeAssigments.ContainsKey(typeAssig.m_name))
                             throw new SemanticErrorException(typeAssig.m_name + " has alrady been defined. Line: " + child.Line);
-                        curModule.typeAssigments.Add(typeAssig.m_name,typeAssig);
+                        curModule.m_typeAssigments.Add(typeAssig.m_name,typeAssig);
                         break;
                     case asn1Parser.VAL_ASSIG:
                         ValueAssigment valAssig = ValueAssigment.CreateFromAntlrAst(child);
-                        if (curModule.valuesAssigments.ContainsKey(valAssig.m_name) )
+                        if (curModule.m_valuesAssigments.ContainsKey(valAssig.m_name) )
                             throw new SemanticErrorException(valAssig.m_name + " has alrady been defined. Line: " + child.Line);
-                        curModule.valuesAssigments.Add(valAssig.m_name, valAssig);
+                        curModule.m_valuesAssigments.Add(valAssig.m_name, valAssig);
                         break;
-                    case asn1Parser.VAL_SET_ASSIG:
+/*                    case asn1Parser.VAL_SET_ASSIG:
                         ValueSetAssigment valSetAssig = ValueSetAssigment.CreateFromAntlrAst(child);
-                        if (curModule.valueSetsAssigments.ContainsKey(valSetAssig.m_typeReference))
+                        if (curModule.m_valueSetsAssigments.ContainsKey(valSetAssig.m_typeReference))
                             throw new SemanticErrorException(valSetAssig.m_typeReference + " has alrady been defined. Line: " + child.Line);
-                        curModule.valueSetsAssigments.Add(valSetAssig.m_typeReference, valSetAssig);
-                        break;
+                        curModule.m_valueSetsAssigments.Add(valSetAssig.m_typeReference, valSetAssig);
+                        break;*/
                     default:
                         throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
                 }
 
             }
+            
+//            curModule.fixTree();
             return curModule;
         }
+/*
+        private void fixTree()
+        {
+            // fix myself
+            if (bExportAll)
+            {
+                foreach (TypeAssigment typeAss in m_typeAssigments.Values)
+                    m_exportedTypes.Add(typeAss.m_name);
+                foreach (ValueAssigment valAsig in m_valuesAssigments.Values)
+                    m_exportedVariables.Add(valAsig.m_name);
+            }
+            //fix children
+        }
 
-
+        */
 
 
         private static void handleExports(Module curMod, ITree tree)
@@ -198,7 +222,7 @@ namespace tinyAsn1
 
     }
 
-
+/*
     public partial class ValueSetAssigment
     {
         static public ValueSetAssigment CreateFromAntlrAst(ITree tree)
@@ -211,7 +235,7 @@ namespace tinyAsn1
         }
 
     }
-
+*/
 
     public partial class Asn1Type
     {
@@ -298,7 +322,7 @@ namespace tinyAsn1
                             ret = SetOfType.CreateFromAntlrAst(child);
                             break;
                         case asn1Parser.REFERENCED_TYPE:
-                            ret = ReferencedType.CreateFromAntlrAst(child);
+                            ret = ReferenceType.CreateFromAntlrAst(child);
                             break;
                         case asn1Parser.OBJECT_TYPE:
                             break;
@@ -335,8 +359,13 @@ namespace tinyAsn1
             {
                 ret.m_tag = tag;
                 ret.m_module = Module.CurrentlyConstructModule;
+                ret.antlrNode = tree;
             }
             return ret;
+        }
+        internal virtual void FixVariable(Asn1Value val)
+        {
+            throw new Exception("Internal Error: abstract function call");
         }
     }
 
@@ -381,10 +410,10 @@ namespace tinyAsn1
             {
                 ITree child = tree.GetChild(i);
                 NumberedItem item = NumberedItem.CreateFromAntlrAst(child);
-                if (ret.m_namedBis.ContainsKey(item.m_id))
-                    throw new SemanticErrorException(item.m_id + " has alrady been defined. Line: " + child.Line);
+//                if (ret.m_namedBitsPriv.ContainsKey(item.m_id))
+//                    throw new SemanticErrorException(item.m_id + " has alrady been defined. Line: " + child.Line);
                     
-                ret.m_namedBis.Add(item.m_id, item);
+                ret.m_namedBitsPriv.Add(item);
             }
 
 
@@ -408,9 +437,9 @@ namespace tinyAsn1
                         NumberedItem item = NumberedItem.CreateFromAntlrAst(child);
                         if (ret.m_extMarkPresent)
                             item.m_extended = true;
-                        if (ret.m_enumValues.ContainsKey(item.m_id))
-                            throw new SemanticErrorException(item.m_id + " has alrady been defined. Line: " + child.Line);
-                        ret.m_enumValues.Add(item.m_id, item);
+                        //if (ret.m_enumValuesPriv.ContainsKey(item.m_id))
+                        //    throw new SemanticErrorException(item.m_id + " has alrady been defined. Line: " + child.Line);
+                        ret.m_enumValuesPriv.Add(item);
                         break;
                     case asn1Parser.EXT_MARK:
                         ret.m_extMarkPresent = true;
@@ -426,6 +455,87 @@ namespace tinyAsn1
             
             return ret;
         }
+
+        bool isIdentifierDeclared(string id)
+        {
+            foreach (NumberedItem ni in m_enumValuesPriv)
+                if (ni.m_id == id)
+                    return true;
+
+            return isIdentifierProcessed(id);
+        }
+
+        bool isIdentifierProcessed(string id)
+        {
+            return m_enumValues.ContainsKey(id);
+        }
+
+        internal override void FixVariable(Asn1Value val)
+        {
+            string referenceId;
+            switch (val.antlrNode.Type)
+            {
+                case asn1Parser.VALUE_REFERENCE:
+                    referenceId = val.antlrNode.GetChild(0).Text;
+                    if (this.isIdentifierDeclared(referenceId))
+                    {
+                        if (this.isIdentifierProcessed(referenceId))
+                        {
+                            val.m_valType = Asn1Value.ValType.ENUMERATED;
+                            val.m_value = this.m_enumValues[referenceId].m_value;
+                            val.m_module = m_module;
+                        } 
+                        // else leave for a next pass where (hopefully) it will have been resolved
+                    }
+                    else if (m_module.isValueDeclared(referenceId)) 
+                    {
+                        ValueAssigment vas = m_module.GetValueAssigment(referenceId);
+                        if (vas.m_value.m_valType == Asn1Value.ValType.UNDEFINED)
+                            break;
+                        if (vas.m_type.GetFinalType() == this)
+                        {
+                            val.m_valType = Asn1Value.ValType.ENUMERATED;
+                            val.m_value = vas.m_value;
+                            val.m_module = m_module;
+
+                        } else
+                            throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
+                    }
+                    else
+                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
+                    break;
+                default:
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting enumerated item or enumerated item variable");
+            }
+
+        }
+
+        private bool IsValueDefined(Int64 val)
+        {
+            foreach (Item i in m_enumValues.Values)
+                if (i.m_value == val)
+                    return true;
+            return false;
+        }
+
+        internal void FixNumbers()
+        {
+            int proposedVal = 0;
+            foreach (Item i in m_enumValues.Values)
+            {
+                if (i.m_valCalculated)
+                    continue;
+                
+                while (IsValueDefined(proposedVal))
+                    proposedVal++;
+
+                i.m_value = proposedVal;
+                i.m_valCalculated = true;
+                
+            }
+
+            
+        }
     }
 
     public partial class IntegerType : Asn1Type
@@ -437,14 +547,90 @@ namespace tinyAsn1
             {
                 ITree child = tree.GetChild(i);
                 NumberedItem item = NumberedItem.CreateFromAntlrAst(child);
-                if (ret.m_namedValues.ContainsKey(item.m_id))
-                    throw new SemanticErrorException(item.m_id + " has alrady been defined. Line: " + child.Line);
-                ret.m_namedValues.Add(item.m_id, item);
+                ret.m_privNamedValues.Add(item);
             }
 
             return ret;
             
         }
+
+        bool isIdentifierDeclared(string id)
+        {
+            foreach (NumberedItem ni in m_privNamedValues)
+                if (ni.m_id == id)
+                    return true;
+
+            return isIdentifierProcessed(id);
+        }
+
+        bool isIdentifierProcessed(string id)
+        {
+            return m_namedValues.ContainsKey(id);
+        }
+
+        
+
+        internal override void FixVariable(Asn1Value val)
+        {
+            string referenceId="";
+            switch (val.antlrNode.Type)
+            {
+                case asn1Parser.NUMERIC_VALUE:
+                    val.m_valType = Asn1Value.ValType.INT;
+                    if (val.antlrNode.ChildCount == 1)
+                        val.m_value = Int64.Parse(val.antlrNode.GetChild(0).Text);
+                    else if ((val.antlrNode.ChildCount == 2) && (val.antlrNode.GetChild(1).Text == "-"))
+                        val.m_value = Int64.Parse(val.antlrNode.GetChild(0).Text);
+                    else
+                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + " Expecting integer or integer variable");
+                    break;
+                case asn1Parser.MIN:
+                    val.m_valType = Asn1Value.ValType.MIN;
+                    val.m_value = Int64.MinValue;
+                    break;
+                case asn1Parser.MAX:
+                    val.m_valType = Asn1Value.ValType.MAX;
+                    val.m_value = Int64.MaxValue;
+                    break;
+                case asn1Parser.VALUE_REFERENCE:
+                    referenceId = val.antlrNode.GetChild(0).Text;
+                    if (m_module.isValueDeclared(referenceId))
+                    {
+                        Asn1Value tmp = m_module.GetValue(referenceId);
+                        switch (tmp.m_valType)
+                        {
+                            case Asn1Value.ValType.INT:
+                            case Asn1Value.ValType.MAX:
+                            case Asn1Value.ValType.MIN:
+                                val.m_valType = tmp.m_valType;
+                                val.m_value = tmp.m_value;
+                                val.m_module = m_module;
+                                break;
+                            case Asn1Value.ValType.UNDEFINED:
+                                break;
+                            default:
+                                throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                        }
+                    }
+                    else if (this.isIdentifierDeclared(referenceId))
+                    {
+                        if (this.isIdentifierProcessed(referenceId))
+                        {
+                            val.m_valType = Asn1Value.ValType.INT;
+                            val.m_value = m_namedValues[referenceId];
+                            val.m_module = m_module;
+                        }
+                    } else
+                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
+
+                    break;
+                default:
+                    throw new SemanticErrorException("Error in line : "+val.antlrNode.Line+". Expecting integer or integer variable");
+            }
+            
+
+        }
+
     }
 
 
@@ -765,27 +951,34 @@ namespace tinyAsn1
         }
     }
 
-    public partial class ReferencedType : Asn1Type
+    public partial class ReferenceType : Asn1Type
     {
-        static public new ReferencedType CreateFromAntlrAst(ITree tree)
+        static public new ReferenceType CreateFromAntlrAst(ITree tree)
         {
-            ReferencedType ret = new ReferencedType();
+            ReferenceType ret = new ReferenceType();
             if (tree.ChildCount == 1)
                 ret.m_referencedTypeName = tree.GetChild(0).Text;
             else if (tree.ChildCount == 2)
             {
-                ret.m_modName = tree.GetChild(0).Text;
+                ret.m_referencedModName = tree.GetChild(0).Text;
                 ret.m_referencedTypeName = tree.GetChild(1).Text;
             }
             else
                 throw new Exception("Incorrect parse tree!");
             return ret;
         }
+
+        internal override void FixVariable(Asn1Value val)
+        {
+            Type.FixVariable(val);
+        }
+
     }
 
 
     public partial class Asn1Value
     {
+        
         //^(NUMERIC_VALUE $intPart $s? $decPart?)
         public static Int64 GetValFrom_NUMERIC_VALUE_asInt(ITree tree)
         {
@@ -799,6 +992,12 @@ namespace tinyAsn1
         {
 
             Asn1Value ret = new Asn1Value();
+            ret.antlrNode = tree;
+
+
+            // Asn1Value will be modified in a second tree pass
+            return ret;
+/*
             ret.m_module = Module.CurrentlyConstructModule;
 
             switch (tree.Type)
@@ -838,11 +1037,11 @@ namespace tinyAsn1
                     break;
                 case asn1Parser.MIN:
                     ret.m_valType = ValType.MIN;
-                    ret.m_value = Int32.MinValue;
+                    ret.m_value = Int64.MinValue;
                     break;
                 case asn1Parser.MAX:
                     ret.m_valType = ValType.MAX;
-                    ret.m_value = Int32.MaxValue;
+                    ret.m_value = Int64.MaxValue;
                     break;
                 case asn1Parser.CHAR_SEQUENCE_VALUE:
                     ret.m_value = new List<int>();
@@ -855,7 +1054,7 @@ namespace tinyAsn1
 
             }
 
-            return ret;
+            return ret;*/
         }
 
         static void handleNumeric(Asn1Value ret,ITree tree) 

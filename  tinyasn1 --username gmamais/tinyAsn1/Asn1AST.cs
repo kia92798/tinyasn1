@@ -27,27 +27,54 @@ namespace tinyAsn1
         {
             EXPLICIT,
             IMPLICIT,
-            AUTOMATIC,
-            NONE
-        }
-        public enum ExportStatus
-        {
-            ALL,
-            SOME,
-            NONE
+            AUTOMATIC
         }
 
         public string m_moduleID="";
-        public Tags m_tags = Tags.NONE;
+        public Tags m_tags = Tags.EXPLICIT;
         public bool m_extensibilityImplied = false;
-        public ExportStatus m_exportStatus = ExportStatus.NONE;
+
+        public Asn1Value GetValue(string valueName)
+        {
+            if (!isValueDeclared(valueName))
+                throw new Exception("Internal Error: variable '"+valueName+"' is not declared");
+            if (m_valuesAssigments.ContainsKey(valueName))
+                return m_valuesAssigments[valueName].m_value;
+
+            throw new Exception("Internal error: Imports/Exports are not implemented yet!");
+        }
+
+        public ValueAssigment GetValueAssigment(string valueAssigId)
+        {
+            if (!isValueDeclared(valueAssigId))
+                throw new Exception("Internal Error: variable assigment '" + valueAssigId + "' is not declared");
+            if (m_valuesAssigments.ContainsKey(valueAssigId))
+                return m_valuesAssigments[valueAssigId];
+
+            throw new Exception("Internal error: Imports/Exports are not implemented yet!");
+        }
+
+        public bool isValueDeclared(string valueName)
+        {
+            if (m_valuesAssigments.ContainsKey(valueName))
+                return true;
+            foreach (ImportedModule im in m_imports)
+                if (im.m_importedVariables.Contains(valueName))
+                    return true;
+
+            return false;
+        }
+        
         public List<string> m_exportedTypes = new List<string>();
         public List<string> m_exportedVariables = new List<string>();
         public List<ImportedModule> m_imports = new List<ImportedModule>();
-        public OrderedDictionary<string, TypeAssigment> typeAssigments = new OrderedDictionary<string, TypeAssigment>();
-//        public List<TypeAssigment> typeAssigments = new List<TypeAssigment>();
-        public OrderedDictionary<string, ValueAssigment> valuesAssigments = new OrderedDictionary<string, ValueAssigment>();
-        public OrderedDictionary<string, ValueSetAssigment> valueSetsAssigments = new OrderedDictionary<string, ValueSetAssigment>();
+
+        public OrderedDictionary<string, TypeAssigment> m_typeAssigments = new OrderedDictionary<string, TypeAssigment>();
+        public OrderedDictionary<string, ValueAssigment> m_valuesAssigments = new OrderedDictionary<string, ValueAssigment>();
+//        public OrderedDictionary<string, ValueSetAssigment> m_valueSetsAssigments = new OrderedDictionary<string, ValueSetAssigment>();
+
+        internal Dictionary<string, Int64> m_resolvedIntegerVars = new Dictionary<string, Int64>(); 
+
     }
 
 
@@ -64,6 +91,7 @@ namespace tinyAsn1
         public Asn1Type m_type;
     }
 
+/*
     public partial class ValueSetAssigment
     {
         public string m_typeReference = "";
@@ -71,10 +99,11 @@ namespace tinyAsn1
         public SetOfValues m_constr_body;
 
     }
+ */ 
 
     public partial class Asn1Type
     {
-
+        internal ITree antlrNode;
         public Module m_module;
         public partial class Tag
         {
@@ -83,15 +112,28 @@ namespace tinyAsn1
                 UNIVERSAL,
                 APPLICATION, 
                 PRIVATE,
-                NONE
+                CONTEXT_SPECIFIC
             }
             public int m_tag;
-            public TagClass m_class = TagClass.NONE;
-            public Module.Tags ImpOrExpl = Module.Tags.NONE;
+            public TagClass m_class = TagClass.CONTEXT_SPECIFIC;
+            public Module.Tags ImpOrExpl = Module.Tags.EXPLICIT;
         }
 
         public Tag m_tag;
         public List<Constraint> m_constraints = new List<Constraint>();
+
+        public virtual Asn1Type GetFinalType()
+        {
+            return this;
+        }
+
+        public virtual string Name
+        {
+            get
+            {
+                throw new Exception("Internal Error: Abstract method call");
+            }
+        }
     }
 
 
@@ -115,34 +157,72 @@ namespace tinyAsn1
 
     public partial class NullType : Asn1Type
     {
-        //here I should set the correct tag for NULL
+        public override string Name
+        {
+            get   { return "NULL"; }
+        }
     }
 
     public partial class BitStringType : Asn1Type
     {
-        public OrderedDictionary<string, NumberedItem> m_namedBis = new OrderedDictionary<string, NumberedItem>();
+        internal List<NumberedItem> m_namedBitsPriv = new List<NumberedItem>();
+        public OrderedDictionary<string, Int64> m_namedBits = new OrderedDictionary<string, Int64>();
+        public override string Name
+        {
+            get { return "BIT STRING"; }
+        }
     }
 
     public partial class BooleanType : Asn1Type
     {
+        public override string Name
+        {
+            get { return "BOOLEAN"; }
+        }
+
     }
 
     public partial class RealType : Asn1Type
     {
+        public override string Name
+        {
+            get { return "REAL"; }
+        }
     }
 
     public partial class EnumeratedType : Asn1Type
     {
+        public class Item
+        {
+            public Item(string id, Int64 val, bool isExtended) { m_id = id; m_value = val; m_isExtended = isExtended; m_valCalculated = true; }
+            public Item(string id, bool isExtended) { m_id = id; m_isExtended = isExtended; m_valCalculated = false; }
+            public string m_id;
+            public Int64 m_value;
+            public bool m_isExtended=false;
+            internal bool m_valCalculated = false;
+        }
 
-        public OrderedDictionary<string, NumberedItem> m_enumValues = new OrderedDictionary<string, NumberedItem>();
+        internal List<NumberedItem> m_enumValuesPriv = new List<NumberedItem>();
+        public OrderedDictionary<string, Item> m_enumValues = new OrderedDictionary<string, Item>();
         public bool m_extMarkPresent = false;
         public ExceptionSpec m_exceptionSpec;
-//        public Dictionary<string, NumberedItem> m_additionalEnumValues = new Dictionary<string, NumberedItem>();
+
+        public override string Name
+        {
+            get { return "ENUMERATED"; }
+        }
     }
     
     public partial class IntegerType : Asn1Type
     {
-        public OrderedDictionary<string, NumberedItem> m_namedValues = new OrderedDictionary<string, NumberedItem>();
+        internal List<NumberedItem> m_privNamedValues = new List<NumberedItem>();
+        public OrderedDictionary<string, Int64> m_namedValues = new OrderedDictionary<string, Int64>();
+
+        public override string Name
+        {
+            get { return "INTEGER"; }
+        }
+
     }
 
     public partial class ChoiceType : Asn1Type
@@ -160,6 +240,11 @@ namespace tinyAsn1
         public bool m_extMarkPresent = false;
         public ExceptionSpec m_exceptionSpec;
         public bool m_extMarkPresent2 = false;
+
+        public override string Name
+        {
+            get { return "CHOICE"; }
+        }
 
     }
 
@@ -194,22 +279,38 @@ namespace tinyAsn1
 
     public partial class SequenceType : SequenceOrSetType
     {
+        public override string Name
+        {
+            get { return "SEQUENCE"; }
+        }
     }
 
     public partial class SetType : SequenceOrSetType
     {
+        public override string Name
+        {
+            get { return "SET"; }
+        }
     }
 
     public partial class SequenceOfType : Asn1Type
     {
         public string m_xmlVarName;
         public Asn1Type type;
+        public override string Name
+        {
+            get { return "SEQUENCE OF"; }
+        }
     }
 
     public partial class SetOfType : Asn1Type
     {
         public string m_xmlVarName;
         public Asn1Type type;
+        public override string Name
+        {
+            get { return "SET OF"; }
+        }
     }
 
     public partial class OctetStringType : Asn1Type
@@ -219,12 +320,16 @@ namespace tinyAsn1
         {
             m_stringType = strType;
         }
+        public override string Name
+        {
+            get { return "OCTECT STRING"; }
+        }
     }
 
-    public partial class ReferencedType : Asn1Type
+    public partial class ReferenceType : Asn1Type
     {
         public string m_referencedTypeName="";
-        public string m_modName="";
+        public string m_referencedModName = "";
 
         public Asn1Type Type
         {
@@ -232,16 +337,32 @@ namespace tinyAsn1
             {
                 Asn1Type ret = this;
 
-                while (ret is ReferencedType)
+                while (ret is ReferenceType)
                 {
-                    if (((ReferencedType)ret).m_modName != "")
-                        throw new Exception("Unimplemented feature ...");
-                    if (ret.m_module.typeAssigments.ContainsKey(((ReferencedType)ret).m_referencedTypeName))
-                        ret = ret.m_module.typeAssigments[((ReferencedType)ret).m_referencedTypeName].m_type;
+                    if (((ReferenceType)ret).m_referencedModName != "")
+                        throw new Exception("Type references to external modules are not implemented (yet) ...");
+                    if (ret.m_module.m_typeAssigments.ContainsKey(((ReferenceType)ret).m_referencedTypeName))
+                        ret = ret.m_module.m_typeAssigments[((ReferenceType)ret).m_referencedTypeName].m_type;
                     else
+                    {
                         throw new Exception("Unimplemented feature ...");
+                    }
                 }
                 return ret;
+            }
+        }
+        public override Asn1Type GetFinalType()
+        {
+            return Type;
+        }
+
+        public override string Name
+        {
+            get {
+                if (m_referencedModName == "")
+                    return m_referencedTypeName;
+                else
+                    return m_referencedModName + "." + m_referencedTypeName;
             }
         }
     }
@@ -249,6 +370,7 @@ namespace tinyAsn1
 /* ************ VALUES ***********************/
     public partial class Asn1Value
     {
+        internal ITree antlrNode;
         public object m_value;
 
         public Module m_module;
@@ -263,6 +385,7 @@ namespace tinyAsn1
             BOOLEAN_FALSE,
             STRING_LITERAL,
             VALUE_REFERENCE,
+            ENUMERATED,
             MIN,
             MAX,
             CHAR_SEQUENCE_VALUE,
@@ -282,8 +405,8 @@ namespace tinyAsn1
 
                 while (ret.m_valType == ValType.VALUE_REFERENCE)
                 {
-                    if (ret.m_module.valuesAssigments.ContainsKey(ret.m_value.ToString()))
-                        ret = ret.m_module.valuesAssigments[ret.m_value.ToString()].m_value;
+                    if (ret.m_module.m_valuesAssigments.ContainsKey(ret.m_value.ToString()))
+                        ret = ret.m_module.m_valuesAssigments[ret.m_value.ToString()].m_value;
                     else
                         throw new Exception("Unimplemented feature ...");
                 }
@@ -384,6 +507,7 @@ namespace tinyAsn1
             : base(ErrMsg)
         {
         }
+
     }
 
 
