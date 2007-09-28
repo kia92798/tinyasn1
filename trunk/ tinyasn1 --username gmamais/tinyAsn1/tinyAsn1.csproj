@@ -51,11 +51,12 @@
   <ItemGroup>
     <Compile Include="Asn1AST.cs" />
     <Compile Include="Asn1ASTConstruction.cs" />
-    <Compile Include="Asn1AST_DEBUG.cs" />
     <Compile Include="asn1Lexer.cs" />
     <Compile Include="asn1Parser.cs" />
-    <Compile Include="ICD.cs" />
+    <Compile Include="ASTVisit.cs" />
+    <Compile Include="SemanticParser.cs" />
     <Compile Include="PERConstraints.cs" />
+    <Compile Include="PrintASN1.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util.cs" />

@@ -8,6 +8,7 @@ using Antlr.StringTemplate;
 using Antlr.StringTemplate.Language;
 using Antlr.Utility.Tree;
 using Antlr.Runtime.Tree;
+using System.IO;
 
 namespace tinyAsn1
 {
@@ -48,7 +49,7 @@ namespace tinyAsn1
                 return Usage();
             }
 
-
+//Create Syntax Tree
             foreach (string inFileName in inputFiles)
             {
                 if (!System.IO.File.Exists(inFileName))
@@ -77,6 +78,7 @@ namespace tinyAsn1
                     Asn1File asnFile = Asn1File.CreateFromAntlrAst(tree);
                     asnFile.m_fileName = inFileName;
                     ASTs.Add(asnFile);
+
                 }
                 catch (RecognitionException)
                 {
@@ -95,6 +97,27 @@ namespace tinyAsn1
                     return 3;
                 }
             }
+// Modify Syntax Tree and make Semantic checks
+
+            try
+            {
+
+                SemanticParser sp = new SemanticParser();
+
+                do
+                {
+                    for (int i = 0; i < inputFiles.Count; i++)
+                        ASTs[i].Visit(sp);
+                } while (!sp.Finished() && sp.PassNo<50);
+                Console.Error.WriteLine("Semantic parsing passes : " + sp.PassNo.ToString());
+            }
+            catch (SemanticErrorException ex)
+            {
+                Console.Error.WriteLine(ex.Message);
+                return 2;
+            }
+
+
 
 
             if (debug)
@@ -102,20 +125,22 @@ namespace tinyAsn1
                 Console.WriteLine("Debugging ...");
                 for (int i = 0; i < inputFiles.Count; i++)
                 {
-                    try
-                    {
-                        System.IO.StreamWriter wr = new System.IO.StreamWriter(inputFiles[i] + ".xml");
-                        ASTs[i].printAstAsXml(wr);
+                    //try
+                    //{
+                        StreamWriter wr = new StreamWriter(inputFiles[i] + ".txt");
+                        PrintASN1 pr = new PrintASN1(wr);
+                        ASTs[i].Visit(pr);
+//                        ASTs[i].printAstAsXml(wr);
                         wr.Flush();
                         wr.Close();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.Error.WriteLine("Unkown exception ...");
-                        Console.Error.WriteLine(ex.Message);
-                        Console.Error.WriteLine(ex.StackTrace);
-                        return 3;
-                    }
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    Console.Error.WriteLine("Unkown exception ...");
+                    //    Console.Error.WriteLine(ex.Message);
+                    //    Console.Error.WriteLine(ex.StackTrace);
+                    //    return 3;
+                    //}
                 }
             }
 
@@ -126,7 +151,7 @@ namespace tinyAsn1
                     try
                     {
                         System.IO.StreamWriter wr = new System.IO.StreamWriter(inputFiles[i] + ".html");
-                        ASTs[i].GenerateICD(wr);
+//                        ASTs[i].GenerateICD(wr);
                         wr.Flush();
                         wr.Close();
                     }
