@@ -1,0 +1,219 @@
+<ASN1FILE>
+  <Module name="MY-MODULE" Tags="EXPLICIT" ExportStatus="NONE" ExtensibilityImplied="True" >
+    <EXPORTS>
+      <EXPORT_TYPE>B1</EXPORT_TYPE>
+      <EXPORT_TYPE>B2</EXPORT_TYPE>
+      <EXPORT_VAR>a1</EXPORT_VAR>
+      <EXPORT_VAR>a2</EXPORT_VAR>
+    </EXPORTS>
+    <IMPORTS>
+      <ImportedModule module="MODULE-A">
+        <ImportedType name="A1"/>
+        <ImportedVar name="a1" />
+      </ImportedModule>
+      <ImportedModule module="MODULE-B">
+        <ImportedType name="B1"/>
+        <ImportedVar name="b1" />
+      </ImportedModule>
+    </IMPORTS>
+    <TYPE_ASSIGMENTS>
+      <TYPE_ASSIGMENT name="TypeEnumerated">
+        <ENUMERATED_TYPE Class="NONE" tag="4" ImplOrExpl="NONE" >
+          <NUMBERD_ITEM name="red" value="0" />
+          <NUMBERD_ITEM name="green" value="1" />
+          <NUMBERD_ITEM name="blue" value="2" />
+        </ENUMERATED_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="SubType">
+        <SEQUENCE_TYPE >
+          <CHILD name="intValue" optinal="False" default="False" >
+            <INTEGER_TYPE >
+              <CONSTRAINTS_LIST>
+                <CONSTRAINT ExtensionPresent="False">
+                  <UNION_SET1>
+                    <UNION_ELEMENT>
+                      <INTERSECTION_ELEMENT>
+                        <RANGE min="0" minValIsIncluded="False" maxValIsIncluded="False" />
+                      </INTERSECTION_ELEMENT>
+                    </UNION_ELEMENT>
+                    <UNION_ELEMENT>
+                      <INTERSECTION_ELEMENT>
+                        <RANGE min="10" minValIsIncluded="False" maxValIsIncluded="False" />
+                      </INTERSECTION_ELEMENT>
+                    </UNION_ELEMENT>
+                  </UNION_SET1>
+                </CONSTRAINT>
+              </CONSTRAINTS_LIST>
+            </INTEGER_TYPE>
+          </CHILD>
+          <CHILD name="intArray" optinal="False" default="False" >
+            <SEQUENCE_OF_TYPE >
+              <INTEGER_TYPE >
+                <CONSTRAINTS_LIST>
+                  <CONSTRAINT ExtensionPresent="False">
+                    <UNION_SET1>
+                      <UNION_ELEMENT>
+                        <INTERSECTION_ELEMENT>
+                          <RANGE min="0" max="3" minValIsIncluded="False" maxValIsIncluded="False" />
+                        </INTERSECTION_ELEMENT>
+                      </UNION_ELEMENT>
+                    </UNION_SET1>
+                  </CONSTRAINT>
+                </CONSTRAINTS_LIST>
+              </INTEGER_TYPE>
+              <CONSTRAINTS_LIST>
+                <CONSTRAINT ExtensionPresent="False">
+                  <UNION_SET1>
+                    <UNION_ELEMENT>
+                      <INTERSECTION_ELEMENT>
+                        <SIZE_CONSTRAINT>
+                          <CONSTRAINT ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min="10" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </CONSTRAINT>
+                        </SIZE_CONSTRAINT>
+                      </INTERSECTION_ELEMENT>
+                    </UNION_ELEMENT>
+                  </UNION_SET1>
+                </CONSTRAINT>
+              </CONSTRAINTS_LIST>
+            </SEQUENCE_OF_TYPE>
+          </CHILD>
+          <CHILD name="enumValue" optinal="False" default="False" >
+            <REFERENCED_TYPE name="TypeEnumerated" modName="" />
+          </CHILD>
+          <CHILD name="label" optinal="False" default="False" >
+            <OCTECT_STRING >
+              <CONSTRAINTS_LIST>
+                <CONSTRAINT ExtensionPresent="False">
+                  <UNION_SET1>
+                    <UNION_ELEMENT>
+                      <INTERSECTION_ELEMENT>
+                        <SIZE_CONSTRAINT>
+                          <CONSTRAINT ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min="10" max="40" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </CONSTRAINT>
+                        </SIZE_CONSTRAINT>
+                      </INTERSECTION_ELEMENT>
+                    </UNION_ELEMENT>
+                  </UNION_SET1>
+                </CONSTRAINT>
+              </CONSTRAINTS_LIST>
+            </OCTECT_STRING>
+          </CHILD>
+          <CHILD name="label2" optinal="False" default="False" >
+            <OCTECT_STRING >
+              <CONSTRAINTS_LIST>
+                <CONSTRAINT ExtensionPresent="False">
+                  <UNION_SET1>
+                    <UNION_ELEMENT>
+                      <INTERSECTION_ELEMENT>
+                        <PERMITTED_ALPHABET_CONSTRAINT>
+                          <CONSTRAINT ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min=""A"" max=""Z"" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </CONSTRAINT>
+                        </PERMITTED_ALPHABET_CONSTRAINT>
+                      </INTERSECTION_ELEMENT>
+                    </UNION_ELEMENT>
+                  </UNION_SET1>
+                </CONSTRAINT>
+              </CONSTRAINTS_LIST>
+            </OCTECT_STRING>
+          </CHILD>
+        </SEQUENCE_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="T-POS">
+        <SEQUENCE_TYPE >
+          <CHILD name="longitude" optinal="False" default="False" >
+            <REAL_TYPE >
+              <CONSTRAINTS_LIST>
+                <CONSTRAINT ExtensionPresent="False">
+                  <UNION_SET1>
+                    <UNION_ELEMENT>
+                      <INTERSECTION_ELEMENT>
+                        <RANGE min="180" max="-180" minValIsIncluded="False" maxValIsIncluded="False" />
+                      </INTERSECTION_ELEMENT>
+                    </UNION_ELEMENT>
+                  </UNION_SET1>
+                </CONSTRAINT>
+              </CONSTRAINTS_LIST>
+            </REAL_TYPE>
+          </CHILD>
+          <CHILD name="latitude" optinal="False" default="False" >
+            <REAL_TYPE >
+              <CONSTRAINTS_LIST>
+                <CONSTRAINT ExtensionPresent="False">
+                  <UNION_SET1>
+                    <UNION_ELEMENT>
+                      <INTERSECTION_ELEMENT>
+                        <RANGE min="90" max="-90" minValIsIncluded="False" maxValIsIncluded="False" />
+                      </INTERSECTION_ELEMENT>
+                    </UNION_ELEMENT>
+                  </UNION_SET1>
+                </CONSTRAINT>
+              </CONSTRAINTS_LIST>
+            </REAL_TYPE>
+          </CHILD>
+          <CHILD name="height" optinal="False" default="False" >
+            <REAL_TYPE >
+              <CONSTRAINTS_LIST>
+                <CONSTRAINT ExtensionPresent="False">
+                  <UNION_SET1>
+                    <UNION_ELEMENT>
+                      <INTERSECTION_ELEMENT>
+                        <RANGE min="-30000" max="-45000" minValIsIncluded="False" maxValIsIncluded="False" />
+                      </INTERSECTION_ELEMENT>
+                    </UNION_ELEMENT>
+                  </UNION_SET1>
+                </CONSTRAINT>
+              </CONSTRAINTS_LIST>
+            </REAL_TYPE>
+          </CHILD>
+          <CHILD name="subTypeArray" optinal="False" default="False" >
+            <SEQUENCE_OF_TYPE >
+              <REFERENCED_TYPE name="SubType" modName="" />
+              <CONSTRAINTS_LIST>
+                <CONSTRAINT ExtensionPresent="False">
+                  <UNION_SET1>
+                    <UNION_ELEMENT>
+                      <INTERSECTION_ELEMENT>
+                        <SIZE_CONSTRAINT>
+                          <CONSTRAINT ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min="10" max="15" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </CONSTRAINT>
+                        </SIZE_CONSTRAINT>
+                      </INTERSECTION_ELEMENT>
+                    </UNION_ELEMENT>
+                  </UNION_SET1>
+                </CONSTRAINT>
+              </CONSTRAINTS_LIST>
+            </SEQUENCE_OF_TYPE>
+          </CHILD>
+        </SEQUENCE_TYPE>
+      </TYPE_ASSIGMENT>
+    </TYPE_ASSIGMENTS>
+  </Module>
+</ASN1FILE>

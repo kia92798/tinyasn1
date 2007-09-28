@@ -1,0 +1,84 @@
+<ASN1FILE>
+  <Module name="ModuleTestSequenceSimple" Tags="IMPLICIT" ExportStatus="NONE" ExtensibilityImplied="False" >
+    <EXPORTS>
+    </EXPORTS>
+    <IMPORTS>
+    </IMPORTS>
+    <TYPE_ASSIGMENTS>
+      <TYPE_ASSIGMENT name="Programming">
+        <SEQUENCE_OF_TYPE >
+          <REFERENCED_TYPE name="Fault" modName="" Class="NONE" tag="0" ImplOrExpl="IMPLICIT" />
+          <CONSTRAINTS_LIST>
+            <CONSTRAINT>
+              <SET_OF_VALUES ExtensionPresent="False">
+                <UNION_SET1>
+                  <UNION_ELEMENT>
+                    <INTERSECTION_ELEMENT>
+                      <SIZE_CONSTRAINT>
+                        <CONSTRAINT>
+                          <SET_OF_VALUES ExtensionPresent="False">
+                            <UNION_SET1>
+                              <UNION_ELEMENT>
+                                <INTERSECTION_ELEMENT>
+                                  <RANGE min="1" max="maxSize" minValIsIncluded="False" maxValIsIncluded="False" />
+                                </INTERSECTION_ELEMENT>
+                              </UNION_ELEMENT>
+                            </UNION_SET1>
+                          </SET_OF_VALUES>
+                        </CONSTRAINT>
+                      </SIZE_CONSTRAINT>
+                    </INTERSECTION_ELEMENT>
+                  </UNION_ELEMENT>
+                </UNION_SET1>
+              </SET_OF_VALUES>
+            </CONSTRAINT>
+          </CONSTRAINTS_LIST>
+        </SEQUENCE_OF_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Fault">
+        <SET__OF_TYPE >
+          <REFERENCED_TYPE name="Error" modName="" />
+        </SET__OF_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="Error">
+        <SEQUENCE_TYPE >
+        </SEQUENCE_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="SeqWithMandatory">
+        <SEQUENCE_TYPE >
+          <CHILD name="someString" optinal="False" default="False" >
+            <OCTECT_STRING >
+            </OCTECT_STRING>
+          </CHILD>
+          <CHILD name="seqOfMan" optinal="False" default="False" >
+            <SEQUENCE_OF_TYPE Class="NONE" tag="0" ImplOrExpl="EXPLICIT" >
+              <REFERENCED_TYPE name="Error" modName="" />
+            </SEQUENCE_OF_TYPE>
+          </CHILD>
+        </SEQUENCE_TYPE>
+      </TYPE_ASSIGMENT>
+      <TYPE_ASSIGMENT name="SeqWithOptional">
+        <SEQUENCE_TYPE >
+          <CHILD name="someString" optinal="False" default="False" >
+            <OCTECT_STRING >
+            </OCTECT_STRING>
+          </CHILD>
+          <CHILD name="seqOfOpt" optinal="True" default="False" >
+            <SEQUENCE_OF_TYPE Class="NONE" tag="0" ImplOrExpl="EXPLICIT" >
+              <REFERENCED_TYPE name="Error" modName="" />
+            </SEQUENCE_OF_TYPE>
+          </CHILD>
+        </SEQUENCE_TYPE>
+      </TYPE_ASSIGMENT>
+    </TYPE_ASSIGMENTS>
+    <VALUE_ASSIGMENTS>
+      <VALUE_ASSIGMENT name="maxSize">
+        <INTEGER_TYPE >
+        </INTEGER_TYPE>
+        <VALUE>10</VALUE>
+      </VALUE_ASSIGMENT>
+    </VALUE_ASSIGMENTS>
+    <VALUE__SET_ASSIGMENTS>
+    </VALUE__SET_ASSIGMENTS>
+  </Module>
+</ASN1FILE>

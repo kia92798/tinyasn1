@@ -1,0 +1,130 @@
+-- System Software Co-engineering: Data Modelling Technologies
+-- (Contract ESTEC 20467/06/NL/JD)
+
+-- Numerical ICD For DTG Equipment, ATV-AS-ICD-1004
+-- Author: David Lesens
+-- Issue 1, revision 0
+
+DTG DEFINITIONS AUTOMATIC TAGS ::= BEGIN
+
+--*************************************
+-- Common types
+--*************************************
+
+UI16 ::= BIT STRING( SIZE(16) )
+
+-- Mil Bus transfer BC-RT (i.e. commands) for DTG
+BC-RT-DTG-MIL-BUS-TRANSFER ::= SEQUENCE SIZE(4) OF CHOICE {
+  mode-fine SEQUENCE {
+  -- Internal Register: MODE_FINE
+  -- Select fine mode (2 deg/sec)
+    fine-cmd NULL
+  },
+  mode-coarse SEQUENCE {
+  -- Internal Register: MODE_COARSE
+  -- Select coarse mode (30 deg/sec)
+    coarse-cmd NULL
+  },
+  disable-heater SEQUENCE {
+  -- Internal Register: DISABLE_HEATER
+  -- Disable heating of gyro
+    heater-off-cmd NULL
+  },
+  enable-heater SEQUENCE {
+  -- Internal Register: ENABLE_HEATER
+  -- Enable heating of gyro
+    heater-on-cmd NULL
+  },
+  disable-protection SEQUENCE {
+  -- Internal Register: DISABLE_PROTECTION
+  -- Allow to start the gyro even if temp < 50°c
+    protec-off-cmd NULL
+  },
+  enable-protection SEQUENCE {
+  -- Internal Register: ENABLE_PROTECTION
+  -- Prevent to start the gyro if temp < 50°c
+    protec-on-cmd NULL
+  },
+  -- Any Remote Terminal shall provide at receive SA#30 the capability to receive
+  -- one to N data words of any bit pattern. Any Remote Terminal shall provide at 
+  -- transmit SA#30 the capability to transmit a minimum of N data words of any 
+  -- bit pattern. N is equal to the maximum word count from the set of all 
+  -- messages defined for the Remote Terminal.
+  -- A valid receive message, to the receive SA#30 followed by a valid transmit 
+  -- command to the transmit SA#30 with the same word count and without any 
+  -- intervening valid commands to that Remote Terminal, shall cause the Remote 
+  -- Terminal to respond with each data word having the same bit pattern as the 
+  -- corresponding received data word
+  data-wrap-service SEQUENCE {
+  -- Internal Register: None
+    data-wrap-service-data UI16
+  },
+  synch-broadcast SEQUENCE {
+  -- Internal Register: PCF counter
+  -- Mode command
+    synch-broadcast-data INTEGER( 0 .. 99 )
+  }
+}
+
+-- Mil Bus transfer RT-BC (i.e. measurement acquisitions) for DTG
+RT-BC-DTG-MIL-BUS-TRANSFER ::= SEQUENCE SIZE(4) OF CHOICE {
+  gyro-channel-output-data SEQUENCE {
+  -- Internal Register: X_GYRO_ANGLE
+  -- Gyro angular increments of X axis
+    xgyro-angle INTEGER( 0 .. 65535 ) ,
+    -- Internal Register: Y_GYRO_ANGLE
+    -- Gyro angular increments of Y axis
+    ygyro-angle INTEGER( 0 .. 65535 ) ,
+    -- Internal Register: GYRO_LOOP
+    -- Status of gyro loop
+    loop-sts ENUMERATED { 
+      open(0), 
+      closed(1) } ,
+      -- Internal Register: GYRO_TEMPERATURE
+      -- Status of gyro temperature
+    gyro-temp-sts ENUMERATED { 
+      less-than-50-degree-celsius(0), 
+      more-than-50-degree-celsius(1) } ,
+      -- Internal Register: FUNCTIONAL MODE
+      -- Status of functioning mode
+    safety-mode-sts ENUMERATED { 
+      safety(0), 
+      normal(1) } ,
+      -- Internal Register: GYRO HEATING
+      -- Status of heating
+    heater-sts ENUMERATED { 
+      off(0), 
+      on(0) } ,
+      -- Internal Register: PROTECTION
+      -- Status of 50°c protection
+    protec-sts ENUMERATED { 
+      disable(0), 
+      enable(1) } ,
+      -- Internal Register: PRECISION MODE
+      -- Status of precision mode
+    mode-sts ENUMERATED { 
+      fine(0), 
+      coarse(1) }
+  },
+  geu-1553-config SEQUENCE {
+  -- Internal Register: GEU_1553_CONFIG
+  -- TM manufacturer only
+    geu-conf-sts UI16
+  },
+  -- See data-wrap-service
+  data-wrap-rslt SEQUENCE {
+  -- Internal Register: None
+    data-wrap-rslt-data UI16
+  },
+  transmit-bit-word SEQUENCE {
+  -- Internal Register: BIT_Word
+  -- Built in test
+    bit-word UI16
+  },
+  transmit-last-cmd SEQUENCE {
+  -- Internal Register: Last command
+    last-cmd BC-RT-DTG-MIL-BUS-TRANSFER
+  }
+}
+
+END

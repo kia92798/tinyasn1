@@ -1,0 +1,274 @@
+package id3qf57f71na1xhf71neeiv;
+
+/**
+@version 2.0
+@physicalPackage
+@__modelType diagram 
+*/
+class diagram {
+/**
+@__ref <oiref:design#Class#id3qf57f71na1xhf71neeiv.node:oiref><oihard>
+@__modelType reference 
+*/
+class reference {
+}/**
+@__ref <oiref:design#Class#id3qf57f71na1xhf71neeiv.node1:oiref><oihard>
+@__modelType reference 
+*/
+class reference2 {
+}/**
+@__ref <oiref:design#Class#id3qf57f71na1xhf71neeiv.node3:oiref><oihard>
+@__modelType reference 
+*/
+class reference4 {
+}/**
+@__ref <oiref:design#Class#id3qf57f71na1xhf71neeiv.node2:oiref><oihard>
+@__modelType reference 
+*/
+class reference3 {
+}/**
+@__ref <oiref:design#Class#id3qf57f71na1xhf71neeiv.node8:oiref><oihard>
+@__modelType reference 
+*/
+class reference9 {
+}/**
+@__ref <oiref:design#Class#id3qf57f71na1xhf71neeiv.node10:oiref><oihard>
+@__modelType reference 
+*/
+class reference11 {
+}}/**
+@__tags
+@shapeType ClassDiagram 
+*/
+class __tags {
+}/**
+@__options 
+*/
+class __options {
+}/**
+@__positions <oigroup:Composite#supplierCardinality#<oiref:design#Class#id3qf57f71na1xhf71neeiv.node1.link15:oiref>=179,620,26,16,0:oigroup>
+<oigroup:Composite#label#<oiref:design#Class#id3qf57f71na1xhf71neeiv.node1.link16:oiref>=558,554,128,16,0:oigroup>
+<oigroup:Composite#supplierCardinality#<oiref:design#Class#id3qf57f71na1xhf71neeiv.node1.link6:oiref>=234,393,15,16,0:oigroup>
+<oigroup:<oiref:design#Class#id3qf57f71na1xhf71neeiv.node1.link6:oiref>=370,413,230,413:oigroup>
+<oigroup:<oiref:design#Class#id3qf57f71na1xhf71neeiv.node.link:oiref>=442,231,442,360:oigroup>
+<oigroup:<oiref:design#Class#id3qf57f71na1xhf71neeiv.node10:oiref>=520,630,130,139,1:oigroup>
+<oigroup:<oiref:design#Class#id3qf57f71na1xhf71neeiv.node1:oiref>=370,360,200,139,1:oigroup>
+<oigroup:<oiref:design#Class#id3qf57f71na1xhf71neeiv.node2:oiref>=120,350,110,139,1:oigroup>
+<oigroup:<oiref:design#Class#id3qf57f71na1xhf71neeiv.node:oiref>=380,140,124,91,1:oigroup>
+<oigroup:<oiref:design#Class#id3qf57f71na1xhf71neeiv.node1.link16:oiref>=554,499,554,630:oigroup>
+<oigroup:Composite#supplierCardinality#<oiref:design#Class#id3qf57f71na1xhf71neeiv.node1.link16:oiref>=524,610,26,16,0:oigroup>
+<oigroup:Composite#label#<oiref:design#Class#id3qf57f71na1xhf71neeiv.node1.link15:oiref>=207,549,114,16,0:oigroup>
+<oigroup:Composite#supplierCardinality#<oiref:design#Class#id3qf57f71na1xhf71neeiv.node1.link:oiref>=660,396,26,16,0:oigroup>
+<oigroup:Composite#label#<oiref:design#Class#id3qf57f71na1xhf71neeiv.node1.link6:oiref>=275,393,50,16,0:oigroup>
+<oigroup:<oiref:design#Class#id3qf57f71na1xhf71neeiv.node8:oiref>=150,640,118,123,1:oigroup>
+<oigroup:<oiref:design#Class#id3qf57f71na1xhf71neeiv.node3:oiref>=690,350,200,123,1:oigroup>
+<oigroup:Composite#label#<oiref:design#Class#id3qf57f71na1xhf71neeiv.node1.link:oiref>=596,416,68,16,0:oigroup>
+<oigroup:Composite#supplierCardinality#<oiref:design#Class#id3qf57f71na1xhf71neeiv.node.link:oiref>=412,340,26,16,0:oigroup>
+<oigroup:<oiref:design#Class#id3qf57f71na1xhf71neeiv.node1.link15:oiref>=442,499,209,640:oigroup>
+<oigroup:<oiref:design#Class#id3qf57f71na1xhf71neeiv.node1.link:oiref>=570,416,690,416:oigroup>
+*/
+class __positions {
+}/**
+@shapeType Class
+@__modelType node
+@name Asn1File 
+*/
+class node {
+/**
+@shapeType Attribute
+@__modelType member
+@name m_fileName 
+*/
+class member {
+}/**
+@shapeType AssociatesLink
+@__modelType link
+@__ref <oiref:design#Class#id3qf57f71na1xhf71neeiv.node1:oiref><oihard>
+@aggregation
+@composition
+@supplierCardinality 1..* 
+*/
+class link {
+}}/**
+@shapeType Class
+@__modelType node
+@name Module 
+*/
+class node1 {
+/**
+@shapeType AssociatesLink
+@__modelType link
+@__ref <oiref:design#Class#id3qf57f71na1xhf71neeiv.node3:oiref><oihard>
+@aggregation
+@composition
+@label m_imports
+@supplierCardinality 0..* 
+*/
+class link {
+}/**
+@shapeType Attribute
+@__modelType member
+@name m_moduleID 
+*/
+class member {
+}/**
+@shapeType AssociatesLink
+@__modelType link
+@__ref <oiref:design#Class#id3qf57f71na1xhf71neeiv.node2:oiref><oihard>
+@supplierCardinality 1
+@label m_tags 
+*/
+class link6 {
+}/**
+@shapeType Attribute
+@__modelType member
+@name m_extensibilityImplied
+@mod__type bool*/
+class member7 {
+}/**
+@shapeType AssociatesLink
+@__modelType link
+@__ref <oiref:design#Class#id3qf57f71na1xhf71neeiv.node8:oiref><oihard>
+@aggregation
+@composition
+@supplierCardinality 0..*
+@label m_typeAssigments 
+*/
+class link15 {
+}/**
+@shapeType AssociatesLink
+@__modelType link
+@__ref <oiref:design#Class#id3qf57f71na1xhf71neeiv.node10:oiref><oihard>
+@supplierCardinality 0..*
+@aggregation
+@composition
+@label m_valuesAssigments 
+*/
+class link16 {
+}/**
+@shapeType Attribute
+@__modelType member
+@name m_exportedTypes
+@mod__type List<String> 
+*/
+class member21 {
+}/**
+@shapeType Attribute
+@__modelType member
+@name m_exportedVariables
+@mod__type List<String> 
+*/
+class member22 {
+}}/**
+@shapeType Class
+@__modelType node
+@name ImportedModule 
+*/
+class node3 {
+/**
+@shapeType Attribute
+@__modelType member
+@name m_moduleID 
+*/
+class member {
+}/**
+@shapeType Attribute
+@__modelType member
+@name m_importedTypes
+@mod__type List<String>*/
+class member5 {
+}/**
+@shapeType Attribute
+@__modelType member
+@name m_importedVariables
+@mod__type List<String> 
+*/
+class member1 {
+}}/**
+@shapeType Class
+@__modelType node
+@name Tags
+@stereotype enumeration 
+*/
+class node2 {
+/**
+@shapeType Attribute
+@__modelType member
+@name EXPLICIT
+@mod__type int 
+*/
+class member {
+}/**
+@shapeType Attribute
+@__modelType member
+@name IMPLICIT
+@mod__type int 
+*/
+class member4 {
+}/**
+@shapeType Attribute
+@__modelType member
+@name AUTOMATIC
+@mod__type int 
+*/
+class member5 {
+}}/**
+@shapeType Class
+@__modelType node
+@name TypeAssigment 
+*/
+class node8 {
+/**
+@shapeType Attribute
+@__modelType member
+@name m_name 
+*/
+class member {
+}/**
+@shapeType Attribute
+@__modelType member
+@name m_exported
+@mod__type bool 
+*/
+class member12 {
+}/**
+@shapeType Attribute
+@__modelType member
+@name m_type
+@mod__type Asn1Type 
+*/
+class member17 {
+}}/**
+@shapeType Class
+@__modelType node
+@name ValueAssigment 
+*/
+class node10 {
+/**
+@shapeType Attribute
+@__modelType member
+@name m_name 
+*/
+class member {
+}/**
+@shapeType Attribute
+@__modelType member
+@name m_exported
+@mod__type bool 
+*/
+class member14 {
+}/**
+@shapeType Attribute
+@__modelType member
+@name m_type
+@mod__type Asn1Type 
+*/
+class member18 {
+}/**
+@shapeType Attribute
+@__modelType member
+@name m_value
+@mod__type Asn1Value 
+*/
+class member20 {
+}}

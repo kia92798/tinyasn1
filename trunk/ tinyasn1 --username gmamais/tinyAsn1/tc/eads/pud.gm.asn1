@@ -1,0 +1,942 @@
+-- System Software Co-engineering: Data Modelling Technologies
+-- (Contract ESTEC 20467/06/NL/JD)
+
+-- Modelling of the PUD (Packet Utilization Document)
+-- Author: David Lesens
+-- Issue 1, revision 0
+
+-- Derived from ESA Packet Utilisation Standard [RD-1], this Packet Utilisation
+-- Document complements the Packet Telemetry and Telecommand Standards by
+-- defining, in the scope of ATV, the Application-Level interface between
+-- ground and space.
+-- To that effect, this document describes the telemetry and
+-- telecommand-related procedures and data structures to be implemented in
+-- support of the ATV operations interface requirements.
+
+PUD DEFINITIONS AUTOMATIC TAGS ::= BEGIN
+
+IMPORTS OBIT, OBUT, FLOAT32 FROM TYPES;
+
+-- A unique identification of a system bus
+BUS-ID ::= ENUMERATED{ bus1, bus2, bus3, bus4, nop }
+
+INT32 ::= INTEGER( -2147483648 .. 2147483647 )
+
+UINT32 ::= INTEGER( 0 .. 4294967295 )
+
+UINT16 ::= INTEGER( 0 .. 65535 )
+
+--******************************************************************************
+--
+-- Headers of CCSDS packets
+--
+--******************************************************************************
+
+PACKET-HEADER ::= SEQUENCE {
+  primary-header PRIMARY-HEADER,
+  secondary-header SECONDARY-HEADER
+}
+
+-- Defines the primary header of any CCSDS packet
+PRIMARY-HEADER ::= SEQUENCE {
+  packet-identification PACKET-IDENTIFICATION,
+  packet-sequence-control PACKET-SEQUENCE-CONTROL,
+  -- This field shall contain a sequential binary count identifying the
+  -- length (expressed in octets) of the remainder of the CCSDS packet
+  -- that follows the 'PACKET LENGTH' fiel
+  packet-length INTEGER( 0 .. 992 )
+}
+
+PACKET-IDENTIFICATION ::= SEQUENCE {
+-- Shall be set to '000'B any standard CCSDS packet.
+  version-number BIT STRING { mandatory-value(0) } (SIZE( 3 )),
+  -- Shall be set to '0' or '1' for any standard CCSDS packet. The Type
+  -- bit is used to distinguish between two Application Process Id (APID)
+  -- domains, namely system (core) and payload domains
+  type BIT STRING { system-core-packet(0), payload-packet(1) } (SIZE( 1 )),
+  -- Shall be set to '1'B for any standard CCSDS packet, to indicate the
+  -- presence of a secondary header
+  secondary-header-flag BIT STRING { mandatory-value(1) } (SIZE( 1)),
+  -- The APID field of any standard CCSDS packet identifies the source
+  -- and destination of the packet
+  application-process-id APID 
+}
+
+-- APID associated with packet type bit of primary header gives the source TC
+-- packets
+APID ::= BIT STRING { 
+  apid-1c( 0 ), -- Source ATV-CC '000 0100 1111'B
+  apid-msu-1c( 1 ), -- Source ATV-CC '000 0111 1001'B
+  apid-2c( 2 ), -- Source SM-TC '000 0100 1110'B
+  apid-msu-2c( 3 ), -- Source SM-TC '000 0111 1000'B
+  apid-3c( 4 ), -- Source Lap-top1 '000 0100 1100'B
+  apid-msu-3c( 5 ), -- Source Lap-top1 '000 0111 1101'B
+  apid-4c( 6 ), -- Source Lap-top2 '000 0100 1000'B
+  apid-msu-4c( 7 ), -- Source Lap-top2 '000 0111 1111'B
+  apid-5c( 8 ), -- Source SM-CC '000 0100 0111'B
+  apid-6c( 9 ) -- Source ISS CTL panel '000 0100 0011'B
+} (SIZE( 11 ))
+
+PACKET-SEQUENCE-CONTROL ::= SEQUENCE {
+-- The APID field of any standard CCSDS packet identifies the source
+-- and destination of the packet
+  sequence-flags BIT STRING { mandatory-value(3) } (SIZE( 2 )),
+  -- This field shall contain a sequential count (modulo 16384)
+  packet-sequence-count SEQUENCE-COUNT
+}
+
+SEQUENCE-COUNT ::= INTEGER ( 0 .. 16383 )
+
+SECONDARY-HEADER ::= SEQUENCE {
+-- This field consists of 4 octets of coarse time and 1 octet of fine
+-- time
+  time OBUT,
+  -- Shall be set to '00'B or '01'B for any standard CCSDS packet
+  time-id BIT STRING { time-field-not-used(0), time-field-used(1) } (SIZE( 2 )),
+  -- Value '1'B indicates the presence of a checkword
+  checkword-indicator BIT STRING { mandatory-value(1) } (SIZE( 1 )),
+  spare1 BIT STRING { mandatory-value(0) } (SIZE( 1 )),
+  -- '1000'B
+  packet-type BIT STRING { mandatory-value(4) } (SIZE( 4 )),
+  spare2 BIT STRING { mandatory-value(0) } (SIZE( 1 )),
+  element-id BIT STRING {
+  -- '0110'B
+    atv-or-atvcc(6),
+    -- '0100'B
+    iss-sm(4)
+  } (SIZE( 4 )),
+  -- This field is used only for standard CCSDS packets sent to the ATV,
+  -- its content depends on the type of command embedded within the
+  -- particular packet.
+  packet-content-id PACKET-CONTENT-ID,
+  ack BIT STRING {
+  -- '0000'B
+    ack-not-required(0),
+    -- '0001'
+    ack-required(1) 
+  } (SIZE( 4 )),
+  service-type INTEGER(2 | 3 | 6 | 8 | 11 | 14 | 17 | 18),
+  service-sub-type INTEGER(1 | 2 | 3 | 4 | 5 | 6 | 7 | 9 | 10 | 13 | 12 | 14 | 25 | 26)
+}
+
+PACKET-CONTENT-ID ::= BIT STRING {
+  a5i(0), acca(1), cms(2), dps(3), drscore(4), drsdock(5), drspwr(6), drsref(7),
+  ecls(8), fcm(9), fdir(10), frms(11), fum-setup(12), gnc(13), gps(14), gyra(15), 
+  heart-beat(16), kbm(17), mm(18), pfs(19), press(20), prox(21), pws(22), rgps(23), 
+  sgs(24), str(25), tank(26), tcc(27), tdrs(28), tgm(29), thru(30), tmtc(31), vcm(32), 
+  vdm(33), vcl-tbl(34), vrc(35), vvt(36)
+} (SIZE( 7 ))
+
+CHECKSUM ::= OCTET STRING (SIZE( 2 ))
+
+--******************************************************************************
+--
+-- HLTC CCSDS packets
+--
+--******************************************************************************
+
+HLTC-CCSDS-PACKET ::= SEQUENCE {
+-- Same structure as for Standard CCSDS Packets
+  hltc-primary-header PRIMARY-HEADER,
+  user-data SEQUENCE {
+  -- For any HLTC CCSDS packet, this field identifies the CPD
+  -- output channel in use for that packet (i.e. contains the
+  -- corresponding pin assigned number).
+    command-pulse-output-number OCTET STRING (SIZE( 1 )),
+    -- '00'H
+    spare1 BIT STRING {mandatory-value(0) } (SIZE( 8 )),
+    -- For any HLTC CCSDS packet, this field is set by bit-wise
+    -- inverting the 'COMMAND PULSE OUTPUT NUMBER' set for that
+    -- packet
+    inverted-command-pulse-output-number OCTET STRING (SIZE( 1 )),
+    -- '00'H
+    spare2 BIT STRING {mandatory-value(0) } (SIZE( 8 ))
+  },
+  -- The 'CRC' field of any HLTC CCSDS packet transmitted from ISS-RS to
+  -- ATV via the RF proximity link contains the cyclic redundancy code of
+  -- the entire CCSDS packet (except the CRC position).
+  crc OCTET STRING(SIZE(2))
+}
+
+--******************************************************************************
+--
+-- TC CCSDS packets
+--
+--******************************************************************************
+
+TC-CCSDS-PACKET ::= SEQUENCE {
+  packet-header PACKET-HEADER,
+  user-data USER-DATA-TC,
+  -- For any standard CCSDS packet, this field contains the checksum of
+  -- the entire CCSDS packet (except the check word position).
+  checkword CHECKSUM
+}
+
+USER-DATA-TC ::= CHOICE {
+-- Distribute Trouble Shooting Commands
+  tc-2-1 SEQUENCE {
+  -- A unique identification of the bus where the Data is to be
+  -- written
+    bus-id BUS-ID(ALL EXCEPT nop),
+    -- MIL-1553B Message Command word
+    command-word COMMAND-WORD,
+    -- Identifies the MIL-STD-1553B command type
+    command CHOICE {
+      transmit-command-data NULL,
+      -- MIL-1553B Command Data. This field is present if the Command
+      -- Type is 'Troubleshooting TC'.
+      receive-command-data BUS-DATA
+    }
+  },
+  -- Distribute Low-Level Commands
+  tc-2-2 SEQUENCE {
+  -- Data corresponding to the LLC to be uploaded
+    llc LLC
+  },
+  -- Distribute Cyclical Trouble Shooting Telemetry Commands
+  tc-2-4 SEQUENCE {
+  -- A unique identification of the bus where the 'Command Word'
+  -- is to be written.
+    bus-id SEQUENCE SIZE(40) OF BUS-ID,
+    command-word SEQUENCE SIZE(40) OF COMMAND-WORD
+  },
+  -- Stop Cyclical Trouble Shooting
+  tc-2-5 NULL,
+  -- Define New Housekeeping - Parameter Report
+  tc-3-1 SEQUENCE {
+  -- The Structure Identification reporting definition.
+    sid SID,
+    -- This value identifies the offset/phase of the samples
+    -- collection relative to a fixed point
+    sid-offset SID-OFFSET,
+    -- The data collection interval/period for this parameter
+    -- report definition
+    collection-interval COLLECTION-INTERVAL
+  },
+  -- Define New Diagnostic - Parameter Report
+  tc-3-2 SEQUENCE {
+  -- The Structure Identification reporting definition.
+    sid SID,
+    -- This value identifies the offset/phase of the samples
+    -- collection relative to a fixed point
+    sid-offset SID-OFFSET,
+    -- The data collection interval/period for this parameter
+    -- report definition
+    collection-interval COLLECTION-INTERVAL,
+    -- The parameter number to be sampled.
+    parameter SEQUENCE SIZE(1..24) OF PARAMETER-NUMBER
+  },
+  -- Load Memory using Absolute Addresses
+  tc-6-2 SEQUENCE {
+  -- This identifies the destination memory block.
+    memory-id LOAD-MEMORY-ID,
+    -- This gives the start address (in octets, with the count
+    -- starting from zero) within the memory block for loading the
+    -- data.
+    start-address MEMORY-ADDRESS,
+    -- The data to be loaded.
+    data OCTET STRING(SIZE(1..60))
+  },
+  -- Dump Memory using Absolute Addresses
+  tc-6-5 SEQUENCE {
+  -- This identifies the source memory block.
+    memory-id DUMP-MEMORY-ID,
+    -- This gives the start address (in octets, with the count
+    -- starting from zero) within the memory block for dumping the
+    -- data.
+    start-address MEMORY-ADDRESS,
+    -- The length of data to be dumped
+    length INTEGER(1..60)
+  },
+  -- Check Memory using Absolute Addresses
+  tc-6-9 SEQUENCE {
+  -- This identifies the source memory block.
+    memory-id CHECK-MEMORY-ID,
+    -- This gives the start address (in octets, with the count
+    -- starting from zero) within the memory block for checking the
+    -- data.
+    start-address MEMORY-ADDRESS,
+    -- The length of data to be checked
+    length INTEGER(1..60)
+  },
+  -- Perform Activity of Function - Vehicle Configuration Management
+  -- Command
+  tc-8-3 SEQUENCE {
+  -- This indicates which activity of the specified application
+  -- function is to be performed
+    activity-id ACTIVITY-ID
+  },
+  -- Command Functional Unit Automated Procedure
+  tc-8-4 SEQUENCE {
+  -- This indicates which automatic procedure is to be performed.
+    automated-procedure-id AUTOMATED-PROCEDURE-ID
+  },
+  -- Reset Command Schedule
+  tc-11-3 NULL,
+  -- Insert Telecommands in Command Schedule
+  tc-11-4 SEQUENCE {
+  -- The absolute time (OBIT) at which the telecommand is to
+  -- be released
+    absolute-time-tag OBIT,
+    -- This is a standard telecommand packet of any Service type
+    -- and sub-type
+    telecommand-packet TC-CCSDS-PACKET
+  },
+  -- Report Command Schedule in Summary Form
+  tc-11-12 NULL,
+  -- Enable Transmission of Housekeeping Packets
+  tc-14-5 SEQUENCE {
+  -- The Structure Identification reporting definition.
+    sid SEQUENCE SIZE(1..24) OF SID
+  },
+  -- Disable Transmission of Housekeeping Packets
+  tc-14-6 SEQUENCE {
+  -- The Structure Identification reporting definition.
+    sid SEQUENCE SIZE(1..24) OF SID
+  },
+  -- Enable Transmission of Diagnostic Packets
+  tc-14-9 SEQUENCE {
+  -- The Structure Identification reporting definition.
+    sid SEQUENCE SIZE(1..24) OF SID
+  },
+  -- Disable Transmission of Diagnostic Packets
+  tc-14-10 SEQUENCE {
+  -- The Structure Identification reporting definition.
+    sid SEQUENCE SIZE(1..24) OF SID
+  },
+  -- Enable Transmission of Event Reports
+  tc-14-13 SEQUENCE {
+  -- The Report Identifier identifying an event report packet
+  -- definition
+    rid SEQUENCE SIZE(1..24) OF RID
+  },
+  -- Disable Transmission of Event Reports
+  tc-14-14 SEQUENCE {
+  -- The Report Identifier identifying an event report packet
+  -- definition
+    rid SEQUENCE SIZE(1..24) OF RID
+  },
+  -- Perform Connection Test
+  tc-17-1 NULL,
+  -- Enable Mission Plan
+  tc-18-1 SEQUENCE {
+  -- A unique identification of a plan
+    plan-id PLAN-ID
+  },
+  -- Disable Mission Plan
+  tc-18-2 SEQUENCE {
+  -- A unique identification of a plan
+    plan-id PLAN-ID
+  },
+  -- Erase Buffer
+  tc-18-3 NULL,
+  -- Load Commands
+  tc-18-4 SEQUENCE {
+  -- The plan where the commands are to be loaded
+    plan-id PLAN-ID,
+    lines SEQUENCE SIZE(0..10) OF SEQUENCE { 
+    -- An identifier of the line/slot in the OMP build
+    -- buffer where the following command will be written
+      command-line-number INTEGER,
+      -- The value of this field is either an identifier that
+      -- the command is released at a specific (absolute)
+      -- time or a Mission Event number to indicate that the
+      -- command release is relative to this mission event
+      on-date-mission-event CHOICE {
+	absolute-time-release NULL,
+	mission-event MISSION-EVENT
+      },
+      -- The OBIT time of the command release. This time can
+      -- be either a relative time (relative to an event) or
+      -- an Absolute Time. The interpretation depends on the
+      -- "On Date/Mission Event" field.
+      time-tag CHOICE {
+	relative-time-tag OBIT,
+	absolute-time-tag OBIT
+      },
+      -- This indicates which activity of the specified
+      -- application function is to be performed
+      activity-id ACTIVITY-ID
+    }
+  },
+  -- Jump to Mission Plan
+  tc-18-5 SEQUENCE {
+  -- A unique identification of a plan
+    plan-id PLAN-ID
+  },
+  -- Update Plan
+  tc-18-6 SEQUENCE {
+  -- A unique identification of a plan
+    plan-id PLAN-ID
+  },
+  -- Append Commands
+  tc-18-7 SEQUENCE {
+  -- A unique identification of a plan
+    plan-id PLAN-ID
+  }
+}
+
+--******************************************************************************
+--
+-- TC CCSDS packets
+--
+--******************************************************************************
+
+TM-CCSDS-PACKET ::= SEQUENCE {
+  packet-header PACKET-HEADER,
+  user-data USER-DATA-TM,
+  -- For any standard CCSDS packet, this field contains the checksum of
+  -- the entire CCSDS packet (except the check word position).
+  checkword CHECKSUM
+}
+
+USER-DATA-TM ::= CHOICE {
+-- TC Acceptance Report - Success
+  tm-1-1 SEQUENCE {
+  -- This is a copy of the corresponding fields from the packet
+  -- header of the telecommand to which this verification packet
+  -- relates.
+    packet-identification PACKET-IDENTIFICATION,
+    -- This is a copy of the corresponding fields from the packet
+    -- header of the telecommand to which this verification packet
+    -- relates.
+    packet-sequence-control PACKET-SEQUENCE-CONTROL
+  },
+  -- packet-sequence-control PACKET-SEQUENCE-CONTROL
+  tm-1-2 SEQUENCE {
+  -- This is a copy of the corresponding fields from the packet
+  -- header of the telecommand to which this verification packet
+  -- relates.
+    packet-identification PACKET-IDENTIFICATION,
+    -- This is a copy of the corresponding fields from the packet
+    -- header of the telecommand to which this verification packet
+    -- relates.
+    packet-sequence-control PACKET-SEQUENCE-CONTROL,
+    -- The code is an identifier of the type of failure. The
+    -- parameters field provides complementary information
+    -- relating to the particular value of the code field
+    response-parameter RESPONSE-PARAMETER
+  },
+  -- Distribute Trouble Shooting Command - Response
+  tm-2-3 SEQUENCE {
+  -- A unique identification of the bus where the command
+  -- response was received
+    bus-id BUS-ID(ALL EXCEPT nop),
+    -- The MIL-1553B Message Command word that initiated the
+    -- MIL-STD-1553B bus transaction
+    command-word COMMAND-WORD,
+    -- Message MIL-1553B Status word
+    status-word STATUS-WORD-1553,
+    -- Identifies the MIL-STD-1553B triggering/original command
+    command CHOICE {
+      receive-read-data NULL,
+      -- MIL-1553B Read Data. This field is present if the Command
+      -- Type is '1553 RT Transmit command (Troubleshooting TM)'.
+      transmit-read-data BUS-DATA
+    }
+  },
+  -- Housekeeping - Parameter Report
+  tm-3-25 SEQUENCE {
+  -- The Structure Identification reporting definition.
+    sid SID,
+    -- Raw values of all parameters in the defined SID
+    parameters SEQUENCE SIZE(1..768) OF HOUSEKEEPING-PARAMETER
+  },
+  -- Diagnostic - Parameter Report
+  tm-3-26 SEQUENCE {
+  -- The Structure Identification reporting definition.
+    sid SID,
+    -- Raw values of all parameters in the defined SID
+    parameters SEQUENCE SIZE(1..24) OF DIAGNOSTIC-PARAMETER
+  },
+  -- Normal/Progress Report
+  tm-5-1 NORMAL-PROGRESS-REPORT-RID,
+  -- Error/Anomaly Report - High Severity
+  tm-5-4 ERROR-ANOMALY-REPORT-HIGH-SEVERITY-RID,
+  -- Memory Dump using Absolute Addresses Report
+  tm-6-6 SEQUENCE {
+  -- This identifies the source memory block.
+    memory-id DUMP-MEMORY-ID,
+    -- This gives the start address
+    start-address MEMORY-ADDRESS,
+    -- The dumped data
+    data OCTET STRING(SIZE(1..60))
+  },
+  -- Memory Check using Absolute Addresses Report
+  tm-6-10 SEQUENCE {
+  -- This identifies the checked memory block.
+    memory-id CHECK-MEMORY-ID,
+    -- This gives the start address
+    start-address MEMORY-ADDRESS,
+    -- The data length
+    length MEMORY-ADDRESS,
+    -- The computed checksum
+    checksum CHECKSUM
+  },
+  -- Time Report
+  tm-10-1 SEQUENCE {
+  -- On-Board Internal Time, correlated with the packet header
+  -- time (OBUT)
+    obit OBIT,
+    -- Time Quality Counter (allows the ATV-CC to derive when the
+    -- last update of the time used in the packet header (OBUT)
+    -- took place)
+    tqc INT32
+  },
+  -- Summary Schedule Report
+  tm-11-13 SEQUENCE {
+  -- The number of packets to be download
+    n UINT32,
+    -- The absolute time (OBIT) at which the telecommand is to be
+    -- released
+    absolute-time-tag OBIT,
+    sequence-count SEQUENCE-COUNT
+  },
+  -- Link Connection Report
+  tm-17-2 NULL
+}
+
+-- A MIL-1553B Message Command word
+COMMAND-WORD ::= OCTET STRING(SIZE(2))
+-- Message MIL-1553B Status word
+STATUS-WORD-1553 ::= OCTET STRING(SIZE(2))
+BUS-DATA ::= OCTET STRING(SIZE(0..64))
+
+-- Only the Low level command of the TMTC are modelled
+LLC ::= CHOICE {
+  tmtc-current-state TMTC-STATE,
+  tmtc-enable-dump-flag BOOLEAN,
+  tmtc-abort-dump-memory NULL,
+  tmtc-authent-delay UINT32,
+  tmtc-al-prox-loss-threshold UINT32
+}
+
+TMTC-STATE ::= ENUMERATED {
+  tmtc-m-surv-free-flight, tmtc-m-surv-attached,
+  tmtc-m-free-flight, tmtc-m-attached,
+  tmtc-m-surv-init
+}
+
+-- Only the TM parameter of the TMTC are modelled
+PARAMETER-NUMBER ::= ENUMERATED {
+  tmtc-tdrs-lr-p1-filling, tmtc-tdrs-lr-p2-filling,
+  tmtc-tdrs-lr-p3-filling, tmtc-tdrs-lr-p4-filling,
+  tmtc-tdrs-lr-p5-filling, tmtc-tdrs-lr-p7-filling,
+  tmtc-tdrs-lr-p9-filling, tmtc-tdrs-lr-p10-filling,
+  tmtc-tdrs-lr-p11-filling, tmtc-tdrs-hr-p9-filling,
+  tmtc-tdrs-hr-p10-filling, tmtc-tdrs-hr-p11-filling,
+  tmtc-normal-event-rec-counter, tmtc-alarm-event-rec-counter,
+  tmtc-event-rec-saturation-flag, tmtc-current-state,
+  tmtc-tdrss-high-rate, tmtc-prox-ctrl, tmtc-heart-beat-recpt,
+  tmtc-heart-beat-counter, tmtc-prox-crypt-failed,
+  tmtc-tdrs-crypt-failed, tmtc-prox-far, tmtc-ack-iss-f1,
+  tmtc-ack-iss-f2, tmtc-ctl-panel-field, 
+  tmtc-tc-checksum-error, tmtc-bad-heartbeat-received,
+  tmtc-default-tm-number
+}
+
+-- The Structure Identification reporting definition.
+SID ::= ENUMERATED {
+  sid-1, sid-2, sid-3, sid-4, sid-5
+}
+
+-- This value identifies the offset/phase of the samples collection relative to a fixed point. It shall be between 0 and COLLECTION-INTERVAL -1
+SID-OFFSET ::= INTEGER ( 0 .. 899 )
+
+-- The data collection interval/period for this parameter report definition.
+COLLECTION-INTERVAL ::= INTEGER ( 1 | 2 | 10 | 30 | 60 | 600 | 900 )
+
+MEMORY-ID ::= ENUMERATED {
+  act-dpu-mem-id, inact-dpu1-mem-id, inact-dpu2-mem-id,
+  inact-dpu3-mem-id, gps1-mem-id, gps2-mem-id,
+  tgm-data1-mem-id, tgm-data2-mem-id, tgm-prog1-mem-id,
+  tgm-prog2-mem-id, pde1-mem-id, pde2-mem-id, pde3-mem-id,
+  pde4-mem-id, str1-mem-id, str2-mem-id, vdm1-mem-id,
+  vdm2-mem-id, cmu1-mem-id, cmu2-mem-id, context-mem-id
+}
+
+LOAD-MEMORY-ID ::= MEMORY-ID( act-dpu-mem-id | gps1-mem-id | gps2-mem-id | 
+			 tgm-data1-mem-id | tgm-data2-mem-id | 
+			 tgm-prog1-mem-id | tgm-prog2-mem-id | pde1-mem-id | 
+			 pde2-mem-id | pde3-mem-id | pde4-mem-id | 
+			 str1-mem-id | str2-mem-id | vdm1-mem-id | 
+			 vdm2-mem-id | cmu1-mem-id | cmu2-mem-id | 
+			 context-mem-id)
+
+DUMP-MEMORY-ID ::= MEMORY-ID
+
+CHECK-MEMORY-ID ::= MEMORY-ID( act-dpu-mem-id | gps1-mem-id | gps2-mem-id | 
+			 tgm-data1-mem-id | tgm-data2-mem-id | 
+			 tgm-prog1-mem-id | tgm-prog2-mem-id | pde1-mem-id | 
+			 pde2-mem-id | pde3-mem-id | pde4-mem-id | 
+			 str1-mem-id | str2-mem-id | vdm1-mem-id | 
+			 vdm2-mem-id)
+
+MEMORY-ADDRESS ::= INTEGER ( 0 .. 16383999 )
+
+ACTIVITY-ID ::= CHOICE {
+  vvt-mc-level-1 NULL,
+  vvt-mc-level-2 NULL,
+  vvt-mc-level-3 NULL,
+  drsdock-sc-auto-dock NULL,
+  tdrs-mc-rf-link NULL,
+  vrc-mc-off NULL,
+  vrc-mc-on NULL,
+  vvt-mc-off NULL,
+  gyra-mc-on NULL,
+  ecls-cc-fail3 NULL,
+  ecls-cc-nominal NULL,
+  ecls-ec-fansd-off NULL,
+  ecls-ec-fansd-on NULL,
+  ecls-sc-pea-close NULL,
+  ecls-sc-pea-open NULL,
+  ecls-ec-pprv1-close NULL,
+  ecls-ec-pprv2-close NULL,
+  ecls-mc-equalisation NULL,
+  gnc-sc-qua-init NULL,
+  prox-mc-rf-link NULL,
+  prox-cc-fail3 NULL,
+  pws-ec-issr-limit SEQUENCE {
+    pcdu-id ENUMERATED { pcdu1, pcdu2, pcdu3, pcdu4 },
+    issr1-limit FLOAT32, 
+    issr2-limit FLOAT32
+  },
+  pws-ec-pcdu-input-rspcu-cmd SEQUENCE {
+    pcdu-id ENUMERATED { pcdu1, pcdu2, pcdu3, pcdu4 },
+    status ENUMERATED { on, off }
+  },
+  sgs-sc-motor-cmd SEQUENCE {
+    pcdu-id ENUMERATED { pcdu1, pcdu2, pcdu3, pcdu4 },
+    status ENUMERATED { on, off }
+  },
+  sgs-motor-cmd-mask SEQUENCE {
+    sgs-motorj-theta-cons-mask FLOAT32,
+    sgs-motorj-theta-point-com-mask UINT32,
+    sgs-motorj-theta-bias-mask FLOAT32,
+    sgs-motorj-calc-mode ENUMERATED { mode-1, mode-2, mode-3, none }
+  },
+  tdrs-ec-select-tx1 NULL,
+  tdrs-ec-select-tx2 NULL,
+  tmtc-mc-attached NULL
+}
+
+-- Only the automated procedure ID of SGS are modelled
+AUTOMATED-PROCEDURE-ID ::= CHOICE {
+  sgs-ap-switch-sade-on NULL,
+  sgs-ap-change-of-sade SEQUENCE {
+    sade-id ENUMERATED{ sade1, sade2 }
+  },
+  sgs-ap-set-remove-sb SEQUENCE {
+    tcu-id ENUMERATED { tcu1, tcu2, tcu3, tcu4 }
+  },
+  sgs-ap-act-deact-pcdu-grp SEQUENCE {
+    action-type ENUMERATED { activate, deactivate }
+  },
+  sgs-ap-act-deact-tk-grp SEQUENCE {
+    tk-ref INTEGER( 0 | 1 | 2 | 4 | 8 )
+  },
+  sgs-ap-two-sade-off NULL,
+  sgs-ap-init-sade NULL
+}
+
+PLAN-ID ::= ENUMERATED {
+  plan1, plan2, plan3, plan4
+}
+
+RESPONSE-PARAMETER ::= CHOICE { 
+-- The packet is accepted by the FAS
+  packet-accepted NULL,
+  -- Error due to the FAR (at CPF level)
+  far-error SEQUENCE {
+    far-cpf1 FAR,
+    far-cpf2 FAR
+  },
+  -- Unknown Extended APID
+  bad-apid APID,
+  -- The specified packet length does not correspond to a valid packet
+  -- length, i.e. less than the packet secondary header or greater than
+  -- the maximal allowed length or odd
+  bad-packet-ength SEQUENCE { 
+    received-packet-length INTEGER 
+  },
+  -- The sequence count validation fails (excepted for CTL panel)
+  packet-sequence-count-validation-failed NULL,
+  -- The time ID field is different from '01' or '00' or time
+  -- authentication has failed
+  time-and-time-id-fields-validation-failed SEQUENCE {
+    packet-time-field OBUT ,
+    current-obut OBUT
+  },
+  -- Incorrect value of one of the following constant fields: Version
+  -- number, Secondary header flag, Sequence flags, Check-word indicator,
+  -- Element ID
+  constant-fields-validation-failed NULL,
+  -- Incorrect value of one of the following fields: Packet type, PUD
+  -- Data Acknowledgement field. The Packet Content ID specified in the
+  -- secondary header is unknown. A packet with an APID dedicated to the
+  -- MSU has a packet content ID different from PFS. The received PUD
+  -- service and sub-service are not accepted. The list of accepted PUD
+  -- services and sub-services is the following: for TMTC, service 2
+  -- sub-services 1, 2, 4 and 5, service 3 sub-services 1 and 2, service
+  -- 6 sub-services 2, 5 and 9, service 11 sub-services 3, 4 and 12,
+  -- service 14 sub-services 5, 6, 9, 10, 13 and 14, service 17
+  -- sub-service 1. For VCM, service 8 sub-service 3. For MM, service 2
+  -- sub-service 2, service 18 sub-services 1, 2, 3, 4, 5, 6 and 7. For
+  -- FUM-SETUP, service 8 sub-service 4. For FU others than FUM-SETUP,
+  -- service 2 sub-service 2, service 8 sub-service 4. For SU others than
+  -- TMTC, VCM and MM, service 2 sub-service 2
+  legal-command-data-validation-failed NULL,
+  -- The specified PUD service is not valid with the specified APID. TC
+  -- accepted by TMTC but rejected by FU. The rejection reason depends of
+  -- the PUD service type and sub-type: For (8,3) and (8,4) it means 'The
+  -- VCM buffer is full'. For (18,1), (18,2), (18,3), (18,5), (18,6) and
+  -- (18,7) it means 'The plan ID is unknown'. For (18,4) it means
+  -- 'The OMP buffer is full'
+  tc-rejected-by-application NULL,
+  -- The computed checksum is different from the checksum field
+  bad-checksum SEQUENCE {
+    received-checksum CHECKSUM,
+    computed-checksum CHECKSUM
+  },
+  -- One of the BUS id specified in a PUD service (2,1) or a PUD service
+  -- (2,4) (trouble shooting) is unknown
+  bad-bus SEQUENCE {
+    bus-id-received BUS-ID
+  },
+  -- The command type specified in a PUD service (2,1) (trouble shooting)
+  -- is unknown
+  bad-command-type SEQUENCE { 
+    command-type-received COMMAND-TYPE
+  },
+  -- Unknown SID for PUD services (3,1), (3,2), (14,5), (14,6), (14,9),
+  -- (14,10)
+  unknown-sid SEQUENCE { 
+    first-unknown-received-sid SID
+  },
+  -- The N and R values specified in the 'SID offset' and 'collection
+  -- interval' fields of PUD services (3,1) and (3,2) are out of range
+  incorrect-n-r-values SEQUENCE {
+    received-n-parameter INTEGER,
+    received-r-parameter INTEGER
+  },
+  -- At least one parameter ID is unknown for PUD services (3,2)
+  unknown-parameter SEQUENCE { 
+    first-unknown-received-parameter PARAMETER-NUMBER
+  },
+  -- The memory ID used for a PUD service 6 (load, check dump) is
+  -- unknown or forbidden for this type of service
+  unknown-memory SEQUENCE { 
+    received-memory MEMORY-ID
+  },
+  -- The load, dump or check memory command is required with an invalid
+  -- memory address into the DPU, i.e.: The address is not a valid
+  -- address or the specified data area is located in the EEPROM in the
+  -- FAS initial code (survival code) for a load TC
+  invalid-memory-address SEQUENCE { 
+    received-memory-address MEMORY-ID
+  },
+  -- This TC can not be executed at the same time that the trouble
+  -- shooting currently in progress
+  trouble-shooting-in-progress NULL,
+  -- This TC can not be executed at the same time that the memory load
+  -- currently in progress
+  memory-load-in-progress NULL,
+  -- This TC can not be executed at the same time that the memory dump
+  -- currently in progress
+  memory-dump-in-progress NULL,
+  -- This TC can not be executed at the same time that the memory check
+  -- currently in progress
+  memory-check-in-progress NULL,
+  -- The time tag of the received time tagged telecommand is lower than
+  -- the current OBIT
+  time-tag-exceeded SEQUENCE {
+    current-obit OBIT,
+    received-time-tag OBIT
+  },
+  -- The time tagged telecommand scheduler is full
+  scheduler-full NULL,
+  -- The specified NPAR1 parameter is not coherent to the packet length
+  -- for PUD services (3,2). The specified N parameter is not coherent to
+  -- the packet length for PUD services (14,5), (14,6), (14,9), (14,10),
+  -- (14,13), (14,14)
+  invalid-pud-parameter NULL,
+  -- A report identifier used as parameter of PUD services (14,13),
+  -- (14,14) is unknown
+  incorrect-report-identifier SEQUENCE { 
+    first-incorrect-report-identifier-received RID
+  }
+}
+
+RID ::= CHOICE {
+  tmtc-rid-tm-warning-saturation SEQUENCE {
+    dps-obit OBIT,
+    p2-saturated BOOLEAN,
+    p5-saturated BOOLEAN,
+    p7-saturated BOOLEAN
+  },
+  tmtc-rid-dump-error SEQUENCE {
+    dps-obit OBIT,
+    memory-id MEMORY-ID,
+    start-address MEMORY-ADDRESS,
+    data-length MEMORY-ADDRESS,
+    feedback-error INTEGER
+  },
+  tmtc-rid-load-error SEQUENCE {
+    dps-obit OBIT,
+    memory-id MEMORY-ID,
+    start-address MEMORY-ADDRESS,
+    data-length INTEGER(1..60),
+    feedback-error INTEGER
+  },
+  tmtc-rid-checksum-error SEQUENCE {
+    dps-obit OBIT,
+    memory-id MEMORY-ID,
+    start-address MEMORY-ADDRESS,
+    data-length MEMORY-ADDRESS,
+    feedback-error INTEGER
+  },
+  tmtc-rid-prox-loss SEQUENCE {
+    dps-obit OBIT
+  },
+  tmtc-rid-tdrs-crypt-fail SEQUENCE {
+    dps-obit OBIT
+  },
+  tmtc-rid-prox-crypt-fail SEQUENCE {
+    dps-obit OBIT
+  },
+  mm-rid-enable-disable-plan-rpt SEQUENCE {
+    dps-obit OBIT,
+    plan-id PLAN-ID,
+    management ENUMERATED { 
+      management-completed, 
+      active-plan }
+  },
+  mm-rid-erase-buffer-rpt SEQUENCE {
+    dps-obit OBIT
+  },
+  mm-rid-load-cmds-rpt SEQUENCE {
+    dps-obit OBIT,
+    plan-id PLAN-ID,
+    management-report ENUMERATED { 
+      plan-id-erroneous, 
+      max-size-reached, 
+      non-consistent-sequencing, 
+      management-completed }
+  },
+  mm-rid-update-plan-rpt SEQUENCE {
+    dps-obit OBIT,
+    plan-id PLAN-ID,
+    management-report ENUMERATED { 
+      plan-id-erroneous, 
+      enabled-plan, 
+      management-completed }
+  },
+  mm-rid-append-cmd-rpt SEQUENCE {
+    dps-obit OBIT,
+    plan-id PLAN-ID,
+    management-report ENUMERATED { 
+      plan-id-erroneous, 
+      max-size-reached, 
+      management-completed }
+  },
+  mm-rid-plan-init-rpt SEQUENCE {
+    dps-obit OBIT,
+    plan-id PLAN-ID,
+    management-report ENUMERATED { 
+      active-plan, 
+      disabled-plan, 
+      initialisation-completed }
+  }
+}
+
+NORMAL-PROGRESS-REPORT-RID ::= RID( WITH COMPONENT( tmtc-rid-tm-warning-saturation | tmtc-rid-dump-error | tmtc-rid-load-error | tmtc-rid-checksum-error | tmtc-rid-prox-loss | tmtc-rid-tdrs-crypt-fail | tmtc-rid-prox-crypt-fail ) )
+
+ERROR-ANOMALY-REPORT-HIGH-SEVERITY-RID ::= RID( WITH COMPONENT( mm-rid-enable-disable-plan-rpt | mm-rid-erase-buffer-rpt | mm-rid-load-cmds-rpt | mm-rid-update-plan-rpt | mm-rid-append-cmd-rpt | mm-rid-plan-init-rpt ) )
+
+MISSION-EVENT ::= ENUMERATED {
+  tdrs-me-surv-selected,
+  mm-me-plan-start,
+  mm-me-eopc,
+  gyra-me-surv-selected,
+  str-me-surv-selected,
+  gms-me-vdm-is-acquired,
+  gnc-me-rate-ok,
+  pro-me-end-draining,
+  pro-me-end-priming,
+  pro-me-surv-selected,
+  a5i-me-h32,
+  a5i-me-separation
+}
+
+HOUSEKEEPING-PARAMETER ::= CHOICE {
+  tmtc-tdrs-lr-p1-filling UINT32,
+  tmtc-tdrs-lr-p2-filling UINT32,
+  tmtc-tdrs-lr-p3-filling UINT32,
+  tmtc-tdrs-lr-p4-filling UINT32,
+  tmtc-tdrs-lr-p5-filling UINT32,
+  tmtc-tdrs-lr-p7-filling UINT32,
+  tmtc-tdrs-lr-p9-filling UINT32,
+  tmtc-tdrs-lr-p10-filling UINT32,
+  tmtc-tdrs-lr-p11-filling UINT32,
+  tmtc-tdrs-hr-p9-filling UINT32,
+  tmtc-tdrs-hr-p10-filling UINT32,
+  tmtc-tdrs-hr-p11-filling UINT32,
+  tmtc-normal-event-rec-counter UINT32,
+  tmtc-alarm-event-rec-counter UINT32,
+  tmtc-event-rec-saturation-flag BOOLEAN,
+  tmtc-current-state TMTC-STATE,
+  tmtc-tdrss-high-rate BOOLEAN,
+  tmtc-prox-ctrl BOOLEAN,
+  tmtc-heart-beat-recpt BOOLEAN,
+  tmtc-heart-beat-counter UINT32,
+  tmtc-prox-crypt-failed BOOLEAN,
+  tmtc-tdrs-crypt-failed BOOLEAN,
+  tmtc-prox-far SEQUENCE { far1 FAR, far2 FAR },
+  tmtc-ack-iss-f1 TMTC-ACK-ISS,
+  tmtc-ack-iss-f2 TMTC-ACK-ISS,
+  tmtc-ctl-panel-field SEQUENCE {
+    atv-motion-control-hold BOOLEAN,
+    atv-motion-control-retreat BOOLEAN,
+    atv-motion-control-escape BOOLEAN,
+    atv-target-light-dim BOOLEAN,
+    atv-target-light-medium BOOLEAN,
+    atv-target-light-bright BOOLEAN,
+    docking-crew BOOLEAN
+  },
+  tmtc-tc-checksum-error BOOLEAN,
+  tmtc-bad-heartbeat-received BOOLEAN,
+  tmtc-default-tm-number SID
+}
+
+TMTC-ACK-ISS ::= SEQUENCE {
+  packet-identification PACKET-IDENTIFICATION,
+  packet-sequence-control PACKET-SEQUENCE-CONTROL,
+  response-code UINT16,
+  acknowledgement-counter UINT16
+}
+
+DIAGNOSTIC-PARAMETER ::= OCTET STRING( SIZE(4) )
+
+-- Frame Analysis Report
+FAR ::= SEQUENCE {
+  status BIT STRING( SIZE(1) ),
+  frame-analysis BIT STRING( SIZE(3) ),
+  legal-ill-qualif BIT STRING( SIZE(3) ),
+  nb-of-accepted-code-block-per-cltu BIT STRING( SIZE(6) ),
+  nb-of-sing-error-cor BIT STRING( SIZE(3) ),
+  leg-frm-qual BIT STRING( SIZE(2) ),
+  sel-channel-input BIT STRING( SIZE(3) ),
+  last-map-addressed BIT STRING( SIZE(6) ),
+  r-1 BIT STRING( SIZE(1) ),
+  auth-analysis BIT STRING( SIZE(3) ),
+  r-2 BIT STRING( SIZE(1) )
+}
+
+COMMAND-TYPE ::= ENUMERATED{
+-- 1553 RT Transmit command (Troubleshooting TM)
+  transmit,
+  -- 1553 RT Receive command (Troubleshooting TC) 
+  receive 
+}
+
+END
