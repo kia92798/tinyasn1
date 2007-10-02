@@ -81,11 +81,11 @@ namespace tinyAsn1
                     if (mod.isValueDeclared(refName))
                     {
                         Asn1Value tmpVal = mod.GetValue(refName);
-                        if (tmpVal.m_valType == Asn1Value.ValType.UNDEFINED)
+                        if (tmpVal.m_TypeID == Asn1Value.TypeID.UNDEFINED)
                             continue;
-                        if (tmpVal.m_valType == Asn1Value.ValType.INT)
+                        if (tmpVal.m_TypeID == Asn1Value.TypeID.INT)
                         {
-                            Int64 val = (Int64)tmpVal.m_value;
+                            Int64 val = ((IntegerValue)tmpVal).Value;
                             if (val<0)
                                 throw new SemanticErrorException("Error in line : " + bsType.antlrNode.Line + ". Identifier '" + refName + "' is a negative integer");
                             bsType.m_namedBits.Add(ni.m_id, val);
@@ -143,11 +143,11 @@ namespace tinyAsn1
                     if (mod.isValueDeclared(refName))
                     {
                         Asn1Value tmpVal = mod.GetValue(refName);
-                        if (tmpVal.m_valType == Asn1Value.ValType.UNDEFINED)
+                        if (tmpVal.m_TypeID == Asn1Value.TypeID.UNDEFINED)
                             continue;
-                        if (tmpVal.m_valType == Asn1Value.ValType.INT)
+                        if (tmpVal.m_TypeID == Asn1Value.TypeID.INT)
                         {
-                            enumType.m_enumValues.Add(ni.m_id, new EnumeratedType.Item(ni.m_id, (Int64)tmpVal.m_value, ni.m_extended));
+                            enumType.m_enumValues.Add(ni.m_id, new EnumeratedType.Item(ni.m_id, ((IntegerValue)tmpVal).Value, ni.m_extended));
                             toBeRemoved.Add(ni);
                         }
                         else
@@ -167,7 +167,10 @@ namespace tinyAsn1
             if (enumType.m_enumValuesPriv.Count > 0)
                 bFinished = false;
             else
+            {
                 enumType.FixNumbers();
+                bFinished = true;
+            }
 
         }
 
@@ -191,11 +194,11 @@ namespace tinyAsn1
                     if (mod.isValueDeclared(refName))
                     {
                         Asn1Value tmpVal = mod.GetValue(refName);
-                        if (tmpVal.m_valType == Asn1Value.ValType.UNDEFINED)
+                        if (tmpVal.m_TypeID == Asn1Value.TypeID.UNDEFINED)
                             continue;
-                        if (tmpVal.m_valType == Asn1Value.ValType.INT)
+                        if (tmpVal.m_TypeID == Asn1Value.TypeID.INT)
                         {
-                            intType.m_namedValues.Add(ni.m_id, (Int64)tmpVal.m_value);
+                            intType.m_namedValues.Add(ni.m_id, ((IntegerValue)tmpVal).Value);
                             toBeRemoved.Add(ni);
                         }
                         else
@@ -253,10 +256,10 @@ namespace tinyAsn1
 
         public void OnValueAssigment(Asn1File asn1File, Module mod, ValueAssigment vas)
         {
-            if (vas.m_value.m_valType == Asn1Value.ValType.UNDEFINED)
+            if (vas.m_value.m_TypeID == Asn1Value.TypeID.UNDEFINED)
             {
-                vas.m_type.FixVariable(vas.m_value);
-                if (vas.m_value.m_valType == Asn1Value.ValType.UNDEFINED)
+                vas.m_value = vas.m_type.FixVariable(vas.m_value);
+                if (vas.m_value.m_TypeID == Asn1Value.TypeID.UNDEFINED)
                     bFinished = false;
             }
         }

@@ -363,9 +363,14 @@ namespace tinyAsn1
             }
             return ret;
         }
-        internal virtual void FixVariable(Asn1Value val)
+        internal virtual Asn1Value FixVariable(Asn1Value val)
         {
             throw new Exception("Internal Error: abstract function call");
+        }
+
+        internal virtual bool NeedMorePasses()
+        {
+            return false;
         }
     }
 
@@ -400,6 +405,75 @@ namespace tinyAsn1
         }
     }
 
+    public partial class NullType : Asn1Type
+    {
+        internal override Asn1Value FixVariable(Asn1Value val)
+        {
+            string referenceId = "";
+            switch (val.antlrNode.Type)
+            {
+                case asn1Parser.NULL:
+                    return new NullValue();
+                case asn1Parser.VALUE_REFERENCE:
+                    referenceId = val.antlrNode.GetChild(0).Text;
+                    if (m_module.isValueDeclared(referenceId))
+                    {
+                        Asn1Value tmp = m_module.GetValue(referenceId);
+                        switch (tmp.m_TypeID)
+                        {
+                            case Asn1Value.TypeID.NULL:
+                                return new NullValue();
+                            case Asn1Value.TypeID.UNDEFINED:
+                                // not yet resolved, wait for next round
+                                return val;
+                            default:
+                                throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                        }
+                    }
+                    else
+                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
+
+                default:
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting BIT STRING constant or BIT STRING variable");
+            }
+        }
+    }
+
+    public partial class BooleanType : Asn1Type
+    {
+        internal override Asn1Value FixVariable(Asn1Value val)
+        {
+            string referenceId = "";
+            switch (val.antlrNode.Type)
+            {
+                case asn1Parser.TRUE:
+                case asn1Parser.FALSE:
+                    return new BooleanValue(val.antlrNode, m_module, this);
+                case asn1Parser.VALUE_REFERENCE:
+                    referenceId = val.antlrNode.GetChild(0).Text;
+                    if (m_module.isValueDeclared(referenceId))
+                    {
+                        Asn1Value tmp = m_module.GetValue(referenceId);
+                        switch (tmp.m_TypeID)
+                        {
+                            case Asn1Value.TypeID.BOOLEAN:
+                                return new BooleanValue(tmp as BooleanValue);
+                            case Asn1Value.TypeID.UNDEFINED:
+                                // not yet resolved, wait for next round
+                                return val;
+                            default:
+                                throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                        }
+                    }
+                    else
+                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
+
+                default:
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting BIT STRING constant or BIT STRING variable");
+            }
+        }
+
+    }
 
     public partial class BitStringType : Asn1Type
     {
@@ -419,8 +493,131 @@ namespace tinyAsn1
 
             return ret;
         }
+        internal override bool NeedMorePasses()
+        {
+            return this.m_namedBitsPriv.Count>0;
+        }
+
+        internal override Asn1Value FixVariable(Asn1Value val)
+        {
+            string referenceId = "";
+            switch (val.antlrNode.Type)
+            {
+                case asn1Parser.BitStringLiteral:
+                case asn1Parser.OctectStringLiteral:
+                    return new BitStringValue(val.antlrNode, m_module, this);
+                case asn1Parser.BIT_STRING_VALUE: // { id, id2, id3}
+                    {
+                        if (NeedMorePasses())
+                            return val;
+                        List<Int64> ids = new List<Int64>();
+                        for (int i = 0; i < val.antlrNode.ChildCount; i++)
+                        {
+                            string id = val.antlrNode.GetChild(i).Text;
+                            if (!m_namedBits.ContainsKey(id))
+                                throw new SemanticErrorException("Error in line: "+val.antlrNode.Line+". Unknown identifier '"+id+",");
+                            ids.Add(m_namedBits[id]);
+                        }
+                        return new BitStringValue(ids, val.antlrNode, m_module, this);
+                    }
+                case asn1Parser.VALUE_REFERENCE:
+                    referenceId = val.antlrNode.GetChild(0).Text;
+                    if (m_module.isValueDeclared(referenceId))
+                    {
+                        Asn1Value tmp = m_module.GetValue(referenceId);
+                        switch (tmp.m_TypeID)
+                        {
+                            case Asn1Value.TypeID.BIT_STRING:
+                                return new BitStringValue(tmp as BitStringValue);
+                            case Asn1Value.TypeID.UNDEFINED:
+                                // not yet resolved, wait for next round
+                                return val;
+                            default:
+                                throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                        }
+                    }
+                    else
+                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
+
+                default:
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting BIT STRING constant or BIT STRING variable");
+            }
+        }
     }
 
+    public partial class OctetStringType : Asn1Type
+    {
+        internal override Asn1Value FixVariable(Asn1Value val)
+        {
+            string referenceId = "";
+            switch (val.antlrNode.Type)
+            {
+                case asn1Parser.BitStringLiteral:
+                case asn1Parser.OctectStringLiteral:
+                    return new OctectStringValue(val.antlrNode, m_module, this);
+                case asn1Parser.VALUE_REFERENCE:
+                    referenceId = val.antlrNode.GetChild(0).Text;
+                    if (m_module.isValueDeclared(referenceId))
+                    {
+                        Asn1Value tmp = m_module.GetValue(referenceId);
+                        switch (tmp.m_TypeID)
+                        {
+                            case Asn1Value.TypeID.OCTECT_STRING:
+                                return new OctectStringValue(tmp as OctectStringValue);
+                            case Asn1Value.TypeID.UNDEFINED:
+                                // not yet resolved, wait for next round
+                                return val;
+                            default:
+                                throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                        }
+                    }
+                    else
+                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
+
+                default:
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting BIT STRING constant or BIT STRING variable");
+            }
+        }
+
+    }
+
+
+    public partial class RealType : Asn1Type
+    {
+
+        internal override Asn1Value FixVariable(Asn1Value val)
+        {
+            string referenceId = "";
+            switch (val.antlrNode.Type)
+            {
+                case asn1Parser.NUMERIC_VALUE:
+                    return new RealValue(val.antlrNode, m_module, this);
+                case asn1Parser.VALUE_REFERENCE:
+                    referenceId = val.antlrNode.GetChild(0).Text;
+                    if (m_module.isValueDeclared(referenceId))
+                    {
+                        Asn1Value tmp = m_module.GetValue(referenceId);
+                        switch (tmp.m_TypeID)
+                        {
+                            case Asn1Value.TypeID.REAL:
+                                return new RealValue(tmp as RealValue);
+                            case Asn1Value.TypeID.UNDEFINED:
+                                // not yet resolved, wait for next round
+                                return val;
+                            default:
+                                throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                        }
+                    }
+                    else
+                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
+
+                default:
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting REAL or REAL variable");
+            }
+        }
+            
+
+    }
 
     public partial class EnumeratedType : Asn1Type
     {
@@ -470,7 +667,7 @@ namespace tinyAsn1
             return m_enumValues.ContainsKey(id);
         }
 
-        internal override void FixVariable(Asn1Value val)
+        internal override Asn1Value FixVariable(Asn1Value val)
         {
             string referenceId;
             switch (val.antlrNode.Type)
@@ -481,33 +678,32 @@ namespace tinyAsn1
                     {
                         if (this.isIdentifierProcessed(referenceId))
                         {
-                            val.m_valType = Asn1Value.ValType.ENUMERATED;
-                            val.m_value = this.m_enumValues[referenceId].m_value;
-                            val.m_module = m_module;
+                            if (m_enumValues[referenceId].m_valCalculated)
+                                return new EnumeratedValue(m_enumValues[referenceId].m_value, referenceId,
+                                    val.antlrNode, m_module, this);
+                            else
+                                return val; //leave for a next pass where value will have been calculated
                         } 
-                        // else leave for a next pass where (hopefully) it will have been resolved
+                        else
+                            return val;// leave for a next pass where (hopefully) it will have been resolved
                     }
                     else if (m_module.isValueDeclared(referenceId)) 
                     {
-                        ValueAssigment vas = m_module.GetValueAssigment(referenceId);
-                        if (vas.m_value.m_valType == Asn1Value.ValType.UNDEFINED)
-                            break;
-                        if (vas.m_type.GetFinalType() == this)
+                        Asn1Value tmp = m_module.GetValue(referenceId);
+                        if (tmp.m_TypeID == Asn1Value.TypeID.UNDEFINED)
+                            return val; // not yet resolved. Wait for next round
+                        if (tmp.Type.GetFinalType() == this)
                         {
-                            val.m_valType = Asn1Value.ValType.ENUMERATED;
-                            val.m_value = vas.m_value;
-                            val.m_module = m_module;
+                            return new EnumeratedValue(tmp as EnumeratedValue);
 
                         } else
                             throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
                     }
                     else
                         throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
-                    break;
                 default:
                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting enumerated item or enumerated item variable");
             }
-
         }
 
         private bool IsValueDefined(Int64 val)
@@ -568,45 +764,29 @@ namespace tinyAsn1
             return m_namedValues.ContainsKey(id);
         }
 
-        
 
-        internal override void FixVariable(Asn1Value val)
+
+        internal override Asn1Value FixVariable(Asn1Value val)
         {
+            if (m_module == null)
+                throw new Exception("Bug m_module is null");
             string referenceId="";
             switch (val.antlrNode.Type)
             {
                 case asn1Parser.NUMERIC_VALUE:
-                    val.m_valType = Asn1Value.ValType.INT;
-                    if (val.antlrNode.ChildCount == 1)
-                        val.m_value = Int64.Parse(val.antlrNode.GetChild(0).Text);
-                    else if ((val.antlrNode.ChildCount == 2) && (val.antlrNode.GetChild(1).Text == "-"))
-                        val.m_value = Int64.Parse(val.antlrNode.GetChild(0).Text);
-                    else
-                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + " Expecting integer or integer variable");
-                    break;
                 case asn1Parser.MIN:
-                    val.m_valType = Asn1Value.ValType.MIN;
-                    val.m_value = Int64.MinValue;
-                    break;
                 case asn1Parser.MAX:
-                    val.m_valType = Asn1Value.ValType.MAX;
-                    val.m_value = Int64.MaxValue;
-                    break;
+                    return new IntegerValue(val.antlrNode, m_module, this);
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
                     if (m_module.isValueDeclared(referenceId))
                     {
                         Asn1Value tmp = m_module.GetValue(referenceId);
-                        switch (tmp.m_valType)
+                        switch (tmp.m_TypeID)
                         {
-                            case Asn1Value.ValType.INT:
-                            case Asn1Value.ValType.MAX:
-                            case Asn1Value.ValType.MIN:
-                                val.m_valType = tmp.m_valType;
-                                val.m_value = tmp.m_value;
-                                val.m_module = m_module;
-                                break;
-                            case Asn1Value.ValType.UNDEFINED:
+                            case Asn1Value.TypeID.INT:
+                                return new IntegerValue(tmp as IntegerValue);
+                            case Asn1Value.TypeID.UNDEFINED:
                                 break;
                             default:
                                 throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
@@ -615,11 +795,7 @@ namespace tinyAsn1
                     else if (this.isIdentifierDeclared(referenceId))
                     {
                         if (this.isIdentifierProcessed(referenceId))
-                        {
-                            val.m_valType = Asn1Value.ValType.INT;
-                            val.m_value = m_namedValues[referenceId];
-                            val.m_module = m_module;
-                        }
+                            return new IntegerValue(m_namedValues[referenceId], m_module, val.antlrNode,this);
                     } else
                         throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
 
@@ -627,7 +803,8 @@ namespace tinyAsn1
                 default:
                     throw new SemanticErrorException("Error in line : "+val.antlrNode.Line+". Expecting integer or integer variable");
             }
-            
+
+            throw new Exception("Internal error");
 
         }
 
@@ -968,9 +1145,9 @@ namespace tinyAsn1
             return ret;
         }
 
-        internal override void FixVariable(Asn1Value val)
+        internal override Asn1Value FixVariable(Asn1Value val)
         {
-            Type.FixVariable(val);
+            return Type.FixVariable(val);
         }
 
     }
@@ -993,114 +1170,13 @@ namespace tinyAsn1
 
             Asn1Value ret = new Asn1Value();
             ret.antlrNode = tree;
-
-
             // Asn1Value will be modified in a second tree pass
             return ret;
-/*
-            ret.m_module = Module.CurrentlyConstructModule;
-
-            switch (tree.Type)
-            {
-                case asn1Parser.BitStringLiteral:
-                    ret.m_value = tree.Text;
-                    ret.m_valType = ValType.BIT_STRING_LITERAL;
-                    break;
-                case asn1Parser.BIT_STRING_VALUE:
-                    ret.m_value = new List<string>();
-                    ret.m_valType = ValType.BIT_STRING_VALUE;
-                    for (int i = 0; i < tree.ChildCount; i++)
-                        ((List<string>)ret.m_value).Add(tree.GetChild(i).Text);
-                    break;
-                case asn1Parser.OctectStringLiteral:
-                    ret.m_valType = ValType.OCTECT_STRING_LITERAL;
-                    ret.m_value = tree.Text;
-                    break;
-                case asn1Parser.TRUE:
-                    ret.m_valType = ValType.BOOLEAN_TRUE;
-                    ret.m_value = true;
-                    break;
-                case asn1Parser.FALSE:
-                    ret.m_valType = ValType.BOOLEAN_FALSE;
-                    ret.m_value = false;
-                    break;
-                case asn1Parser.StringLiteral:
-                    ret.m_valType = ValType.STRING_LITERAL;
-                    ret.m_value = tree.Text;
-                    break;
-                case asn1Parser.LID:
-                    ret.m_valType = ValType.VALUE_REFERENCE;
-                    ret.m_value = tree.Text;
-                    break;
-                case asn1Parser.NUMERIC_VALUE:
-                    handleNumeric(ret, tree);
-                    break;
-                case asn1Parser.MIN:
-                    ret.m_valType = ValType.MIN;
-                    ret.m_value = Int64.MinValue;
-                    break;
-                case asn1Parser.MAX:
-                    ret.m_valType = ValType.MAX;
-                    ret.m_value = Int64.MaxValue;
-                    break;
-                case asn1Parser.CHAR_SEQUENCE_VALUE:
-                    ret.m_value = new List<int>();
-                    ret.m_valType = ValType.CHAR_SEQUENCE_VALUE;
-                    for (int i = 0; i < tree.ChildCount; i++)
-                        ((List<int>)ret.m_value).Add(int.Parse(tree.GetChild(i).Text));
-                    break;
-                default:
-                    throw new Exception("Unkown child: " + tree.Text + " for node: VALUE" );
-
-            }
-
-            return ret;*/
-        }
-
-        static void handleNumeric(Asn1Value ret,ITree tree) 
-        {
-            Int64 intVall;
-            ret.m_valType = ValType.INT;
-            intVall = Int64.Parse(tree.GetChild(0).Text);
-            bool negate = false;
-            Int64 decPart = 0;
-            if (tree.ChildCount == 1)
-            {
-                ret.m_value = intVall;
-                return;
-            }
-            else if (tree.ChildCount == 2)
-            {
-                if (tree.GetChild(1).Text == "-")
-                {
-                    intVall = -intVall;
-                    ret.m_value = intVall;
-                    return;
-                }
-                else
-                {
-                    ret.m_valType = ValType.REAL;
-                    negate = false;
-                    decPart = Int64.Parse(tree.GetChild(1).Text);
-                }
-            } else if (tree.ChildCount==3)
-            {
-                ret.m_valType = ValType.REAL;
-                negate = tree.GetChild(1).Text == "-";
-                decPart = Int64.Parse(tree.GetChild(2).Text);
-            }
-
-            double tmp = decPart;
-            for (int i = 0; i < decPart.ToString().Length; i++)
-                tmp = tmp / 10.0;
-            double retVal = intVall+tmp;
-
-            if (negate)
-                retVal = -retVal;
-            
-            ret.m_value = -retVal;
         }
     }
+
+
+
 
     public partial class ExceptionSpec
     {
