@@ -11,6 +11,31 @@ class diagram {
 @__modelType reference 
 */
 class reference {
+}/**
+@__ref <oiref:design#Class#id664sf71o3frwf73iqpg4.node1:oiref><oihard>
+@__modelType reference 
+*/
+class reference2 {
+}/**
+@__ref <oiref:design#Class#id664sf71o3frwf73iqpg4.node3:oiref><oihard>
+@__modelType reference 
+*/
+class reference4 {
+}/**
+@__ref <oiref:design#Class#id664sf71o3frwf73iqpg4.node5:oiref><oihard>
+@__modelType reference 
+*/
+class reference6 {
+}/**
+@__ref <oiref:design#Class#id664sf71o3frwf73iqpg4.node7:oiref><oihard>
+@__modelType reference 
+*/
+class reference8 {
+}/**
+@__ref <oiref:design#Class#id664sf71o3frwf73iqpg4.node11:oiref><oihard>
+@__modelType reference 
+*/
+class reference12 {
 }}/**
 @__tags
 @shapeType ClassDiagram 
@@ -21,9 +46,18 @@ class __tags {
 */
 class __options {
 }/**
-@__positions <oigroup:Composite#label#<oiref:design#Class#id664sf71o3frwf73iqpg4.node.link:oiref>=421,184,34,16,0:oigroup>
-<oigroup:<oiref:design#Class#id664sf71o3frwf73iqpg4.node.link:oiref>=545,280,289,129:oigroup>
-<oigroup:<oiref:design#Class#id664sf71o3frwf73iqpg4.node:oiref>=380,220,90,91,1:oigroup>
+@__positions <oigroup:<oiref:design#Class#id664sf71o3frwf73iqpg4.node.link:oiref>=545,280,289,129:oigroup>
+<oigroup:<oiref:design#Class#id664sf71o3frwf73iqpg4.node7:oiref>=600,480,83,82,1:oigroup>
+<oigroup:<oiref:design#Class#id664sf71o3frwf73iqpg4.node1:oiref>=100,470,84,82,1:oigroup>
+<oigroup:<oiref:design#Class#id664sf71o3frwf73iqpg4.node:oiref>=360,150,83,82,1:oigroup>
+<oigroup:<oiref:design#Class#id664sf71o3frwf73iqpg4.node7.link:oiref>=641,480,428,232:oigroup>
+<oigroup:<oiref:design#Class#id664sf71o3frwf73iqpg4.node5.link:oiref>=486,480,413,232:oigroup>
+<oigroup:<oiref:design#Class#id664sf71o3frwf73iqpg4.node5:oiref>=440,480,93,82,1:oigroup>
+<oigroup:<oiref:design#Class#id664sf71o3frwf73iqpg4.node3.link:oiref>=316,480,400,232:oigroup>
+<oigroup:<oiref:design#Class#id664sf71o3frwf73iqpg4.node1.link:oiref>=142,470,380,232:oigroup>
+<oigroup:<oiref:design#Class#id664sf71o3frwf73iqpg4.node11:oiref>=720,310,90,82,1:oigroup>
+<oigroup:<oiref:design#Class#id664sf71o3frwf73iqpg4.node3:oiref>=260,480,113,82,1:oigroup>
+<oigroup:<oiref:design#Class#id664sf71o3frwf73iqpg4.node11.link:oiref>=765,310,436,232:oigroup>
  
 */
 class __positions {
@@ -34,18 +68,71 @@ class __positions {
 */
 class node {
 /**
-@shapeType Attribute
-@__modelType member
-@name Value
-@mod__type Object 
-*/
-class member {
-}/**
 @shapeType AssociatesLink
 @__modelType link
 @__ref <oiref:design#Class#id2lzyxf71o3frwf71vd4f7.node:oiref><oihard>
 @directed
 @label Type 
+*/
+class link {
+}}/**
+@shapeType Class
+@__modelType node
+@name IntegerValue 
+*/
+class node1 {
+/**
+@shapeType GeneralizationLink
+@__modelType link
+@__ref <oiref:design#Class#id664sf71o3frwf73iqpg4.node:oiref><oihard> 
+*/
+class link {
+}}/**
+@shapeType Class
+@__modelType node
+@name EnumeratedValue 
+*/
+class node3 {
+/**
+@shapeType GeneralizationLink
+@__modelType link
+@__ref <oiref:design#Class#id664sf71o3frwf73iqpg4.node:oiref><oihard> 
+*/
+class link {
+}}/**
+@shapeType Class
+@__modelType node
+@name BitStringValue 
+*/
+class node5 {
+/**
+@shapeType GeneralizationLink
+@__modelType link
+@__ref <oiref:design#Class#id664sf71o3frwf73iqpg4.node:oiref><oihard> 
+*/
+class link {
+}}/**
+@shapeType Class
+@__modelType node
+@name RealValue 
+*/
+class node7 {
+/**
+@shapeType GeneralizationLink
+@__modelType link
+@__ref <oiref:design#Class#id664sf71o3frwf73iqpg4.node:oiref><oihard> 
+*/
+class link {
+}}/**
+@shapeType Class
+@__modelType node
+@name BooleanValue 
+*/
+class node11 {
+/**
+@shapeType GeneralizationLink
+@__modelType link
+@__ref <oiref:design#Class#id664sf71o3frwf73iqpg4.node:oiref><oihard> 
 */
 class link {
 }}

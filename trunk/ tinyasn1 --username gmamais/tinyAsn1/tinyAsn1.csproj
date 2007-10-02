@@ -53,6 +53,7 @@
     <Compile Include="Asn1ASTConstruction.cs" />
     <Compile Include="asn1Lexer.cs" />
     <Compile Include="asn1Parser.cs" />
+    <Compile Include="Asn1Value.cs" />
     <Compile Include="ASTVisit.cs" />
     <Compile Include="SemanticParser.cs" />
     <Compile Include="PERConstraints.cs" />

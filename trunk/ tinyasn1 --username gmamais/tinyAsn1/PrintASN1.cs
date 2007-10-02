@@ -7,7 +7,6 @@ namespace tinyAsn1
 {
     public class PrintASN1 : IASTVisitor
     {
-
         TextWriter o;
         public PrintASN1(TextWriter outStream)
         {
@@ -60,7 +59,6 @@ namespace tinyAsn1
 
         public void OnAfterModule(Asn1File asn1File, Module mod)
         {
-
             o.WriteLine("END");
         }
 
@@ -97,12 +95,12 @@ namespace tinyAsn1
 
         public void OnBooleanType(Asn1File asn1File, Module mod, BooleanType boolType, TypeAssigment tas)
         {
-            
+            o.WriteLine("\t" + tas.m_name + " ::=BOOLEAN");
         }
 
         public void OnRealType(Asn1File asn1File, Module mod, RealType realType, TypeAssigment tas)
         {
-            
+            o.WriteLine("\t" + tas.m_name + " ::=REAL");
         }
 
         public void OnEnumeratedType(Asn1File asn1File, Module mod, EnumeratedType enumType, TypeAssigment tas)
@@ -165,7 +163,7 @@ namespace tinyAsn1
 
         public void OnOctectStringType(Asn1File asn1File, Module mod, OctetStringType osType, TypeAssigment tas)
         {
-            
+            o.WriteLine("\t" + tas.m_name + " ::=OCTET STRING");
         }
 
         public void OnReferenceType(Asn1File asn1File, Module mod, ReferenceType refType, TypeAssigment tas)
@@ -177,12 +175,12 @@ namespace tinyAsn1
 
         public void OnValueAssigment(Asn1File asn1File, Module mod, ValueAssigment vas)
         {
-            if (vas.m_value.m_valType == Asn1Value.ValType.UNDEFINED)
+            if (vas.m_value.m_TypeID == Asn1Value.TypeID.UNDEFINED)
             {
                 Console.Error.WriteLine("Variable assigment '"+vas.m_name+"' is still in UNDEFINED state. It will be ignored");
                 return;
             }
-            o.WriteLine("\t" + vas.m_name + " " + vas.m_type.Name + " ::= " + vas.m_value.m_value.ToString());
+            o.WriteLine("\t" + vas.m_name + " " + vas.m_type.Name + " ::= " + vas.m_value.ToString());
         }
 
     }

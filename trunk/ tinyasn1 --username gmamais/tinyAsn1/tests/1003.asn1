@@ -2,6 +2,15 @@ MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
 	
 	MyInt ::= INTEGER
 	myIntVal INTEGER ::= 4
+	
+	MyReal ::= REAL
+	
+	pi REAL ::= 3.1
+	pi2 MyReal ::= 3.1
+	pi3 MyReal ::= pi2
+	--pi4 MyReal ::= myIntVal
+	
+	--pi5 REAL ::= myIntVal
 
 	MyInt2 ::= [APPLICATION 1001] INTEGER { ab(1), ac(3), ad(myIntVal), kala(myIntVal3)}
 	
