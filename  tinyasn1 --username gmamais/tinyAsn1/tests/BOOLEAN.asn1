@@ -1,0 +1,18 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+	
+	MyBOOL ::= BOOLEAN
+
+	mybool1 BOOLEAN ::= TRUE
+	mybool2 BOOLEAN ::= FALSE
+
+	mybool3 MyBOOL ::= TRUE
+	mybool4 MyBOOL ::= FALSE
+
+	mybool5 MyBOOL ::= mybool4
+	mybool6 MyBOOL ::= mybool1
+
+	
+	
+	
+	
+END
