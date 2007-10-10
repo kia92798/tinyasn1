@@ -55,6 +55,7 @@
     <Compile Include="asn1Parser.cs" />
     <Compile Include="Asn1Value.cs" />
     <Compile Include="ASTVisit.cs" />
+    <Compile Include="Constraint.cs" />
     <Compile Include="SemanticParser.cs" />
     <Compile Include="PERConstraints.cs" />
     <Compile Include="PrintASN1.cs" />

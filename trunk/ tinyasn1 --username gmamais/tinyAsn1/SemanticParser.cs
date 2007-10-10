@@ -47,6 +47,8 @@ namespace tinyAsn1
 
         public void OnBeforeTypeAssigment(Asn1File asn1File, Module mod, TypeAssigment tas)
         {
+            if (!tas.m_type.SemanticCheckFinished())
+                bFinished = false;
         }
 
         public void OnAfterTypeAssigment(Asn1File asn1File, Module mod, TypeAssigment tas)
@@ -60,52 +62,7 @@ namespace tinyAsn1
 
         public void OnBitStringType(Asn1File asn1File, Module mod, BitStringType bsType, TypeAssigment tas)
         {
-            List<NumberedItem> toBeRemoved = new List<NumberedItem>();
-            foreach (NumberedItem ni in bsType.m_namedBitsPriv)
-            {
-                if (bsType.m_namedBits.ContainsKey(ni.m_id))
-                    throw new SemanticErrorException("The BIT STRING type defined in line " + bsType.antlrNode.Line +
-                        " containts more than once the identifier " + ni.m_id);
-                
-                if (ni.m_valueAsInt != null)
-                {
-                    if (ni.m_valueAsInt.Value<0)
-                        throw new SemanticErrorException("Error in line : " + bsType.antlrNode.Line + ". Bit string ids must be no negative numbers");
-                    bsType.m_namedBits.Add(ni.m_id, ni.m_valueAsInt.Value);
-                    toBeRemoved.Add(ni);
-                }
-                else
-                {
-                    //We have to look up in the variables definitions
-                    string refName = ni.m_valueAsReference;
-                    if (mod.isValueDeclared(refName))
-                    {
-                        Asn1Value tmpVal = mod.GetValue(refName);
-                        if (tmpVal.m_TypeID == Asn1Value.TypeID.UNDEFINED)
-                            continue;
-                        if (tmpVal.m_TypeID == Asn1Value.TypeID.INT)
-                        {
-                            Int64 val = ((IntegerValue)tmpVal).Value;
-                            if (val<0)
-                                throw new SemanticErrorException("Error in line : " + bsType.antlrNode.Line + ". Identifier '" + refName + "' is a negative integer");
-                            bsType.m_namedBits.Add(ni.m_id, val);
-                            toBeRemoved.Add(ni);
-                        }
-                        else
-                        {
-                            throw new SemanticErrorException("Error in line : " + bsType.antlrNode.Line + ". Identifier '" + refName + "' is not an integer");
-                        }
-                        //else let it be resolved in a next parse round
-                    }
-                    else
-                        throw new SemanticErrorException("Error in line : " + bsType.antlrNode.Line + ". Identifier '" + refName + "' is unknown");
-                }
-
-            }
-            foreach (NumberedItem ni in toBeRemoved)
-                bsType.m_namedBitsPriv.Remove(ni);
-            if (bsType.m_namedBitsPriv.Count > 0)
-                bFinished = false;
+//            bFinished = bsType.SemanticCheck();
         }
 
         public void OnBooleanType(Asn1File asn1File, Module mod, BooleanType boolType, TypeAssigment tas)
@@ -120,101 +77,12 @@ namespace tinyAsn1
 
         public void OnEnumeratedType(Asn1File asn1File, Module mod, EnumeratedType enumType, TypeAssigment tas)
         {
-            List<NumberedItem> toBeRemoved = new List<NumberedItem>();
-            foreach (NumberedItem ni in enumType.m_enumValuesPriv)
-            {
-                if (enumType.m_enumValues.ContainsKey(ni.m_id))
-                    throw new SemanticErrorException("The ENUMERATED type defined in line " + enumType.antlrNode.Line +
-                        " containts more than once the identifier " + ni.m_id);
-                if (ni.m_valueAsInt != null)
-                {
-                    enumType.m_enumValues.Add(ni.m_id, new EnumeratedType.Item(ni.m_id, ni.m_valueAsInt.Value, ni.m_extended));
-                    toBeRemoved.Add(ni);
-                }
-                else if (ni.m_valueAsReference == "")
-                {
-                    enumType.m_enumValues.Add(ni.m_id, new EnumeratedType.Item(ni.m_id, ni.m_extended));
-                    toBeRemoved.Add(ni);
-                }
-                else
-                {
-                    //We have to look up in the variables definitions
-                    string refName = ni.m_valueAsReference;
-                    if (mod.isValueDeclared(refName))
-                    {
-                        Asn1Value tmpVal = mod.GetValue(refName);
-                        if (tmpVal.m_TypeID == Asn1Value.TypeID.UNDEFINED)
-                            continue;
-                        if (tmpVal.m_TypeID == Asn1Value.TypeID.INT)
-                        {
-                            enumType.m_enumValues.Add(ni.m_id, new EnumeratedType.Item(ni.m_id, ((IntegerValue)tmpVal).Value, ni.m_extended));
-                            toBeRemoved.Add(ni);
-                        }
-                        else
-                        {
-                            throw new SemanticErrorException("Error in line : " + enumType.antlrNode.Line + ". Incompatible types assigment");
-                        }
-                        //else let it be resolved in a next parse round
-                    }
-                    else
-                        throw new SemanticErrorException("Error in line : " + enumType.antlrNode.Line + ". Identifier '" + refName + "' is unknown");
-                }
-                
-            }
-
-            foreach (NumberedItem ni in toBeRemoved)
-                enumType.m_enumValuesPriv.Remove(ni);
-            if (enumType.m_enumValuesPriv.Count > 0)
-                bFinished = false;
-            else
-            {
-                enumType.FixNumbers();
-                bFinished = true;
-            }
-
+//               bFinished = enumType.SemanticCheck();
         }
 
         public void OnIntegerType(Asn1File asn1File, Module mod, IntegerType intType, TypeAssigment tas)
         {
-            List<NumberedItem> toBeRemoved = new List<NumberedItem>();
-            foreach (NumberedItem ni in intType.m_privNamedValues)
-            {
-                if (intType.m_namedValues.ContainsKey(ni.m_id))
-                    throw new SemanticErrorException("The INTEGER type defined in line "+intType.antlrNode.Line+
-                        " containts more than once the identifier "+ ni.m_id);
-                if (ni.m_valueAsInt != null)
-                {
-                    intType.m_namedValues.Add(ni.m_id, ni.m_valueAsInt.Value);
-                    toBeRemoved.Add(ni);
-                }
-                else
-                {
-                    //We have to look up in the variables definitions
-                    string refName = ni.m_valueAsReference;
-                    if (mod.isValueDeclared(refName))
-                    {
-                        Asn1Value tmpVal = mod.GetValue(refName);
-                        if (tmpVal.m_TypeID == Asn1Value.TypeID.UNDEFINED)
-                            continue;
-                        if (tmpVal.m_TypeID == Asn1Value.TypeID.INT)
-                        {
-                            intType.m_namedValues.Add(ni.m_id, ((IntegerValue)tmpVal).Value);
-                            toBeRemoved.Add(ni);
-                        }
-                        else
-                        {
-                            throw new SemanticErrorException("Error in line : " + intType.antlrNode.Line + ". Incompatible types assigment");
-                        }
-                        //else let it be resolved in a next parse round
-                    } else
-                        throw new SemanticErrorException("Error in line : " + intType.antlrNode.Line + ". Identifier '" + refName + "' is unknown");
-
-                }
-            }
-            foreach (NumberedItem ni in toBeRemoved)
-                intType.m_privNamedValues.Remove(ni);
-            if (intType.m_privNamedValues.Count > 0)
-                bFinished = false;
+//               bFinished = intType.SemanticCheck();
         }
 
         public void OnChoiceType(Asn1File asn1File, Module mod, ChoiceType choiceType, TypeAssigment tas)

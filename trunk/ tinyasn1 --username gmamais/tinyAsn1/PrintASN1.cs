@@ -5,10 +5,185 @@ using System.IO;
 
 namespace tinyAsn1
 {
+
+
+
+    public partial class Asn1Type
+    {
+        public virtual void PrintAsn1(StreamWriterLevel o, int lev)
+        {
+            o.Write(Name);
+        }
+    }
+
+
+    public partial class BitStringType
+    {
+        public override void PrintAsn1(StreamWriterLevel o, int lev)
+        {
+            if (m_namedBits.Count > 0)
+            {
+                o.WriteLine("BIT STRING {");
+                int cnt = m_namedBits.Count;
+                for (int i = 0; i < m_namedBits.Count - 1; i++)
+                {
+                    o.P(lev + 1);
+                    o.WriteLine(m_namedBits.Keys[i] + "(" + m_namedBits.Values[i] + "),");
+                }
+                o.P(lev + 1);
+                o.WriteLine(m_namedBits.Keys[cnt - 1] + "(" + m_namedBits.Values[cnt - 1] + ")");
+                
+                o.P(lev); o.Write("}");
+            }
+            else
+                o.Write(" BIT STRING");
+        }
+    }
+
+    public partial class EnumeratedType
+    {
+        public override void PrintAsn1(StreamWriterLevel o, int lev)
+        {
+            if (m_enumValues.Count > 0)
+            {
+                o.WriteLine("ENUMERATED {");
+                int cnt = m_enumValues.Count;
+                for (int i = 0; i < m_enumValues.Count - 1; i++)
+                {
+                    o.P(lev + 1);
+                    o.WriteLine(m_enumValues.Keys[i] + "(" + m_enumValues.Values[i].m_value + "),");
+                }
+                o.P(lev + 1);
+                o.WriteLine(m_enumValues.Keys[cnt - 1] + "(" + m_enumValues.Values[cnt - 1].m_value + ")");
+                o.P(lev);
+                o.Write("}");
+            }
+        }
+    }
+
+    public partial class IntegerType
+    {
+        public override void PrintAsn1(StreamWriterLevel o, int lev)
+        {
+            if (m_namedValues.Count > 0)
+            {
+                o.WriteLine("INTEGER {");
+                int cnt = m_namedValues.Count;
+                for (int i = 0; i < m_namedValues.Count - 1; i++)
+                {
+                    o.P(lev + 1);
+                    o.WriteLine(m_namedValues.Keys[i] + "(" + m_namedValues.Values[i] + "),");
+                }
+                o.P(lev + 1);
+                o.WriteLine(m_namedValues.Keys[cnt - 1] + "(" + m_namedValues.Values[cnt - 1] + ")");
+                o.P(lev);
+                o.Write("}");
+            }
+            else
+                o.Write("INTEGER");
+        }
+    }
+
+    public partial class SequenceOrSetType : Asn1Type
+    {
+        public partial class Child
+        {
+            public void PrintAsn1(StreamWriterLevel o, int lev)
+            {
+                o.P(lev);
+                o.Write(m_childVarName); o.Write(" ");
+                m_type.PrintAsn1(o, lev);
+                if (m_defaultValue!=null)
+                {
+                    o.Write(" DEFAULT "+m_defaultValue.ToString());
+                }
+                else if (m_optional)
+                    o.Write(" OPTIONAL");
+
+            }
+        }
+
+        public override void PrintAsn1(StreamWriterLevel o, int lev)
+        {
+            Child ch;
+            o.WriteLine(Name + " {");
+            for (int i = 0; i < m_children.Values.Count-1;i++ )
+            {
+                ch = m_children.Values[i];
+                ch.PrintAsn1(o, lev + 1);
+                o.WriteLine(",");
+            }
+            if (m_children.Values.Count > 0)
+            {
+                ch = m_children.Values[m_children.Values.Count-1];
+                ch.PrintAsn1(o, lev + 1);
+                o.WriteLine();
+            }
+
+            o.P(lev);
+            o.Write("}");
+        }
+    }
+
+    public partial class ChoiceType : Asn1Type
+    {
+        public partial class Child
+        {
+            public void PrintAsn1(StreamWriterLevel o, int lev)
+            {
+                o.P(lev);
+                o.Write(m_childVarName); o.Write(" ");
+                m_type.PrintAsn1(o, lev);
+            }
+        }
+
+        public override void PrintAsn1(StreamWriterLevel o, int lev)
+        {
+            Child ch;
+            o.WriteLine(Name + " {");
+            for (int i = 0; i < m_children.Values.Count - 1; i++)
+            {
+                ch = m_children.Values[i];
+                ch.PrintAsn1(o, lev + 1);
+                o.WriteLine(",");
+            }
+            if (m_children.Values.Count > 0)
+            {
+                ch = m_children.Values[m_children.Values.Count - 1];
+                ch.PrintAsn1(o, lev + 1);
+                o.WriteLine();
+            }
+
+            o.P(lev);
+            o.Write("}");
+        }
+    }
+
+
+    public partial class SequenceOfType : Asn1Type
+    {
+
+        public override void PrintAsn1(StreamWriterLevel o, int lev)
+        {
+            o.Write("SEQUENCE OF ");
+            m_type.PrintAsn1(o, lev);
+        }
+    }
+
+    public partial class SetOfType : Asn1Type
+    {
+
+        public override void PrintAsn1(StreamWriterLevel o, int lev)
+        {
+            o.Write("SET OF ");
+            m_type.PrintAsn1(o, lev);
+        }
+    }
+
     public class PrintASN1 : IASTVisitor
     {
-        TextWriter o;
-        public PrintASN1(TextWriter outStream)
+        StreamWriterLevel o;
+        public PrintASN1(StreamWriterLevel outStream)
         {
             o = outStream;
         }
@@ -64,6 +239,9 @@ namespace tinyAsn1
 
         public void OnBeforeTypeAssigment(Asn1File asn1File, Module mod, TypeAssigment tas)
         {
+            o.P(1); o.Write(tas.m_name + " ::= "); tas.m_type.PrintAsn1(o, 1); o.WriteLine();
+            o.WriteLine();
+
         }
 
         public void OnAfterTypeAssigment(Asn1File asn1File, Module mod, TypeAssigment tas)
@@ -77,62 +255,26 @@ namespace tinyAsn1
 
         public void OnBitStringType(Asn1File asn1File, Module mod, BitStringType bsType, TypeAssigment tas)
         {
-            if (bsType.m_namedBits.Count > 0)
-            {
-                o.WriteLine("\t" + tas.m_name + " ::=BIT STRING {");
-                int cnt = bsType.m_namedBits.Count;
-                for (int i = 0; i < bsType.m_namedBits.Count - 1; i++)
-                {
-                    o.WriteLine("\t\t" + bsType.m_namedBits.Keys[i] + "(" + bsType.m_namedBits.Values[i] + "),");
-                }
-                o.WriteLine("\t\t" + bsType.m_namedBits.Keys[cnt - 1] + "(" + bsType.m_namedBits.Values[cnt - 1] + ")");
-                o.WriteLine("\t}");
-            }
-            else
-                o.WriteLine("\t" + tas.m_name + " ::=BIT STRING");
-            
+//            o.P(1); o.Write(tas.m_name + " ::= "); bsType.PrintAsn1(o, 1); o.WriteLine();
         }
 
         public void OnBooleanType(Asn1File asn1File, Module mod, BooleanType boolType, TypeAssigment tas)
         {
-            o.WriteLine("\t" + tas.m_name + " ::=BOOLEAN");
+//            o.WriteLine("\t" + tas.m_name + " ::=BOOLEAN");
         }
 
         public void OnRealType(Asn1File asn1File, Module mod, RealType realType, TypeAssigment tas)
         {
-            o.WriteLine("\t" + tas.m_name + " ::=REAL");
+//            o.WriteLine("\t" + tas.m_name + " ::=REAL");
         }
 
         public void OnEnumeratedType(Asn1File asn1File, Module mod, EnumeratedType enumType, TypeAssigment tas)
         {
-            if (enumType.m_enumValues.Count > 0)
-            {
-                o.WriteLine("\t" + tas.m_name + " ::=ENUMERATED {");
-                int cnt = enumType.m_enumValues.Count;
-                for (int i = 0; i < enumType.m_enumValues.Count - 1; i++)
-                {
-                    o.WriteLine("\t\t" + enumType.m_enumValues.Keys[i] + "(" + enumType.m_enumValues.Values[i].m_value + "),");
-                }
-                o.WriteLine("\t\t" + enumType.m_enumValues.Keys[cnt - 1] + "(" + enumType.m_enumValues.Values[cnt - 1].m_value + ")");
-                o.WriteLine("\t}");
-            }
             
         }
 
         public void OnIntegerType(Asn1File asn1File, Module mod, IntegerType intType, TypeAssigment tas)
         {
-            if (intType.m_namedValues.Count > 0)
-            {
-                o.WriteLine("\t" + tas.m_name + " ::=INTEGER {");
-                int cnt = intType.m_namedValues.Count;
-                for (int i = 0; i < intType.m_namedValues.Count - 1; i++)
-                {
-                    o.WriteLine("\t\t" + intType.m_namedValues.Keys[i] + "(" + intType.m_namedValues.Values[i] + "),");
-                }
-                o.WriteLine("\t\t" + intType.m_namedValues.Keys[cnt - 1] + "(" + intType.m_namedValues.Values[cnt-1] + ")");
-                o.WriteLine("\t}");
-            } else
-                o.WriteLine("\t" + tas.m_name + " ::=INTEGER");
 
         }
 
@@ -163,12 +305,12 @@ namespace tinyAsn1
 
         public void OnOctectStringType(Asn1File asn1File, Module mod, OctetStringType osType, TypeAssigment tas)
         {
-            o.WriteLine("\t" + tas.m_name + " ::=OCTET STRING");
+//            o.WriteLine("\t" + tas.m_name + " ::=OCTET STRING");
         }
 
         public void OnReferenceType(Asn1File asn1File, Module mod, ReferenceType refType, TypeAssigment tas)
         {
-            o.WriteLine("\t" + tas.m_name + " ::= " + refType.Name);
+//            o.WriteLine("\t" + tas.m_name + " ::= " + refType.Name);
         }
 
 

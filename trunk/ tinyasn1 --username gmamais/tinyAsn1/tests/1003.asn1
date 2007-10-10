@@ -23,7 +23,7 @@ MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
 --	myIntVa4 MyInt2 ::= mama
 
 	MySQ ::= SEQUENCE {
-		a	INTEGER {red(0), blue(1)} (red|blue)
+		a	INTEGER {red(0), blue(1)} (red|blue) DEFAULT red
 	}
 	
 	
