@@ -61,6 +61,7 @@ tokens {
 	NUMBER_LST_ITEM;
 	DEFAULT_VALUE;
 	VALUE_REFERENCE;
+	COMPONENTS_OF;
 }
 
 
@@ -298,8 +299,12 @@ componentTypeList
 	
 componentType
 	:	identifier type (optOrDef=OPTIONAL | optOrDef=DEFAULT value)?	-> ^(SEQUENCE_ITEM identifier type $optOrDef? ^(DEFAULT_VALUE value)?)
+		| componnents_of type											-> ^(componnents_of type)
 	;	
 	
+componnents_of 
+	:	COMPONENTS OF	-> COMPONENTS_OF
+;
 sequenceOfType
 	:	SEQUENCE (sizeShortConstraint | constraint)? OF (identifier)? type			-> ^(SEQUENCE_OF_TYPE sizeShortConstraint? constraint? identifier? type)
 	;
@@ -409,9 +414,12 @@ intersectionItem
 	;	
 
 constraintExpression
-	: valueRangeExpression
-	| subtypeExpression
-	| sizeExpression
+	: valueRangeExpression		//single value & range constraint. Single value can be applied to any type.
+								//Range constraint can be applied to INTEGER and REAL
+	| subtypeExpression      	//inclusion constraint, it can be applied to any type except CHARACTER STRING
+	| sizeExpression			//applicable to BIT, OCTET, CHARACTER STRING and SEQUENCE OF, SET OF
+								//The constraint that appears within a SIZE constraint must be a subset of INTEGER(0..MAX)
+								//In other words, the constraint inside size can contain unions of single integer values, integer ranges
 	| permittedAlphabetExpression
 	| innerTypeExpression
 	| patternExpression

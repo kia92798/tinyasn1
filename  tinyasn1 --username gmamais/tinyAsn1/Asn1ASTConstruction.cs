@@ -372,6 +372,15 @@ namespace tinyAsn1
         {
             return false;
         }
+
+        /*
+         * Returns TRUE if SemanticCheck has finished
+         *         FALSE if SemanticCheck must be also called in a next round
+         */
+        internal virtual bool SemanticCheckFinished()
+        {
+            return true;
+        }
     }
 
     public partial class NumberedItem
@@ -497,6 +506,60 @@ namespace tinyAsn1
         {
             return this.m_namedBitsPriv.Count>0;
         }
+
+
+        internal override bool SemanticCheckFinished()
+        {
+            List<NumberedItem> toBeRemoved = new List<NumberedItem>();
+            foreach (NumberedItem ni in m_namedBitsPriv)
+            {
+                if (m_namedBits.ContainsKey(ni.m_id))
+                    throw new SemanticErrorException("The BIT STRING type defined in line " + antlrNode.Line +
+                        " containts more than once the identifier " + ni.m_id);
+
+                if (ni.m_valueAsInt != null)
+                {
+                    if (ni.m_valueAsInt.Value < 0)
+                        throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Bit string ids must be no negative numbers");
+                    m_namedBits.Add(ni.m_id, ni.m_valueAsInt.Value);
+                    toBeRemoved.Add(ni);
+                }
+                else
+                {
+                    //We have to look up in the variables definitions
+                    string refName = ni.m_valueAsReference;
+                    if (m_module.isValueDeclared(refName))
+                    {
+                        Asn1Value tmpVal = m_module.GetValue(refName);
+                        if (tmpVal.m_TypeID == Asn1Value.TypeID.UNDEFINED)
+                            continue;
+                        if (tmpVal.m_TypeID == Asn1Value.TypeID.INT)
+                        {
+                            Int64 val = ((IntegerValue)tmpVal).Value;
+                            if (val < 0)
+                                throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Identifier '" + refName + "' is a negative integer");
+                            m_namedBits.Add(ni.m_id, val);
+                            toBeRemoved.Add(ni);
+                        }
+                        else
+                        {
+                            throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Identifier '" + refName + "' is not an integer");
+                        }
+                        //else let it be resolved in a next parse round
+                    }
+                    else
+                        throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Identifier '" + refName + "' is unknown");
+                }
+
+            }
+            foreach (NumberedItem ni in toBeRemoved)
+                m_namedBitsPriv.Remove(ni);
+            if (m_namedBitsPriv.Count > 0)
+                return false;
+            
+            return true;
+        }
+
 
         internal override Asn1Value FixVariable(Asn1Value val)
         {
@@ -732,6 +795,62 @@ namespace tinyAsn1
 
             
         }
+
+        internal override bool SemanticCheckFinished()
+        {
+            List<NumberedItem> toBeRemoved = new List<NumberedItem>();
+            foreach (NumberedItem ni in m_enumValuesPriv)
+            {
+                if (m_enumValues.ContainsKey(ni.m_id))
+                    throw new SemanticErrorException("The ENUMERATED type defined in line " + antlrNode.Line +
+                        " containts more than once the identifier " + ni.m_id);
+                if (ni.m_valueAsInt != null)
+                {
+                    m_enumValues.Add(ni.m_id, new EnumeratedType.Item(ni.m_id, ni.m_valueAsInt.Value, ni.m_extended));
+                    toBeRemoved.Add(ni);
+                }
+                else if (ni.m_valueAsReference == "")
+                {
+                    m_enumValues.Add(ni.m_id, new EnumeratedType.Item(ni.m_id, ni.m_extended));
+                    toBeRemoved.Add(ni);
+                }
+                else
+                {
+                    //We have to look up in the variables definitions
+                    string refName = ni.m_valueAsReference;
+                    if (m_module.isValueDeclared(refName))
+                    {
+                        Asn1Value tmpVal = m_module.GetValue(refName);
+                        if (tmpVal.m_TypeID == Asn1Value.TypeID.UNDEFINED)
+                            continue;
+                        if (tmpVal.m_TypeID == Asn1Value.TypeID.INT)
+                        {
+                            m_enumValues.Add(ni.m_id, new EnumeratedType.Item(ni.m_id, ((IntegerValue)tmpVal).Value, ni.m_extended));
+                            toBeRemoved.Add(ni);
+                        }
+                        else
+                        {
+                            throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Incompatible types assigment");
+                        }
+                        //else let it be resolved in a next parse round
+                    }
+                    else
+                        throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Identifier '" + refName + "' is unknown");
+                }
+
+            }
+
+            foreach (NumberedItem ni in toBeRemoved)
+                m_enumValuesPriv.Remove(ni);
+            if (m_enumValuesPriv.Count > 0)
+                return false;
+            else
+            {
+                FixNumbers();
+                return true;
+            }
+
+        }
     }
 
     public partial class IntegerType : Asn1Type
@@ -787,7 +906,7 @@ namespace tinyAsn1
                             case Asn1Value.TypeID.INT:
                                 return new IntegerValue(tmp as IntegerValue);
                             case Asn1Value.TypeID.UNDEFINED:
-                                break;
+                                return val;
                             default:
                                 throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
                         }
@@ -796,16 +915,61 @@ namespace tinyAsn1
                     {
                         if (this.isIdentifierProcessed(referenceId))
                             return new IntegerValue(m_namedValues[referenceId], m_module, val.antlrNode,this);
+                        return val; //else wait for next round
                     } else
                         throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
 
-                    break;
                 default:
                     throw new SemanticErrorException("Error in line : "+val.antlrNode.Line+". Expecting integer or integer variable");
             }
 
-            throw new Exception("Internal error");
 
+        }
+
+        internal override bool SemanticCheckFinished()
+        {
+            List<NumberedItem> toBeRemoved = new List<NumberedItem>();
+            foreach (NumberedItem ni in m_privNamedValues)
+            {
+                if (m_namedValues.ContainsKey(ni.m_id))
+                    throw new SemanticErrorException("The INTEGER type defined in line " + antlrNode.Line +
+                        " containts more than once the identifier " + ni.m_id);
+                if (ni.m_valueAsInt != null)
+                {
+                    m_namedValues.Add(ni.m_id, ni.m_valueAsInt.Value);
+                    toBeRemoved.Add(ni);
+                }
+                else
+                {
+                    //We have to look up in the variables definitions
+                    string refName = ni.m_valueAsReference;
+                    if (m_module.isValueDeclared(refName))
+                    {
+                        Asn1Value tmpVal = m_module.GetValue(refName);
+                        if (tmpVal.m_TypeID == Asn1Value.TypeID.UNDEFINED)
+                            continue;
+                        if (tmpVal.m_TypeID == Asn1Value.TypeID.INT)
+                        {
+                            m_namedValues.Add(ni.m_id, ((IntegerValue)tmpVal).Value);
+                            toBeRemoved.Add(ni);
+                        }
+                        else
+                        {
+                            throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Incompatible types assigment");
+                        }
+                        //else let it be resolved in a next parse round
+                    }
+                    else
+                        throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Identifier '" + refName + "' is unknown");
+
+                }
+            }
+            foreach (NumberedItem ni in toBeRemoved)
+                m_privNamedValues.Remove(ni);
+            if (m_privNamedValues.Count > 0)
+                return false;
+            
+            return true;
         }
 
     }
@@ -842,6 +1006,11 @@ namespace tinyAsn1
                 return ret;
 
             }
+            internal bool SemanticCheckFinished()
+            {
+                return m_type.SemanticCheckFinished(); 
+            }
+
         }
 
         //	^(CHOICE_TYPE choiceItemsList choiceExtensionBody?)
@@ -921,6 +1090,18 @@ namespace tinyAsn1
                 }
             }
         }
+        internal override bool SemanticCheckFinished()
+        {
+            bool bFinished = true;
+
+            foreach (Child ch in m_children.Values)
+            {
+                if (!ch.SemanticCheckFinished())
+                    bFinished = false;
+            }
+            return bFinished;
+        }
+
     }
 
 
@@ -957,12 +1138,32 @@ namespace tinyAsn1
                             ret.m_defaultValue = Asn1Value.CreateFromAntlrAst(child.GetChild(0));
                             break;
                         default:
-                            throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
+                            throw new Exception("Internal Error, unexpected child: " + child.Text + " for node: " + tree.Text);
                     }
                 }
 
                 return ret;
                 
+            }
+            
+            internal bool SemanticCheckFinished()
+            {
+                bool bFinished = m_type.SemanticCheckFinished();
+                if (!bFinished)
+                    return false;
+
+                if (m_defaultValue != null)
+                {
+                    if (m_defaultValue.m_TypeID == Asn1Value.TypeID.UNDEFINED)
+                    {
+                        m_defaultValue = m_type.FixVariable(m_defaultValue);
+                        if (m_defaultValue.m_TypeID == Asn1Value.TypeID.UNDEFINED)
+                            return false;
+                    }
+
+                }
+
+                return true;
             }
         }
 
@@ -982,6 +1183,10 @@ namespace tinyAsn1
                     case asn1Parser.SEQUENCE_EXT_BODY:
                         handleExtension(ret, child);
                         break;
+                    case asn1Parser.COMPONENTS_OF:
+                        throw new SemanticErrorException("COMPONENTS OF are not implemented yet. Sorry ...");
+                    default:
+                        throw new Exception("Internal Error, unexpected child: " + child.Text + " for node: " + tree.Text);
                 }
             }
             
@@ -1008,11 +1213,13 @@ namespace tinyAsn1
                             throw new SemanticErrorException(ch.m_childVarName + " has alrady been defined. Line: " + child.Line);
                         ret.m_children.Add(ch.m_childVarName, ch);
                         break;
+                    case asn1Parser.COMPONENTS_OF:
+                        throw new SemanticErrorException("COMPONENTS OF are not implemented yet. Sorry ...");
                     case asn1Parser.SEQUENCE_EXT_GROUP:
                         handleVersionGroup(ret, child);
                         break;
                     default:
-                        throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
+                        throw new Exception("Internal Error, unexpected child: " + child.Text + " for node: " + tree.Text);
                 }
             }
 
@@ -1035,11 +1242,27 @@ namespace tinyAsn1
                             throw new SemanticErrorException(ch.m_childVarName + " has alrady been defined. Line: " + child.Line);
                         ret.m_children.Add(ch.m_childVarName, ch);
                         break;
+                    case asn1Parser.COMPONENTS_OF:
+                        throw new SemanticErrorException("COMPONENTS OF are not implemented yet. Sorry ...");
                     default:
-                        throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
+                        throw new Exception("Internal Error, unexpected child: " + child.Text + " for node: " + tree.Text);
                 }
             }
         }
+
+
+        internal override bool SemanticCheckFinished()
+        {
+            bool bFinished = true;
+            
+            foreach (Child ch in m_children.Values)
+            {
+                if (!ch.SemanticCheckFinished())
+                    bFinished = false;
+            }
+            return bFinished;
+        }
+
     }
 
 
@@ -1086,7 +1309,7 @@ namespace tinyAsn1
                         ret.m_xmlVarName = child.Text;
                         break;
                     case asn1Parser.TYPE_DEF:
-                        ret.type = Asn1Type.CreateFromAntlrAst(child);
+                        ret.m_type = Asn1Type.CreateFromAntlrAst(child);
                         break;
                     default:
                         throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
@@ -1094,6 +1317,10 @@ namespace tinyAsn1
             }
 
             return ret;
+        }
+        internal override bool SemanticCheckFinished()
+        {
+            return m_type.SemanticCheckFinished();   
         }
     }
 
@@ -1117,7 +1344,7 @@ namespace tinyAsn1
                         ret.m_xmlVarName = child.Text;
                         break;
                     case asn1Parser.TYPE_DEF:
-                        ret.type = Asn1Type.CreateFromAntlrAst(child);
+                        ret.m_type = Asn1Type.CreateFromAntlrAst(child);
                         break;
                     default:
                         throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
@@ -1125,6 +1352,10 @@ namespace tinyAsn1
             }
 
             return ret;
+        }
+        internal override bool SemanticCheckFinished()
+        {
+            return m_type.SemanticCheckFinished();
         }
     }
 

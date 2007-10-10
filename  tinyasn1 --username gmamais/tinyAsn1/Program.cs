@@ -125,15 +125,18 @@ namespace tinyAsn1
                 Console.WriteLine("Debugging ...");
                 for (int i = 0; i < inputFiles.Count; i++)
                 {
-                    //try
-                    //{
-                        StreamWriter wr = new StreamWriter(inputFiles[i] + ".txt");
+                    StreamWriterLevel wr = new StreamWriterLevel(inputFiles[i] + ".txt");
+                    try
+                    {
                         PrintASN1 pr = new PrintASN1(wr);
                         ASTs[i].Visit(pr);
-//                        ASTs[i].printAstAsXml(wr);
+                        //                        ASTs[i].printAstAsXml(wr);
+                    }
+                    finally
+                    {
                         wr.Flush();
                         wr.Close();
-                    //}
+                    }
                     //catch (Exception ex)
                     //{
                     //    Console.Error.WriteLine("Unkown exception ...");

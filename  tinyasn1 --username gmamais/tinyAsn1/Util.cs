@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace tinyAsn1
 {
@@ -40,6 +41,17 @@ namespace tinyAsn1
             get { return m_keys; }
         }
         public int Count { get { return m_values.Count; } }
+    }
+
+
+    public class StreamWriterLevel : StreamWriter
+    {
+        public StreamWriterLevel(string fileName) : base(fileName) { }
+        public void P(int level)
+        {
+            for (int i = 0; i < level; i++)
+                Write("\t");
+        }
     }
 
 }

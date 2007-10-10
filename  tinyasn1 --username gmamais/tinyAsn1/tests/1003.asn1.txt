@@ -1,25 +1,31 @@
 MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
 BEGIN
-	MyInt ::=INTEGER
-	MyReal ::=REAL
-	MyInt2 ::=INTEGER {
+	MyInt ::= INTEGER
+	MyReal ::= REAL
+	MyInt2 ::= INTEGER {
 		ab(1),
 		ac(3),
 		ad(4),
 		kala(1)
 	}
-	MyBitStr ::=BIT STRING {
+	MyBitStr ::= BIT STRING {
 		a(1),
 		b(2),
 		c(4)
 	}
 	MyInt3 ::= MyInt2
-	MyEnum ::=ENUMERATED {
+	MySQ ::= SEQUENCE {
+		a INTEGER {
+			red(0),
+			blue(1)
+		} DEFAULT 0
+	}
+	MyEnum ::= ENUMERATED {
 		red(1),
 		blue(0),
 		green(4)
 	}
-	MyBitStr2 ::=BIT STRING {
+	MyBitStr2 ::= BIT STRING {
 		aha(1)
 	}
 	myIntVal INTEGER ::= 4

@@ -1,0 +1,165 @@
+.headerRow
+{
+	background-color: #BBBBBB;
+}
+
+.hrNo
+{
+	text-align: center;
+	font-family: Verdana;
+	color: white;
+	font-size: 10pt;
+	width:30pt;
+}
+.hrField
+{
+	text-align: center;
+	font-family: Verdana;
+	color: white;
+	font-size: 10pt;
+	width:15%;
+}
+
+.hrComment
+{
+	text-align: center;
+	font-family: Verdana;
+	color: white;
+	font-size: 10pt;
+	width:25%;
+}
+
+.hrType
+{
+	text-align: center;
+	font-family: Verdana;
+	color: white;
+	font-size: 10pt;
+	width:10%;
+}
+
+.hrconstraint
+{
+	text-align: center;
+	font-family: Verdana;
+	color: white;
+	font-size: 10pt;
+	width:10%;
+}
+
+.hrOptional
+{
+	text-align: center;
+	font-family: Verdana;
+	color: white;
+	font-size: 10pt;
+	width:10%;
+}
+.hrMin
+{
+	text-align: center;
+	font-family: Verdana;
+	color: white;
+	font-size: 10pt;
+	width:70pt;
+}
+.hrMax
+{
+	text-align: center;
+	font-family: Verdana;
+	color: white;
+	font-size: 10pt;
+	width:70pt;
+}
+
+.CommentRow
+{
+	background-color: #e9e9e9;
+	height:25px;
+}
+
+.OddRow
+{
+	background-color: #e9e9e9;
+	height:25px;
+}
+
+.EvenRow
+{
+	background-color: #DBDBDB;
+	height:25px;
+}
+
+
+.no
+{
+	text-align:  center;
+	font-family: Verdana;
+	color: black;
+	font-size: 9pt;
+	width:30pt;
+}
+
+.field
+{
+	text-align: center;
+	font-family: Verdana;
+	color: black;
+	font-size: 9pt;
+	width:15%;
+}
+
+
+.comment
+{
+	color: black;
+	width:25%;
+	font-family: Verdana;
+	font-size: 9pt;
+	text-align:left;
+}
+
+.type
+{
+	text-align: center;
+	font-family: Verdana;
+	color: black;
+	font-size: 9pt;
+	width:10%;
+}
+
+.constraint
+{
+	text-align: center;
+	font-family: Verdana;
+	color: black;
+	font-size: 9pt;
+	width:10%;
+}
+
+.optional
+{
+	text-align: center;
+	font-family: Verdana;
+	color: black;
+	font-size: 9pt;
+	width:10%;
+}
+.min
+{
+	text-align: center;
+	font-family: Verdana;
+	color: black;
+	font-size: 9pt;
+	width:70pt;
+}
+.max
+{
+	text-align: center;
+	font-family: Verdana;
+	color: black;
+	font-size: 9pt;
+	width:70pt;
+}
+
+
