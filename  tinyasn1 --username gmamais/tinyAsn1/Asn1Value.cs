@@ -25,6 +25,7 @@ namespace tinyAsn1
             VALUE_REFERENCE,
             ENUMERATED,
             UNDEFINED,
+            SEQUENCE_OR_SET,
             NULL
         }
 
@@ -46,6 +47,11 @@ namespace tinyAsn1
         public override string ToString()
         {
             throw new Exception("Internal Error: Value is undifined type");
+        }
+
+        public virtual bool SemanticCheckFinished()
+        {
+            return m_TypeID != TypeID.UNDEFINED;
         }
     }
 
@@ -429,6 +435,100 @@ namespace tinyAsn1
         public NullValue()
         {
             m_TypeID = TypeID.NULL;
+        }
+    }
+
+    public partial class SequenceOrSetValue : Asn1Value
+    {
+        public OrderedDictionary<string, Asn1Value> m_children = new OrderedDictionary<string, Asn1Value>();
+        public SequenceOrSetType Type2
+        {
+            get
+            {
+                return (SequenceOrSetType)Type;
+            }
+        }
+
+        public override bool SemanticCheckFinished()
+        {
+            foreach (Asn1Value v in m_children.Values)
+                if (!v.SemanticCheckFinished())
+                    return false;
+            
+            return true;
+        }
+
+        public SequenceOrSetValue(SequenceOrSetValue o)
+        {
+            m_TypeID = Asn1Value.TypeID.BOOLEAN;
+            m_module = o.m_module;
+            antlrNode = o.antlrNode;
+            m_type = o.m_type;
+            m_children = o.m_children;
+        }
+
+        public SequenceOrSetValue(ITree antlrNode, Module module, Asn1Type type)
+        {
+            m_TypeID = Asn1Value.TypeID.SEQUENCE_OR_SET;
+            this.antlrNode = antlrNode;
+            m_module = module;
+            m_type = type;
+
+            if (antlrNode.Type != asn1Parser.NAMED_VALUE_LIST)
+                throw new Exception("Internal Error: SequenceOrSetValue called with wrong antlr node type");
+
+            for (int i = 0; i < antlrNode.ChildCount; i++)
+            {
+                ITree namedValue = antlrNode.GetChild(i);
+                if (namedValue.Type!=asn1Parser.NAMED_VALUE)
+                    throw new Exception("Internal Error");
+
+                string id = namedValue.GetChild(0).Text;
+
+                if (m_children.ContainsKey(id))
+                    throw new SemanticErrorException("Error in line :" + antlrNode.GetChild(i).Line + ". '" + id + "' already exists");
+
+                if (!Type2.m_children.ContainsKey(id))
+                    throw new SemanticErrorException("Error in line :" + antlrNode.GetChild(i).Line + ". '" + id + "' is not a member");
+
+                Asn1Value val = Asn1Value.CreateFromAntlrAst(namedValue.GetChild(1));
+
+                m_children.Add(id, val);
+            }
+        }
+
+        internal void FixChildrenVars()
+        {
+            foreach (string id in m_children.Keys)
+            {
+                Asn1Value childVal = m_children[id];
+                if (childVal.SemanticCheckFinished())
+                    continue;
+                
+                Asn1Type childType = Type2.m_children[id].m_type;
+                m_children[id] = childType.FixVariable(childVal);
+            }
+        }
+
+        public override string ToString()
+        {
+
+            System.IO.StringWriter w = new System.IO.StringWriter();
+            
+            string key;
+            w.Write("{");
+            int cnt = m_children.Count;
+            for (int i = 0; i < cnt - 1; i++)
+            {
+                key = m_children.Keys[i];
+                w.Write(" "+ key + " " + m_children[key].ToString() +",");
+            }
+
+            key = m_children.Keys[cnt-1];
+            w.WriteLine(" " + key + " " + m_children[key].ToString()+" }");
+
+            w.Flush();
+            return w.ToString();
         }
     }
 

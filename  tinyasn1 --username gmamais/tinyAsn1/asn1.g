@@ -2,6 +2,7 @@ grammar asn1;
 options {
 	output=AST;
 	language=CSharp;
+	backtrack=true;
 }
 
 tokens {
@@ -62,6 +63,10 @@ tokens {
 	DEFAULT_VALUE;
 	VALUE_REFERENCE;
 	COMPONENTS_OF;
+	NAMED_VALUE;
+	NAMED_VALUE_LIST;
+	VALUE_LIST;
+	CHOICE_VALUE;
 }
 
 
@@ -338,6 +343,25 @@ referencedType
 /* *************************************** VALUES DEFINITION *********************************************************** */
 /* ********************************************************************************************************************* */
 
+namedValue 
+	:
+			identifier value		->^(NAMED_VALUE identifier value)
+	;
+	
+namedValueList	:
+	'{' namedValue (',' namedValue)* '}'			->^(NAMED_VALUE_LIST namedValue+)
+	;
+	
+valueList 	:	
+	'{' value (',' value)* '}'			->^(VALUE_LIST value+)
+
+;	
+	
+choiceValue 
+	:
+			identifier ':' value	->^(CHOICE_VALUE identifier value)
+	;	
+
 value	:
 		BitStringLiteral
 	|	bitStringValue
@@ -352,7 +376,10 @@ value	:
 	|	MIN
 	|	MAX
 //	|	objectIdentifierValue
-	|	charSequenceValue
+//	|	charSequenceValue
+	|   choiceValue
+	|   namedValueList	// SEQUENCE, SET, but also for SEQUENCE OF and SET OF 
+	|   valueList
 	;	
 	
 bitStringValue

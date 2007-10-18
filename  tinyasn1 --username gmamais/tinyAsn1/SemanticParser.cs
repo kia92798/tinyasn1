@@ -124,10 +124,10 @@ namespace tinyAsn1
 
         public void OnValueAssigment(Asn1File asn1File, Module mod, ValueAssigment vas)
         {
-            if (vas.m_value.m_TypeID == Asn1Value.TypeID.UNDEFINED)
+            if (!vas.m_value.SemanticCheckFinished())
             {
                 vas.m_value = vas.m_type.FixVariable(vas.m_value);
-                if (vas.m_value.m_TypeID == Asn1Value.TypeID.UNDEFINED)
+                if (!vas.m_value.SemanticCheckFinished())
                     bFinished = false;
             }
         }

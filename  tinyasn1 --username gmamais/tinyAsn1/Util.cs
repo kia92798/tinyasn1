@@ -24,6 +24,12 @@ namespace tinyAsn1
             {
                 return m_keyval[key];
             }
+            set
+            {
+                
+                m_keyval[key] = value;
+                m_values[m_keys.IndexOf(key)] = value;
+            }
         }
 
         public bool ContainsKey(TKey key)
