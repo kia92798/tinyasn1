@@ -17,6 +17,30 @@ MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
 	
 	myIntVal3 MyInt3 ::= ab
 
+	MySQ0 ::= SEQUENCE {
+		int1	INTEGER,
+		int2  INTEGER
+	}
+
+	mySQvar1 MySQ0 ::= { int1 10, int2 myIntVal}
+
+	MySQ22 ::= SEQUENCE {
+		a	INTEGER {red(0), blue(1)} (red|blue) DEFAULT red,
+		b 	MyReal	DEFAULT pi,
+		c	MyEnum	DEFAULT red,
+		d	MyBitStr	OPTIONAL
+	}
+
+	mySQ2 MySQ22 ::= { 
+		a blue, 
+		b 2.7, 
+		c green, 
+		d {a,b} 
+	}
+
+	mySQ22 MySQ22 ::= mySQ2
+
+	--mySQ23 MySQ22 ::= mySQvar1
 
 
 	MySQ ::= SEQUENCE {

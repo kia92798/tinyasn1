@@ -1262,7 +1262,50 @@ namespace tinyAsn1
             }
             return bFinished;
         }
+        
+        internal override Asn1Value FixVariable(Asn1Value val)
+        {
+            string referenceId="";
+            SequenceOrSetValue sqVal = val as SequenceOrSetValue;
+            switch (val.antlrNode.Type)
+            {
+                case asn1Parser.NAMED_VALUE_LIST:
+                    if (sqVal == null)
+                        return new SequenceOrSetValue(val.antlrNode, m_module, this);
+                    else
+                    {
+                        sqVal.FixChildrenVars();
+                        return sqVal;
+                    }
+                case asn1Parser.VALUE_REFERENCE:
+                    referenceId = val.antlrNode.GetChild(0).Text;
+                    if (m_module.isValueDeclared(referenceId))
+                    {
+                        Asn1Value tmp = m_module.GetValue(referenceId);
+                        switch (tmp.m_TypeID)
+                        {
+                            case Asn1Value.TypeID.SEQUENCE_OR_SET:
+                                if (tmp.SemanticCheckFinished())
+                                {
+                                    if (tmp.Type.GetFinalType() == this)
+                                        return new SequenceOrSetValue(tmp as SequenceOrSetValue);
+                                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                                }
+                                return val; // not yet fully resolved, wait for next round
+                            case Asn1Value.TypeID.UNDEFINED:
+                                // not yet resolved, wait for next round
+                                return val;
+                            default:
+                                throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                        }
+                    }
+                    else
+                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
 
+                default:
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting SEQUENCE variable");
+            }
+        }
     }
 
 
