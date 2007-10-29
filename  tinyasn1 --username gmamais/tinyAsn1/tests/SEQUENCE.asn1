@@ -26,7 +26,7 @@ MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
 
 	MySQ22 ::= SEQUENCE {
 		a	INTEGER {red(0), blue(1)} (red|blue) DEFAULT red,
-		b 	MyReal	DEFAULT pi,
+		b 	MyReal,
 		c	MyEnum	DEFAULT red,
 		d	MyBitStr	OPTIONAL
 	}
@@ -53,9 +53,20 @@ MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
 			b 	MyReal	DEFAULT pi,
 			c	MyEnum	DEFAULT red,
 			d	MyBitStr2	OPTIONAL
-		},
-		g	MySQ2 OPTIONAL
-
+		}
+	}
+	
+	varMyso MySQ ::= {
+		a	blue,
+		b 	pi,
+		c	green,
+		d	'011'B,
+		e	{
+			a	red,
+			b 	45.2,
+			c	blue,
+			d	'001'B
+		}
 	}
 
 	MySQ2 ::= SEQUENCE {
@@ -72,6 +83,53 @@ MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
 
 	}
 	
+	
+	MYCHOICE ::= CHOICE {
+		a	INTEGER {red(0), blue(1)} (red|blue),
+		b 	MyReal	,
+		c	MyEnum	,
+		d	MyBitStr2	,
+		e	SEQUENCE {
+			a	INTEGER {red(0), blue(1)} (red|blue) DEFAULT red,
+			b 	MyReal	DEFAULT pi,
+			c	MyEnum	DEFAULT red,
+			d	MyBitStr2	OPTIONAL
+		}
+	}
+	
+	myChoice MYCHOICE ::= e:{ a blue, c red}
+	
+	MYSQOFCHOICE ::= SEQUENCE OF MYCHOICE
+	
+	mysqofchoice MYSQOFCHOICE ::= {
+				a:10, 
+				e:{ a blue, c red},
+				e:{ a blue, b pi, c red},
+				d:'011'B
+				}
+	
+	SQOF ::= SEQUENCE OF INTEGER
+	SQOFOF ::= SEQUENCE OF SEQUENCE OF INTEGER
+	
+	sqof SQOF::= {1,2,3,4,1,1,1}
+	sqofof SQOFOF::= {{1,2,3,4,1,1,1},
+		{
+		10,
+		20,
+		myIntVal,
+		40,
+		10,
+		10,
+		10}}
+		
+	SETOF ::= SET OF INTEGER
+	SETSETOF ::= SET OF SET OF INTEGER
+	
+	setsetof SETSETOF ::= { {1,2,3,4,5}, {1,2,3,4,5,6}, {1,2,3,4,5,6,7} } 
+--	setsetof SETSETOF ::= { {1,2,3,4,5}, {1,2,3,4,5}, {1,2,3,4,5,6,7} } 
+	
+	setof SETOF ::= {1,2,3,4,5}
+--	setof SETOF ::= {1,2,3,4,4,5}
 	
 	MyEnum ::= ENUMERATED {red, blue(0), green(myIntVal)}
 	

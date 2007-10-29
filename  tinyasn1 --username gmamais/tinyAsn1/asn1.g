@@ -2,7 +2,6 @@ grammar asn1;
 options {
 	output=AST;
 	language=CSharp;
-	backtrack=true;
 }
 
 tokens {
@@ -304,12 +303,9 @@ componentTypeList
 	
 componentType
 	:	identifier type (optOrDef=OPTIONAL | optOrDef=DEFAULT value)?	-> ^(SEQUENCE_ITEM identifier type $optOrDef? ^(DEFAULT_VALUE value)?)
-		| componnents_of type											-> ^(componnents_of type)
+		| COMPONENTS OF type											-> ^(COMPONENTS_OF type)
 	;	
 	
-componnents_of 
-	:	COMPONENTS OF	-> COMPONENTS_OF
-;
 sequenceOfType
 	:	SEQUENCE (sizeShortConstraint | constraint)? OF (identifier)? type			-> ^(SEQUENCE_OF_TYPE sizeShortConstraint? constraint? identifier? type)
 	;
@@ -343,24 +339,21 @@ referencedType
 /* *************************************** VALUES DEFINITION *********************************************************** */
 /* ********************************************************************************************************************* */
 
-namedValue 
-	:
-			identifier value		->^(NAMED_VALUE identifier value)
+choiceValue :	identifier ':' value	->^(CHOICE_VALUE identifier value)
+	;	
+
+namedValue 	:	identifier value		->^(NAMED_VALUE identifier value)
 	;
 	
-namedValueList	:
-	'{' namedValue (',' namedValue)* '}'			->^(NAMED_VALUE_LIST namedValue+)
+namedValueList	: namedValue (',' namedValue)* 		->^(NAMED_VALUE_LIST namedValue+)
 	;
 	
 valueList 	:	
-	'{' value (',' value)* '}'			->^(VALUE_LIST value+)
-
+	value (',' value)* 			->^(VALUE_LIST value+)
 ;	
-	
-choiceValue 
-	:
-			identifier ':' value	->^(CHOICE_VALUE identifier value)
-	;	
+bitStringValue
+	:	'{' identifier (',' identifier)* '}'		->^(BIT_STRING_VALUE identifier+)
+	;
 
 value	:
 		BitStringLiteral
@@ -378,13 +371,10 @@ value	:
 //	|	objectIdentifierValue
 //	|	charSequenceValue
 	|   choiceValue
-	|   namedValueList	// SEQUENCE, SET, but also for SEQUENCE OF and SET OF 
-	|   valueList
+	| '{' namedValueList '}' 				->namedValueList
+	| '{' valueList '}'						->valueList
 	;	
 	
-bitStringValue
-	:	'{' identifier (',' identifier)* '}'		->^(BIT_STRING_VALUE identifier+)
-	;
 
 charSequenceValue	: 
 	'{' INT (',' INT)* '}'							->^(CHAR_SEQUENCE_VALUE INT+)

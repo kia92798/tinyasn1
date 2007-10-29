@@ -47,6 +47,11 @@ namespace tinyAsn1
             get { return m_keys; }
         }
         public int Count { get { return m_values.Count; } }
+
+        public override int GetHashCode()
+        {
+            return m_keyval.GetHashCode();
+        }
     }
 
 

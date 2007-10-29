@@ -1101,7 +1101,50 @@ namespace tinyAsn1
             }
             return bFinished;
         }
+        
+        internal override Asn1Value FixVariable(Asn1Value val)
+        {
+            string referenceId = "";
+            ChoiceValue sqVal = val as ChoiceValue;
+            switch (val.antlrNode.Type)
+            {
+                case asn1Parser.CHOICE_VALUE:
+                    if (sqVal == null)
+                        return new ChoiceValue(val.antlrNode, m_module, this);
+                    else
+                    {
+                        sqVal.FixChildrenVars();
+                        return sqVal;
+                    }
+                case asn1Parser.VALUE_REFERENCE:
+                    referenceId = val.antlrNode.GetChild(0).Text;
+                    if (m_module.isValueDeclared(referenceId))
+                    {
+                        Asn1Value tmp = m_module.GetValue(referenceId);
+                        switch (tmp.m_TypeID)
+                        {
+                            case Asn1Value.TypeID.CHOICE:
+                                if (tmp.SemanticCheckFinished())
+                                {
+                                    if (tmp.Type.GetFinalType() == this)
+                                        return new ChoiceValue(tmp as ChoiceValue);
+                                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                                }
+                                return val; // not yet fully resolved, wait for next round
+                            case Asn1Value.TypeID.UNDEFINED:
+                                // not yet resolved, wait for next round
+                                return val;
+                            default:
+                                throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                        }
+                    }
+                    else
+                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
 
+                default:
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting CHOICE variable");
+            }
+        }
     }
 
 
@@ -1110,6 +1153,7 @@ namespace tinyAsn1
     {
         public partial class Child
         {
+//            bool componentsOf = false;
             //^(SEQUENCE_ITEM identifier type (OPTIONAL|DEFAULT)? value?)
             static public Child CreateFromAntlrAst(ITree tree, int? version, bool extended)
             {
@@ -1141,10 +1185,11 @@ namespace tinyAsn1
                             throw new Exception("Internal Error, unexpected child: " + child.Text + " for node: " + tree.Text);
                     }
                 }
-
                 return ret;
                 
             }
+
+
             
             internal bool SemanticCheckFinished()
             {
@@ -1165,6 +1210,7 @@ namespace tinyAsn1
 
                 return true;
             }
+
         }
 
         static public SequenceOrSetType CreateFromAntlrAst(SequenceOrSetType ret, ITree tree)
@@ -1271,7 +1317,10 @@ namespace tinyAsn1
             {
                 case asn1Parser.NAMED_VALUE_LIST:
                     if (sqVal == null)
-                        return new SequenceOrSetValue(val.antlrNode, m_module, this);
+                        if (this is SequenceType)
+                            return new SequenceOrSetValue(val.antlrNode, m_module, this,true);
+                        else
+                            return new SequenceOrSetValue(val.antlrNode, m_module, this, false);
                     else
                     {
                         sqVal.FixChildrenVars();
@@ -1365,6 +1414,53 @@ namespace tinyAsn1
         {
             return m_type.SemanticCheckFinished();   
         }
+
+
+
+        internal override Asn1Value FixVariable(Asn1Value val)
+        {
+            string referenceId = "";
+            SequenceOfValue sqVal = val as SequenceOfValue;
+            switch (val.antlrNode.Type)
+            {
+                case asn1Parser.VALUE_LIST:
+                    if (sqVal == null)
+                        return new SequenceOfValue(val.antlrNode, m_module, this);
+                    else
+                    {
+                        sqVal.FixChildrenVars();
+                        return sqVal;
+                    }
+                case asn1Parser.VALUE_REFERENCE:
+                    referenceId = val.antlrNode.GetChild(0).Text;
+                    if (m_module.isValueDeclared(referenceId))
+                    {
+                        Asn1Value tmp = m_module.GetValue(referenceId);
+                        switch (tmp.m_TypeID)
+                        {
+                            case Asn1Value.TypeID.SEQUENCE_OF:
+                                if (tmp.SemanticCheckFinished())
+                                {
+                                    if (tmp.Type.GetFinalType() == this)
+                                        return new SequenceOfValue(tmp as SequenceOfValue);
+                                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                                }
+                                return val; // not yet fully resolved, wait for next round
+                            case Asn1Value.TypeID.UNDEFINED:
+                                // not yet resolved, wait for next round
+                                return val;
+                            default:
+                                throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                        }
+                    }
+                    else
+                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
+
+                default:
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting SEQUENCE OF variable");
+            }
+        }
+
     }
 
     public partial class SetOfType : Asn1Type
@@ -1400,6 +1496,51 @@ namespace tinyAsn1
         {
             return m_type.SemanticCheckFinished();
         }
+        
+        internal override Asn1Value FixVariable(Asn1Value val)
+        {
+            string referenceId = "";
+            SetOfValue sqVal = val as SetOfValue;
+            switch (val.antlrNode.Type)
+            {
+                case asn1Parser.VALUE_LIST:
+                    if (sqVal == null)
+                        return new SetOfValue(val.antlrNode, m_module, this);
+                    else
+                    {
+                        sqVal.FixChildrenVars();
+                        return sqVal;
+                    }
+                case asn1Parser.VALUE_REFERENCE:
+                    referenceId = val.antlrNode.GetChild(0).Text;
+                    if (m_module.isValueDeclared(referenceId))
+                    {
+                        Asn1Value tmp = m_module.GetValue(referenceId);
+                        switch (tmp.m_TypeID)
+                        {
+                            case Asn1Value.TypeID.SEQUENCE_OF:
+                                if (tmp.SemanticCheckFinished())
+                                {
+                                    if (tmp.Type.GetFinalType() == this)
+                                        return new SetOfValue(tmp as SetOfValue);
+                                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                                }
+                                return val; // not yet fully resolved, wait for next round
+                            case Asn1Value.TypeID.UNDEFINED:
+                                // not yet resolved, wait for next round
+                                return val;
+                            default:
+                                throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                        }
+                    }
+                    else
+                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
+
+                default:
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting SET OF variable");
+            }
+        }
+
     }
 
     public partial class ReferenceType : Asn1Type
