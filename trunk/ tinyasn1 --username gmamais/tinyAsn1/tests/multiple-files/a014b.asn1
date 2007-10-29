@@ -1,0 +1,32 @@
+MY-MODULE-B DEFINITIONS AUTOMATIC TAGS::= BEGIN
+	IMPORTS
+		MyReal, MyEnum, MyBitStr,SQOFOF FROM MY-MODULE;
+	
+
+	MySQ22 ::= SEQUENCE {
+		a	INTEGER {red(0), blue(1)} (red|blue) DEFAULT red,
+		b 	MyReal,
+		c	MyEnum	DEFAULT red,
+		d	MyBitStr	OPTIONAL
+	}
+
+	mySQ2 MySQ22 ::= { 
+		a blue, 
+		b 2.7, 
+		c green, 
+		d {a,b} 
+	}
+
+	mySQ22 MySQ22 ::= mySQ2
+
+	sqofof SQOFOF::= {{1,2,3,4,1,1,1},
+		{
+		10,
+		20,
+		myIntVal,
+		40,
+		10,
+		10,
+		10}}
+	
+END

@@ -7,6 +7,10 @@ namespace tinyAsn1
 {
     public interface IASTVisitor
     {
+        bool Finished();
+
+        int PassNo { get;}
+
         void OnBeforeAsn1File(Asn1File asn1File);
         void OnAfterAsn1File(Asn1File asn1File);
         void OnBeforeModule(Asn1File asn1File, Module mod);
@@ -31,6 +35,20 @@ namespace tinyAsn1
         void OnReferenceType(Asn1File asn1File, Module mod, ReferenceType refType, TypeAssigment tas);
     
     }
+
+    public partial class Asn1CompilerInvokation
+    {
+        public void Visit(IASTVisitor visitor)
+        {
+            do
+            {
+                for (int i = 0; i < m_files.Count; i++)
+                    m_files[i].Visit(visitor);
+            } while (!visitor.Finished() && visitor.PassNo < 50);
+            Console.Error.WriteLine("Semantic parsing passes : " + visitor.PassNo.ToString());
+        }
+    }
+
 
     public partial class Asn1File
     {

@@ -1,0 +1,38 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+	EXPORTS 
+		MyInt,  
+		MyInt25,	-- not defined anywhere  
+		myIntVal
+	;
+
+	IMPORTS 
+		MyInt2  FROM MY-MODULE2
+		MyInt3  FROM MY-MODULE3	
+	;
+
+
+
+	
+	MyInt ::= INTEGER
+	myIntVal INTEGER ::= 4
+	
+END
+
+
+MY-MODULE2 DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+	MyInt2 ::= INTEGER
+	MyInt3 ::= INTEGER
+	
+END
+
+MY-MODULE3 DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+	MyInt2 ::= INTEGER
+	MyInt3 ::= INTEGER
+	
+END
+
+
+

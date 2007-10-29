@@ -6,6 +6,75 @@ using Antlr.Runtime.Tree;
 namespace tinyAsn1
 {
 
+    public partial class Asn1CompilerInvokation
+    {
+        private static Asn1CompilerInvokation m_instance;
+
+
+        public static Asn1CompilerInvokation Instance
+        {
+            get
+            {
+                if (m_instance == null)
+                    m_instance = new Asn1CompilerInvokation();
+                return m_instance;
+            }
+        }
+        private Asn1CompilerInvokation() { }
+        public List<Asn1File> m_files = new List<Asn1File>();
+
+        public bool isModuleDefined(string modName)
+        {
+            foreach (Asn1File f in m_files)
+                foreach (Module m in f.m_modules)
+                    if (m.m_moduleID == modName)
+                        return true;
+            return false;
+        }
+
+        public Module GetModuleByName(string modName)
+        {
+            foreach (Asn1File f in m_files)
+                foreach (Module m in f.m_modules)
+                    if (m.m_moduleID == modName)
+                        return m;
+            throw new SemanticErrorException("Error no module is defined with name: '"+modName+"'");
+        }
+
+        public void SemanticParse()
+        {
+            SemanticParser sp = new SemanticParser(this);
+            Visit(sp);
+        }
+        public void debug()
+        {
+            Console.WriteLine("Debugging ...");
+
+
+            for (int i = 0; i < m_files.Count; i++)
+            {
+                StreamWriterLevel wr = new StreamWriterLevel(m_files[i].m_fileName + ".txt");
+                try
+                {
+                    PrintASN1 pr = new PrintASN1(wr);
+                    m_files[i].Visit(pr);
+                }
+                finally
+                {
+                    wr.Flush();
+                    wr.Close();
+                }
+                //catch (Exception ex)
+                //{
+                //    Console.Error.WriteLine("Unkown exception ...");
+                //    Console.Error.WriteLine(ex.Message);
+                //    Console.Error.WriteLine(ex.StackTrace);
+                //    return 3;
+                //}
+            }
+        }
+    }
+
     public partial class Asn1File
     {
         public string m_fileName = "";
@@ -18,7 +87,8 @@ namespace tinyAsn1
 
         public partial class ImportedModule
         {
-            public string m_moduleID = "";
+            public Module m_parentModule;          // parent module is the module that contains myself
+            public string m_moduleID = "";  // moduleID is the module where the definition of imported types occurs
             public List<string> m_importedTypes = new List<string>();
             public List<string> m_importedVariables = new List<string>();
         }
@@ -31,7 +101,7 @@ namespace tinyAsn1
         }
 
         public string m_moduleID="";
-        public Tags m_tags = Tags.EXPLICIT;
+        public Tags m_tags = Tags.EXPLICIT;     // clause 12.2
         public bool m_extensibilityImplied = false;
 
         public Asn1Value GetValue(string valueName)
@@ -40,19 +110,27 @@ namespace tinyAsn1
                 throw new Exception("Internal Error: variable '"+valueName+"' is not declared");
             if (m_valuesAssigments.ContainsKey(valueName))
                 return m_valuesAssigments[valueName].m_value;
+            foreach (Module.ImportedModule im in m_imports)
+            {
+                if (im.m_importedVariables.Contains(valueName))
+                {
+                    Module otherModule = Asn1CompilerInvokation.Instance.GetModuleByName(im.m_moduleID);
+                    return otherModule.GetValue(valueName);
+                }
+            }
 
-            throw new Exception("Internal error: Imports/Exports are not implemented yet!");
+            throw new Exception("Internal error: ");
         }
 
-        public ValueAssigment GetValueAssigment(string valueAssigId)
-        {
-            if (!isValueDeclared(valueAssigId))
-                throw new Exception("Internal Error: variable assigment '" + valueAssigId + "' is not declared");
-            if (m_valuesAssigments.ContainsKey(valueAssigId))
-                return m_valuesAssigments[valueAssigId];
+        //public ValueAssigment GetValueAssigment(string valueAssigId)
+        //{
+        //    if (!isValueDeclared(valueAssigId))
+        //        throw new Exception("Internal Error: variable assigment '" + valueAssigId + "' is not declared");
+        //    if (m_valuesAssigments.ContainsKey(valueAssigId))
+        //        return m_valuesAssigments[valueAssigId];
 
-            throw new Exception("Internal error: Imports/Exports are not implemented yet!");
-        }
+        //    throw new Exception("Internal error: Imports/Exports are not implemented yet!");
+        //}
 
         public bool isValueDeclared(string valueName)
         {
@@ -63,6 +141,52 @@ namespace tinyAsn1
                     return true;
 
             return false;
+        }
+        
+        public bool isValueDeclaredAsExported(string valueName)
+        {
+            if (!isValueDeclared(valueName))
+                return false;
+            if (m_exportedVariables.Contains(valueName))
+                return true;
+            return false;
+        }
+
+        public bool isTypeDeclared(string typeName)
+        {
+            if (m_typeAssigments.ContainsKey(typeName))
+                return true;
+            foreach (ImportedModule im in m_imports)
+                if (im.m_importedTypes.Contains(typeName))
+                    return true;
+
+            return false;
+
+        }
+        
+        public bool isTypeDeclaredAsExported(string typeName)
+        {
+            if (!isTypeDeclared(typeName))
+                return false;
+            if (m_exportedTypes.Contains(typeName))
+                return true;
+            return false;
+
+        }
+
+        // it return the type 
+        public Asn1Type GetTypeByName(string typeName)
+        {
+            if (m_typeAssigments.ContainsKey(typeName))
+                return m_typeAssigments[typeName].m_type;
+
+            foreach (ImportedModule im in m_imports)
+                if (im.m_importedTypes.Contains(typeName))
+                {
+                    Module otherMode = Asn1CompilerInvokation.Instance.GetModuleByName(im.m_moduleID);
+                    return otherMode.GetTypeByName(typeName);
+                }
+            throw new SemanticErrorException("Error: '" + typeName+"' is undefined");
         }
         
         public List<string> m_exportedTypes = new List<string>();
@@ -340,12 +464,20 @@ namespace tinyAsn1
                 while (ret is ReferenceType)
                 {
                     if (((ReferenceType)ret).m_referencedModName != "")
-                        throw new Exception("Type references to external modules are not implemented (yet) ...");
+                    {
+//                        throw new Exception("Type references to external modules are not implemented (yet) ...");
+                        if (!Asn1CompilerInvokation.Instance.isModuleDefined(((ReferenceType)ret).m_referencedModName))
+                            throw new SemanticErrorException("Error: No module is defined with name '" + ((ReferenceType)ret).m_referencedModName+"'. Line: "+ret.antlrNode.Line);
+                        Module otherModule = Asn1CompilerInvokation.Instance.GetModuleByName(((ReferenceType)ret).m_referencedModName);
+                        ret = otherModule.GetTypeByName(((ReferenceType)ret).m_referencedModName);
+                    }
                     if (ret.m_module.m_typeAssigments.ContainsKey(((ReferenceType)ret).m_referencedTypeName))
                         ret = ret.m_module.m_typeAssigments[((ReferenceType)ret).m_referencedTypeName].m_type;
                     else
                     {
-                        throw new Exception("Unimplemented feature ...");
+                        if (!ret.m_module.isTypeDeclared(((ReferenceType)ret).m_referencedTypeName))
+                            throw new SemanticErrorException("Error: referenced type with name '" + ((ReferenceType)ret).m_referencedTypeName+"' is not define. Line: "+ret.antlrNode.Line);
+                        ret = ret.m_module.GetTypeByName(((ReferenceType)ret).m_referencedTypeName);
                     }
                 }
                 return ret;

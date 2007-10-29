@@ -6,8 +6,6 @@ using System.IO;
 namespace tinyAsn1
 {
 
-
-
     public partial class Asn1Type
     {
         public virtual void PrintAsn1(StreamWriterLevel o, int lev)
@@ -182,6 +180,8 @@ namespace tinyAsn1
 
     public class PrintASN1 : IASTVisitor
     {
+        
+
         StreamWriterLevel o;
         public PrintASN1(StreamWriterLevel outStream)
         {
@@ -324,6 +324,14 @@ namespace tinyAsn1
             }
             o.WriteLine("\t" + vas.m_name + " " + vas.m_type.Name + " ::= " + vas.m_value.ToString());
         }
+
+
+
+        public bool Finished()
+        {
+            return true;
+        }
+        public int PassNo { get { return 1; }  }
 
     }
 }
