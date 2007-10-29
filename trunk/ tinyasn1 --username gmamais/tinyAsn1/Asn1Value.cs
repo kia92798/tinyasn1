@@ -26,6 +26,9 @@ namespace tinyAsn1
             ENUMERATED,
             UNDEFINED,
             SEQUENCE_OR_SET,
+            SEQUENCE_OF,
+            SET_OF,
+            CHOICE,
             NULL
         }
 
@@ -111,6 +114,19 @@ namespace tinyAsn1
         {
             return Value.ToString();
         }
+        
+        public override bool Equals(object obj)
+        {
+            IntegerValue oth = obj as IntegerValue;
+            if (oth==null)
+                return false;
+            return oth.m_value == m_value;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_value.GetHashCode();
+        }
     }
 
 
@@ -149,6 +165,19 @@ namespace tinyAsn1
         public override string ToString()
         {
             return ID + "(" + Value.ToString()+")";
+        }
+
+        public override bool Equals(object obj)
+        {
+            EnumeratedValue oth = obj as EnumeratedValue;
+            if (oth == null)
+                return false;
+            return oth.m_value == m_value;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_value.GetHashCode();
         }
     }
 
@@ -239,6 +268,18 @@ namespace tinyAsn1
         {
             return Value.ToString();
         }
+        public override bool Equals(object obj)
+        {
+            BitStringValue oth = obj as BitStringValue;
+            if (oth == null)
+                return false;
+            return oth.m_value == m_value;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_value.GetHashCode();
+        }
 
     }
 
@@ -304,6 +345,18 @@ namespace tinyAsn1
         public override string ToString()
         {
             return Value.ToString();
+        }
+        public override bool Equals(object obj)
+        {
+            RealValue oth = obj as RealValue;
+            if (oth == null)
+                return false;
+            return oth.m_value == m_value;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_value.GetHashCode();
         }
     }
 
@@ -391,6 +444,18 @@ namespace tinyAsn1
             m_value.AddRange(o.m_value);
             m_type = o.m_type;
         }
+        public override bool Equals(object obj)
+        {
+            OctectStringValue oth = obj as OctectStringValue;
+            if (oth == null)
+                return false;
+            return oth.m_value == m_value;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_value.GetHashCode();
+        }
     }
 
     public partial class BooleanValue : Asn1Value
@@ -428,6 +493,18 @@ namespace tinyAsn1
             m_value = o.m_value;
             m_type = o.m_type;
         }
+        public override bool Equals(object obj)
+        {
+            BooleanValue oth = obj as BooleanValue;
+            if (oth == null)
+                return false;
+            return oth.m_value == m_value;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_value.GetHashCode();
+        }
     }
 
     public partial class NullValue : Asn1Value
@@ -435,6 +512,98 @@ namespace tinyAsn1
         public NullValue()
         {
             m_TypeID = TypeID.NULL;
+        }
+        public override bool Equals(object obj)
+        {
+            NullValue oth = obj as NullValue;
+            if (oth == null)
+                return false;
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+    }
+    
+    public partial class ChoiceValue : Asn1Value
+    {
+        public ChoiceType ChoiceType
+        {
+            get { return (ChoiceType)m_type; }
+        }
+        Asn1Value m_value;
+        public virtual Asn1Value Value
+        {
+            get { return m_value; }
+        }
+
+        string m_alternativeName;
+        public virtual string AlternativeName
+        {
+            get { return m_alternativeName; }
+        }
+        public ChoiceValue(ChoiceValue o)
+        {
+            m_TypeID = Asn1Value.TypeID.CHOICE;
+            m_module = o.m_module;
+            antlrNode = o.antlrNode;
+            m_type = o.m_type;
+            m_value = o.m_value;
+            m_alternativeName = o.m_alternativeName;
+        }
+
+        public ChoiceValue(ITree antlrNode, Module module, Asn1Type type)
+        {
+            m_TypeID = Asn1Value.TypeID.CHOICE;
+            this.antlrNode = antlrNode;
+            m_module = module;
+            m_type = type;
+
+            if (antlrNode.Type != asn1Parser.CHOICE_VALUE)
+                throw new Exception("Internal Error: ChoiceValue called with wrong antlr node type");
+
+
+            m_alternativeName = antlrNode.GetChild(0).Text;
+
+            m_value = Asn1Value.CreateFromAntlrAst(antlrNode.GetChild(1));
+
+            if (!ChoiceType.m_children.ContainsKey(m_alternativeName))
+                throw new SemanticErrorException("Error in line :" + antlrNode.Line + ". '" + m_alternativeName + "' is not a member of the choice");
+        }
+        public override bool SemanticCheckFinished()
+        {
+            return m_value.SemanticCheckFinished();
+        }
+
+
+        internal void FixChildrenVars()
+        {
+            if (SemanticCheckFinished())
+                return;
+
+            Asn1Type childType = ChoiceType.m_children[m_alternativeName].m_type;
+            m_value = childType.FixVariable(m_value);
+        }
+
+        public override string ToString()
+        {
+            return m_alternativeName + ":" + m_value.ToString();
+        }
+
+
+        public override bool Equals(object obj)
+        {
+            ChoiceValue oth = obj as ChoiceValue;
+            if (oth == null)
+                return false;
+            return (oth.m_value == m_value) && (oth.m_alternativeName == m_alternativeName);
+        }
+
+        public override int GetHashCode()
+        {
+            return m_value.GetHashCode();
         }
     }
 
@@ -460,14 +629,14 @@ namespace tinyAsn1
 
         public SequenceOrSetValue(SequenceOrSetValue o)
         {
-            m_TypeID = Asn1Value.TypeID.BOOLEAN;
+            m_TypeID = Asn1Value.TypeID.SEQUENCE_OR_SET;
             m_module = o.m_module;
             antlrNode = o.antlrNode;
             m_type = o.m_type;
             m_children = o.m_children;
         }
 
-        public SequenceOrSetValue(ITree antlrNode, Module module, Asn1Type type)
+        public SequenceOrSetValue(ITree antlrNode, Module module, Asn1Type type, bool checkChildrenOrder)
         {
             m_TypeID = Asn1Value.TypeID.SEQUENCE_OR_SET;
             this.antlrNode = antlrNode;
@@ -495,6 +664,21 @@ namespace tinyAsn1
 
                 m_children.Add(id, val);
             }
+
+            foreach (string typeChildName in Type2.m_children.Keys)
+            {
+                SequenceOrSetType.Child child = Type2.m_children[typeChildName];
+                if (child.m_optional || child.m_default)
+                    continue;
+                if (!m_children.ContainsKey(typeChildName))
+                    throw new SemanticErrorException("Error in line :" + antlrNode.Line + ". Mandatory child '" + typeChildName + "' missing");
+            }
+
+            if (checkChildrenOrder)
+            {
+                //to be implemented
+            }
+
         }
 
         internal void FixChildrenVars()
@@ -525,11 +709,258 @@ namespace tinyAsn1
             }
 
             key = m_children.Keys[cnt-1];
-            w.WriteLine(" " + key + " " + m_children[key].ToString()+" }");
+            w.Write(" " + key + " " + m_children[key].ToString()+" }");
 
             w.Flush();
             return w.ToString();
         }
+        public override bool Equals(object obj)
+        {
+            SequenceOrSetValue oth = obj as SequenceOrSetValue;
+            if (oth == null)
+                return false;
+            if (oth.m_children.Count != m_children.Count)
+                return false;
+            
+            for (int i = 0; i < m_children.Count; i++)
+            {
+                if (m_children.Keys[i] != oth.m_children.Keys[i])
+                    return false;
+                if (!m_children.Values[i].Equals(oth.m_children.Values[i]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_children.GetHashCode();
+        }
+    }
+
+
+
+    public partial class SequenceOfValue : Asn1Value
+    {
+        public List<Asn1Value> m_children = new List<Asn1Value>();
+        public SequenceOfType Type2
+        {
+            get
+            {
+                return (SequenceOfType)Type;
+            }
+        }
+
+        public override bool SemanticCheckFinished()
+        {
+            foreach (Asn1Value v in m_children)
+                if (!v.SemanticCheckFinished())
+                    return false;
+            
+            return true;
+        }
+
+        public SequenceOfValue(SequenceOfValue o)
+        {
+            m_TypeID = Asn1Value.TypeID.SEQUENCE_OF;
+            m_module = o.m_module;
+            antlrNode = o.antlrNode;
+            m_type = o.m_type;
+            m_children = o.m_children;
+        }
+
+        internal void FixChildrenVars()
+        {
+            for (int i = 0; i < m_children.Count;i++ )
+            {
+                Asn1Value childVal = m_children[i];
+                if (childVal.SemanticCheckFinished())
+                    continue;
+
+                Asn1Type childType = Type2.m_type;
+                m_children[i] = childType.FixVariable(childVal);
+            }
+        }
+
+
+        public override string ToString()
+        {
+
+            System.IO.StringWriter w = new System.IO.StringWriter();
+
+            w.Write("{");
+            int cnt = m_children.Count;
+            for (int i = 0; i < cnt - 1; i++)
+            {
+                w.Write(" " + m_children[i].ToString() + ",");
+            }
+
+            w.Write(m_children[cnt - 1].ToString() + " }");
+
+            w.Flush();
+            return w.ToString();
+        }
+        public SequenceOfValue(ITree antlrNode, Module module, Asn1Type type)
+        {
+            m_TypeID = Asn1Value.TypeID.SEQUENCE_OF;
+            this.antlrNode = antlrNode;
+            m_module = module;
+            m_type = type;
+
+            if (antlrNode.Type != asn1Parser.VALUE_LIST)
+                throw new Exception("Internal Error: SequenceOfValue called with wrong antlr node type");
+
+            for (int i = 0; i < antlrNode.ChildCount; i++)
+            {
+                Asn1Value val = Asn1Value.CreateFromAntlrAst(antlrNode.GetChild(i));
+
+                m_children.Add(val);
+            }
+
+
+        }
+
+        public override bool Equals(object obj)
+        {
+            SequenceOfValue oth = obj as SequenceOfValue;
+            if (oth == null)
+                return false;
+            if (oth.m_children.Count != m_children.Count)
+                return false;
+
+            for (int i = 0; i < m_children.Count; i++)
+            {
+                if (!m_children[i].Equals(oth.m_children[i]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_children.GetHashCode();
+        }
+
+    }
+
+
+
+    public partial class SetOfValue : Asn1Value
+    {
+        public List<Asn1Value> m_children = new List<Asn1Value>();
+        public SetOfType Type2
+        {
+            get
+            {
+                return (SetOfType)Type;
+            }
+        }
+
+        public override bool SemanticCheckFinished()
+        {
+            foreach (Asn1Value v in m_children)
+                if (!v.SemanticCheckFinished())
+                    return false;
+
+            return true;
+        }
+
+        public SetOfValue(SetOfValue o)
+        {
+            m_TypeID = Asn1Value.TypeID.SET_OF;
+            m_module = o.m_module;
+            antlrNode = o.antlrNode;
+            m_type = o.m_type;
+            m_children = o.m_children;
+        }
+
+        internal void FixChildrenVars()
+        {
+            for (int i = 0; i < m_children.Count; i++)
+            {
+                Asn1Value childVal = m_children[i];
+                if (childVal.SemanticCheckFinished())
+                    continue;
+
+                Asn1Type childType = Type2.m_type;
+                m_children[i] = childType.FixVariable(childVal);
+            }
+
+            //check if a value exists twice in the set
+            int cnt = m_children.Count;
+            for (int i = 0; i < cnt; i++)
+            {
+                for (int j = i+1; j < cnt; j++)
+                {
+                    if (m_children[i].Equals(m_children[j]))
+                        throw new SemanticErrorException("Error: SET declared in line :" + antlrNode.Line + " contains value :" + m_children[i].ToString()+" more than once");
+                }
+            }
+            
+        }
+
+
+        public override string ToString()
+        {
+
+            System.IO.StringWriter w = new System.IO.StringWriter();
+
+            w.Write("{");
+            int cnt = m_children.Count;
+            for (int i = 0; i < cnt - 1; i++)
+            {
+                w.Write(" " + m_children[i].ToString() + ",");
+            }
+
+            w.Write(m_children[cnt - 1].ToString() + " }");
+
+            w.Flush();
+            return w.ToString();
+        }
+        public SetOfValue(ITree antlrNode, Module module, Asn1Type type)
+        {
+            m_TypeID = Asn1Value.TypeID.SET_OF;
+            this.antlrNode = antlrNode;
+            m_module = module;
+            m_type = type;
+
+            if (antlrNode.Type != asn1Parser.VALUE_LIST)
+                throw new Exception("Internal Error: SetOfValue called with wrong antlr node type");
+
+            for (int i = 0; i < antlrNode.ChildCount; i++)
+            {
+                Asn1Value val = Asn1Value.CreateFromAntlrAst(antlrNode.GetChild(i));
+
+                m_children.Add(val);
+            }
+
+
+        }
+
+        public override bool Equals(object obj)
+        {
+            SetOfValue oth = obj as SetOfValue;
+            if (oth == null)
+                return false;
+            if (oth.m_children.Count != m_children.Count)
+                return false;
+
+            for (int i = 0; i < m_children.Count; i++)
+            {
+                if (!m_children[i].Equals(oth.m_children[i]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_children.GetHashCode();
+        }
+
     }
 
 }
