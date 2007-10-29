@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Antlr.Runtime.Tree;
+using Antlr.Runtime;
 
 namespace tinyAsn1
 {
@@ -23,6 +24,58 @@ namespace tinyAsn1
         }
     }
 
+    public partial class Asn1CompilerInvokation
+    {
+
+        public void CreateASTs(List<string> inputFiles)
+        {
+            foreach (string inFileName in inputFiles)
+            {
+                ICharStream input = new ANTLRFileStream(inFileName);
+                asn1Lexer lexer = new asn1Lexer(input);
+                CommonTokenStream tokens = new CommonTokenStream(lexer);
+                asn1Parser parser = new asn1Parser(tokens);
+
+                asn1Parser.moduleDefinitions_return result = parser.moduleDefinitions();
+
+
+                CommonTree tree = (CommonTree)result.Tree;
+                CommonTreeNodeStream nodes = new CommonTreeNodeStream(tree);
+                nodes.TokenStream = tokens;
+
+                //                    Console.WriteLine(tree.ToStringTree());
+
+
+                Asn1File asnFile = Asn1File.CreateFromAntlrAst(tree);
+                asnFile.m_fileName = inFileName;
+                m_files.Add(asnFile);
+            }
+            EarlySemanticCheck();
+        }
+
+        void EarlySemanticCheck()
+        {
+            List<string> m_modNames = new List<string>();
+
+            foreach(Asn1File f in m_files)
+                foreach (Module mod in f.m_modules)
+                {
+                    if (m_modNames.Contains(mod.m_moduleID))
+                        throw new SemanticErrorException("Error: Module with name '" + mod.m_moduleID + "' defined twice"); //12.5
+                    m_modNames.Add(mod.m_moduleID);
+                }
+
+        }
+
+
+        internal bool SemanticCheckFinished()
+        {
+            foreach (Asn1File f in m_files)
+                if (!f.SemanticCheckFinished())
+                    return false;
+            return true;
+        }
+    }
 
     public partial class Asn1File
     {
@@ -42,6 +95,14 @@ namespace tinyAsn1
 
             return ret;
         }
+        internal bool SemanticCheckFinished()
+        {
+            foreach (Module m in m_modules)
+                if (!m.SemanticCheckFinished())
+                    return false;
+            return true;
+        }
+
     }
 
     partial class Module
@@ -51,12 +112,15 @@ namespace tinyAsn1
         {
             ITree tree;
             //^(IMPORTS_FROM_MODULE modulereference typereference* valuereference*  )
-            static public ImportedModule CreateFromAntlrAst(ITree tree)
+            static public ImportedModule CreateFromAntlrAst(ITree tree, Module parent)
             {
                 ImportedModule ret = new ImportedModule();
+                ret.m_parentModule = parent;
                 ret.tree = tree;
 
                 ret.m_moduleID = tree.GetChild(0).Text;
+                if (ret.m_moduleID == ret.m_parentModule.m_moduleID)
+                    throw new SemanticErrorException("Error: Can not import from myself. Line: "+tree.Line);
 
                 for (int i = 1; i < tree.ChildCount; i++)
                 {
@@ -65,12 +129,12 @@ namespace tinyAsn1
                     switch (child.Type)
                     {
                         case asn1Parser.UID:
-                            if (ret.m_importedTypes.Contains(child.Text))
+                            if (ret.m_parentModule.isTypeDeclared(child.Text))
                                 throw new SemanticErrorException(child.Text + " has alrady been imported. Line: "+child.Line);
                             ret.m_importedTypes.Add(child.Text);
                             break;
                         case asn1Parser.LID:
-                            if (ret.m_importedVariables.Contains(child.Text))
+                            if (ret.m_parentModule.isValueDeclared(child.Text))
                                 throw new SemanticErrorException(child.Text + " has alrady been imported. Line: " + child.Line);
                             ret.m_importedVariables.Add(child.Text);
                             break;
@@ -122,39 +186,59 @@ namespace tinyAsn1
                         break;
                     case asn1Parser.EXPORTS_ALL:
                         curModule.bExportAll = true;
-//                        curModule.m_exportStatus = ExportStatus.ALL;
+                        //                        curModule.m_exportStatus = ExportStatus.ALL;
                         break;
                     case asn1Parser.EXPORTS:
-                        handleExports(curModule, child);                        
+                        handleExports(curModule, child);
                         break;
                     case asn1Parser.IMPORTS_FROM_MODULE:
-                        curModule.m_imports.Add(ImportedModule.CreateFromAntlrAst(child));
+                        curModule.m_imports.Add(ImportedModule.CreateFromAntlrAst(child, curModule));
                         break;
                     case asn1Parser.TYPE_ASSIG:
                         TypeAssigment typeAssig = TypeAssigment.CreateFromAntlrAst(child);
-                        if (curModule.m_typeAssigments.ContainsKey(typeAssig.m_name))
-                            throw new SemanticErrorException(typeAssig.m_name + " has alrady been defined. Line: " + child.Line);
-                        curModule.m_typeAssigments.Add(typeAssig.m_name,typeAssig);
+                        if (curModule.isTypeDeclared(typeAssig.m_name))
+                            throw new SemanticErrorException(typeAssig.m_name + " has alrady been defined or imported. Line: " + child.Line);
+                        curModule.m_typeAssigments.Add(typeAssig.m_name, typeAssig);
                         break;
                     case asn1Parser.VAL_ASSIG:
                         ValueAssigment valAssig = ValueAssigment.CreateFromAntlrAst(child);
-                        if (curModule.m_valuesAssigments.ContainsKey(valAssig.m_name) )
-                            throw new SemanticErrorException(valAssig.m_name + " has alrady been defined. Line: " + child.Line);
+                        if (curModule.isValueDeclared(valAssig.m_name))
+                            throw new SemanticErrorException(valAssig.m_name + " has alrady been defined or imported. Line: " + child.Line);
                         curModule.m_valuesAssigments.Add(valAssig.m_name, valAssig);
                         break;
-/*                    case asn1Parser.VAL_SET_ASSIG:
-                        ValueSetAssigment valSetAssig = ValueSetAssigment.CreateFromAntlrAst(child);
-                        if (curModule.m_valueSetsAssigments.ContainsKey(valSetAssig.m_typeReference))
-                            throw new SemanticErrorException(valSetAssig.m_typeReference + " has alrady been defined. Line: " + child.Line);
-                        curModule.m_valueSetsAssigments.Add(valSetAssig.m_typeReference, valSetAssig);
-                        break;*/
+                    /*                    case asn1Parser.VAL_SET_ASSIG:
+                                            ValueSetAssigment valSetAssig = ValueSetAssigment.CreateFromAntlrAst(child);
+                                            if (curModule.m_valueSetsAssigments.ContainsKey(valSetAssig.m_typeReference))
+                                                throw new SemanticErrorException(valSetAssig.m_typeReference + " has alrady been defined. Line: " + child.Line);
+                                            curModule.m_valueSetsAssigments.Add(valSetAssig.m_typeReference, valSetAssig);
+                                            break;*/
                     default:
                         throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
                 }
 
             }
-            
-//            curModule.fixTree();
+
+            {
+                // If EXPORT ALL OR nothing is exported ==> make all type, variable and imports assigment exportable
+                if (curModule.bExportAll || (curModule.m_exportedTypes.Count == 0 && curModule.m_exportedVariables.Count == 0))
+                {
+                    foreach (TypeAssigment typeAss in curModule.m_typeAssigments.Values)
+                        curModule.m_exportedTypes.Add(typeAss.m_name);
+                    foreach (ValueAssigment valAsig in curModule.m_valuesAssigments.Values)
+                        curModule.m_exportedVariables.Add(valAsig.m_name);
+                    foreach (Module.ImportedModule im in curModule.m_imports)
+                    {
+                        curModule.m_exportedTypes.AddRange(im.m_importedTypes);
+                        curModule.m_exportedVariables.AddRange(im.m_importedVariables);
+                    }
+
+                    curModule.bExportAll = false;
+                }
+            }
+
+
+
+            //            curModule.fixTree();
             return curModule;
         }
 /*
@@ -193,6 +277,20 @@ namespace tinyAsn1
                 }
             }
         }
+
+        internal bool SemanticCheckFinished()
+        {
+            foreach (TypeAssigment t in m_typeAssigments.Values)
+                if (!t.m_type.SemanticCheckFinished())
+                    return false;
+
+            foreach (ValueAssigment v in m_valuesAssigments.Values)
+                if (!v.m_value.SemanticCheckFinished())
+                    return false;
+
+            return true;
+        }
+
     }
 
     public partial class ValueAssigment

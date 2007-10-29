@@ -7,18 +7,29 @@ namespace tinyAsn1
 {
     class SemanticParser : IASTVisitor
     {
-        public int PassNo = 0;
-        bool bFinished = true;
+        int m_PassNo = 0;
+        public int PassNo { get { return m_PassNo; } set { m_PassNo = value; } }
+
+
+        Asn1CompilerInvokation m_compInv;
+
+        public SemanticParser(Asn1CompilerInvokation compInv)
+        {
+            m_compInv = compInv;
+        }
+
+        
+//        bool bFinished = true;
         public bool Finished()
         {
-            return bFinished;
+            return m_compInv.SemanticCheckFinished();
         }
 
 
         public void OnBeforeAsn1File(Asn1File asn1File)
         {
             PassNo++;
-            bFinished = true;
+//            bFinished = true;
             if (PassNo > 100)
                 throw new Exception("Bug. Number of semantic passes exceeded 100");
         }
@@ -29,15 +40,32 @@ namespace tinyAsn1
 
         public void OnBeforeModule(Asn1File asn1File, Module mod)
         {
-//1 If EXPORT ALL ==> make all type and variable assigment exportable
-            if (mod.bExportAll)
-            {
-                foreach (TypeAssigment typeAss in mod.m_typeAssigments.Values)
-                    mod.m_exportedTypes.Add(typeAss.m_name);
-                foreach (ValueAssigment valAsig in mod.m_valuesAssigments.Values)
-                    mod.m_exportedVariables.Add(valAsig.m_name);
-                mod.bExportAll = false;
+
+
+// Make sure that all imported types are defined in the reference module
+            foreach(Module.ImportedModule im in mod.m_imports) {
+                if (!m_compInv.isModuleDefined(im.m_moduleID))
+                    throw new SemanticErrorException("Error: no module is defined with name: '" + im.m_moduleID + "'");
+
+                Module otherModule = m_compInv.GetModuleByName(im.m_moduleID);
+                foreach (string typeName in im.m_importedTypes)
+                {
+                    if (!otherModule.isTypeDeclaredAsExported(typeName))
+                        throw new SemanticErrorException("Error: import type '" + typeName + "' which appears in the import list of module '" + mod.m_moduleID + "' is not exported in module:'" + otherModule.m_moduleID+"'");
+                }
+                foreach (string varName in im.m_importedVariables)
+                {
+                    if (!otherModule.isValueDeclaredAsExported(varName))
+                        throw new SemanticErrorException("Error: import variable '" + varName + "' which appears in the import list of module '" + mod.m_moduleID + "' is not exported in module:'" + otherModule.m_moduleID + "'");
+                }
             }
+//Make sure that every export is defined 
+            foreach (string expTypeName in mod.m_exportedTypes)
+                if (!mod.isTypeDeclared(expTypeName))
+                    throw new SemanticErrorException("Error: type '" + expTypeName + "' which appears in the export list of module '" + mod.m_moduleID + "' is not defined");
+            foreach(string expVarName in mod.m_exportedVariables)
+                if (!mod.isValueDeclared(expVarName))
+                    throw new SemanticErrorException("Error: variable '" + expVarName + "' which appears in the export list of module '" + mod.m_moduleID + "' is not defined");
 
         }
 
@@ -47,8 +75,8 @@ namespace tinyAsn1
 
         public void OnBeforeTypeAssigment(Asn1File asn1File, Module mod, TypeAssigment tas)
         {
-            if (!tas.m_type.SemanticCheckFinished())
-                bFinished = false;
+            tas.m_type.SemanticCheckFinished();
+            //    bFinished = false;
         }
 
         public void OnAfterTypeAssigment(Asn1File asn1File, Module mod, TypeAssigment tas)
@@ -127,8 +155,8 @@ namespace tinyAsn1
             if (!vas.m_value.SemanticCheckFinished())
             {
                 vas.m_value = vas.m_type.FixVariable(vas.m_value);
-                if (!vas.m_value.SemanticCheckFinished())
-                    bFinished = false;
+                //if (!vas.m_value.SemanticCheckFinished())
+                //    bFinished = false;
             }
         }
 
