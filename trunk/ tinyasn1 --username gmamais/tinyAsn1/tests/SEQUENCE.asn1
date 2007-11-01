@@ -24,6 +24,24 @@ MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
 
 	mySQvar1 MySQ0 ::= { int1 10, int2 myIntVal}
 
+	MyTest ::= SEQUENCE {
+		field1	INTEGER	
+	}
+	
+	myTestVar MyTest ::= {field1 5}
+	myTestVar2 MyTest ::= {field1 myIntVal3}
+
+	MyTest2 ::= SEQUENCE {
+		field1	MyTest	
+	}
+	
+	myTest2Var1 MyTest2 ::= {field1 myTestVar}
+	myTest2Var2 MyTest2 ::= {field1 myTestVar2}
+	myTest2Var3 MyTest2 ::= {field1 {field1 myIntVal3}}
+--	myTest2Var4 MyTest2 ::= {field1 myIntVal3}	error myIntVal3 is an integer
+	
+	
+
 	MySQ22 ::= SEQUENCE {
 		a	INTEGER {red(0), blue(1)} (red|blue) DEFAULT red,
 		b 	MyReal,
@@ -109,6 +127,10 @@ MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
 				}
 	
 	SQOF ::= SEQUENCE OF INTEGER
+	
+	sqof1 SQOF ::= {myIntVal}
+	sqof2 SQOF ::= {10}
+	
 	SQOFOF ::= SEQUENCE OF SEQUENCE OF INTEGER
 	
 	sqof SQOF::= {1,2,3,4,1,1,1}
@@ -123,6 +145,10 @@ MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
 		10}}
 		
 	SETOF ::= SET OF INTEGER
+	
+	setof2 SETOF ::= {myIntVal}
+	setof1 SETOF ::= {12}
+	
 	SETSETOF ::= SET OF SET OF INTEGER
 	
 	setsetof SETSETOF ::= { {1,2,3,4,5}, {1,2,3,4,5,6}, {1,2,3,4,5,6,7} } 
