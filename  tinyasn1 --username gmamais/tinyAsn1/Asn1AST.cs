@@ -297,6 +297,15 @@ namespace tinyAsn1
         }
     }
 
+    public partial class ObjectIdentifier : Asn1Type
+    {
+        
+        public override string Name
+        {
+            get { return "OBJECT IDENTIFIER"; }
+        }
+    }
+
     public partial class BooleanType : Asn1Type
     {
         public override string Name

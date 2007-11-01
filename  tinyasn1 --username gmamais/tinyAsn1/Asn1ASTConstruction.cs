@@ -423,6 +423,7 @@ namespace tinyAsn1
                             ret = ReferenceType.CreateFromAntlrAst(child);
                             break;
                         case asn1Parser.OBJECT_TYPE:
+                            ret = ObjectIdentifier.CreateFromAntlrAst(child);
                             break;
                         case asn1Parser.RELATIVE_OID:
                             break;
@@ -530,7 +531,7 @@ namespace tinyAsn1
                         {
                             case Asn1Value.TypeID.NULL:
                                 return new NullValue();
-                            case Asn1Value.TypeID.UNDEFINED:
+                            case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
                             default:
@@ -545,6 +546,8 @@ namespace tinyAsn1
             }
         }
     }
+
+
 
     public partial class BooleanType : Asn1Type
     {
@@ -565,7 +568,7 @@ namespace tinyAsn1
                         {
                             case Asn1Value.TypeID.BOOLEAN:
                                 return new BooleanValue(tmp as BooleanValue);
-                            case Asn1Value.TypeID.UNDEFINED:
+                            case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
                             default:
@@ -629,7 +632,7 @@ namespace tinyAsn1
                     if (m_module.isValueDeclared(refName))
                     {
                         Asn1Value tmpVal = m_module.GetValue(refName);
-                        if (tmpVal.m_TypeID == Asn1Value.TypeID.UNDEFINED)
+                        if (tmpVal.m_TypeID == Asn1Value.TypeID.UNRESOLVED)
                             continue;
                         if (tmpVal.m_TypeID == Asn1Value.TypeID.INT)
                         {
@@ -667,16 +670,54 @@ namespace tinyAsn1
                 case asn1Parser.BitStringLiteral:
                 case asn1Parser.OctectStringLiteral:
                     return new BitStringValue(val.antlrNode, m_module, this);
-                case asn1Parser.BIT_STRING_VALUE: // { id, id2, id3}
+
+                case asn1Parser.OBJECT_ID_VALUE: // There is case { id } that the parser thinks that this a OBJECT ID value
+                    // although it should handled as VALUE_LIST
+                    if (NeedMorePasses())
+                        return val;
+                    if (val.antlrNode.ChildCount != 1)
+                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting BIT STRING constant or BIT STRING variable");
+                    ITree objLstItem = val.antlrNode.GetChild(0);
+                    if (objLstItem.ChildCount != 1)
+                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting BIT STRING constant or BIT STRING variable");
+                    ITree identifier = objLstItem.GetChild(0);
+
+                    if (identifier.Type != asn1Parser.LID)
+                        throw new SemanticErrorException("Error in line: " + identifier.Line + ", col: " + identifier.CharPositionInLine + ". Expecting identifier");
+                    else
+                    {
+                        string id = identifier.Text;
+                        if (!m_namedBits.ContainsKey(id))
+                            throw new SemanticErrorException("Error in line: " + identifier.Line + ", col: " + identifier.CharPositionInLine + ". Unknown identifier '" + id + ",");
+
+                        List<Int64> ids = new List<Int64>();
+                        ids.Add(m_namedBits[id]);
+                        return new BitStringValue(ids, val.antlrNode, m_module, this);
+                    }
+
+
+                //To resolve another grammar Ambiguouity, we no more declare bitStringValue. 
+                //The parser will only return valueList. 
+                //Therefore, we must make sure that all values are identifiers
+                //case asn1Parser.BIT_STRING_VALUE: // { id, id2, id3}
+                case asn1Parser.VALUE_LIST: // { val1, val2, val3}
                     {
                         if (NeedMorePasses())
                             return val;
                         List<Int64> ids = new List<Int64>();
                         for (int i = 0; i < val.antlrNode.ChildCount; i++)
                         {
-                            string id = val.antlrNode.GetChild(i).Text;
+                            ITree child = val.antlrNode.GetChild(i);
+                            string id;
+                            if (child.Type == asn1Parser.LID) 
+                                id = child.Text;
+                            else if (child.Type == asn1Parser.VALUE_REFERENCE)
+                                id = child.GetChild(0).Text;
+                            else
+                                throw new SemanticErrorException("Error in line: " + child.Line + ", col: " + child.CharPositionInLine + ". Expecting identifier");
                             if (!m_namedBits.ContainsKey(id))
-                                throw new SemanticErrorException("Error in line: "+val.antlrNode.Line+". Unknown identifier '"+id+",");
+                                throw new SemanticErrorException("Error in line: " + child.Line + ", col: " + child.CharPositionInLine + ". Unknown identifier '" + id + ",");
+
                             ids.Add(m_namedBits[id]);
                         }
                         return new BitStringValue(ids, val.antlrNode, m_module, this);
@@ -690,7 +731,7 @@ namespace tinyAsn1
                         {
                             case Asn1Value.TypeID.BIT_STRING:
                                 return new BitStringValue(tmp as BitStringValue);
-                            case Asn1Value.TypeID.UNDEFINED:
+                            case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
                             default:
@@ -725,7 +766,7 @@ namespace tinyAsn1
                         {
                             case Asn1Value.TypeID.OCTECT_STRING:
                                 return new OctectStringValue(tmp as OctectStringValue);
-                            case Asn1Value.TypeID.UNDEFINED:
+                            case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
                             default:
@@ -762,7 +803,7 @@ namespace tinyAsn1
                         {
                             case Asn1Value.TypeID.REAL:
                                 return new RealValue(tmp as RealValue);
-                            case Asn1Value.TypeID.UNDEFINED:
+                            case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
                             default:
@@ -851,7 +892,7 @@ namespace tinyAsn1
                     else if (m_module.isValueDeclared(referenceId)) 
                     {
                         Asn1Value tmp = m_module.GetValue(referenceId);
-                        if (tmp.m_TypeID == Asn1Value.TypeID.UNDEFINED)
+                        if (tmp.m_TypeID == Asn1Value.TypeID.UNRESOLVED)
                             return val; // not yet resolved. Wait for next round
                         if (tmp.Type.GetFinalType() == this)
                         {
@@ -919,7 +960,7 @@ namespace tinyAsn1
                     if (m_module.isValueDeclared(refName))
                     {
                         Asn1Value tmpVal = m_module.GetValue(refName);
-                        if (tmpVal.m_TypeID == Asn1Value.TypeID.UNDEFINED)
+                        if (tmpVal.m_TypeID == Asn1Value.TypeID.UNRESOLVED)
                             continue;
                         if (tmpVal.m_TypeID == Asn1Value.TypeID.INT)
                         {
@@ -1003,7 +1044,7 @@ namespace tinyAsn1
                         {
                             case Asn1Value.TypeID.INT:
                                 return new IntegerValue(tmp as IntegerValue);
-                            case Asn1Value.TypeID.UNDEFINED:
+                            case Asn1Value.TypeID.UNRESOLVED:
                                 return val;
                             default:
                                 throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
@@ -1044,7 +1085,7 @@ namespace tinyAsn1
                     if (m_module.isValueDeclared(refName))
                     {
                         Asn1Value tmpVal = m_module.GetValue(refName);
-                        if (tmpVal.m_TypeID == Asn1Value.TypeID.UNDEFINED)
+                        if (tmpVal.m_TypeID == Asn1Value.TypeID.UNRESOLVED)
                             continue;
                         if (tmpVal.m_TypeID == Asn1Value.TypeID.INT)
                         {
@@ -1229,7 +1270,7 @@ namespace tinyAsn1
                                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
                                 }
                                 return val; // not yet fully resolved, wait for next round
-                            case Asn1Value.TypeID.UNDEFINED:
+                            case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
                             default:
@@ -1297,10 +1338,10 @@ namespace tinyAsn1
 
                 if (m_defaultValue != null)
                 {
-                    if (m_defaultValue.m_TypeID == Asn1Value.TypeID.UNDEFINED)
+                    if (m_defaultValue.m_TypeID == Asn1Value.TypeID.UNRESOLVED)
                     {
                         m_defaultValue = m_type.FixVariable(m_defaultValue);
-                        if (m_defaultValue.m_TypeID == Asn1Value.TypeID.UNDEFINED)
+                        if (m_defaultValue.m_TypeID == Asn1Value.TypeID.UNRESOLVED)
                             return false;
                     }
 
@@ -1414,6 +1455,7 @@ namespace tinyAsn1
             switch (val.antlrNode.Type)
             {
                 case asn1Parser.NAMED_VALUE_LIST:
+                case asn1Parser.OBJECT_ID_VALUE:    // for catching cases {id id2} or {id 4}
                     if (sqVal == null)
                         if (this is SequenceType)
                             return new SequenceOrSetValue(val.antlrNode, m_module, this,true);
@@ -1439,7 +1481,7 @@ namespace tinyAsn1
                                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
                                 }
                                 return val; // not yet fully resolved, wait for next round
-                            case Asn1Value.TypeID.UNDEFINED:
+                            case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
                             default:
@@ -1522,6 +1564,7 @@ namespace tinyAsn1
             switch (val.antlrNode.Type)
             {
                 case asn1Parser.VALUE_LIST:
+                case asn1Parser.OBJECT_ID_VALUE:    //for catching case {valref} or {23}
                     if (sqVal == null)
                         return new SequenceOfValue(val.antlrNode, m_module, this);
                     else
@@ -1544,7 +1587,7 @@ namespace tinyAsn1
                                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
                                 }
                                 return val; // not yet fully resolved, wait for next round
-                            case Asn1Value.TypeID.UNDEFINED:
+                            case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
                             default:
@@ -1602,6 +1645,7 @@ namespace tinyAsn1
             switch (val.antlrNode.Type)
             {
                 case asn1Parser.VALUE_LIST:
+                case asn1Parser.OBJECT_ID_VALUE: //for catching case {valref} or {23}
                     if (sqVal == null)
                         return new SetOfValue(val.antlrNode, m_module, this);
                     else
@@ -1616,7 +1660,7 @@ namespace tinyAsn1
                         Asn1Value tmp = m_module.GetValue(referenceId);
                         switch (tmp.m_TypeID)
                         {
-                            case Asn1Value.TypeID.SEQUENCE_OF:
+                            case Asn1Value.TypeID.SET_OF:
                                 if (tmp.SemanticCheckFinished())
                                 {
                                     if (tmp.Type.GetFinalType() == this)
@@ -1624,7 +1668,7 @@ namespace tinyAsn1
                                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
                                 }
                                 return val; // not yet fully resolved, wait for next round
-                            case Asn1Value.TypeID.UNDEFINED:
+                            case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
                             default:
@@ -1640,6 +1684,58 @@ namespace tinyAsn1
         }
 
     }
+
+    public partial class ObjectIdentifier : Asn1Type
+    {
+        static public new ObjectIdentifier CreateFromAntlrAst(ITree tree)
+        {
+            return new ObjectIdentifier();
+        }
+        internal override Asn1Value FixVariable(Asn1Value val)
+        {
+            string referenceId = "";
+            ObjectIdentifierValue obVal = val as ObjectIdentifierValue;
+            switch (val.antlrNode.Type)
+            {
+                case asn1Parser.OBJECT_ID_VALUE:
+                    if (obVal == null)
+                        return new ObjectIdentifierValue(val.antlrNode, m_module, this);
+                    else
+                    {
+                        obVal.FixChildrenVars();
+                        return obVal;
+                    }
+                case asn1Parser.VALUE_REFERENCE:
+                    referenceId = val.antlrNode.GetChild(0).Text;
+                    if (m_module.isValueDeclared(referenceId))
+                    {
+                        Asn1Value tmp = m_module.GetValue(referenceId);
+                        switch (tmp.m_TypeID)
+                        {
+                            case Asn1Value.TypeID.OBJECT_IDENTIFIER:
+                                if (tmp.SemanticCheckFinished())
+                                {
+                                    if (tmp.Type.GetFinalType() == this)
+                                        return new ObjectIdentifierValue(tmp as ObjectIdentifierValue);
+                                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                                }
+                                return val; // not yet fully resolved, wait for next round
+                            case Asn1Value.TypeID.UNRESOLVED:
+                                // not yet resolved, wait for next round
+                                return val;
+                            default:
+                                throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                        }
+                    }
+                    else
+                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
+
+                default:
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting OBJECT IDENTIFIER variable");
+            }
+        }
+    }
+
 
     public partial class ReferenceType : Asn1Type
     {

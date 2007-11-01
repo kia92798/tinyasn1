@@ -317,7 +317,7 @@ namespace tinyAsn1
 
         public void OnValueAssigment(Asn1File asn1File, Module mod, ValueAssigment vas)
         {
-            if (vas.m_value.m_TypeID == Asn1Value.TypeID.UNDEFINED)
+            if (vas.m_value.m_TypeID == Asn1Value.TypeID.UNRESOLVED)
             {
                 Console.Error.WriteLine("Variable assigment '"+vas.m_name+"' is still in UNDEFINED state. It will be ignored");
                 return;

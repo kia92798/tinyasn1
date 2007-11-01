@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Antlr.Runtime.Tree;
 
 namespace tinyAsn1
 {
@@ -62,6 +63,102 @@ namespace tinyAsn1
         {
             for (int i = 0; i < level; i++)
                 Write("\t");
+        }
+    }
+
+    public class SemanticTreeNode : ITree
+    {
+        List<ITree> children = new List<ITree>();
+
+        public void AddChild(ITree t)
+        {
+            children.Add(t);
+        }
+
+        int m_CharPositionInLine;
+        public int CharPositionInLine
+        {
+            get { return m_CharPositionInLine; }
+        }
+
+        public int ChildCount
+        {
+            get { return children.Count; }
+        }
+
+        public ITree DupNode()
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
+
+        public ITree DupTree()
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
+
+        public ITree GetChild(int i)
+        {
+            return children[i];
+        }
+
+        public bool IsNil
+        {
+            get { throw new Exception("The method or operation is not implemented."); }
+        }
+
+        int m_line;
+        public int Line
+        {
+            get { return m_line; }
+        }
+
+        string m_text;
+        public string Text
+        {
+            get { return m_text; }
+        }
+
+        public string ToStringTree()
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
+
+        public int TokenStartIndex
+        {
+            get
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
+            set
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
+        }
+
+        public int TokenStopIndex
+        {
+            get
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
+            set
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
+        }
+
+        int m_type;
+        public int Type
+        {
+            get { return m_type; }
+        }
+
+        public SemanticTreeNode(int charPositionInLine, int line, string text, int type)
+        {
+            m_CharPositionInLine = charPositionInLine;
+            m_line = line;
+            m_text = text;
+            m_type = type;
         }
     }
 

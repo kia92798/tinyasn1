@@ -31,7 +31,8 @@ tokens {
 	SET_OF_TYPE;
 	STRING_TYPE;
 	REFERENCED_TYPE;
-	OBJ_LST_ITEM;
+	OBJ_LST_ITEM1;
+	OBJ_LST_ITEM2;
 	DEFINED_VALUE;
 	NUMERIC_VALUE;
 	CONSTRAINT;
@@ -50,7 +51,7 @@ tokens {
 	MIN_VAL_INCLUDED;
 	MAX_VAL_INCLUDED;
 	MAX_VAL_PRESENT;
-	BIT_STRING_VALUE;
+//	BIT_STRING_VALUE;
 	CHAR_SEQUENCE_VALUE;
 	EXPORTS_ALL;
 	IMPORTS_FROM_MODULE;
@@ -66,6 +67,7 @@ tokens {
 	NAMED_VALUE_LIST;
 	VALUE_LIST;
 	CHOICE_VALUE;
+	OBJECT_ID_VALUE;
 }
 
 
@@ -92,9 +94,14 @@ moduleDefinitions
 
 
 definitiveIdentifier
-	:	'{' definitiveObjIdComponent* '}'
+	:	L_BRACKET definitiveObjIdComponent* R_BRACKET
 	;
 
+definitiveObjIdComponent
+	:	identifier ( L_PAREN INT R_PAREN )?
+	|	INT
+	;	
+	
 moduleDefinition :  	modulereference	definitiveIdentifier?
 			DEFINITIONS
 			//			moduleTag?
@@ -128,13 +135,11 @@ EXTENSIBILITY ==> An ENUMERATED, SEQUENCE, SET or CHOICE type that does not incl
 			
 
 
-definitiveObjIdComponent
-	:	identifier ( '(' INT ')' )?
-	|	INT;		
+	
 			
 exports :
 	   EXPORTS ALL ';' -> EXPORTS_ALL
-	 | EXPORTS ((typereference | valuereference) (',' (typereference | valuereference))*)?  ';' 
+	 | EXPORTS ((typereference | valuereference) (COMMA (typereference | valuereference))*)?  ';' 
 	 	-> ^(EXPORTS typereference* valuereference*)?
 ;			
 
@@ -143,7 +148,7 @@ imports :
 	;
 	
 importFromModule
-	:	(typereference | valuereference) (',' (typereference | valuereference))* FROM modulereference definitiveIdentifier?
+	:	(typereference | valuereference) (COMMA (typereference | valuereference))* FROM modulereference definitiveIdentifier?
 		-> ^(IMPORTS_FROM_MODULE modulereference typereference* valuereference*  )
 	;	
 	
@@ -154,7 +159,7 @@ valueAssigment
 
 /*		
 valueSetAssigment
-	:	typereference type '::=' '{' setOfValues '}'    -> ^(VAL_SET_ASSIG typereference type setOfValues)
+	:	typereference type '::=' L_BRACKET setOfValues R_BRACKET    -> ^(VAL_SET_ASSIG typereference type setOfValues)
 	;		
 */	
 typeAssigment 
@@ -207,11 +212,11 @@ sizeShortConstraint
 nULL:	NULL;
 
 bitStringType
-	:	BIT STRING ('{' (bitStringItem (',' bitStringItem )* )? '}' )?	-> ^(BIT_STRING_TYPE bitStringItem*)
+	:	BIT STRING (L_BRACKET (bitStringItem (COMMA bitStringItem )* )? R_BRACKET )?	-> ^(BIT_STRING_TYPE bitStringItem*)
 	;
 
 bitStringItem 
-	:	identifier '(' (INT|valuereference) ')'		->  ^(NUMBER_LST_ITEM identifier INT? valuereference?)
+	:	identifier L_PAREN (INT|valuereference) R_PAREN		->  ^(NUMBER_LST_ITEM identifier INT? valuereference?)
 	;	
 	
 booleanType
@@ -219,22 +224,22 @@ booleanType
 	;
 	
 enumeratedType 
-	:	ENUMERATED '{' en1=enumeratedTypeItems  ( ',' ext='...' exceptionSpec? (',' en2=enumeratedTypeItems)? )? '}'
+	:	ENUMERATED L_BRACKET en1=enumeratedTypeItems  ( COMMA ext='...' exceptionSpec? (COMMA en2=enumeratedTypeItems)? )? R_BRACKET
 	-> ^(ENUMERATED_TYPE $en1 ($ext exceptionSpec? $en2?) ?)
 	;
 
 enumeratedTypeItems 
-	:	 enumeratedLstItem (',' enumeratedLstItem)* ->enumeratedLstItem+
+	:	 enumeratedLstItem (COMMA enumeratedLstItem)* ->enumeratedLstItem+
 	;		
 enumeratedLstItem	:	
-	identifier ( '(' (signedNumber|valuereference) ')')? -> ^(NUMBER_LST_ITEM identifier signedNumber? valuereference?)
+	identifier ( L_PAREN (signedNumber|valuereference) R_PAREN)? -> ^(NUMBER_LST_ITEM identifier signedNumber? valuereference?)
 ;
 integerType
-	:	INTEGER ( '{' (integerTypeListItem (',' integerTypeListItem)*)? '}')?	-> ^(INTEGER_TYPE integerTypeListItem*)
+	:	INTEGER ( L_BRACKET (integerTypeListItem (COMMA integerTypeListItem)*)? R_BRACKET)?	-> ^(INTEGER_TYPE integerTypeListItem*)
 	;
 	
 integerTypeListItem 
-	:	identifier '(' (signedNumber|valuereference) ')'	-> ^(NUMBER_LST_ITEM identifier signedNumber? valuereference?)
+	:	identifier L_PAREN (signedNumber|valuereference) R_PAREN	-> ^(NUMBER_LST_ITEM identifier signedNumber? valuereference?)
 	;	
 	
 realType 
@@ -243,24 +248,24 @@ realType
 	
 	
 choiceType
-	:	CHOICE '{' choiceItemsList choiceExtensionBody? '}'
+	:	CHOICE L_BRACKET choiceItemsList choiceExtensionBody? R_BRACKET
 	-> ^(CHOICE_TYPE choiceItemsList choiceExtensionBody?)
 	;
 	
 choiceExtensionBody
-	:	',' '...' exceptionSpec?  choiceListExtension?   (',' extMark2='...')?  
+	:	COMMA '...' exceptionSpec?  choiceListExtension?   (COMMA extMark2='...')?  
 		-> ^(CHOICE_EXT_BODY exceptionSpec? choiceListExtension? $extMark2?)
 	;	
 
 choiceItemsList
-	:	choiceItem (',' choiceItem)*	-> choiceItem+
+	:	choiceItem (COMMA choiceItem)*	-> choiceItem+
 	;
 choiceItem
 	:	identifier type				->  ^(CHOICE_ITEM identifier type)
 	;	
 
 choiceListExtension
-	:	',' extensionAdditionAlternative (',' extensionAdditionAlternative)*	->	extensionAdditionAlternative+
+	:	COMMA extensionAdditionAlternative (COMMA extensionAdditionAlternative)*	->	extensionAdditionAlternative+
 	;	
 	
 extensionAdditionAlternative
@@ -269,24 +274,24 @@ extensionAdditionAlternative
 	;	
 
 sequenceType
-	:	SEQUENCE '{' sequenceOrSetBody?  '}' -> ^(SEQUENCE_TYPE sequenceOrSetBody?)
+	:	SEQUENCE L_BRACKET sequenceOrSetBody?  R_BRACKET -> ^(SEQUENCE_TYPE sequenceOrSetBody?)
 	;
 	
-setType	:	SET '{' sequenceOrSetBody?  '}' -> ^(SET_TYPE sequenceOrSetBody?)
+setType	:	SET L_BRACKET sequenceOrSetBody?  R_BRACKET -> ^(SET_TYPE sequenceOrSetBody?)
 	;	
 	
 sequenceOrSetBody	:
-		  componentTypeList ( ',' seqOrSetExtBody)?		-> ^(SEQUENCE_BODY componentTypeList seqOrSetExtBody?)
+		  componentTypeList ( COMMA seqOrSetExtBody)?		-> ^(SEQUENCE_BODY componentTypeList seqOrSetExtBody?)
 		| seqOrSetExtBody								-> ^(SEQUENCE_BODY seqOrSetExtBody)
 	;
 	
 seqOrSetExtBody
-	:	'...' exceptionSpec? (',' extensionAdditionList)? (',' extMark2='...'   (',' componentTypeList )? )?
+	:	'...' exceptionSpec? (COMMA extensionAdditionList)? (COMMA extMark2='...'   (COMMA componentTypeList )? )?
 	->	^(SEQUENCE_EXT_BODY exceptionSpec? extensionAdditionList? $extMark2? componentTypeList?)
 	;	
 	
 extensionAdditionList
-	:	extensionAddition (',' extensionAddition)*		-> extensionAddition+
+	:	extensionAddition (COMMA extensionAddition)*		-> extensionAddition+
 	;	
 
 extensionAddition
@@ -298,7 +303,7 @@ extensionAdditionGroup
 	;
 
 componentTypeList 
-	:	componentType  (',' componentType )*		-> componentType+
+	:	componentType  (COMMA componentType )*		-> componentType+
 	;
 	
 componentType
@@ -345,48 +350,60 @@ choiceValue :	identifier ':' value	->^(CHOICE_VALUE identifier value)
 namedValue 	:	identifier value		->^(NAMED_VALUE identifier value)
 	;
 	
-namedValueList	: namedValue (',' namedValue)* 		->^(NAMED_VALUE_LIST namedValue+)
+namedValueList	: namedValue (COMMA namedValue)* 		->^(NAMED_VALUE_LIST namedValue+)
 	;
 	
 valueList 	:	
-	value (',' value)* 			->^(VALUE_LIST value+)
+	value (COMMA value)* 			->^(VALUE_LIST value+)
 ;	
-bitStringValue
-	:	'{' identifier (',' identifier)* '}'		->^(BIT_STRING_VALUE identifier+)
-	;
 
+/*
+To resolve another grammar Ambiguouity, we no more declare bitStringValue. The parser will only return valueList. Extra checking 
+must be done during semantic checking.
+bitStringValue
+	:	L_BRACKET identifier (COMMA identifier)* R_BRACKET		->^(BIT_STRING_VALUE identifier+)
+	;
+*/	
+
+
+/*
+Grammar is ambiguous. For example
+{ id 10} can be both objectIdentifierValue and namedValueList. The only way to resolve it is during Semantic checking. This parser
+will always return objectIdentifierValue for such input
+The same applies for {id}. It can be both objectIdentifierValue or valueList. It will be resolved during Semantic checking.
+*/
 value	:
 		BitStringLiteral
-	|	bitStringValue
+//	|	bitStringValue
 	|	OctectStringLiteral
 	|	TRUE
 	|	FALSE
 	|	StringLiteral
-//	|	valuereference										
 	|	val=valuereference										->^(VALUE_REFERENCE $val)
 	|	(s='+'|s='-')? intPart=INT ('.' decPart=INT?)? 					->^(NUMERIC_VALUE $intPart $s? $decPart?)
 //	|	('+'|'-')? INT ('.' INT?)? ( ('E'|'e') ('+'|'-')? INT)?
 	|	MIN
 	|	MAX
-//	|	objectIdentifierValue
+	| L_BRACKET objectIdentifierValue R_BRACKET		->objectIdentifierValue
 //	|	charSequenceValue
 	|   choiceValue
-	| '{' namedValueList '}' 				->namedValueList
-	| '{' valueList '}'						->valueList
+	| L_BRACKET namedValueList R_BRACKET 				->namedValueList
+	| L_BRACKET valueList R_BRACKET						->valueList
 	;	
 	
 
 charSequenceValue	: 
-	'{' INT (',' INT)* '}'							->^(CHAR_SEQUENCE_VALUE INT+)
+	L_BRACKET INT (COMMA INT)* R_BRACKET							->^(CHAR_SEQUENCE_VALUE INT+)
 ;
 	
 objectIdentifierValue
-	:	'{' objectIdentifierComponent+  '}'			->objectIdentifierComponent+
+	:	objectIdentifierComponent+  			->   ^(OBJECT_ID_VALUE objectIdentifierComponent+ )
 	;	
+
 objectIdentifierComponent
-	:	identifier ('(' (INT | definedValue) ')' )?	->^(OBJ_LST_ITEM identifier INT? definedValue?) //3 cases identifier or valuereference or identifier(number)
-	| 	INT											->^(OBJ_LST_ITEM INT)
-	|	modulereference '.' valuereference			->^(OBJ_LST_ITEM modulereference valuereference)
+	:	identifier ( L_PAREN (INT | definedValue) R_PAREN )?	->^(OBJ_LST_ITEM1 identifier INT? definedValue?) //3 cases identifier or valuereference or identifier(number)
+	| 	INT											->^(OBJ_LST_ITEM2 INT)
+	|	modulereference '.' valuereference			->^(DEFINED_VALUE modulereference valuereference)
 	;
 
 
@@ -399,7 +416,7 @@ definedValue
 /* *************************************** Constraints DEFINITION ****************************************************** */
 /* ********************************************************************************************************************* */
 constraint 
-	:	'(' setOfValues  exceptionSpec? ')'			->^(CONSTRAINT setOfValues  exceptionSpec?)
+	:	L_PAREN setOfValues  exceptionSpec? R_PAREN			->^(CONSTRAINT setOfValues  exceptionSpec?)
 	;
 
 exceptionSpec 
@@ -414,7 +431,7 @@ exceptionSpec
 
 
 setOfValues
-	:	uset1=unionElement (',' extMark='...' ( ',' uset2=unionElement)?)?			-> ^(SET_OF_VALUES $uset1 $extMark? $uset2?)
+	:	uset1=unionElement (COMMA extMark='...' ( COMMA uset2=unionElement)?)?			-> ^(SET_OF_VALUES $uset1 $extMark? $uset2?)
 	;
 	
 unionElement
@@ -440,7 +457,7 @@ constraintExpression
 	| permittedAlphabetExpression
 	| innerTypeExpression
 	| patternExpression
-	| '(' unionElement ')'	->	unionElement
+	| L_PAREN unionElement R_PAREN	->	unionElement
 	;	
 	
 valueRangeExpression
@@ -460,10 +477,10 @@ permittedAlphabetExpression : FROM constraint	-> ^(PERMITTED_ALPHABET_EXPR const
 
 innerTypeExpression 
 	: WITH COMPONENT constraint											-> ^(INNER_TYPE_EXPR constraint)
-	| WITH COMPONENTS '{'
-			( '...' ',')?
-			namedConstraintExpression  (',' namedConstraintExpression)* 
-		'}'
+	| WITH COMPONENTS L_BRACKET
+			( '...' COMMA)?
+			namedConstraintExpression  (COMMA namedConstraintExpression)* 
+		R_BRACKET
 		-> ^(INNER_TYPE_EXPR namedConstraintExpression+)
 	;
 
@@ -554,12 +571,18 @@ UTF8String	:'UTF8String';
 INCLUDES	:'INCLUDES';
 EXCEPT		:'EXCEPT';
 SET		:'SET';
+L_BRACKET	:	'{';	
+R_BRACKET	:	'}';	
+L_PAREN		:	'(';
+R_PAREN		:	')';
+COMMA		:	',';
 
 EXT_MARK	: '...';
 
 BitStringLiteral	:
 	'\'' ('0'|'1')* '\'B'
 	;
+	
 
 OctectStringLiteral	:
 	'\'' ('0'..'9'|'a'..'f'|'A'..'F')* '\'H'

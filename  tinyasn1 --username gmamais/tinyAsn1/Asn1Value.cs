@@ -24,16 +24,18 @@ namespace tinyAsn1
             STRING,
             VALUE_REFERENCE,
             ENUMERATED,
-            UNDEFINED,
+            UNRESOLVED,
             SEQUENCE_OR_SET,
             SEQUENCE_OF,
             SET_OF,
             CHOICE,
+            OBJECT_IDENTIFIER,
+            REL_OBJ_ID,
             NULL
         }
 
 
-        public TypeID m_TypeID = TypeID.UNDEFINED;
+        public TypeID m_TypeID = TypeID.UNRESOLVED;
 
         public Asn1Type Type
         {
@@ -54,7 +56,7 @@ namespace tinyAsn1
 
         public virtual bool SemanticCheckFinished()
         {
-            return m_TypeID != TypeID.UNDEFINED;
+            return m_TypeID != TypeID.UNRESOLVED;
         }
     }
 
@@ -282,6 +284,10 @@ namespace tinyAsn1
         }
 
     }
+
+
+    
+
 
     public partial class RealValue : Asn1Value
     {
@@ -643,27 +649,72 @@ namespace tinyAsn1
             m_module = module;
             m_type = type;
 
-            if (antlrNode.Type != asn1Parser.NAMED_VALUE_LIST)
-                throw new Exception("Internal Error: SequenceOrSetValue called with wrong antlr node type");
 
-            for (int i = 0; i < antlrNode.ChildCount; i++)
+            if (antlrNode.Type == asn1Parser.NAMED_VALUE_LIST)
             {
-                ITree namedValue = antlrNode.GetChild(i);
-                if (namedValue.Type!=asn1Parser.NAMED_VALUE)
+
+                for (int i = 0; i < antlrNode.ChildCount; i++)
+                {
+                    ITree namedValue = antlrNode.GetChild(i);
+                    if (namedValue.Type != asn1Parser.NAMED_VALUE)
+                        throw new Exception("Internal Error");
+
+                    string id = namedValue.GetChild(0).Text;
+
+                    if (m_children.ContainsKey(id))
+                        throw new SemanticErrorException("Error in line :" + antlrNode.GetChild(i).Line + ". '" + id + "' already exists");
+
+                    if (!Type2.m_children.ContainsKey(id))
+                        throw new SemanticErrorException("Error in line :" + antlrNode.GetChild(i).Line + ". '" + id + "' is not a member");
+
+                    Asn1Value val = Asn1Value.CreateFromAntlrAst(namedValue.GetChild(1));
+
+                    m_children.Add(id, val);
+                }
+            }
+            else if (antlrNode.Type == asn1Parser.OBJECT_ID_VALUE)
+            {
+                //we expect two children, no more no less
+                if (antlrNode.ChildCount != 2)
+                    throw new SemanticErrorException("Error in line :"+antlrNode.Line+", col:"+antlrNode.CharPositionInLine+". Expecting a SEQUENCE variable");
+                // first child must be an identifier and nothing else
+                ITree ObjListItem1 = antlrNode.GetChild(0);
+                if (ObjListItem1.ChildCount!=1)
+                    throw new SemanticErrorException("Error in line :" + antlrNode.Line + ", col:" + antlrNode.CharPositionInLine + ". Expecting a SEQUENCE variable");
+                ITree identifier = ObjListItem1.GetChild(0);
+                if (identifier.Type != asn1Parser.LID)
+                    throw new SemanticErrorException("Error in line :" + identifier.Line + ", col:" + identifier.CharPositionInLine + ". Expecting identifier");
+
+                string id = identifier.Text;
+                if (m_children.ContainsKey(id))
+                    throw new SemanticErrorException("Error in line :" + identifier.Line + ",col:" + identifier.CharPositionInLine+ ". '" + id + "' already exists");
+                if (!Type2.m_children.ContainsKey(id))
+                    throw new SemanticErrorException("Error in line :" + identifier.Line + ",col:" + identifier.CharPositionInLine+ ". '" + id + "' is not a member");
+                //second child must be an INT or valuereference
+                ITree ObjListItem2 = antlrNode.GetChild(1);
+                if (ObjListItem2.ChildCount != 1)
+                    throw new SemanticErrorException("Error in line :" + antlrNode.Line + ", col:" + antlrNode.CharPositionInLine + ". Expecting a SEQUENCE variable");
+                ITree grChild = ObjListItem2.GetChild(0);
+                if (grChild.Type == asn1Parser.INT)
+                {
+                    SemanticTreeNode numericValue = new SemanticTreeNode(grChild.CharPositionInLine, grChild.Line, grChild.Text, asn1Parser.NUMERIC_VALUE);
+                    numericValue.AddChild(grChild);
+                    Asn1Value val = Asn1Value.CreateFromAntlrAst(numericValue);
+                    m_children.Add(id, val);
+                }
+                else if (ObjListItem2.GetChild(0).Type == asn1Parser.LID)
+                {
+                    SemanticTreeNode valueReference = new SemanticTreeNode(grChild.CharPositionInLine, grChild.Line, grChild.Text, asn1Parser.VALUE_REFERENCE);
+                    valueReference.AddChild(grChild);
+                    Asn1Value val = Asn1Value.CreateFromAntlrAst(valueReference);
+                    m_children.Add(id, val);
+                }
+                else
                     throw new Exception("Internal Error");
 
-                string id = namedValue.GetChild(0).Text;
 
-                if (m_children.ContainsKey(id))
-                    throw new SemanticErrorException("Error in line :" + antlrNode.GetChild(i).Line + ". '" + id + "' already exists");
-
-                if (!Type2.m_children.ContainsKey(id))
-                    throw new SemanticErrorException("Error in line :" + antlrNode.GetChild(i).Line + ". '" + id + "' is not a member");
-
-                Asn1Value val = Asn1Value.CreateFromAntlrAst(namedValue.GetChild(1));
-
-                m_children.Add(id, val);
-            }
+            } else
+                throw new Exception("Internal Error: SequenceOrSetValue called with wrong antlr node type");
 
             foreach (string typeChildName in Type2.m_children.Keys)
             {
@@ -801,6 +852,7 @@ namespace tinyAsn1
             w.Flush();
             return w.ToString();
         }
+
         public SequenceOfValue(ITree antlrNode, Module module, Asn1Type type)
         {
             m_TypeID = Asn1Value.TypeID.SEQUENCE_OF;
@@ -808,15 +860,39 @@ namespace tinyAsn1
             m_module = module;
             m_type = type;
 
-            if (antlrNode.Type != asn1Parser.VALUE_LIST)
-                throw new Exception("Internal Error: SequenceOfValue called with wrong antlr node type");
-
-            for (int i = 0; i < antlrNode.ChildCount; i++)
+            if (antlrNode.Type == asn1Parser.VALUE_LIST)
             {
-                Asn1Value val = Asn1Value.CreateFromAntlrAst(antlrNode.GetChild(i));
+                for (int i = 0; i < antlrNode.ChildCount; i++)
+                {
+                    Asn1Value val = Asn1Value.CreateFromAntlrAst(antlrNode.GetChild(i));
 
-                m_children.Add(val);
+                    m_children.Add(val);
+                }
             }
+            else if (antlrNode.Type == asn1Parser.OBJECT_ID_VALUE)
+            {
+                //we expect only one child either INT or identifier
+                if (antlrNode.ChildCount != 1)
+                    throw new SemanticErrorException("Error in line:"+antlrNode.Line+" col:"+antlrNode.CharPositionInLine+". Expecting SEQUENCE OF value");
+                if (antlrNode.GetChild(0).ChildCount != 1)
+                    throw new SemanticErrorException("Error in line:" + antlrNode.Line + " col:" + antlrNode.CharPositionInLine + ". Expecting SEQUENCE OF value");
+                ITree grandChild = antlrNode.GetChild(0).GetChild(0);
+
+                SemanticTreeNode nodeValue;
+                if (grandChild.Type == asn1Parser.INT) 
+                    nodeValue = new SemanticTreeNode(grandChild.CharPositionInLine, grandChild.Line, grandChild.Text, asn1Parser.NUMERIC_VALUE);
+                else if (grandChild.Type == asn1Parser.LID)
+                    nodeValue = new SemanticTreeNode(grandChild.CharPositionInLine, grandChild.Line, grandChild.Text, asn1Parser.VALUE_REFERENCE);
+                else
+                    throw new Exception("Internal Error");
+
+                nodeValue.AddChild(grandChild);
+                Asn1Value val = Asn1Value.CreateFromAntlrAst(nodeValue);
+                m_children.Add(val);
+
+
+            } else
+                throw new Exception("Internal Error: SequenceOfValue called with wrong antlr node type");
 
 
         }
@@ -926,15 +1002,41 @@ namespace tinyAsn1
             m_module = module;
             m_type = type;
 
-            if (antlrNode.Type != asn1Parser.VALUE_LIST)
+            if (antlrNode.Type == asn1Parser.VALUE_LIST)
+            {
+                for (int i = 0; i < antlrNode.ChildCount; i++)
+                {
+                    Asn1Value val = Asn1Value.CreateFromAntlrAst(antlrNode.GetChild(i));
+
+                    m_children.Add(val);
+                }
+            }
+            else if (antlrNode.Type == asn1Parser.OBJECT_ID_VALUE)
+            {
+                //we expect only one child either INT or identifier
+                if (antlrNode.ChildCount != 1)
+                    throw new SemanticErrorException("Error in line:" + antlrNode.Line + " col:" + antlrNode.CharPositionInLine + ". Expecting SEQUENCE OF value");
+                if (antlrNode.GetChild(0).ChildCount != 1)
+                    throw new SemanticErrorException("Error in line:" + antlrNode.Line + " col:" + antlrNode.CharPositionInLine + ". Expecting SEQUENCE OF value");
+                ITree grandChild = antlrNode.GetChild(0).GetChild(0);
+
+                SemanticTreeNode nodeValue;
+                if (grandChild.Type == asn1Parser.INT)
+                    nodeValue = new SemanticTreeNode(grandChild.CharPositionInLine, grandChild.Line, grandChild.Text, asn1Parser.NUMERIC_VALUE);
+                else if (grandChild.Type == asn1Parser.LID)
+                    nodeValue = new SemanticTreeNode(grandChild.CharPositionInLine, grandChild.Line, grandChild.Text, asn1Parser.VALUE_REFERENCE);
+                else
+                    throw new Exception("Internal Error");
+
+                nodeValue.AddChild(grandChild);
+                Asn1Value val = Asn1Value.CreateFromAntlrAst(nodeValue);
+                m_children.Add(val);
+
+
+            }
+            else
                 throw new Exception("Internal Error: SetOfValue called with wrong antlr node type");
 
-            for (int i = 0; i < antlrNode.ChildCount; i++)
-            {
-                Asn1Value val = Asn1Value.CreateFromAntlrAst(antlrNode.GetChild(i));
-
-                m_children.Add(val);
-            }
 
 
         }
@@ -961,6 +1063,438 @@ namespace tinyAsn1
             return m_children.GetHashCode();
         }
 
+    }
+    
+    public partial class ObjectIdentifierValue : Asn1Value
+    {
+        public List<ObjectIdentifierComponent> m_components = new List<ObjectIdentifierComponent>();
+        public class ObjectIdentifierComponent
+        {
+            //cases:
+            // case 1 : id1
+                            // is id1 reserved word    -->  label:=id1, no = id1.value
+                            // if (INDEX==0) && id1 is value reference to OBJ-ID ->replace component with components of other OBJ-ID
+                            // is id1 reference to INTEGER --> no := INTEGER value
+                            // is id1 reference to REL_OBJ ID --> ?
+                            //default: id1 is unknown or reference wrong type
+            // case 2 : id1.id2
+                            // if (INDEX==0) && id1.id2 is value reference to OBJ-ID ->replace component with components of other OBJ-ID
+                            // is id1.id2 reference to INTEGER --> no := INTEGER value
+                            // is id1.id2 reference to REL_OBJ ID --> ?
+            // case 3 : INT
+                            // no := INT
+            // case 4 : id1 (INT)
+                            // label := id1, no := INT
+            // case 5 : id1 (id2)
+                            // is id2 reference to INT val  -> label := id1, no:=INT of id2
+            // case 6 : id1 (id2.id3)
+                            // is id2.id3 reference to INT val  -> label := id1, no:=INT of id2.id3
+            public int? no = null;
+            public string label = null;
+            private string id1 = null;
+            private string id2 = null;
+            private string id3 = null;
+            private ITree tr1 = null;
+            private ITree tr2 = null;
+            private ITree tr3 = null;
+            private int caseNo = 0;
+
+            static public ObjectIdentifierComponent CreateFromAntlrAst(ITree tree)
+            {
+                ObjectIdentifierComponent ret = new ObjectIdentifierComponent();
+                switch (tree.Type)
+                {
+                    case asn1Parser.OBJ_LST_ITEM1:
+                        ret.id1 = tree.GetChild(0).Text;
+                        ret.tr1 = tree;
+                        ret.caseNo = 1;
+                        if (tree.ChildCount == 2)
+                        {
+                            ret.label = ret.id1;
+                            ITree chTree = tree.GetChild(1);
+                            if (chTree.Type == asn1Parser.INT)
+                            {
+                                ret.caseNo = 4;
+                                ret.no = int.Parse(chTree.Text);
+                            }
+                            else if (chTree.Type == asn1Parser.DEFINED_VALUE)
+                            {
+                                if (chTree.ChildCount == 1)
+                                {
+                                    ret.caseNo = 5;
+                                    ret.id2 = chTree.GetChild(0).Text;
+                                    ret.tr2 = chTree.GetChild(0);
+                                }
+                                else if (chTree.ChildCount == 2)
+                                {
+                                    ret.caseNo = 6;
+                                    ret.id2 = chTree.GetChild(0).Text;
+                                    ret.tr2 = chTree.GetChild(0);
+                                    ret.id3 = chTree.GetChild(1).Text;
+                                    ret.tr3 = chTree.GetChild(1);
+                                }
+                                else
+                                    throw new Exception("INTERNAL ERROR");
+                            }
+                        }
+                        return ret;
+                    case asn1Parser.OBJ_LST_ITEM2:
+                        ret.caseNo = 3;
+                        ret.no = int.Parse(tree.GetChild(0).Text);
+                        return ret;
+                    case asn1Parser.DEFINED_VALUE:
+                        ret.caseNo = 2;
+                        if (tree.ChildCount!=2)
+                            throw new Exception("INTERNAL ERROR");
+                        ret.tr1 = tree.GetChild(0);
+                        ret.id1 = tree.GetChild(0).Text;
+                        ret.tr2 = tree.GetChild(1);
+                        ret.id2 = tree.GetChild(1).Text;
+                        return ret;
+                    default:
+                        throw new Exception("Internal Error");
+                }
+
+            }
+
+            internal List<ObjectIdentifierComponent> Fixup(int Index, Module mod, ObjectIdentifierComponent prev)
+            {
+                if (SemanticCheckFinished())
+                    return null;
+                switch (caseNo)
+                {
+                    case 1:
+                        return handleCase1(Index,mod,prev);
+                    case 2:
+                        return handleCase2(Index, mod);
+                    case 5:
+                        return handleCase5(Index, mod);
+                    case 6:
+                        return handleCase6(Index, mod);
+                    default:
+                        throw new Exception("INTERNAL ERROR.");
+                }
+            }
+
+            // case 1 : id1
+                // is id1 reserved word    -->  label:=id1, no = id1.value
+                // if (INDEX==0) && id1 is value reference to OBJ-ID ->replace component with components of other OBJ-ID
+                // is id1 reference to INTEGER --> no := INTEGER value
+                // is id1 reference to REL_OBJ ID --> ?
+                //default: id1 is unknown or reference wrong type
+            List<ObjectIdentifierComponent> handleCase1(int Index, Module mod, ObjectIdentifierComponent prev)
+            {
+                int tmp;
+                string prvLbl = null;
+                if (prev != null)
+                    prvLbl = prev.label;
+                if (YellowIDs.isYellowId(Index, id1, prvLbl, out tmp))
+                {
+                    no = tmp;
+                    label = id1;
+                    return null;
+                }
+                if (!mod.isValueDeclared(id1))
+                    throw new SemanticErrorException("Error in line: " + tr1.Line + ", col:"+tr1.CharPositionInLine+". Unknown identifier: "+id1);
+                Asn1Value val = mod.GetValue(id1);
+                if (val.m_TypeID == Asn1Value.TypeID.UNRESOLVED)
+                    return null; // not yet resolved. wait for next round
+                if (val.m_TypeID == TypeID.INT)
+                {
+                    tmp = (int)((IntegerValue)val).Value;
+                    no = tmp;
+                    return null;
+                }
+                if (val.m_TypeID == TypeID.OBJECT_IDENTIFIER)
+                {
+                    if (Index == 0)
+                    {
+                        ObjectIdentifierValue obj = val as ObjectIdentifierValue;
+                        if (!obj.SemanticCheckFinished())
+                            return null; //wait until resolved
+                        return obj.m_components;
+                    } else
+                        throw new SemanticErrorException("Error in line: " + tr1.Line + ", col:" + tr1.CharPositionInLine + ". Identifier: " + id1 + "resolves to OBJECT IDENTIFIER but it is not the first item");
+                }
+                if (val.m_TypeID == TypeID.REL_OBJ_ID)
+                {
+                    throw new Exception("UNIMPLEMENTED FEATURE");
+                }
+
+                throw new SemanticErrorException("Error in line: " + tr1.Line + ", col:" + tr1.CharPositionInLine + ". Identifier: " + id1 + "does not resolve to INTEGER or RELATIVE-OID");
+            }
+
+            static class YellowIDs
+            {
+                class ID
+                {
+                    public int value;
+                    public int level;
+                    public string father;
+                    public ID(int v, int l, string f) { value = v; level = l; father = f; }
+                }
+                static Dictionary<string, ID> ids = new Dictionary<string, ID>();
+                static YellowIDs()
+                {
+                    ids.Add("itu-t", new ID(0, 0, null));
+                    ids.Add("ccitt", new ID(0, 0, null));
+                    ids.Add("iso", new ID(1, 0, null));
+                    ids.Add("joint-iso-itu-t", new ID(2, 0, null));
+                    ids.Add("joint-iso-ccitt", new ID(2, 0, null));
+
+                    ids.Add("itu-t.recommendation", new ID(0, 1, "itu-t"));
+                    ids.Add("itu-t.question", new ID(1, 1, "itu-t"));
+                    ids.Add("itu-t.administration", new ID(2, 1, "itu-t"));
+                    ids.Add("itu-t.network-operator", new ID(3, 1, "itu-t"));
+                    ids.Add("itu-t.identified-organization", new ID(4, 1, "itu-t"));
+
+                    ids.Add("iso.standard", new ID(0, 1, "iso"));
+                    ids.Add("iso.member-body", new ID(2, 1, "iso"));
+                    ids.Add("iso.identified-organization", new ID(3, 1, "iso"));
+
+                    int j = 0;
+                    for (char i = 'a'; i <= 'z'; i++)
+                    {
+                        j++;
+                        ids.Add("recommendation." + new string(i,1), new ID(j, 2, "recommendation"));
+                    }
+                }
+
+                public static bool isYellowId(int level, string id, string prevId, out int retVal)
+                {
+                    retVal = 0;
+                    if (prevId == "ccitt")
+                        prevId = "itu-t";
+                    if (prevId == "joint-iso-ccitt")
+                        prevId = "joint-iso-itu-t";
+                    if (prevId != null)
+                        id = prevId + "." + id;
+
+                    if (!ids.ContainsKey(id))
+                        return false;
+
+                    ID y = ids[id];
+                    if (y.level == level)
+                    {
+                        retVal = y.value;
+                        return true;
+                    }
+                    return false;
+                }
+            }
+
+
+            // case 2 : id1.id2
+                // if (INDEX==0) && id1.id2 is value reference to OBJ-ID ->replace component with components of other OBJ-ID
+                // is id1.id2 reference to INTEGER --> no := INTEGER value
+                // is id1.id2 reference to REL_OBJ ID --> ?
+            List<ObjectIdentifierComponent> handleCase2(int Index, Module m)
+            {
+                if (!Asn1CompilerInvokation.Instance.isModuleDefined(id1))
+                    throw new SemanticErrorException("Error in line: " + tr1.Line + ", col:" + tr1.CharPositionInLine + ". Identifier: " + id1 + " does not resolve to a MODULE");
+                
+                Module mod = Asn1CompilerInvokation.Instance.GetModuleByName(id1);
+
+                if (!mod.isValueDeclared(id2))
+                    throw new SemanticErrorException("Error in line: " + tr2.Line + ", col:" + tr2.CharPositionInLine + ". Unknown identifier: " + id2);
+                Asn1Value val = mod.GetValue(id2);
+                if (val.m_TypeID == Asn1Value.TypeID.UNRESOLVED)
+                    return null; // not yet resolved. wait for next round
+                if (val.m_TypeID == TypeID.INT)
+                {
+                    int tmp = (int)((IntegerValue)val).Value;
+                    no = tmp;
+                    return null;
+                }
+                if (val.m_TypeID == TypeID.OBJECT_IDENTIFIER)
+                {
+                    if (Index == 0)
+                    {
+                        ObjectIdentifierValue obj = val as ObjectIdentifierValue;
+                        if (!obj.SemanticCheckFinished())
+                            return null; //wait until resolved
+                        return obj.m_components;
+                    }
+                    else
+                        throw new SemanticErrorException("Error in line: " + tr1.Line + ", col:" + tr1.CharPositionInLine + ". Identifier: " + id1 + " resolves to OBJECT IDENTIFIER but it is not the first item");
+                }
+
+                if (val.m_TypeID == TypeID.REL_OBJ_ID)
+                {
+                    throw new Exception("UNIMPLEMENTED FEATURE");
+                }
+
+                throw new SemanticErrorException("Error in line: " + tr2.Line + ", col:" + tr2.CharPositionInLine + ". Identifier: " + id2 + "does not resolve to INTEGER or RELATIVE-OID");
+            }
+            // case 5 : id1 (id2)
+                // is id2 reference to INT val  -> label := id1, no:=INT of id2
+            List<ObjectIdentifierComponent> handleCase5(int Index, Module mod)
+            {
+                if (!mod.isValueDeclared(id2))
+                    throw new SemanticErrorException("Error in line: " + tr2.Line + ", col:" + tr2.CharPositionInLine + ". Unknown identifier: " + id2);
+                Asn1Value val = mod.GetValue(id2);
+                if (val.m_TypeID == Asn1Value.TypeID.UNRESOLVED)
+                    return null; // not yet resolved. wait for next round
+                if (val.m_TypeID == TypeID.INT)
+                {
+                    int tmp = (int)((IntegerValue)val).Value;
+                    no = tmp;
+                    return null;
+                }
+
+                throw new SemanticErrorException("Error in line: " + tr2.Line + ", col:" + tr2.CharPositionInLine + ". Identifier: " + id2 + "does not resolve to INTEGER or RELATIVE-OID");
+            }
+            // case 6 : id1 (id2.id3)
+                // is id2.id3 reference to INT val  -> label := id1, no:=INT of id2.id3
+            List<ObjectIdentifierComponent> handleCase6(int Index, Module m)
+            {
+                if (!Asn1CompilerInvokation.Instance.isModuleDefined(id2))
+                    throw new SemanticErrorException("Error in line: " + tr2.Line + ", col:" + tr2.CharPositionInLine + ". Identifier: " + id2 + "does not resolve to a MODULE");
+
+                Module mod = Asn1CompilerInvokation.Instance.GetModuleByName(id2);
+
+                if (!mod.isValueDeclared(id3))
+                    throw new SemanticErrorException("Error in line: " + tr3.Line + ", col:" + tr3.CharPositionInLine + ". Unknown identifier: " + id3);
+                Asn1Value val = mod.GetValue(id3);
+                if (val.m_TypeID == Asn1Value.TypeID.UNRESOLVED)
+                    return null; // not yet resolved. wait for next round
+                if (val.m_TypeID == TypeID.INT)
+                {
+                    int tmp = (int)((IntegerValue)val).Value;
+                    no = tmp;
+                    return null;
+                }
+
+                throw new SemanticErrorException("Error in line: " + tr3.Line + ", col:" + tr2.CharPositionInLine + ". Identifier: " + id3 + "does not resolve to INTEGER or RELATIVE-OID");
+            }
+            
+            public override string ToString()
+            {
+                if (no==null)
+                    throw new Exception("Internal Error");
+
+                if (label != null )
+                    return label + "(" + no.Value.ToString() + ")";
+
+                return no.Value.ToString();
+
+            }
+            public override bool Equals(object obj)
+            {
+                ObjectIdentifierComponent oth = obj as ObjectIdentifierComponent;
+                if (oth == null)
+                    return false;
+                if (no == null)
+                    throw new Exception("Internal Error");
+                if (oth.no == null)
+                    throw new Exception("Internal Error");
+
+                return oth.no== no;
+            }
+            public override int GetHashCode()
+            {
+                return ToString().GetHashCode();
+            }
+
+            public bool SemanticCheckFinished()
+            {
+                return no!=null;
+            }
+
+
+        }
+        public override string ToString()
+        {
+
+            System.IO.StringWriter w = new System.IO.StringWriter();
+
+            w.Write("{");
+            int cnt = m_components.Count;
+            for (int i = 0; i < cnt - 1; i++)
+            {
+                w.Write(" " + m_components[i].ToString() + ",");
+            }
+
+            w.Write(m_components[cnt - 1].ToString() + " }");
+
+            w.Flush();
+            return w.ToString();
+        }
+        public override bool Equals(object obj)
+        {
+            ObjectIdentifierValue oth = obj as ObjectIdentifierValue;
+            if (oth == null)
+                return false;
+            if (oth.m_components.Count != m_components.Count)
+                return false;
+
+            for (int i = 0; i < m_components.Count; i++)
+            {
+                if (!m_components[i].Equals(oth.m_components[i]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_components.GetHashCode();
+        }
+        public ObjectIdentifierValue(ObjectIdentifierValue o)
+        {
+            m_TypeID = Asn1Value.TypeID.OBJECT_IDENTIFIER;
+            m_module = o.m_module;
+            antlrNode = o.antlrNode;
+            m_type = o.m_type;
+            m_components = o.m_components;
+        }
+        public ObjectIdentifierValue(ITree antlrNode, Module module, Asn1Type type)
+        {
+            m_TypeID = Asn1Value.TypeID.OBJECT_IDENTIFIER;
+            this.antlrNode = antlrNode;
+            m_module = module;
+            m_type = type;
+
+            if (antlrNode.Type != asn1Parser.OBJECT_ID_VALUE)
+                throw new Exception("Internal Error. ObjectIdentifierValue() constructot called with wrong antlr node type");
+            for (int i = 0; i < antlrNode.ChildCount; i++)
+            {
+                m_components.Add(ObjectIdentifierComponent.CreateFromAntlrAst(antlrNode.GetChild(i)));
+            }
+            
+
+        }
+
+        public override bool SemanticCheckFinished()
+        {
+            foreach (ObjectIdentifierComponent cm in m_components)
+                if (!cm.SemanticCheckFinished())
+                    return false;
+
+            return true;
+        }
+
+
+        internal void FixChildrenVars()
+        {
+
+            List<ObjectIdentifierComponent> items;
+            for (int i = 0; i < m_components.Count; i++)
+            {
+                if (i > 0)
+                    items = m_components[i].Fixup(i, m_module, m_components[i - 1]);
+                else
+                    items = m_components[i].Fixup(i, m_module, null);
+
+                if (items != null)
+                {
+                    //replace i item with items
+                    m_components.RemoveAt(i);
+                    m_components.InsertRange(i, items);
+                }
+            }
+        }
     }
 
 }
