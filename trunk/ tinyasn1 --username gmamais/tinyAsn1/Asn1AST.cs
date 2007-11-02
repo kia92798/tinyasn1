@@ -448,14 +448,25 @@ namespace tinyAsn1
 
     public partial class OctetStringType : Asn1Type
     {
-        public int m_stringType;
-        public OctetStringType(int strType)
-        {
-            m_stringType = strType;
-        }
         public override string Name
         {
             get { return "OCTECT STRING"; }
+        }
+    }
+
+    public partial class IA5StringType : Asn1Type
+    {
+        public override string Name
+        {
+            get { return "IA5String"; }
+        }
+    }
+
+    public partial class NumericStringType : Asn1Type
+    {
+        public override string Name
+        {
+            get { return "NumericString"; }
         }
     }
 
