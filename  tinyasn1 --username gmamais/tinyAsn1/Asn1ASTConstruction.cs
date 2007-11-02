@@ -426,12 +426,18 @@ namespace tinyAsn1
                             ret = ObjectIdentifier.CreateFromAntlrAst(child);
                             break;
                         case asn1Parser.RELATIVE_OID:
-                            break;
+                            throw new SemanticErrorException("Error line: " + child.Line + ", col: "+child.CharPositionInLine+". RELATIVE-OID are not supported. Use OBJECT IDENTIFIER instead");
                         case asn1Parser.OCTECT_STING:
+                            ret = new OctetStringType();
+                            break;
+                        case asn1Parser.IA5String:
+                            ret = new IA5StringType();
+                            break;
                         case asn1Parser.NumericString:
+                            ret = new NumericStringType();
+                            break;
                         case asn1Parser.PrintableString:
                         case asn1Parser.VisibleString:
-                        case asn1Parser.IA5String:
                         case asn1Parser.TeletexString:
                         case asn1Parser.VideotexString:
                         case asn1Parser.GraphicString:
@@ -439,8 +445,7 @@ namespace tinyAsn1
                         case asn1Parser.UniversalString:
                         case asn1Parser.BMPString:
                         case asn1Parser.UTF8String:
-                            ret = new OctetStringType(child.Type);
-                            break;
+                            throw new SemanticErrorException("Error line: " + child.Line + ", col: " + child.CharPositionInLine + ". "+child.Text+" is currently not supported.");
                         case asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT:
                             if (ret != null)
                                 ret.m_constraints.Add(Constraint.CreateConstraintFromSizeConstraint(child));
@@ -546,8 +551,6 @@ namespace tinyAsn1
             }
         }
     }
-
-
 
     public partial class BooleanType : Asn1Type
     {
@@ -781,6 +784,75 @@ namespace tinyAsn1
             }
         }
 
+    }
+
+    public partial class IA5StringType : Asn1Type
+    {
+        internal override Asn1Value FixVariable(Asn1Value val)
+        {
+            string referenceId = "";
+            switch (val.antlrNode.Type)
+            {
+                case asn1Parser.StringLiteral:
+                    return new IA5StringValue(val.antlrNode, m_module, this);
+                case asn1Parser.VALUE_REFERENCE:
+                    referenceId = val.antlrNode.GetChild(0).Text;
+                    if (m_module.isValueDeclared(referenceId))
+                    {
+                        Asn1Value tmp = m_module.GetValue(referenceId);
+                        switch (tmp.m_TypeID)
+                        {
+                            case Asn1Value.TypeID.IA5String:
+                                return new IA5StringValue(tmp as IA5StringValue);
+                            case Asn1Value.TypeID.UNRESOLVED:
+                                // not yet resolved, wait for next round
+                                return val;
+                            default:
+                                throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                        }
+                    }
+                    else
+                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
+
+                default:
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting string constant or string variable referebce");
+            }
+        }
+
+    }
+
+    public partial class NumericStringType : Asn1Type
+    {
+        internal override Asn1Value FixVariable(Asn1Value val)
+        {
+            string referenceId = "";
+            switch (val.antlrNode.Type)
+            {
+                case asn1Parser.StringLiteral:
+                    return new NumericStringValue(val.antlrNode, m_module, this);
+                case asn1Parser.VALUE_REFERENCE:
+                    referenceId = val.antlrNode.GetChild(0).Text;
+                    if (m_module.isValueDeclared(referenceId))
+                    {
+                        Asn1Value tmp = m_module.GetValue(referenceId);
+                        switch (tmp.m_TypeID)
+                        {
+                            case Asn1Value.TypeID.NumericString:
+                                return new NumericStringValue(tmp as NumericStringValue);
+                            case Asn1Value.TypeID.UNRESOLVED:
+                                // not yet resolved, wait for next round
+                                return val;
+                            default:
+                                throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                        }
+                    }
+                    else
+                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
+
+                default:
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting NumericString constant or NumericString variable referebce");
+            }
+        }
     }
 
 
@@ -1113,7 +1185,6 @@ namespace tinyAsn1
 
     }
 
-
     public partial class ChoiceType : Asn1Type
     {
 
@@ -1285,8 +1356,6 @@ namespace tinyAsn1
             }
         }
     }
-
-
 
     public partial class SequenceOrSetType : Asn1Type
     {
@@ -1496,8 +1565,6 @@ namespace tinyAsn1
             }
         }
     }
-
-
 
     public partial class SequenceType : SequenceOrSetType
     {
@@ -1844,7 +1911,6 @@ namespace tinyAsn1
         }
     }
 
-
     public partial class UnionElementOfIntersectionItems : UnionElement
     {
         static public UnionElementOfIntersectionItems CreateFromAntlrAst(ITree tree)
@@ -1927,8 +1993,6 @@ namespace tinyAsn1
             return ret;
         }
     }
-
-    
 
     public partial class ValueRangeExpression : ConstraintExpression
     {

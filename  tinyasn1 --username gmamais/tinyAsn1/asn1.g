@@ -374,7 +374,7 @@ The same applies for {id}. It can be both objectIdentifierValue or valueList. It
 */
 value	:
 		BitStringLiteral
-//	|	bitStringValue
+//	|	bitStringValue		
 	|	OctectStringLiteral
 	|	TRUE
 	|	FALSE
@@ -385,17 +385,43 @@ value	:
 	|	MIN
 	|	MAX
 	| L_BRACKET objectIdentifierValue R_BRACKET		->objectIdentifierValue
-//	|	charSequenceValue
 	|   choiceValue
 	| L_BRACKET namedValueList R_BRACKET 				->namedValueList
 	| L_BRACKET valueList R_BRACKET						->valueList
 	;	
 	
-
-charSequenceValue	: 
-	L_BRACKET INT (COMMA INT)* R_BRACKET							->^(CHAR_SEQUENCE_VALUE INT+)
-;
 	
+/*
+a CharacterStringValue is
+	a string literal
+or value list of 4 INT
+or value list of 2 INT	
+or value list that contains any of the following 
+		a string literal
+	or value list of 4 INT
+	or value list of 2 INT	
+		
+restrictedCharacterStringValue	:
+		StringLiteral
+	|	characterStringList
+	|	quadruple
+	|	tuple
+	;
+
+characterStringList  	:	
+	L_BRACKET charsDefn ( COMMA charsDefn)* R_BRACKET
+	;
+
+charsDefn	:
+		StringLiteral
+	|	quadruple
+	|	tuple
+	|	definedValue
+	;
+	
+quadruple 	:	L_BRACKET INT COMMA INT COMMA INT COMMA INT R_BRACKET	;
+tuple		:   L_BRACKET INT COMMA INT R_BRACKET	;
+*/	
 objectIdentifierValue
 	:	objectIdentifierComponent+  			->   ^(OBJECT_ID_VALUE objectIdentifierComponent+ )
 	;	
