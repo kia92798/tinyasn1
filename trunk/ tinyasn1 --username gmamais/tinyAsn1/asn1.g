@@ -186,6 +186,19 @@ typeTag
 * IMPLICIT ==> Only one tag is encoded ; a tag marked IMPLICIT overwrites the tag that follows it (recursively)
 */		
 
+/*
+Note on constraints
+
+(1) If Type is (literally) a SEQUENCE OF or SET OF type, the Constraint
+applies on the type appearing after the keywords SEQUENCE OF or SET OF
+FOR THIS REASON sequenceOfType AND setOfType ARE NOT FOLLOWED BY A constraint*
+If Type is a reference to a SEQUENCE OF or SET OF type,
+the Constraint applies to the SEQUENCE OF or SET OF type, and not to
+the type that follows these keywords.		
+(2) If several Constraints appear one after the other after Type, the possible
+values for this type are those of the intersection of constraints .
+
+*/
 type	: typeTag?
 (	 nULL													-> ^(TYPE_DEF typeTag? nULL)
 	|bitStringType (sizeShortConstraint| constraint)*		-> ^(TYPE_DEF typeTag? bitStringType sizeShortConstraint* constraint*)
@@ -196,12 +209,12 @@ type	: typeTag?
 	|stringType (sizeShortConstraint| constraint)*			-> ^(TYPE_DEF typeTag? stringType sizeShortConstraint* constraint*)
 	|referencedType	constraint*								-> ^(TYPE_DEF typeTag? referencedType constraint*)
 	|sequenceOfType 										-> ^(TYPE_DEF typeTag? sequenceOfType)
-	|choiceType												-> ^(TYPE_DEF typeTag? choiceType)
+	|choiceType	constraint*											-> ^(TYPE_DEF typeTag? choiceType)
     |sequenceType constraint*								-> ^(TYPE_DEF typeTag? sequenceType constraint*)
-    |setType												-> ^(TYPE_DEF typeTag? setType)
+    |setType	constraint*											-> ^(TYPE_DEF typeTag? setType)
     |setOfType												-> ^(TYPE_DEF typeTag? setOfType)
     |objectIdentifier constraint*							-> ^(TYPE_DEF typeTag? objectIdentifier constraint*)
-    |relativeOID											-> ^(TYPE_DEF typeTag? relativeOID)
+    |relativeOID	constraint*										-> ^(TYPE_DEF typeTag? relativeOID)
 )
 ;
 
