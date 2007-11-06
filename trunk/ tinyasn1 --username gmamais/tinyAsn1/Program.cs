@@ -121,7 +121,14 @@ namespace tinyAsn1
                     }
                 }
             }
-            
+
+            /*
+            SingleValueSet<int> t1 = new SingleValueSet<int>(12);
+            SingleValueSet<double> d1 = new SingleValueSet<double>(3.13);
+            SingleValueSet<char> c1 = new SingleValueSet<char>('a');
+            */
+
+
             return 0;            
         }
 
