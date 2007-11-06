@@ -866,6 +866,9 @@ namespace tinyAsn1
             {
                 case asn1Parser.NUMERIC_VALUE:
                     return new RealValue(val.antlrNode, m_module, this);
+                case asn1Parser.NAMED_VALUE_LIST: //e.g. {mantissa 2, base 10, exponent 0}
+                    
+                    throw new Exception("Unimplemented feature");
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
                     if (m_module.isValueDeclared(referenceId))
