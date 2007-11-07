@@ -10,8 +10,99 @@ namespace tinyAsn1
         public abstract T PERMax { get;}
         public abstract bool HasValue(T val);
         public abstract bool IsNull();
+        public abstract ConstraintsSet<T> Simplify();
     }
 
+    public class Set1ExceptOfSet2Set<T> : ConstraintsSet<T> where T : IComparable<T>
+    {
+        ConstraintsSet<T> m_set1;
+        ConstraintsSet<T> m_set2;
+
+        public Set1ExceptOfSet2Set(ConstraintsSet<T> set1, ConstraintsSet<T> set2)
+        {
+            if (set1 == null)
+                throw new ArgumentNullException("set1");
+            if (set2 == null)
+                throw new ArgumentNullException("set2");
+            m_set1 = set1;
+            m_set2 = set2;
+        }
+
+        public override T PERMin
+        {
+            get { throw new Exception("The method or operation is not implemented."); }
+        }
+
+        public override T PERMax
+        {
+            get { throw new Exception("The method or operation is not implemented."); }
+        }
+
+        public override bool HasValue(T val)
+        {
+            if (m_set1.HasValue(val) && !m_set2.HasValue(val))
+                return true;
+            return false;
+        }
+
+        public override bool IsNull()
+        {
+            return false;
+        }
+        public override ConstraintsSet<T> Simplify()
+        {
+            m_set1 = m_set1.Simplify();
+            m_set2 = m_set2.Simplify();
+            return this;
+        }
+        public override string ToString()
+        {
+            string ret = m_set1.ToString()+ " EXCEPT " + m_set2.ToString();
+            return ret;
+        }
+    }
+    
+    public class AllExceptOfSet<T> : ConstraintsSet<T> where T : IComparable<T>
+    {
+        ConstraintsSet<T> m_set;
+        public AllExceptOfSet(ConstraintsSet<T> set)
+        {
+            if (set == null)
+                throw new ArgumentNullException("set");
+
+            m_set = set;
+        }
+
+        public override T PERMin
+        {
+            get { throw new Exception("The method or operation is not implemented."); }
+        }
+
+        public override T PERMax
+        {
+            get { throw new Exception("The method or operation is not implemented."); }
+        }
+
+        public override bool HasValue(T val)
+        {
+            return !m_set.HasValue(val);
+        }
+
+        public override bool IsNull()
+        {
+            return false;
+        }
+        public override ConstraintsSet<T> Simplify()
+        {
+            m_set = m_set.Simplify();
+            return this;
+        }
+        public override string ToString()
+        {
+            string ret = "ALL EXCEPT " + m_set.ToString();
+            return ret;
+        }
+    }
 
     public class IntersectionSet<T> : ConstraintsSet<T> where T : IComparable<T>
     {
@@ -24,8 +115,8 @@ namespace tinyAsn1
             if (elems.Count == 0)
                 throw new ArgumentException("size of elems must be greater than zero");
             m_elems = elems;
-            CalcMin();
-            CalcMax();
+///            CalcMin();
+//            CalcMax();
         }
 
 
@@ -79,6 +170,9 @@ namespace tinyAsn1
 
         public override bool HasValue(T val)
         {
+            if (IsNull())
+                return false;
+
             foreach (ConstraintsSet<T> e in m_elems)
             {
                 if (!e.HasValue(val))
@@ -93,6 +187,25 @@ namespace tinyAsn1
             if (PERMin.CompareTo(PERMax) > 0)
                 return true;
             return false;
+        }
+        public override ConstraintsSet<T> Simplify()
+        {
+            if (m_elems.Count == 1)
+                return m_elems[0].Simplify();
+            for (int i = 0; i < m_elems.Count; i++)
+                m_elems[i] = m_elems[i].Simplify();
+            return this;
+        }
+        public override string ToString()
+        {
+            int cnt = m_elems.Count;
+            string ret = "(";
+            for (int i = 0; i < cnt - 1; i++)
+            {
+                ret += m_elems[i].ToString() + " ^ ";
+            }
+            ret += m_elems[cnt - 1].ToString() + ")";
+            return ret;
         }
     }
 
@@ -169,6 +282,27 @@ namespace tinyAsn1
 
             return true;
         }
+
+        public override ConstraintsSet<T> Simplify()
+        {
+            if (m_elems.Count == 1)
+                return m_elems[0].Simplify();
+            for (int i = 0; i < m_elems.Count; i++)
+                m_elems[i] = m_elems[i].Simplify();
+            return this;
+        }
+
+        public override string ToString()
+        {
+            int cnt = m_elems.Count;
+            string ret = "(";
+            for (int i = 0; i < cnt - 1; i++)
+            {
+                ret += m_elems[i].ToString() + " | ";
+            }
+            ret += m_elems[cnt-1].ToString() + ")";
+            return ret;
+        }
     }
 
     public class SingleValueSet<T> : ConstraintsSet<T> where T : IComparable<T>
@@ -196,6 +330,14 @@ namespace tinyAsn1
         public override bool IsNull()
         {
             return false;
+        }
+        public override ConstraintsSet<T> Simplify()
+        {
+            return this;
+        }
+        public override string ToString()
+        {
+            return m_value.ToString();
         }
     }
 
@@ -245,6 +387,23 @@ namespace tinyAsn1
             if (m_min.CompareTo(m_max) > 0) // m_min>m_max
                 return true;
             return false;
+        }
+
+        public override ConstraintsSet<T> Simplify()
+        {
+            return this;
+        }
+
+        public override string ToString()
+        {
+            string ret = m_min.ToString();
+            if (m_minValIsInluded)
+                ret += "<";
+            ret += "..";
+            if (m_maxValIsInluded)
+                ret += "<";
+            ret += m_max.ToString();
+            return ret;
         }
     }
 }

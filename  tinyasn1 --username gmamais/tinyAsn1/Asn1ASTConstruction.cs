@@ -446,13 +446,14 @@ namespace tinyAsn1
                         case asn1Parser.BMPString:
                         case asn1Parser.UTF8String:
                             throw new SemanticErrorException("Error line: " + child.Line + ", col: " + child.CharPositionInLine + ". "+child.Text+" is currently not supported.");
-                        case asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT:
+/*                        case asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT:
                             if (ret != null)
                                 ret.m_constraints.Add(Constraint.CreateConstraintFromSizeConstraint(child));
-                            break;
+                            break;*/
                         case asn1Parser.CONSTRAINT:
-                            if (ret != null)
-                                ret.m_constraints.Add(Constraint.CreateFromAntlrAst(child));
+                            //if (ret != null)
+                            //    ret.m_constraints.Add(Constraint.CreateFromAntlrAst(child));
+                            ret.m_AntlrConstraints.Add(child);
                             break;
                         default:
                             throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
@@ -1180,12 +1181,129 @@ namespace tinyAsn1
             }
             foreach (NumberedItem ni in toBeRemoved)
                 m_privNamedValues.Remove(ni);
+
+            SemanticCheckConstraints();
             if (m_privNamedValues.Count > 0)
                 return false;
-            
+            if (nNumberOfUnresolvedVarsInConstraints > 0)
+                return false;
             return true;
         }
 
+        int nNumberOfUnresolvedVarsInConstraints = 0;
+        void SemanticCheckConstraints()
+        {
+            nNumberOfUnresolvedVarsInConstraints = 0;
+            AntlrTreeVisitor visit = new AntlrTreeVisitor();
+            int[] AllowedTokes = { asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
+                asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
+                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR};
+            int[] StopList = { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR };
+
+//1. check that only single value, range and type constraints exist
+            foreach (ITree cons in m_AntlrConstraints)
+                visit.visitIfNot(cons, AllowedTokes, ConstraintCheck_InvalidConstraint, StopList);
+//2. Check Single Value & Value Range
+            foreach (ITree cons in m_AntlrConstraints)
+                visit.visit(cons, asn1Parser.VALUE_RANGE_EXPR, ConstraintCheck_CheckValue);
+
+//3. build set with allowed values
+            if (nNumberOfUnresolvedVarsInConstraints==0)
+            {
+                foreach (ITree cons in m_AntlrConstraints)
+                {
+                    m_AllowedValueSet = Constraints_BuildSetFromConstraint(cons);
+                    if (m_AllowedValueSet != null)
+                        m_AllowedValueSet = m_AllowedValueSet.Simplify();
+                }
+            }
+        }
+
+        void ConstraintCheck_InvalidConstraint(ITree root)
+        {
+            throw new SemanticErrorException("Error in Line:" + root.Line + ", col:" + root.CharPositionInLine +
+                " . This type of constraint '"+root.Text+"'cannot appear under "+Name);
+        }
+
+      
+        void ConstraintCheck_CheckValue(ITree root)
+        {
+            ValueRangeExpression valRange = ValueRangeExpression.CreateFromAntlrAst(root);
+            Asn1Value minVal = FixVariable(valRange.m_minValue);
+            IntegerValue min = minVal as IntegerValue;
+            if (valRange.m_maxValue != null)
+            {
+                Asn1Value maxVal = FixVariable(valRange.m_maxValue);
+                IntegerValue max = maxVal as IntegerValue;
+
+                if (min != null && max != null)
+                {
+                    if (min.Value > max.Value)
+                        throw new SemanticErrorException("Error in Line:" + root.Line + ", col:" + root.CharPositionInLine +
+                " . Lower range value(" + min.Value + ") is greater than upper range value(" + max.Value + ").");
+                }
+                else
+                    nNumberOfUnresolvedVarsInConstraints++;
+            }
+            else
+            {
+                if (min == null)
+                    nNumberOfUnresolvedVarsInConstraints++;
+            }
+        }
+
+        ConstraintsSet<Int64> Constraints_BuildSetFromConstraint(ITree root)
+        {
+            switch (root.Type)
+            {
+                case asn1Parser.VALUE_RANGE_EXPR:
+                    ValueRangeExpression valRange = ValueRangeExpression.CreateFromAntlrAst(root);
+                    Asn1Value minVal = FixVariable(valRange.m_minValue);
+                    IntegerValue min = minVal as IntegerValue;
+                    if (valRange.m_maxValue != null)
+                    {
+                        Asn1Value maxVal = FixVariable(valRange.m_maxValue);
+                        IntegerValue max = maxVal as IntegerValue;
+
+                        if (min != null && max != null)
+                            return new RangeValueSet<Int64>(min.Value, max.Value, valRange.m_minValIsIncluded, valRange.m_maxValIsIncluded);
+                    }
+                    else
+                    {
+                        if (min != null)
+                            return new SingleValueSet<Int64>(min.Value);
+                    }
+                    break;
+                case asn1Parser.UNION_SET:
+                    List<ConstraintsSet<Int64>> childSets = new List<ConstraintsSet<long>>();
+                    for (int i = 0; i < root.ChildCount; i++)
+                    {
+                        childSets.Add(Constraints_BuildSetFromConstraint(root.GetChild(i)));
+                    }
+                    return new UnionSet<Int64>(childSets);
+                case asn1Parser.UNION_SET_ALL_EXCEPT:
+                    return new AllExceptOfSet<Int64>(Constraints_BuildSetFromConstraint(root.GetChild(0)));
+                case asn1Parser.INTERSECTION_SET:
+                    childSets = new List<ConstraintsSet<long>>();
+                    for (int i = 0; i < root.ChildCount; i++)
+                    {
+                        childSets.Add(Constraints_BuildSetFromConstraint(root.GetChild(i)));
+                    }
+                    return new IntersectionSet<Int64>(childSets);
+                case asn1Parser.INTERSECTION_ELEMENT:
+                    if (root.ChildCount == 1)
+                        return Constraints_BuildSetFromConstraint(root.GetChild(0));
+                    return new Set1ExceptOfSet2Set<Int64>(Constraints_BuildSetFromConstraint(root.GetChild(0)),
+                                                          Constraints_BuildSetFromConstraint(root.GetChild(1)));
+                case asn1Parser.CONSTRAINT:
+                    return Constraints_BuildSetFromConstraint(root.GetChild(0));
+                default:
+                    throw new Exception("You missed: "+ root.Text);
+            }
+            return null;
+        }
+
+        public ConstraintsSet<Int64> m_AllowedValueSet;
     }
 
     public partial class ChoiceType : Asn1Type
@@ -1602,10 +1720,11 @@ namespace tinyAsn1
                 switch (child.Type)
                 {
                     case asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT:
-                        ret.m_constraints.Add(Constraint.CreateConstraintFromSizeConstraint(child));
-                        break;
+//                        ret.m_constraints.Add(Constraint.CreateConstraintFromSizeConstraint(child));
+//                        break;
                     case asn1Parser.CONSTRAINT:
-                        ret.m_constraints.Add(Constraint.CreateFromAntlrAst(child));
+//                        ret.m_constraints.Add(Constraint.CreateFromAntlrAst(child));
+                        ret.m_AntlrConstraints.Add(child);
                         break;
                     case asn1Parser.LID:
                         ret.m_xmlVarName = child.Text;
@@ -1685,10 +1804,11 @@ namespace tinyAsn1
                 switch (child.Type)
                 {
                     case asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT:
-                        ret.m_constraints.Add(Constraint.CreateConstraintFromSizeConstraint(child));
-                        break;
+//                        ret.m_constraints.Add(Constraint.CreateConstraintFromSizeConstraint(child));
+//                        break;
                     case asn1Parser.CONSTRAINT:
-                        ret.m_constraints.Add(Constraint.CreateFromAntlrAst(child));
+//                        ret.m_constraints.Add(Constraint.CreateFromAntlrAst(child));
+                        ret.m_AntlrConstraints.Add(child);
                         break;
                     case asn1Parser.LID:
                         ret.m_xmlVarName = child.Text;
@@ -1854,261 +1974,8 @@ namespace tinyAsn1
         }
     }
 
-
-
-
-    public partial class ExceptionSpec
-    {
-        static public ExceptionSpec CreateFromAntlrAst(ITree tree)
-        {
-            Console.Error.WriteLine("Unimplemented feature ASN.1 Exception are parsed but ignored");
-            return new ExceptionSpec();
-        }
-    }
-
-    public partial class Constraint
-    {
-        static public Constraint CreateFromAntlrAst(ITree tree)
-        {
-            if (tree.Type != asn1Parser.CONSTRAINT)
-                throw new Exception(tree.Text + " is not a constraint");
-            Constraint ret = new Constraint();
-            for (int i = 0; i < tree.ChildCount; i++)
-            {
-                ITree child = tree.GetChild(i);
-                switch (child.Type)
-                {
-                    case asn1Parser.SET_OF_VALUES:
-                        ret.m_values = SetOfValues.CreateFromAntlrAst(child);
-                        break;
-                    case asn1Parser.EXCEPTION_SPEC:
-                        ret.m_exception = ExceptionSpec.CreateFromAntlrAst(child);
-                        break;
-                    default:
-                        throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
-                }
-            }
-
-            return ret;
-        }
-
-        static public void HandleBody(Constraint ret, ITree tree)
-        {
-        }
-
-        static public Constraint CreateConstraintFromSizeConstraint(ITree tree)
-        {
-
-
-            Constraint ret = new Constraint();
-            ret.m_values = new SetOfValues();
-            UnionElementOfIntersectionItems un = new UnionElementOfIntersectionItems();
-            ret.m_values.m_set1.Add(un);
-            IntersectionElement ir = new IntersectionElement();
-            un.m_intersectionElements.Add(ir);
-            SizeExpression sz = new SizeExpression();
-            ir.m_exp = sz;
-            sz.m_sizeConstraint = Constraint.CreateFromAntlrAst(tree.GetChild(0));
-
-            return ret;
-        }
-    }
-
-    public partial class UnionElementOfIntersectionItems : UnionElement
-    {
-        static public UnionElementOfIntersectionItems CreateFromAntlrAst(ITree tree)
-        {
-            UnionElementOfIntersectionItems ret = new UnionElementOfIntersectionItems();
-            for (int i = 0; i < tree.ChildCount; i++)
-            {
-                ITree child = tree.GetChild(i);
-                switch (child.Type)
-                {
-                    case asn1Parser.INTERSECTION_ELEMENT:
-                        ret.m_intersectionElements.Add(IntersectionElement.CreateFromAntlrAst(child));
-                        break;
-                    default:
-                        throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
-                }
-            }
-            return ret;
-        }
-    }
-
-    public partial class UnionElementExceptOf : UnionElement
-    {
-        static public UnionElementExceptOf CreateFromAntlrAst(ITree tree)
-        {
-            UnionElementExceptOf ret = new UnionElementExceptOf();
-            ret.m_exceptOfThis = ConstraintExpression.CreateFromAntlrAst(tree.GetChild(0));
-            return ret;
-        }
-    }
-
-    public partial class IntersectionElement
-    {
-        static public IntersectionElement CreateFromAntlrAst(ITree tree)
-        {
-            IntersectionElement ret = new IntersectionElement();
-
-            ret.m_exp = ConstraintExpression.CreateFromAntlrAst(tree.GetChild(0));
-            if (tree.ChildCount>1)
-                ret.m_except_exp = ConstraintExpression.CreateFromAntlrAst(tree.GetChild(1));
-
-            return ret;
-        }
-    }
-
-    public partial class ConstraintExpression
-    {
-        static public ConstraintExpression CreateFromAntlrAst(ITree tree)
-        {
-            ConstraintExpression ret = null;
-
-            switch (tree.Type)
-            {
-                case asn1Parser.VALUE_RANGE_EXPR:
-                    ret = ValueRangeExpression.CreateFromAntlrAst(tree);
-                    break;
-                case asn1Parser.SIZE_EXPR:
-                    ret = SizeExpression.CreateFromAntlrAst(tree);
-                    break;
-                case asn1Parser.PERMITTED_ALPHABET_EXPR:
-                    ret = PermittedAlphabetExpression.CreateFromAntlrAst(tree);
-                    break;
-                case asn1Parser.SUBTYPE_EXPR:
-                    ret = SubtypeExpression.CreateFromAntlrAst(tree);
-                    break;
-                case asn1Parser.SET_OF_VALUES:
-                    ret = SetOfValues.CreateFromAntlrAst(tree);
-                    break;
-                case asn1Parser.PATTERN_EXPR:
-                    ret = PatternExpression.CreateFromAntlrAst(tree);
-                    break;
-                case asn1Parser.INNER_TYPE_EXPR:
-                    Console.Error.WriteLine("Unimplemented feature, 'WITH COMPONENTS' is ignored");
-                    ret = new WithComponentsExpression();
-                    break;
-                default:
-                    throw new Exception("Unkown constraint expression: " + tree.Text);
-            }
-
-            return ret;
-        }
-    }
-
-    public partial class ValueRangeExpression : ConstraintExpression
-    {
-        static public new ValueRangeExpression CreateFromAntlrAst(ITree tree)
-        {
-            ValueRangeExpression ret = new ValueRangeExpression();
-            ret.m_minValue = Asn1Value.CreateFromAntlrAst(tree.GetChild(0));
-            int lineNo = tree.GetChild(0).Line;
-            for (int i = 1; i < tree.ChildCount; i++)
-            {
-                ITree child = tree.GetChild(i);
-                switch (child.Type)
-                {
-                    case asn1Parser.MAX_VAL_PRESENT:
-                        ret.m_maxValue = Asn1Value.CreateFromAntlrAst(child.GetChild(0));
-                        break;
-                    case asn1Parser.MIN_VAL_INCLUDED:
-                        ret.m_minValIsIncluded = true;
-                        break;
-                    case asn1Parser.MAX_VAL_INCLUDED:
-                        ret.m_maxValIsIncluded = true;
-                        break;
-                    default:
-                        throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
-                }
-            }
-
-            //if (ret.m_maxValue != null && ret.m_minValue.m_valType != ret.m_maxValue.m_valType)
-            //    throw new SemanticErrorException("Semantic Error: Both values in a range must be of the same type. Line:" +lineNo.ToString());
-
-            return ret;
-        }
-    }
-
-    public partial class SizeExpression : ConstraintExpression
-    {
-        static public new SizeExpression CreateFromAntlrAst(ITree tree)
-        {
-            SizeExpression ret = new SizeExpression();
-            ret.m_sizeConstraint = Constraint.CreateFromAntlrAst(tree.GetChild(0));
-            return ret;
-        }
-    }
-
-    public partial class SubtypeExpression : ConstraintExpression
-    {
-        static public new SubtypeExpression CreateFromAntlrAst(ITree tree)
-        {
-            SubtypeExpression ret = new SubtypeExpression();
-            ret.m_type = Asn1Type.CreateFromAntlrAst(tree.GetChild(0));
-            if (tree.ChildCount > 1)
-                ret.m_includes = true;
-            return ret;
-        }
-    }
-
-    public partial class PermittedAlphabetExpression : ConstraintExpression
-    {
-        static public new PermittedAlphabetExpression CreateFromAntlrAst(ITree tree)
-        {
-            PermittedAlphabetExpression ret = new PermittedAlphabetExpression();
-            ret.m_permittedAlphabetConstraint = Constraint.CreateFromAntlrAst(tree.GetChild(0));
-            return ret;
-        }
-    }
-
-    public partial class PatternExpression : ConstraintExpression
-    {
-        static public new PatternExpression CreateFromAntlrAst(ITree tree)
-        {
-            PatternExpression ret = new PatternExpression();
-            ret.m_pattern = Asn1Value.CreateFromAntlrAst(tree.GetChild(0));
-            return ret;
-        }
-    }
-
-    public partial class SetOfValues : ConstraintExpression
-    {
-        static public new SetOfValues CreateFromAntlrAst(ITree tree)
-        {
-            SetOfValues ret = new SetOfValues();
-            UnionElement element = null;
-            for (int i = 0; i < tree.ChildCount; i++)
-            {
-                ITree child = tree.GetChild(i);
-                switch (child.Type)
-                {
-                    case asn1Parser.UNION_ELEMENT:
-                        element = UnionElementOfIntersectionItems.CreateFromAntlrAst(child);
-                        if (!ret.m_extMarkPresent)
-                            ret.m_set1.Add(element);
-                        else
-                            ret.m_set2.Add(element);
-                        break;
-                    case asn1Parser.UNION_ELEMENT_ALL_EXCEPT:
-                        element = UnionElementExceptOf.CreateFromAntlrAst(child);
-                        if (ret.m_extMarkPresent)
-                            ret.m_set2.Add(element);
-                        else
-                            ret.m_set1.Add(element);
-                        break;
-                    case asn1Parser.EXT_MARK:
-                        ret.m_extMarkPresent = true;
-                        break;
-                    default:
-                        throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
-                }
-            }
-            return ret;
-        }
-
-    }
-
-        
- 
 }
+
+
+
+

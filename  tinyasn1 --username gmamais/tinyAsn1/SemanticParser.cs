@@ -77,6 +77,8 @@ namespace tinyAsn1
         {
             tas.m_type.SemanticCheckFinished();
             //    bFinished = false;
+
+           
         }
 
         public void OnAfterTypeAssigment(Asn1File asn1File, Module mod, TypeAssigment tas)
