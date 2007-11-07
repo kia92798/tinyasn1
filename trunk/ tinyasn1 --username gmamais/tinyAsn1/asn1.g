@@ -37,9 +37,9 @@ tokens {
 	NUMERIC_VALUE;
 	CONSTRAINT;
 	EXCEPTION_SPEC;
-	SET_OF_VALUES;
-	UNION_ELEMENT;
-	UNION_ELEMENT_ALL_EXCEPT;
+//	SET_OF_VALUES;
+	UNION_ELEMENT2;
+	UNION_SET_ALL_EXCEPT;
 	INTERSECTION_ELEMENT;
 	VALUE_RANGE_EXPR;
 	SUBTYPE_EXPR;
@@ -68,6 +68,8 @@ tokens {
 	VALUE_LIST;
 	CHOICE_VALUE;
 	OBJECT_ID_VALUE;
+	UNION_SET;
+	INTERSECTION_SET;
 }
 
 
@@ -201,12 +203,12 @@ values for this type are those of the intersection of constraints .
 */
 type	: typeTag?
 (	 nULL													-> ^(TYPE_DEF typeTag? nULL)
-	|bitStringType (sizeShortConstraint| constraint)*		-> ^(TYPE_DEF typeTag? bitStringType sizeShortConstraint* constraint*)
+	|bitStringType constraint*								-> ^(TYPE_DEF typeTag? bitStringType constraint*)
 	|booleanType constraint*								-> ^(TYPE_DEF typeTag? booleanType constraint*)
 	|enumeratedType constraint*								-> ^(TYPE_DEF typeTag? enumeratedType constraint*)
 	|integerType constraint*								-> ^(TYPE_DEF typeTag? integerType constraint*)
     |realType constraint*									-> ^(TYPE_DEF typeTag? realType constraint*)
-	|stringType (sizeShortConstraint| constraint)*			-> ^(TYPE_DEF typeTag? stringType sizeShortConstraint* constraint*)
+	|stringType constraint*									-> ^(TYPE_DEF typeTag? stringType constraint*)
 	|referencedType	constraint*								-> ^(TYPE_DEF typeTag? referencedType constraint*)
 	|sequenceOfType 										-> ^(TYPE_DEF typeTag? sequenceOfType)
 	|choiceType	constraint*											-> ^(TYPE_DEF typeTag? choiceType)
@@ -237,7 +239,7 @@ booleanType
 	;
 	
 enumeratedType 
-	:	ENUMERATED L_BRACKET en1=enumeratedTypeItems  ( COMMA ext='...' exceptionSpec? (COMMA en2=enumeratedTypeItems)? )? R_BRACKET
+	:	ENUMERATED L_BRACKET en1=enumeratedTypeItems  ( COMMA ext=EXT_MARK exceptionSpec? (COMMA en2=enumeratedTypeItems)? )? R_BRACKET
 	-> ^(ENUMERATED_TYPE $en1 ($ext exceptionSpec? $en2?) ?)
 	;
 
@@ -266,7 +268,7 @@ choiceType
 	;
 	
 choiceExtensionBody
-	:	COMMA '...' exceptionSpec?  choiceListExtension?   (COMMA extMark2='...')?  
+	:	COMMA EXT_MARK exceptionSpec?  choiceListExtension?   (COMMA extMark2=EXT_MARK)?  
 		-> ^(CHOICE_EXT_BODY exceptionSpec? choiceListExtension? $extMark2?)
 	;	
 
@@ -299,7 +301,7 @@ sequenceOrSetBody	:
 	;
 	
 seqOrSetExtBody
-	:	'...' exceptionSpec? (COMMA extensionAdditionList)? (COMMA extMark2='...'   (COMMA componentTypeList )? )?
+	:	EXT_MARK exceptionSpec? (COMMA extensionAdditionList)? (COMMA extMark2=EXT_MARK   (COMMA componentTypeList )? )?
 	->	^(SEQUENCE_EXT_BODY exceptionSpec? extensionAdditionList? $extMark2? componentTypeList?)
 	;	
 	
@@ -455,7 +457,8 @@ definedValue
 /* *************************************** Constraints DEFINITION ****************************************************** */
 /* ********************************************************************************************************************* */
 constraint 
-	:	L_PAREN setOfValues  exceptionSpec? R_PAREN			->^(CONSTRAINT setOfValues  exceptionSpec?)
+	:	L_PAREN uset1=unionSet (COMMA extMark=EXT_MARK ( COMMA uset2=unionSet)?)?  exceptionSpec? R_PAREN			
+						->^(CONSTRAINT $uset1 $extMark? $uset2?  exceptionSpec?)
 	;
 
 exceptionSpec 
@@ -469,17 +472,19 @@ exceptionSpec
 	;
 
 
+/*
 setOfValues
-	:	uset1=unionElement (COMMA extMark='...' ( COMMA uset2=unionElement)?)?			-> ^(SET_OF_VALUES $uset1 $extMark? $uset2?)
+	:	uset1=unionSet (COMMA extMark='...' ( COMMA uset2=unionSet)?)?			-> ^(SET_OF_VALUES $uset1 $extMark? $uset2?)
 	;
-	
-unionElement
-	:	intersectionSetElements (UnionMark intersectionSetElements)*			-> ^(UNION_ELEMENT intersectionSetElements)+
-	|	ALL EXCEPT constraintExpression										-> ^(UNION_ELEMENT_ALL_EXCEPT constraintExpression)
+*/	
+unionSet
+	:	intersectionSet (UnionMark intersectionSet)*			-> ^(UNION_SET intersectionSet+ )
+	|	ALL EXCEPT constraintExpression							-> ^(UNION_SET_ALL_EXCEPT constraintExpression)
 	;	
 	
-intersectionSetElements
-	:	intersectionItem (IntersectionMark intersectionItem)*	->intersectionItem+
+//	UNION_ELEMENT2 is synonymous to INTERSECTION_SET
+intersectionSet
+	:	intersectionItem (IntersectionMark intersectionItem)*	-> ^(INTERSECTION_SET   intersectionItem+)
 	;	
 	
 intersectionItem 
@@ -496,7 +501,7 @@ constraintExpression
 	| permittedAlphabetExpression
 	| innerTypeExpression
 	| patternExpression
-	| L_PAREN unionElement R_PAREN	->	unionElement
+	| L_PAREN unionSet R_PAREN	->	unionSet
 	;	
 	
 valueRangeExpression
@@ -517,7 +522,7 @@ permittedAlphabetExpression : FROM constraint	-> ^(PERMITTED_ALPHABET_EXPR const
 innerTypeExpression 
 	: WITH COMPONENT constraint											-> ^(INNER_TYPE_EXPR constraint)
 	| WITH COMPONENTS L_BRACKET
-			( '...' COMMA)?
+			( EXT_MARK COMMA)?
 			namedConstraintExpression  (COMMA namedConstraintExpression)* 
 		R_BRACKET
 		-> ^(INNER_TYPE_EXPR namedConstraintExpression+)

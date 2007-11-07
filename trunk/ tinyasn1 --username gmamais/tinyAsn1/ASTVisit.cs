@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
+using Antlr.Runtime.Tree;
 
 namespace tinyAsn1
 {
@@ -35,6 +36,41 @@ namespace tinyAsn1
         void OnReferenceType(Asn1File asn1File, Module mod, ReferenceType refType, TypeAssigment tas);
     
     }
+
+
+    public delegate void OnAntrlNode(ITree root);
+
+    public class AntlrTreeVisitor
+    {
+        public void visit(ITree root, int tokenID, OnAntrlNode callBack)
+        {
+            if (root.Type == tokenID)
+                callBack(root);
+            for (int i = 0; i < root.ChildCount; i++)
+                visit(root.GetChild(i), tokenID, callBack);
+        }
+
+        public void visit(ITree root, IList<int> tokenIDs, OnAntrlNode callBack)
+        {
+            if (tokenIDs.Contains(root.Type))
+                callBack(root);
+            for (int i = 0; i < root.ChildCount; i++)
+                visit(root.GetChild(i), tokenIDs, callBack);
+        }
+
+        public void visitIfNot(ITree root, IEnumerable<int> TokenIDs, OnAntrlNode callBack, IEnumerable<int> StopList)
+        {
+            List<int> tokenIDs = new List<int>(TokenIDs);
+            List<int> stopList = new List<int>(StopList);
+            if (!tokenIDs.Contains(root.Type))
+                callBack(root);
+            if (stopList.Contains(root.Type))
+                return;
+            for (int i = 0; i < root.ChildCount; i++)
+                visitIfNot(root.GetChild(i), tokenIDs, callBack, StopList);
+        }
+    }
+
 
     public partial class Asn1CompilerInvokation
     {

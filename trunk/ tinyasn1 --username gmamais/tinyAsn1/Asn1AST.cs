@@ -245,6 +245,8 @@ namespace tinyAsn1
 
         public Tag m_tag;
         public List<Constraint> m_constraints = new List<Constraint>();
+        
+        public List<ITree> m_AntlrConstraints = new List<ITree>();
 
         public virtual Asn1Type GetFinalType()
         {
