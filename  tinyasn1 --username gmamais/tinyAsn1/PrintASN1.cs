@@ -79,7 +79,6 @@ namespace tinyAsn1
             }
             else
                 o.Write("INTEGER");
-
             if (m_AllowedValueSet != null)
             {
                 o.Write(" ");

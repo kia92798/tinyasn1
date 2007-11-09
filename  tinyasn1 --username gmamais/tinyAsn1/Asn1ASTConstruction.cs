@@ -281,11 +281,11 @@ namespace tinyAsn1
         internal bool SemanticCheckFinished()
         {
             foreach (TypeAssigment t in m_typeAssigments.Values)
-                if (!t.m_type.SemanticCheckFinished())
+                if (!t.m_type.SemanticAnalysisFinished())
                     return false;
 
             foreach (ValueAssigment v in m_valuesAssigments.Values)
-                if (!v.m_value.SemanticCheckFinished())
+                if (!v.m_value.IsResolved())
                     return false;
 
             return true;
@@ -468,23 +468,47 @@ namespace tinyAsn1
             }
             return ret;
         }
-        internal virtual Asn1Value FixVariable(Asn1Value val)
+
+        /*
+         * This method takes as input an unresolved variable and 
+         * either returns the same variable if resolving can not be done in this round
+         * or returns a new resolved variable
+         * or throws a SemanticError Exception if resolving cannot be done due to semantic error 
+         * */
+        internal virtual Asn1Value ResolveVariable(Asn1Value val)
         {
             throw new Exception("Internal Error: abstract function call");
         }
 
-        internal virtual bool NeedMorePasses()
+        public virtual object ResolveConstaint(ITree constraint)
         {
-            return false;
+            return null;
         }
 
         /*
+         * This method does not change the state of the object
          * Returns TRUE if SemanticCheck has finished
          *         FALSE if SemanticCheck must be also called in a next round
          */
-        internal virtual bool SemanticCheckFinished()
+        internal virtual bool SemanticAnalysisFinished()
         {
-            return true;
+            throw new Exception("Abstact method called: Asn1Type::SemanticAnalysisFinished()");
+        }
+
+        /*
+         * This method does the semantic analysis. It may may be called multiple times per time.
+         * This method changes the state of the object
+         * This involves: 
+         * - semantic checking 
+         * - resolution of enumerates for enumerated types, integers and bit strings
+         * - check of children for constructed types (e.g. no duplicate names on SEQUENCE etc)
+         * - constraints check
+         * 
+         * The overrides should first call SemanticAnalysisFinished() 
+         * */
+        public virtual void DoSemanticAnalysis()
+        {
+            throw new Exception("Abstact method called: Asn1Type::DoSemanticAnalysis()");
         }
     }
 
@@ -521,7 +545,7 @@ namespace tinyAsn1
 
     public partial class NullType : Asn1Type
     {
-        internal override Asn1Value FixVariable(Asn1Value val)
+        internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId = "";
             switch (val.antlrNode.Type)
@@ -551,11 +575,18 @@ namespace tinyAsn1
                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting BIT STRING constant or BIT STRING variable");
             }
         }
+        internal override bool SemanticAnalysisFinished()
+        {
+            return true;
+        }
+        public override void DoSemanticAnalysis()
+        {
+        }
     }
 
     public partial class BooleanType : Asn1Type
     {
-        internal override Asn1Value FixVariable(Asn1Value val)
+        internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId = "";
             switch (val.antlrNode.Type)
@@ -587,6 +618,13 @@ namespace tinyAsn1
             }
         }
 
+        internal override bool SemanticAnalysisFinished()
+        {
+            return true;
+        }
+        public override void DoSemanticAnalysis()
+        {
+        }
     }
 
     public partial class BitStringType : Asn1Type
@@ -607,13 +645,15 @@ namespace tinyAsn1
 
             return ret;
         }
-        internal override bool NeedMorePasses()
+
+        internal override bool SemanticAnalysisFinished()
         {
-            return this.m_namedBitsPriv.Count>0;
+            if (m_namedBitsPriv.Count > 0)
+                return false;
+
+            return true;
         }
-
-
-        internal override bool SemanticCheckFinished()
+        public override void DoSemanticAnalysis()
         {
             List<NumberedItem> toBeRemoved = new List<NumberedItem>();
             foreach (NumberedItem ni in m_namedBitsPriv)
@@ -659,14 +699,10 @@ namespace tinyAsn1
             }
             foreach (NumberedItem ni in toBeRemoved)
                 m_namedBitsPriv.Remove(ni);
-            if (m_namedBitsPriv.Count > 0)
-                return false;
-            
-            return true;
         }
 
 
-        internal override Asn1Value FixVariable(Asn1Value val)
+        internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId = "";
             switch (val.antlrNode.Type)
@@ -677,7 +713,7 @@ namespace tinyAsn1
 
                 case asn1Parser.OBJECT_ID_VALUE: // There is case { id } that the parser thinks that this a OBJECT ID value
                     // although it should handled as VALUE_LIST
-                    if (NeedMorePasses())
+                    if (!SemanticAnalysisFinished())
                         return val;
                     if (val.antlrNode.ChildCount != 1)
                         throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting BIT STRING constant or BIT STRING variable");
@@ -706,7 +742,7 @@ namespace tinyAsn1
                 //case asn1Parser.BIT_STRING_VALUE: // { id, id2, id3}
                 case asn1Parser.VALUE_LIST: // { val1, val2, val3}
                     {
-                        if (NeedMorePasses())
+                        if (!SemanticAnalysisFinished())
                             return val;
                         List<Int64> ids = new List<Int64>();
                         for (int i = 0; i < val.antlrNode.ChildCount; i++)
@@ -753,7 +789,7 @@ namespace tinyAsn1
 
     public partial class OctetStringType : Asn1Type
     {
-        internal override Asn1Value FixVariable(Asn1Value val)
+        internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId = "";
             switch (val.antlrNode.Type)
@@ -785,11 +821,18 @@ namespace tinyAsn1
             }
         }
 
+        internal override bool SemanticAnalysisFinished()
+        {
+            return true;
+        }
+        public override void DoSemanticAnalysis()
+        {
+        }
     }
 
     public partial class IA5StringType : Asn1Type
     {
-        internal override Asn1Value FixVariable(Asn1Value val)
+        internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId = "";
             switch (val.antlrNode.Type)
@@ -820,11 +863,18 @@ namespace tinyAsn1
             }
         }
 
+        internal override bool SemanticAnalysisFinished()
+        {
+            return true;
+        }
+        public override void DoSemanticAnalysis()
+        {
+        }
     }
 
     public partial class NumericStringType : Asn1Type
     {
-        internal override Asn1Value FixVariable(Asn1Value val)
+        internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId = "";
             switch (val.antlrNode.Type)
@@ -854,13 +904,19 @@ namespace tinyAsn1
                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting NumericString constant or NumericString variable referebce");
             }
         }
+        internal override bool SemanticAnalysisFinished()
+        {
+            return true;
+        }
+        public override void DoSemanticAnalysis()
+        {
+        }
     }
-
 
     public partial class RealType : Asn1Type
     {
 
-        internal override Asn1Value FixVariable(Asn1Value val)
+        internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId = "";
             switch (val.antlrNode.Type)
@@ -893,7 +949,14 @@ namespace tinyAsn1
                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting REAL or REAL variable");
             }
         }
-            
+
+        internal override bool SemanticAnalysisFinished()
+        {
+            return true;
+        }
+        public override void DoSemanticAnalysis()
+        {
+        }
 
     }
 
@@ -945,7 +1008,7 @@ namespace tinyAsn1
             return m_enumValues.ContainsKey(id);
         }
 
-        internal override Asn1Value FixVariable(Asn1Value val)
+        internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId;
             switch (val.antlrNode.Type)
@@ -1011,7 +1074,13 @@ namespace tinyAsn1
             
         }
 
-        internal override bool SemanticCheckFinished()
+        internal override bool SemanticAnalysisFinished()
+        {
+            if (m_enumValuesPriv.Count > 0)
+                return false;
+            return true;
+        }
+        public override void DoSemanticAnalysis()
         {
             List<NumberedItem> toBeRemoved = new List<NumberedItem>();
             foreach (NumberedItem ni in m_enumValuesPriv)
@@ -1057,253 +1126,11 @@ namespace tinyAsn1
 
             foreach (NumberedItem ni in toBeRemoved)
                 m_enumValuesPriv.Remove(ni);
-            if (m_enumValuesPriv.Count > 0)
-                return false;
-            else
-            {
+
+            if (SemanticAnalysisFinished())
                 FixNumbers();
-                return true;
-            }
 
         }
-    }
-
-    public partial class IntegerType : Asn1Type
-    {
-        static public new IntegerType CreateFromAntlrAst(ITree tree)
-        {
-            IntegerType ret = new IntegerType();
-            for (int i = 0; i < tree.ChildCount; i++)
-            {
-                ITree child = tree.GetChild(i);
-                NumberedItem item = NumberedItem.CreateFromAntlrAst(child);
-                ret.m_privNamedValues.Add(item);
-            }
-
-            return ret;
-            
-        }
-
-        bool isIdentifierDeclared(string id)
-        {
-            foreach (NumberedItem ni in m_privNamedValues)
-                if (ni.m_id == id)
-                    return true;
-
-            return isIdentifierProcessed(id);
-        }
-
-        bool isIdentifierProcessed(string id)
-        {
-            return m_namedValues.ContainsKey(id);
-        }
-
-
-
-        internal override Asn1Value FixVariable(Asn1Value val)
-        {
-            if (m_module == null)
-                throw new Exception("Bug m_module is null");
-            string referenceId="";
-            switch (val.antlrNode.Type)
-            {
-                case asn1Parser.NUMERIC_VALUE:
-                case asn1Parser.MIN:
-                case asn1Parser.MAX:
-                    return new IntegerValue(val.antlrNode, m_module, this);
-                case asn1Parser.VALUE_REFERENCE:
-                    referenceId = val.antlrNode.GetChild(0).Text;
-                    if (m_module.isValueDeclared(referenceId))
-                    {
-                        Asn1Value tmp = m_module.GetValue(referenceId);
-                        switch (tmp.m_TypeID)
-                        {
-                            case Asn1Value.TypeID.INT:
-                                return new IntegerValue(tmp as IntegerValue);
-                            case Asn1Value.TypeID.UNRESOLVED:
-                                return val;
-                            default:
-                                throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
-                        }
-                    }
-                    else if (this.isIdentifierDeclared(referenceId))
-                    {
-                        if (this.isIdentifierProcessed(referenceId))
-                            return new IntegerValue(m_namedValues[referenceId], m_module, val.antlrNode,this);
-                        return val; //else wait for next round
-                    } else
-                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
-
-                default:
-                    throw new SemanticErrorException("Error in line : "+val.antlrNode.Line+". Expecting integer or integer variable");
-            }
-
-
-        }
-
-        internal override bool SemanticCheckFinished()
-        {
-            List<NumberedItem> toBeRemoved = new List<NumberedItem>();
-            foreach (NumberedItem ni in m_privNamedValues)
-            {
-                if (m_namedValues.ContainsKey(ni.m_id))
-                    throw new SemanticErrorException("The INTEGER type defined in line " + antlrNode.Line +
-                        " containts more than once the identifier " + ni.m_id);
-                if (ni.m_valueAsInt != null)
-                {
-                    m_namedValues.Add(ni.m_id, ni.m_valueAsInt.Value);
-                    toBeRemoved.Add(ni);
-                }
-                else
-                {
-                    //We have to look up in the variables definitions
-                    string refName = ni.m_valueAsReference;
-                    if (m_module.isValueDeclared(refName))
-                    {
-                        Asn1Value tmpVal = m_module.GetValue(refName);
-                        if (tmpVal.m_TypeID == Asn1Value.TypeID.UNRESOLVED)
-                            continue;
-                        if (tmpVal.m_TypeID == Asn1Value.TypeID.INT)
-                        {
-                            m_namedValues.Add(ni.m_id, ((IntegerValue)tmpVal).Value);
-                            toBeRemoved.Add(ni);
-                        }
-                        else
-                        {
-                            throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Incompatible types assigment");
-                        }
-                        //else let it be resolved in a next parse round
-                    }
-                    else
-                        throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Identifier '" + refName + "' is unknown");
-
-                }
-            }
-            foreach (NumberedItem ni in toBeRemoved)
-                m_privNamedValues.Remove(ni);
-
-            SemanticCheckConstraints();
-            if (m_privNamedValues.Count > 0)
-                return false;
-            if (nNumberOfUnresolvedVarsInConstraints > 0)
-                return false;
-            return true;
-        }
-
-        int nNumberOfUnresolvedVarsInConstraints = 0;
-        void SemanticCheckConstraints()
-        {
-            nNumberOfUnresolvedVarsInConstraints = 0;
-            AntlrTreeVisitor visit = new AntlrTreeVisitor();
-            int[] AllowedTokes = { asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
-                asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
-                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR};
-            int[] StopList = { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR };
-
-//1. check that only single value, range and type constraints exist
-            foreach (ITree cons in m_AntlrConstraints)
-                visit.visitIfNot(cons, AllowedTokes, ConstraintCheck_InvalidConstraint, StopList);
-//2. Check Single Value & Value Range
-            foreach (ITree cons in m_AntlrConstraints)
-                visit.visit(cons, asn1Parser.VALUE_RANGE_EXPR, ConstraintCheck_CheckValue);
-
-//3. build set with allowed values
-            if (nNumberOfUnresolvedVarsInConstraints==0)
-            {
-                foreach (ITree cons in m_AntlrConstraints)
-                {
-                    m_AllowedValueSet = Constraints_BuildSetFromConstraint(cons);
-                    if (m_AllowedValueSet != null)
-                        m_AllowedValueSet = m_AllowedValueSet.Simplify();
-                }
-            }
-        }
-
-        void ConstraintCheck_InvalidConstraint(ITree root)
-        {
-            throw new SemanticErrorException("Error in Line:" + root.Line + ", col:" + root.CharPositionInLine +
-                " . This type of constraint '"+root.Text+"'cannot appear under "+Name);
-        }
-
-      
-        void ConstraintCheck_CheckValue(ITree root)
-        {
-            ValueRangeExpression valRange = ValueRangeExpression.CreateFromAntlrAst(root);
-            Asn1Value minVal = FixVariable(valRange.m_minValue);
-            IntegerValue min = minVal as IntegerValue;
-            if (valRange.m_maxValue != null)
-            {
-                Asn1Value maxVal = FixVariable(valRange.m_maxValue);
-                IntegerValue max = maxVal as IntegerValue;
-
-                if (min != null && max != null)
-                {
-                    if (min.Value > max.Value)
-                        throw new SemanticErrorException("Error in Line:" + root.Line + ", col:" + root.CharPositionInLine +
-                " . Lower range value(" + min.Value + ") is greater than upper range value(" + max.Value + ").");
-                }
-                else
-                    nNumberOfUnresolvedVarsInConstraints++;
-            }
-            else
-            {
-                if (min == null)
-                    nNumberOfUnresolvedVarsInConstraints++;
-            }
-        }
-
-        ConstraintsSet<Int64> Constraints_BuildSetFromConstraint(ITree root)
-        {
-            switch (root.Type)
-            {
-                case asn1Parser.VALUE_RANGE_EXPR:
-                    ValueRangeExpression valRange = ValueRangeExpression.CreateFromAntlrAst(root);
-                    Asn1Value minVal = FixVariable(valRange.m_minValue);
-                    IntegerValue min = minVal as IntegerValue;
-                    if (valRange.m_maxValue != null)
-                    {
-                        Asn1Value maxVal = FixVariable(valRange.m_maxValue);
-                        IntegerValue max = maxVal as IntegerValue;
-
-                        if (min != null && max != null)
-                            return new RangeValueSet<Int64>(min.Value, max.Value, valRange.m_minValIsIncluded, valRange.m_maxValIsIncluded);
-                    }
-                    else
-                    {
-                        if (min != null)
-                            return new SingleValueSet<Int64>(min.Value);
-                    }
-                    break;
-                case asn1Parser.UNION_SET:
-                    List<ConstraintsSet<Int64>> childSets = new List<ConstraintsSet<long>>();
-                    for (int i = 0; i < root.ChildCount; i++)
-                    {
-                        childSets.Add(Constraints_BuildSetFromConstraint(root.GetChild(i)));
-                    }
-                    return new UnionSet<Int64>(childSets);
-                case asn1Parser.UNION_SET_ALL_EXCEPT:
-                    return new AllExceptOfSet<Int64>(Constraints_BuildSetFromConstraint(root.GetChild(0)));
-                case asn1Parser.INTERSECTION_SET:
-                    childSets = new List<ConstraintsSet<long>>();
-                    for (int i = 0; i < root.ChildCount; i++)
-                    {
-                        childSets.Add(Constraints_BuildSetFromConstraint(root.GetChild(i)));
-                    }
-                    return new IntersectionSet<Int64>(childSets);
-                case asn1Parser.INTERSECTION_ELEMENT:
-                    if (root.ChildCount == 1)
-                        return Constraints_BuildSetFromConstraint(root.GetChild(0));
-                    return new Set1ExceptOfSet2Set<Int64>(Constraints_BuildSetFromConstraint(root.GetChild(0)),
-                                                          Constraints_BuildSetFromConstraint(root.GetChild(1)));
-                case asn1Parser.CONSTRAINT:
-                    return Constraints_BuildSetFromConstraint(root.GetChild(0));
-                default:
-                    throw new Exception("You missed: "+ root.Text);
-            }
-            return null;
-        }
-
-        public ConstraintsSet<Int64> m_AllowedValueSet;
     }
 
     public partial class ChoiceType : Asn1Type
@@ -1337,9 +1164,15 @@ namespace tinyAsn1
                 return ret;
 
             }
-            internal bool SemanticCheckFinished()
+
+            internal bool SemanticAnalysisFinished()
             {
-                return m_type.SemanticCheckFinished(); 
+                return m_type.SemanticAnalysisFinished();
+            }
+            
+            public void DoSemanticAnalysis()
+            {
+                m_type.DoSemanticAnalysis();
             }
 
         }
@@ -1421,19 +1254,26 @@ namespace tinyAsn1
                 }
             }
         }
-        internal override bool SemanticCheckFinished()
+
+
+        internal override bool SemanticAnalysisFinished()
         {
-            bool bFinished = true;
 
             foreach (Child ch in m_children.Values)
             {
-                if (!ch.SemanticCheckFinished())
-                    bFinished = false;
+                if (!ch.SemanticAnalysisFinished())
+                    return false;
             }
-            return bFinished;
+            return true;
         }
-        
-        internal override Asn1Value FixVariable(Asn1Value val)
+
+        public override void DoSemanticAnalysis()
+        {
+            foreach (Child ch in m_children.Values)
+                ch.DoSemanticAnalysis();
+        }
+
+        internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId = "";
             ChoiceValue sqVal = val as ChoiceValue;
@@ -1455,7 +1295,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.CHOICE:
-                                if (tmp.SemanticCheckFinished())
+                                if (tmp.IsResolved())
                                 {
                                     if (tmp.Type.GetFinalType() == this)
                                         return new ChoiceValue(tmp as ChoiceValue);
@@ -1518,28 +1358,29 @@ namespace tinyAsn1
                 
             }
 
-
-            
-            internal bool SemanticCheckFinished()
+            public bool SemanticAnalysisFinished()
             {
-                bool bFinished = m_type.SemanticCheckFinished();
-                if (!bFinished)
-                    return false;
+                if (m_defaultValue == null)
+                    return m_type.SemanticAnalysisFinished();
+
+                return m_type.SemanticAnalysisFinished() && m_defaultValue.IsResolved();
+
+            }
+
+            public void DoSemanticAnalysis()
+            {
+                if (SemanticAnalysisFinished())
+                    return;
+
+                m_type.DoSemanticAnalysis();
 
                 if (m_defaultValue != null)
                 {
-                    if (m_defaultValue.m_TypeID == Asn1Value.TypeID.UNRESOLVED)
-                    {
-                        m_defaultValue = m_type.FixVariable(m_defaultValue);
-                        if (m_defaultValue.m_TypeID == Asn1Value.TypeID.UNRESOLVED)
-                            return false;
-                    }
+                    if (!m_defaultValue.IsResolved())
+                        m_defaultValue = m_type.ResolveVariable(m_defaultValue);
 
                 }
-
-                return true;
             }
-
         }
 
         static public SequenceOrSetType CreateFromAntlrAst(SequenceOrSetType ret, ITree tree)
@@ -1626,19 +1467,27 @@ namespace tinyAsn1
         }
 
 
-        internal override bool SemanticCheckFinished()
+        internal override bool SemanticAnalysisFinished()
         {
-            bool bFinished = true;
-            
             foreach (Child ch in m_children.Values)
             {
-                if (!ch.SemanticCheckFinished())
-                    bFinished = false;
+                if (!ch.SemanticAnalysisFinished())
+                    return false;
             }
-            return bFinished;
+            return true;
+        }
+        public override void DoSemanticAnalysis()
+        {
+            if (SemanticAnalysisFinished())
+                return;
+
+            foreach (Child ch in m_children.Values)
+            {
+                ch.DoSemanticAnalysis();
+            }
         }
         
-        internal override Asn1Value FixVariable(Asn1Value val)
+        internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId="";
             SequenceOrSetValue sqVal = val as SequenceOrSetValue;
@@ -1664,7 +1513,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.SEQUENCE_OR_SET:
-                                if (tmp.SemanticCheckFinished())
+                                if (tmp.IsResolved())
                                 {
                                     if (tmp.Type.GetFinalType() == this)
                                         return new SequenceOrSetValue(tmp as SequenceOrSetValue);
@@ -1739,14 +1588,21 @@ namespace tinyAsn1
 
             return ret;
         }
-        internal override bool SemanticCheckFinished()
+
+        internal override bool SemanticAnalysisFinished()
         {
-            return m_type.SemanticCheckFinished();   
+            return m_type.SemanticAnalysisFinished();
         }
 
+        public override void DoSemanticAnalysis()
+        {
+            if (SemanticAnalysisFinished())
+                return;
+            m_type.DoSemanticAnalysis();
+        }
+        
 
-
-        internal override Asn1Value FixVariable(Asn1Value val)
+        internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId = "";
             SequenceOfValue sqVal = val as SequenceOfValue;
@@ -1769,7 +1625,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.SEQUENCE_OF:
-                                if (tmp.SemanticCheckFinished())
+                                if (tmp.IsResolved())
                                 {
                                     if (tmp.Type.GetFinalType() == this)
                                         return new SequenceOfValue(tmp as SequenceOfValue);
@@ -1823,12 +1679,18 @@ namespace tinyAsn1
 
             return ret;
         }
-        internal override bool SemanticCheckFinished()
+        internal override bool SemanticAnalysisFinished()
         {
-            return m_type.SemanticCheckFinished();
+            return m_type.SemanticAnalysisFinished();
         }
-        
-        internal override Asn1Value FixVariable(Asn1Value val)
+
+        public override void DoSemanticAnalysis()
+        {
+            if (SemanticAnalysisFinished())
+                return;
+            m_type.DoSemanticAnalysis();
+        }
+        internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId = "";
             SetOfValue sqVal = val as SetOfValue;
@@ -1851,7 +1713,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.SET_OF:
-                                if (tmp.SemanticCheckFinished())
+                                if (tmp.IsResolved())
                                 {
                                     if (tmp.Type.GetFinalType() == this)
                                         return new SetOfValue(tmp as SetOfValue);
@@ -1881,7 +1743,7 @@ namespace tinyAsn1
         {
             return new ObjectIdentifier();
         }
-        internal override Asn1Value FixVariable(Asn1Value val)
+        internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId = "";
             ObjectIdentifierValue obVal = val as ObjectIdentifierValue;
@@ -1903,7 +1765,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.OBJECT_IDENTIFIER:
-                                if (tmp.SemanticCheckFinished())
+                                if (tmp.IsResolved())
                                 {
                                     if (tmp.Type.GetFinalType() == this)
                                         return new ObjectIdentifierValue(tmp as ObjectIdentifierValue);
@@ -1924,31 +1786,13 @@ namespace tinyAsn1
                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting OBJECT IDENTIFIER variable");
             }
         }
-    }
-
-
-    public partial class ReferenceType : Asn1Type
-    {
-        static public new ReferenceType CreateFromAntlrAst(ITree tree)
+        internal override bool SemanticAnalysisFinished()
         {
-            ReferenceType ret = new ReferenceType();
-            if (tree.ChildCount == 1)
-                ret.m_referencedTypeName = tree.GetChild(0).Text;
-            else if (tree.ChildCount == 2)
-            {
-                ret.m_referencedModName = tree.GetChild(0).Text;
-                ret.m_referencedTypeName = tree.GetChild(1).Text;
-            }
-            else
-                throw new Exception("Incorrect parse tree!");
-            return ret;
+            return true;
         }
-
-        internal override Asn1Value FixVariable(Asn1Value val)
+        public override void DoSemanticAnalysis()
         {
-            return Type.FixVariable(val);
         }
-
     }
 
 

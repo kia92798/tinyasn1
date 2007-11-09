@@ -75,8 +75,8 @@ namespace tinyAsn1
 
         public void OnBeforeTypeAssigment(Asn1File asn1File, Module mod, TypeAssigment tas)
         {
-            tas.m_type.SemanticCheckFinished();
-            //    bFinished = false;
+            if (!tas.m_type.SemanticAnalysisFinished())
+                tas.m_type.DoSemanticAnalysis();
 
            
         }
@@ -92,7 +92,6 @@ namespace tinyAsn1
 
         public void OnBitStringType(Asn1File asn1File, Module mod, BitStringType bsType, TypeAssigment tas)
         {
-//            bFinished = bsType.SemanticCheck();
         }
 
         public void OnBooleanType(Asn1File asn1File, Module mod, BooleanType boolType, TypeAssigment tas)
@@ -107,12 +106,10 @@ namespace tinyAsn1
 
         public void OnEnumeratedType(Asn1File asn1File, Module mod, EnumeratedType enumType, TypeAssigment tas)
         {
-//               bFinished = enumType.SemanticCheck();
         }
 
         public void OnIntegerType(Asn1File asn1File, Module mod, IntegerType intType, TypeAssigment tas)
         {
-//               bFinished = intType.SemanticCheck();
         }
 
         public void OnChoiceType(Asn1File asn1File, Module mod, ChoiceType choiceType, TypeAssigment tas)
@@ -154,11 +151,9 @@ namespace tinyAsn1
 
         public void OnValueAssigment(Asn1File asn1File, Module mod, ValueAssigment vas)
         {
-            if (!vas.m_value.SemanticCheckFinished())
+            if (!vas.m_value.IsResolved())
             {
-                vas.m_value = vas.m_type.FixVariable(vas.m_value);
-                //if (!vas.m_value.SemanticCheckFinished())
-                //    bFinished = false;
+                vas.m_value = vas.m_type.ResolveVariable(vas.m_value);
             }
         }
 

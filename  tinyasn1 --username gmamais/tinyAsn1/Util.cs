@@ -162,4 +162,43 @@ namespace tinyAsn1
         }
     }
 
+    public static class Config
+    {
+        private static int m_integerSize = 4;
+        public static int IntegerSize { get { return m_integerSize; } }
+        public static Int64 MAXINT
+        {
+            get
+            {
+                if (IntegerSize == 2)
+                    return Int16.MaxValue;
+                if (IntegerSize == 4)
+                    return Int32.MaxValue;
+                if (IntegerSize == 8)
+                    return Int64.MaxValue;
+                throw new SemanticErrorException("Error Setting in configuration file. IntegerSize must be 2 or 4 or 8");
+            }
+        }
+        public static Int64 MININT
+        {
+            get
+            {
+                if (IntegerSize == 2)
+                    return Int16.MinValue;
+                if (IntegerSize == 4)
+                    return Int32.MinValue;
+                if (IntegerSize == 8)
+                    return Int64.MinValue;
+                throw new SemanticErrorException("Error Setting in configuration file. IntegerSize must be 2 or 4 or 8");
+            }
+        }
+
+        public static void ExportDefaultSettingToFile(string fileName)
+        {
+        }
+        public static void ReadSettingsFromFile(string fileName)
+        {
+        }
+    }
+
 }

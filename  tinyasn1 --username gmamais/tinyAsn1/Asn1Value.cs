@@ -6,7 +6,19 @@ using Antlr.Runtime.Tree;
 namespace tinyAsn1
 {
     /* ************ VALUES ***********************/
-    public partial class Asn1Value
+
+    public interface ISize
+    {
+        Int64 Size { get;}
+    }
+
+    public interface ICharacterString
+    {
+        string Value { get;}
+    }
+
+
+    public partial class Asn1Value : IComparable
     {
         internal ITree antlrNode;
         //m_module is the module where the variable is declared where it can be different to the module of the type
@@ -56,11 +68,22 @@ namespace tinyAsn1
             throw new Exception("Internal Error: Value is undifined type");
         }
 
-        public virtual bool SemanticCheckFinished()
+        public virtual bool IsResolved()
         {
             return m_TypeID != TypeID.UNRESOLVED;
         }
+
+        #region IComparable Members
+
+        public virtual int CompareTo(object obj)
+        {
+            throw new Exception("Internal Error: Abstract Method Called.");
+        }
+
+        #endregion
+
     }
+    
 
     public partial class IntegerValue : Asn1Value
     {
@@ -86,12 +109,6 @@ namespace tinyAsn1
                         m_value = -Int64.Parse(antlrNode.GetChild(0).Text);
                     else
                         throw new SemanticErrorException("Error in line : " + antlrNode.Line + " Expecting integer or integer variable");
-                    break;
-                case asn1Parser.MIN:
-                    m_value = Int64.MinValue;
-                    break;
-                case asn1Parser.MAX:
-                    m_value = Int64.MaxValue;
                     break;
                 default:
                     throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Expecting integer or integer variable");
@@ -131,6 +148,14 @@ namespace tinyAsn1
         {
             return m_value.GetHashCode();
         }
+        public override int CompareTo(object obj)
+        {
+            IntegerValue oth = obj as IntegerValue;
+            if (oth == null)
+                throw new ArgumentException("obj is not an IntegerValue");
+            return Value.CompareTo(oth.Value);
+        }
+
     }
 
     public partial class EnumeratedValue : Asn1Value
@@ -184,7 +209,7 @@ namespace tinyAsn1
         }
     }
 
-    public partial class BitStringValue : Asn1Value
+    public partial class BitStringValue : Asn1Value, ISize
     {
         static Dictionary<char, string> lookup = new Dictionary<char, string>();
         static BitStringValue()
@@ -284,6 +309,13 @@ namespace tinyAsn1
             return m_value.GetHashCode();
         }
 
+
+
+        public long Size
+        {
+            get { return m_value.Length; }
+        }
+
     }
 
     public partial class RealValue : Asn1Value
@@ -361,9 +393,17 @@ namespace tinyAsn1
         {
             return m_value.GetHashCode();
         }
+        public override int CompareTo(object obj)
+        {
+            RealValue oth = obj as RealValue;
+            if (oth == null)
+                throw new ArgumentException("obj is not an IntegerValue");
+            return Value.CompareTo(oth.Value);
+        }
+        
     }
 
-    public partial class OctectStringValue : Asn1Value
+    public partial class OctectStringValue : Asn1Value, ISize
     {
         static Dictionary<string, byte> lookup = new Dictionary<string, byte>();
         static OctectStringValue()
@@ -459,9 +499,16 @@ namespace tinyAsn1
         {
             return m_value.GetHashCode();
         }
+
+
+        public long Size
+        {
+            get { return Value.Count; }
+        }
+
     }
 
-    public partial class IA5StringValue : Asn1Value
+    public partial class IA5StringValue : Asn1Value, ISize, ICharacterString
     {
         string m_value;
         public string Value
@@ -517,6 +564,13 @@ namespace tinyAsn1
         {
             return m_value.GetHashCode();
         }
+
+
+        public long Size
+        {
+            get { return Value.Length; }
+        }
+
     }
 
     public partial class NumericStringValue : IA5StringValue
@@ -651,19 +705,19 @@ namespace tinyAsn1
             if (!ChoiceType.m_children.ContainsKey(m_alternativeName))
                 throw new SemanticErrorException("Error in line :" + antlrNode.Line + ". '" + m_alternativeName + "' is not a member of the choice");
         }
-        public override bool SemanticCheckFinished()
+        public override bool IsResolved()
         {
-            return m_value.SemanticCheckFinished();
+            return m_value.IsResolved();
         }
 
 
         internal void FixChildrenVars()
         {
-            if (SemanticCheckFinished())
+            if (IsResolved())
                 return;
 
             Asn1Type childType = ChoiceType.m_children[m_alternativeName].m_type;
-            m_value = childType.FixVariable(m_value);
+            m_value = childType.ResolveVariable(m_value);
         }
 
         public override string ToString()
@@ -697,10 +751,10 @@ namespace tinyAsn1
             }
         }
 
-        public override bool SemanticCheckFinished()
+        public override bool IsResolved()
         {
             foreach (Asn1Value v in m_children.Values)
-                if (!v.SemanticCheckFinished())
+                if (!v.IsResolved())
                     return false;
             
             return true;
@@ -810,11 +864,11 @@ namespace tinyAsn1
             foreach (string id in m_children.Keys)
             {
                 Asn1Value childVal = m_children[id];
-                if (childVal.SemanticCheckFinished())
+                if (childVal.IsResolved())
                     continue;
                 
                 Asn1Type childType = Type2.m_children[id].m_type;
-                m_children[id] = childType.FixVariable(childVal);
+                m_children[id] = childType.ResolveVariable(childVal);
             }
         }
 
@@ -863,7 +917,7 @@ namespace tinyAsn1
         }
     }
 
-    public partial class SequenceOfValue : Asn1Value
+    public partial class SequenceOfValue : Asn1Value, ISize
     {
         public List<Asn1Value> m_children = new List<Asn1Value>();
         public SequenceOfType Type2
@@ -874,10 +928,10 @@ namespace tinyAsn1
             }
         }
 
-        public override bool SemanticCheckFinished()
+        public override bool IsResolved()
         {
             foreach (Asn1Value v in m_children)
-                if (!v.SemanticCheckFinished())
+                if (!v.IsResolved())
                     return false;
             
             return true;
@@ -897,11 +951,11 @@ namespace tinyAsn1
             for (int i = 0; i < m_children.Count;i++ )
             {
                 Asn1Value childVal = m_children[i];
-                if (childVal.SemanticCheckFinished())
+                if (childVal.IsResolved())
                     continue;
 
                 Asn1Type childType = Type2.m_type;
-                m_children[i] = childType.FixVariable(childVal);
+                m_children[i] = childType.ResolveVariable(childVal);
             }
         }
 
@@ -990,9 +1044,18 @@ namespace tinyAsn1
             return m_children.GetHashCode();
         }
 
+
+        
+
+        public long Size
+        {
+            get { return m_children.Count; }
+        }
+
+        
     }
 
-    public partial class SetOfValue : Asn1Value
+    public partial class SetOfValue : Asn1Value, ISize
     {
         public List<Asn1Value> m_children = new List<Asn1Value>();
         public SetOfType Type2
@@ -1003,10 +1066,10 @@ namespace tinyAsn1
             }
         }
 
-        public override bool SemanticCheckFinished()
+        public override bool IsResolved()
         {
             foreach (Asn1Value v in m_children)
-                if (!v.SemanticCheckFinished())
+                if (!v.IsResolved())
                     return false;
 
             return true;
@@ -1026,11 +1089,11 @@ namespace tinyAsn1
             for (int i = 0; i < m_children.Count; i++)
             {
                 Asn1Value childVal = m_children[i];
-                if (childVal.SemanticCheckFinished())
+                if (childVal.IsResolved())
                     continue;
 
                 Asn1Type childType = Type2.m_type;
-                m_children[i] = childType.FixVariable(childVal);
+                m_children[i] = childType.ResolveVariable(childVal);
             }
 
             //check if a value exists twice in the set
@@ -1132,6 +1195,10 @@ namespace tinyAsn1
             return m_children.GetHashCode();
         }
 
+        public long Size
+        {
+            get { return m_children.Count; }
+        }
     }
     
     public partial class ObjectIdentifierValue : Asn1Value
@@ -1279,7 +1346,7 @@ namespace tinyAsn1
                     if (Index == 0)
                     {
                         ObjectIdentifierValue obj = val as ObjectIdentifierValue;
-                        if (!obj.SemanticCheckFinished())
+                        if (!obj.IsResolved())
                             return null; //wait until resolved
                         return obj.m_components;
                     } else
@@ -1380,7 +1447,7 @@ namespace tinyAsn1
                     if (Index == 0)
                     {
                         ObjectIdentifierValue obj = val as ObjectIdentifierValue;
-                        if (!obj.SemanticCheckFinished())
+                        if (!obj.IsResolved())
                             return null; //wait until resolved
                         return obj.m_components;
                     }
@@ -1535,7 +1602,7 @@ namespace tinyAsn1
 
         }
 
-        public override bool SemanticCheckFinished()
+        public override bool IsResolved()
         {
             foreach (ObjectIdentifierComponent cm in m_components)
                 if (!cm.SemanticCheckFinished())
