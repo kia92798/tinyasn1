@@ -397,8 +397,6 @@ value	:
 	|	val=valuereference										->^(VALUE_REFERENCE $val)
 	|	(s='+'|s='-')? intPart=INT ('.' decPart=INT?)? 					->^(NUMERIC_VALUE $intPart $s? $decPart?)
 //	|	('+'|'-')? INT ('.' INT?)? ( ('E'|'e') ('+'|'-')? INT)?
-	|	MIN
-	|	MAX
 	| L_BRACKET objectIdentifierValue R_BRACKET		->objectIdentifierValue
 	|   choiceValue
 	| L_BRACKET namedValueList R_BRACKET 				->namedValueList
@@ -505,9 +503,19 @@ constraintExpression
 	;	
 	
 valueRangeExpression
-	: minVal=value ( (minIncl='<')? '..' (maxIncl='<')? maxVal=value)?			
+	: minVal=lowerEndValue ( (minIncl='<')? '..' (maxIncl='<')? maxVal=upperEndValue)?			
 		-> ^(VALUE_RANGE_EXPR $minVal ^(MAX_VAL_PRESENT $maxVal)? ^(MIN_VAL_INCLUDED $minIncl)? ^(MAX_VAL_INCLUDED $maxIncl)? )
 	;
+
+lowerEndValue
+	:	value
+	| MIN
+	;
+
+upperEndValue 
+	:	value
+	| MAX
+	;		
 
 
 subtypeExpression: bInlc=INCLUDES? type		-> ^(SUBTYPE_EXPR type $bInlc?)

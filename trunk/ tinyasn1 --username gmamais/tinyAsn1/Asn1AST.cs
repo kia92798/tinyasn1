@@ -244,7 +244,7 @@ namespace tinyAsn1
         }
 
         public Tag m_tag;
-        public List<Constraint> m_constraints = new List<Constraint>();
+//        public List<Constraint> m_constraints = new List<Constraint>();
         
         public List<ITree> m_AntlrConstraints = new List<ITree>();
 
@@ -477,48 +477,6 @@ namespace tinyAsn1
         public string m_referencedTypeName="";
         public string m_referencedModName = "";
 
-        public Asn1Type Type
-        {
-            get
-            {
-                Asn1Type ret = this;
-
-                while (ret is ReferenceType)
-                {
-                    if (((ReferenceType)ret).m_referencedModName != "")
-                    {
-//                        throw new Exception("Type references to external modules are not implemented (yet) ...");
-                        if (!Asn1CompilerInvokation.Instance.isModuleDefined(((ReferenceType)ret).m_referencedModName))
-                            throw new SemanticErrorException("Error: No module is defined with name '" + ((ReferenceType)ret).m_referencedModName+"'. Line: "+ret.antlrNode.Line);
-                        Module otherModule = Asn1CompilerInvokation.Instance.GetModuleByName(((ReferenceType)ret).m_referencedModName);
-                        ret = otherModule.GetTypeByName(((ReferenceType)ret).m_referencedModName);
-                    }
-                    if (ret.m_module.m_typeAssigments.ContainsKey(((ReferenceType)ret).m_referencedTypeName))
-                        ret = ret.m_module.m_typeAssigments[((ReferenceType)ret).m_referencedTypeName].m_type;
-                    else
-                    {
-                        if (!ret.m_module.isTypeDeclared(((ReferenceType)ret).m_referencedTypeName))
-                            throw new SemanticErrorException("Error: referenced type with name '" + ((ReferenceType)ret).m_referencedTypeName+"' is not define. Line: "+ret.antlrNode.Line);
-                        ret = ret.m_module.GetTypeByName(((ReferenceType)ret).m_referencedTypeName);
-                    }
-                }
-                return ret;
-            }
-        }
-        public override Asn1Type GetFinalType()
-        {
-            return Type;
-        }
-
-        public override string Name
-        {
-            get {
-                if (m_referencedModName == "")
-                    return m_referencedTypeName;
-                else
-                    return m_referencedModName + "." + m_referencedTypeName;
-            }
-        }
     }
 
 
