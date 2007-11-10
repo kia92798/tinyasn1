@@ -480,11 +480,6 @@ namespace tinyAsn1
             throw new Exception("Internal Error: abstract function call");
         }
 
-        public virtual object ResolveConstaint(ITree constraint)
-        {
-            return null;
-        }
-
         /*
          * This method does not change the state of the object
          * Returns TRUE if SemanticCheck has finished
@@ -510,6 +505,113 @@ namespace tinyAsn1
         {
             throw new Exception("Abstact method called: Asn1Type::DoSemanticAnalysis()");
         }
+
+        /// <summary>
+        /// For non reference types e.g. INTEGER, REAL ect it will return the default
+        /// set of allowed values. E.g. for integers this set is (Config.MININT .. Config.MAXINT)
+        /// For a reference type e.g. A::=B, it will return B.Constraint
+        /// </summary>
+        public virtual IConstraint ParentConstraint
+        {
+            get
+            {
+                throw new Exception("Abstact method called: Asn1Type::ParentConstraint");
+            }
+        }
+
+        /// <summary>
+        /// This property returns the constraint associated with the type. 
+        /// If type has more than one constraint, it return the intersection of 
+        /// these constraints
+        /// This property should never return NULL
+        /// 
+        /// </summary>
+        /// 
+        IConstraint m_oneConstraint;
+        public virtual IConstraint Constraint
+        {
+            get
+            {
+                if (!AreConstraintsResolved())
+                    throw new Exception("INTERNAL ERROR");
+                if (m_constraints.Count == 1)
+                    m_oneConstraint = m_constraints[0];
+                else
+                    m_oneConstraint = new AndConstraint(this, ParentConstraint, m_constraints);
+                return m_oneConstraint;
+            }
+        }
+
+        protected List<IConstraint> m_constraints = new List<IConstraint>();
+        
+        /// <summary>
+        /// This method resolves all constraints associated with this type. 
+        /// The method must be called only after the type has been resolved
+        /// This method must be overrider by types that contain other types (e.g. SEQUENCE, 
+        /// CHOICE etc) and for ReferenceType
+        /// </summary>
+        public virtual void ResolveConstraints()
+        {
+            if (AreConstraintsResolved())
+                return;
+            
+            if (m_AntlrConstraints.Count == 0) // I have no constraints, so I must inlude the allow all constraint
+            {
+                if (!ParentConstraint.IsResolved() || !ParentConstraint.AllowsEverything())
+                    throw new Exception("INERNAL ERROR");
+                m_constraints.Add(ParentConstraint); 
+                return;
+            }
+
+            if (m_constraints.Count == 0)
+            {
+                foreach (ITree tree in m_AntlrConstraints)
+                {
+                    checkConstraintsSemantically(tree);
+                    m_constraints.Add(RootConstraint.Create(tree, this, ParentConstraint));
+                }
+            }
+
+            foreach (IConstraint cn in m_constraints)
+                cn.DoSemanticAnalysis();
+            
+            if (AreConstraintsResolved())       //constraints have just been resolved so let's simplify them
+            {
+                for (int i = 0; i < m_constraints.Count; i++)
+                {
+                    m_constraints[i] = m_constraints[i].Simplify();
+                }
+            }
+        }
+
+        /// <summary>
+        /// This method must check weather the constraints are Semantically OK. It actually checks if e.g. under an
+        /// Integer SIZE or FROM or pattern constraints are NOT allowed
+        /// </summary>
+
+        public virtual void checkConstraintsSemantically(ITree antrlConstraint)
+        {
+            throw new Exception("Abstact method called: Asn1Type::DoSemanticAnalysis()");
+        }
+
+
+        /// <summary>
+        /// This method resolves all constraints associated with this type. 
+        /// The method must be called only after the type has been resolved
+        /// This method must be overrider by types that contain other types (e.g. SEQUENCE, CHOICE etc)
+        /// </summary>
+        public virtual bool AreConstraintsResolved() 
+        {
+            if (m_AntlrConstraints.Count > m_constraints.Count)
+                return false;
+            if (m_AntlrConstraints.Count == 0 && m_constraints.Count == 0) // no antlr constraint and allow all constraint has not yet be added
+                return false;
+            foreach (IConstraint cn in m_constraints)
+                if (!cn.IsResolved())
+                    return false;
+            return true;
+        }
+
     }
 
     public partial class NumberedItem

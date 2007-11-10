@@ -45,6 +45,9 @@ namespace tinyAsn1
         {
             SemanticParser sp = new SemanticParser(this);
             Visit(sp);
+
+            SemanticParserConstraints spcon = new SemanticParserConstraints(this);
+            Visit(spcon);
         }
         public void debug()
         {

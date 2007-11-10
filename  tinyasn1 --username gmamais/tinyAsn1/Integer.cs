@@ -81,8 +81,8 @@ namespace tinyAsn1
         {
             if (m_privNamedValues.Count > 0)
                 return false;
-            if (nNumberOfUnresolvedVarsInConstraints > 0)
-                return false;
+            //if (nNumberOfUnresolvedVarsInConstraints > 0)
+            //    return false;
             return true;
         }
 
@@ -127,122 +127,31 @@ namespace tinyAsn1
             foreach (NumberedItem ni in toBeRemoved)
                 m_privNamedValues.Remove(ni);
 
-            SemanticCheckConstraints();
+//            SemanticCheckConstraints();
         }
 
-        int nNumberOfUnresolvedVarsInConstraints = 0;
-        void SemanticCheckConstraints()
+        public override IConstraint ParentConstraint
         {
-            nNumberOfUnresolvedVarsInConstraints = 0;
+            get
+            {
+                return DefaultIntegerConstraint.Instance;
+            }
+        }
+
+        public override void checkConstraintsSemantically(ITree antrlConstraint)
+        {
             AntlrTreeVisitor visit = new AntlrTreeVisitor();
             int[] AllowedTokes = { asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
                 asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
                 asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR};
             int[] StopList = { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR };
 
-            //1. check that only single value, range and type constraints exist
-            foreach (ITree cons in m_AntlrConstraints)
-                visit.visitIfNot(cons, AllowedTokes, ConstraintCheck_InvalidConstraint, StopList);
-            //2. Check Single Value & Value Range
-            foreach (ITree cons in m_AntlrConstraints)
-                visit.visit(cons, asn1Parser.VALUE_RANGE_EXPR, ConstraintCheck_CheckValue);
-
-            //3. build set with allowed values
-            if (nNumberOfUnresolvedVarsInConstraints == 0)
-            {
-                foreach (ITree cons in m_AntlrConstraints)
-                {
-                    m_AllowedValueSet = Constraints_BuildSetFromConstraint(cons);
-                    if (m_AllowedValueSet != null)
-                        m_AllowedValueSet = m_AllowedValueSet.Simplify();
-                }
-            }
+            visit.visitIfNot(antrlConstraint, AllowedTokes, delegate(ITree root) {
+                throw new SemanticErrorException("Error in Line:" + root.Line + ", col:" + root.CharPositionInLine +
+                    " . This type of constraint '" + root.Text + "'cannot appear under " + Name);
+                }, 
+                StopList);
         }
-
-        void ConstraintCheck_InvalidConstraint(ITree root)
-        {
-            throw new SemanticErrorException("Error in Line:" + root.Line + ", col:" + root.CharPositionInLine +
-                " . This type of constraint '" + root.Text + "'cannot appear under " + Name);
-        }
-
-        void ConstraintCheck_CheckValue(ITree root)
-        {
-            ValueRangeExpression valRange = ValueRangeExpression.CreateFromAntlrAst(root);
-            Asn1Value minVal = ResolveVariable(valRange.m_minValue);
-            IntegerValue min = minVal as IntegerValue;
-            if (valRange.m_maxValue != null)
-            {
-                Asn1Value maxVal = ResolveVariable(valRange.m_maxValue);
-                IntegerValue max = maxVal as IntegerValue;
-
-                if (min != null && max != null)
-                {
-                    if (min.Value > max.Value)
-                        throw new SemanticErrorException("Error in Line:" + root.Line + ", col:" + root.CharPositionInLine +
-                " . Lower range value(" + min.Value + ") is greater than upper range value(" + max.Value + ").");
-                }
-                else
-                    nNumberOfUnresolvedVarsInConstraints++;
-            }
-            else
-            {
-                if (min == null)
-                    nNumberOfUnresolvedVarsInConstraints++;
-            }
-        }
-
-        ConstraintsSet<Int64> Constraints_BuildSetFromConstraint(ITree root)
-        {
-            switch (root.Type)
-            {
-                case asn1Parser.VALUE_RANGE_EXPR:
-                    ValueRangeExpression valRange = ValueRangeExpression.CreateFromAntlrAst(root);
-                    Asn1Value minVal = ResolveVariable(valRange.m_minValue);
-                    IntegerValue min = minVal as IntegerValue;
-                    if (valRange.m_maxValue != null)
-                    {
-                        Asn1Value maxVal = ResolveVariable(valRange.m_maxValue);
-                        IntegerValue max = maxVal as IntegerValue;
-
-                        if (min != null && max != null)
-                            return new RangeValueSet<Int64>(min.Value, max.Value, valRange.m_minValIsIncluded, valRange.m_maxValIsIncluded);
-                    }
-                    else
-                    {
-                        if (min != null)
-                            return new SingleValueSet<Int64>(min.Value);
-                    }
-                    break;
-                case asn1Parser.UNION_SET:
-                    List<ConstraintsSet<Int64>> childSets = new List<ConstraintsSet<long>>();
-                    for (int i = 0; i < root.ChildCount; i++)
-                    {
-                        childSets.Add(Constraints_BuildSetFromConstraint(root.GetChild(i)));
-                    }
-                    return new UnionSet<Int64>(childSets);
-                case asn1Parser.UNION_SET_ALL_EXCEPT:
-                    return new AllExceptOfSet<Int64>(Constraints_BuildSetFromConstraint(root.GetChild(0)));
-                case asn1Parser.INTERSECTION_SET:
-                    childSets = new List<ConstraintsSet<long>>();
-                    for (int i = 0; i < root.ChildCount; i++)
-                    {
-                        childSets.Add(Constraints_BuildSetFromConstraint(root.GetChild(i)));
-                    }
-                    return new IntersectionSet<Int64>(childSets);
-                case asn1Parser.INTERSECTION_ELEMENT:
-                    if (root.ChildCount == 1)
-                        return Constraints_BuildSetFromConstraint(root.GetChild(0));
-                    return new Set1ExceptOfSet2Set<Int64>(Constraints_BuildSetFromConstraint(root.GetChild(0)),
-                                                          Constraints_BuildSetFromConstraint(root.GetChild(1)));
-                case asn1Parser.CONSTRAINT:
-                    return Constraints_BuildSetFromConstraint(root.GetChild(0));
-                default:
-                    throw new Exception("You missed: " + root.Text);
-            }
-            return null;
-        }
-
-        public ConstraintsSet<Int64> m_AllowedValueSet;
     }
 
 
@@ -268,7 +177,15 @@ namespace tinyAsn1
         {
             return Type.ResolveVariable(val);
         }
- 
+
+        /// <summary>
+        /// Returns the final type. Example
+        /// A ::=INTEGER
+        /// B ::= A
+        /// C ::= B
+        /// 
+        /// if we call this property for type C this it will return INTEGER (Nor B )
+        /// </summary>
         public Asn1Type Type
         {
             get
@@ -283,7 +200,7 @@ namespace tinyAsn1
                         if (!Asn1CompilerInvokation.Instance.isModuleDefined(((ReferenceType)ret).m_referencedModName))
                             throw new SemanticErrorException("Error: No module is defined with name '" + ((ReferenceType)ret).m_referencedModName + "'. Line: " + ret.antlrNode.Line);
                         Module otherModule = Asn1CompilerInvokation.Instance.GetModuleByName(((ReferenceType)ret).m_referencedModName);
-                        ret = otherModule.GetTypeByName(((ReferenceType)ret).m_referencedModName);
+                        ret = otherModule.GetTypeByName(((ReferenceType)ret).m_referencedTypeName);
                     }
                     if (ret.m_module.m_typeAssigments.ContainsKey(((ReferenceType)ret).m_referencedTypeName))
                         ret = ret.m_module.m_typeAssigments[((ReferenceType)ret).m_referencedTypeName].m_type;
@@ -303,6 +220,25 @@ namespace tinyAsn1
             return Type;
         }
 
+
+        public Asn1Type ParentType
+        {
+            get
+            {
+                if (m_referencedModName != "")
+                {
+                    //                        throw new Exception("Type references to external modules are not implemented (yet) ...");
+                    if (!Asn1CompilerInvokation.Instance.isModuleDefined(m_referencedModName))
+                        throw new SemanticErrorException("Error: No module is defined with name '" + m_referencedModName + "'. Line: " + antlrNode.Line);
+                    Module otherModule = Asn1CompilerInvokation.Instance.GetModuleByName(m_referencedModName);
+                    return otherModule.GetTypeByName(m_referencedTypeName);
+                }
+                return m_module.GetTypeByName(m_referencedTypeName);
+            }
+        }
+
+
+
         public override string Name
         {
             get
@@ -318,11 +254,68 @@ namespace tinyAsn1
         {
             return true;
         }
+        
         public override void DoSemanticAnalysis()
         {
-
         }
 
+        public override IConstraint ParentConstraint
+        {
+            get
+            {
+                return ParentType.Constraint;
+            }
+        }
+
+        public override void ResolveConstraints()
+        {
+            if (AreConstraintsResolved())
+                return;
+
+            if (!ParentType.AreConstraintsResolved())
+                return;
+
+            m_constraints.Add(ParentConstraint);
+
+            if (m_constraints.Count == 1)
+            {
+                foreach (ITree tree in m_AntlrConstraints)
+                {
+                    checkConstraintsSemantically(tree);
+                    m_constraints.Add(RootConstraint.Create(tree, this, ParentConstraint));
+                }
+            }
+
+            foreach (IConstraint cn in m_constraints)
+                cn.DoSemanticAnalysis();
+
+            if (AreConstraintsResolved())       //constraints have just been resolved so let's simplify them
+            {
+                for (int i = 0; i < m_constraints.Count; i++)
+                {
+                    m_constraints[i] = m_constraints[i].Simplify();
+                }
+            }
+        }
+        
+        public override bool AreConstraintsResolved()
+        {
+            if (!ParentType.AreConstraintsResolved())
+                return false;
+            if (m_AntlrConstraints.Count > m_constraints.Count)
+                return false;
+            if (m_AntlrConstraints.Count == 0 && m_constraints.Count == 0) // no antlr constraint and ParentType's constraint have not been added yet
+                return false;
+            foreach (IConstraint cn in m_constraints)
+                if (!cn.IsResolved())
+                    return false;
+            return true;
+        }
+        
+        public override void checkConstraintsSemantically(ITree antrlConstraint)
+        {
+            Type.checkConstraintsSemantically(antrlConstraint);
+        }
     }
 
 

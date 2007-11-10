@@ -65,6 +65,7 @@ namespace tinyAsn1
         Asn1Value MAX {get;} //applicable only for Integers & Reals & ?Strings
         bool IsResolved();
         void DoSemanticAnalysis();
+        bool AllowsEverything();
     }
 
     public class BaseConstraint : IConstraint
@@ -77,6 +78,8 @@ namespace tinyAsn1
         {
             throw new Exception("Abstract method called");
         }
+
+
 
         public virtual IConstraint Simplify()
         {
@@ -120,7 +123,7 @@ namespace tinyAsn1
                 case asn1Parser.UNION_SET_ALL_EXCEPT:
                     return CreateUnionSet(tree, type, parentTypeConstraint);
                 default:
-                    throw new Exception("Internal Error");
+                    throw new Exception("Internal Error: unexpectected token: " + tree.Text);
             }
         }
 
@@ -143,7 +146,11 @@ namespace tinyAsn1
                 throw new Exception("Internal Error");
             if (iTree.ChildCount == 2)
                 return ExceptConstraint.Create(iTree, type, parentTypeConstraint);
-            return BaseConstraint.CreateConstraintExpression(iTree, type, parentTypeConstraint);
+            return BaseConstraint.CreateConstraintExpression(iTree.GetChild(0), type, parentTypeConstraint);
+        }
+        public virtual bool AllowsEverything() 
+        {
+            return false;
         }
     }
 
@@ -196,6 +203,15 @@ namespace tinyAsn1
         public override IConstraint Simplify()
         {
             return this;
+        }
+        public override bool AllowsEverything()
+        {
+            return true;
+        }
+
+        public override string ToString()
+        {
+            return "";
         }
     }
 
@@ -276,6 +292,15 @@ namespace tinyAsn1
             m_extConstr.Simplify();
             return this;
         }
+        public override string ToString()
+        {
+            string ret = "";
+            ret = "(" + m_constr.ToString();
+            if (m_extConstr != null)
+                ret += ",...," + m_extConstr.ToString();
+            ret += ")";
+            return ret;
+        }
     }
     
     // Union, I
@@ -336,7 +361,22 @@ namespace tinyAsn1
                 return m_items[0].Simplify();
             for (int i = 0; i < m_items.Count; i++)
                 m_items[i] = m_items[i].Simplify();
+
+            //Simplify should also attempt to merge child constraints
+            // e.g. 1..5 | 4..10 --> 1..10  quite excotic!
             return this;
+        }
+        public override string ToString()
+        {
+            string ret = "(";
+            int cnt = m_items.Count;
+            for (int i = 0; i < cnt - 1; i++)
+            {
+                ret += m_items[i].ToString() + "|";
+            }
+
+            ret += m_items[cnt-1].ToString()+")";
+            return ret;
         }
     }
 
@@ -397,7 +437,20 @@ namespace tinyAsn1
                 return m_items[0].Simplify();
             for (int i = 0; i < m_items.Count; i++)
                 m_items[i] = m_items[i].Simplify();
+
             return this;
+        }
+        public override string ToString()
+        {
+            string ret = "(";
+            int cnt = m_items.Count;
+            for (int i = 0; i < cnt - 1; i++)
+            {
+                ret += m_items[i].ToString() + "^";
+            }
+
+            ret += m_items[cnt - 1].ToString() + ")";
+            return ret;
         }
     }
 
@@ -450,6 +503,11 @@ namespace tinyAsn1
             m_c2.Simplify();
             return this;
         }
+
+        public override string ToString()
+        {
+            return m_c1.ToString() + " EXCEPT " + m_c2.ToString();
+        }
     }
 
     // m_c1 is the Parent constraint
@@ -498,6 +556,10 @@ namespace tinyAsn1
         {
             m_c.Simplify();
             return this;
+        }
+        public override string ToString()
+        {
+            return "ALL EXCEPT " + m_c.ToString();
         }
     }
 
@@ -565,6 +627,10 @@ namespace tinyAsn1
                 return m_val;
             }
         }
+        public override string ToString()
+        {
+            return m_val.ToString();
+        }
     }
 
     public class RangeConstraint : BaseConstraint
@@ -605,7 +671,7 @@ namespace tinyAsn1
                 throw new Exception("Internal Error");
 
             Asn1Value minVal=null;
-            if (tree.Type != asn1Parser.MIN)
+            if (tree.GetChild(0).Type != asn1Parser.MIN)
             {
                 minVal = Asn1Value.CreateFromAntlrAst(tree.GetChild(0));
                 minVal = type.ResolveVariable(minVal);
@@ -614,7 +680,7 @@ namespace tinyAsn1
                 minVal = parentTypeConstraint.MIN;
 
             Asn1Value maxVal = null;
-            if (tree.Type != asn1Parser.MAX)
+            if (tree.GetChild(1).GetChild(0).Type != asn1Parser.MAX)
             {
                 maxVal = Asn1Value.CreateFromAntlrAst(tree.GetChild(1).GetChild(0));
                 maxVal = type.ResolveVariable(maxVal);
@@ -717,6 +783,17 @@ namespace tinyAsn1
             }
         }
 
+        public override string ToString()
+        {
+            string ret = m_min.ToString();
+            if (!m_minValIsInluded)
+                ret += "<";
+            ret += "..";
+            if (!m_maxValIsInluded)
+                ret += "<";
+            ret += m_max.ToString();
+            return ret;
+        }
     }
 
     public class SizeConstraint : BaseConstraint
@@ -745,6 +822,10 @@ namespace tinyAsn1
         ConstraintsSet<Int64> CreateFromConstraint(IConstraint constraint)
         {
             throw new Exception();
+        }
+        public override string ToString()
+        {
+            return "SIZE "+ m_constraint.ToString();
         }
 
     }
@@ -781,6 +862,10 @@ namespace tinyAsn1
                     return false;
 
             return true;
+        }
+        public override string ToString()
+        {
+            return "FROM " + m_constraint.ToString();
         }
     }
 

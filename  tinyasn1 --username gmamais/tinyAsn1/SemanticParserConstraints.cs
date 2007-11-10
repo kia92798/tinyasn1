@@ -1,14 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.IO;
 
 namespace tinyAsn1
 {
-    /// <summary>
-    /// SemanticParser resolves variables and types but not the constraints
-    /// </summary>
-    class SemanticParser : IASTVisitor
+    class SemanticParserConstraints : IASTVisitor
     {
         int m_PassNo = 0;
         public int PassNo { get { return m_PassNo; } set { m_PassNo = value; } }
@@ -16,23 +12,26 @@ namespace tinyAsn1
 
         Asn1CompilerInvokation m_compInv;
 
-        public SemanticParser(Asn1CompilerInvokation compInv)
+        public SemanticParserConstraints(Asn1CompilerInvokation compInv)
         {
             m_compInv = compInv;
         }
 
         
-//        bool bFinished = true;
         public bool Finished()
         {
-            return m_compInv.SemanticCheckFinished();
+            foreach (Asn1File f in m_compInv.m_files)
+                foreach (Module m in f.m_modules)
+                    foreach (TypeAssigment t in m.m_typeAssigments.Values)
+                        if (!t.m_type.AreConstraintsResolved())
+                            return false;
+            return true;
         }
 
 
         public void OnBeforeAsn1File(Asn1File asn1File)
         {
             PassNo++;
-//            bFinished = true;
             if (PassNo > 100)
                 throw new Exception("Bug. Number of semantic passes exceeded 100");
         }
@@ -43,33 +42,6 @@ namespace tinyAsn1
 
         public void OnBeforeModule(Asn1File asn1File, Module mod)
         {
-
-
-// Make sure that all imported types are defined in the reference module
-            foreach(Module.ImportedModule im in mod.m_imports) {
-                if (!m_compInv.isModuleDefined(im.m_moduleID))
-                    throw new SemanticErrorException("Error: no module is defined with name: '" + im.m_moduleID + "'");
-
-                Module otherModule = m_compInv.GetModuleByName(im.m_moduleID);
-                foreach (string typeName in im.m_importedTypes)
-                {
-                    if (!otherModule.isTypeDeclaredAsExported(typeName))
-                        throw new SemanticErrorException("Error: import type '" + typeName + "' which appears in the import list of module '" + mod.m_moduleID + "' is not exported in module:'" + otherModule.m_moduleID+"'");
-                }
-                foreach (string varName in im.m_importedVariables)
-                {
-                    if (!otherModule.isValueDeclaredAsExported(varName))
-                        throw new SemanticErrorException("Error: import variable '" + varName + "' which appears in the import list of module '" + mod.m_moduleID + "' is not exported in module:'" + otherModule.m_moduleID + "'");
-                }
-            }
-//Make sure that every export is defined 
-            foreach (string expTypeName in mod.m_exportedTypes)
-                if (!mod.isTypeDeclared(expTypeName))
-                    throw new SemanticErrorException("Error: type '" + expTypeName + "' which appears in the export list of module '" + mod.m_moduleID + "' is not defined");
-            foreach(string expVarName in mod.m_exportedVariables)
-                if (!mod.isValueDeclared(expVarName))
-                    throw new SemanticErrorException("Error: variable '" + expVarName + "' which appears in the export list of module '" + mod.m_moduleID + "' is not defined");
-
         }
 
         public void OnAfterModule(Asn1File asn1File, Module mod)
@@ -78,10 +50,7 @@ namespace tinyAsn1
 
         public void OnBeforeTypeAssigment(Asn1File asn1File, Module mod, TypeAssigment tas)
         {
-            if (!tas.m_type.SemanticAnalysisFinished())
-                tas.m_type.DoSemanticAnalysis();
-
-           
+            tas.m_type.ResolveConstraints();
         }
 
         public void OnAfterTypeAssigment(Asn1File asn1File, Module mod, TypeAssigment tas)
@@ -154,11 +123,8 @@ namespace tinyAsn1
 
         public void OnValueAssigment(Asn1File asn1File, Module mod, ValueAssigment vas)
         {
-            if (!vas.m_value.IsResolved())
-            {
-                vas.m_value = vas.m_type.ResolveVariable(vas.m_value);
-            }
         }
 
     }
+
 }
