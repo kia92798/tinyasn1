@@ -13,7 +13,15 @@ namespace tinyAsn1
             o.Write(Name);
         }
     }
-
+    public partial class ReferenceType : Asn1Type
+    {
+        public override void PrintAsn1(StreamWriterLevel o, int lev)
+        {
+            o.Write(Name);
+            o.Write(" ");
+            o.Write(Constraint.ToString());
+        }
+    }
 
     public partial class BitStringType
     {
@@ -78,12 +86,14 @@ namespace tinyAsn1
                 o.Write("}");
             }
             else
-                o.Write("INTEGER");
-            if (m_AllowedValueSet != null)
+                o.Write("INTEGER ");
+
+            o.Write(Constraint.ToString());
+/*            if (m_AllowedValueSet != null)
             {
                 o.Write(" ");
                 o.Write(m_AllowedValueSet.ToString());
-            }
+            }*/
         }
     }
 
@@ -161,7 +171,6 @@ namespace tinyAsn1
             o.Write("}");
         }
     }
-
 
     public partial class SequenceOfType : Asn1Type
     {
