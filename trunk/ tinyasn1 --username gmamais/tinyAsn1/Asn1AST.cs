@@ -48,6 +48,14 @@ namespace tinyAsn1
 
             SemanticParserConstraints spcon = new SemanticParserConstraints(this);
             Visit(spcon);
+
+            foreach (Asn1File f in m_files)
+                foreach (Module m in f.m_modules)
+                    foreach (ValueAssigment vs in m.m_valuesAssigments.Values)
+                        if (!vs.m_type.isValueAllowed(vs.m_value))
+                            Console.Error.WriteLine("Warning: Value defined in line " + vs.m_value.antlrNode.Line +
+                                " does not conform to its type constraints");
+
         }
         public void debug()
         {

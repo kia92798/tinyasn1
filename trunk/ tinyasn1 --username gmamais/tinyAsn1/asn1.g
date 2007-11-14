@@ -70,6 +70,7 @@ tokens {
 	OBJECT_ID_VALUE;
 	UNION_SET;
 	INTERSECTION_SET;
+	NUMERIC_VALUE2;
 }
 
 
@@ -396,6 +397,7 @@ value	:
 	|	StringLiteral
 	|	val=valuereference										->^(VALUE_REFERENCE $val)
 	|	(s='+'|s='-')? intPart=INT ('.' decPart=INT?)? 					->^(NUMERIC_VALUE $intPart $s? $decPart?)
+	| L_BRACKET MANTISSA mant=INT COMMA BASE bas=INT COMMA EXPONENT exp=INT R_BRACKET -> ^(NUMERIC_VALUE2 $mant $bas $exp)
 //	|	('+'|'-')? INT ('.' INT?)? ( ('E'|'e') ('+'|'-')? INT)?
 	| L_BRACKET objectIdentifierValue R_BRACKET		->objectIdentifierValue
 	|   choiceValue
@@ -563,7 +565,9 @@ signedNumber	:	(s='+'|s='-')? INT			->^(NUMERIC_VALUE INT $s?)
 /* ***************************************************************************************************************** */
 		
 
-
+MANTISSA	: 'mantissa';
+BASE		: 'base';
+EXPONENT	: 'exponent';
 UnionMark  :  '|'|'UNION';
 IntersectionMark  :	'^' | 'INTERSECTION';
 DEFINITIONS :	 'DEFINITIONS';

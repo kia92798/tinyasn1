@@ -58,10 +58,6 @@ namespace tinyAsn1
 
 //to be removed
 
-        public virtual Int64 getValueAsInt()
-        {
-            throw new Exception("Internal Error: Abstract method called is not INTEGER");
-        }
 
         public override string ToString()
         {
@@ -100,19 +96,29 @@ namespace tinyAsn1
             this.antlrNode = antlrNode;
             m_module = module;
             m_type = type;
-            switch (antlrNode.Type)
+            try
             {
-                case asn1Parser.NUMERIC_VALUE:
-                    if (antlrNode.ChildCount == 1)
-                        m_value = Int64.Parse(antlrNode.GetChild(0).Text);
-                    else if ((antlrNode.ChildCount == 2) && (antlrNode.GetChild(1).Text == "-"))
-                        m_value = -Int64.Parse(antlrNode.GetChild(0).Text);
-                    else
-                        throw new SemanticErrorException("Error in line : " + antlrNode.Line + " Expecting integer or integer variable");
-                    break;
-                default:
-                    throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Expecting integer or integer variable");
+                switch (antlrNode.Type)
+                {
+                    case asn1Parser.NUMERIC_VALUE:
+                        if (antlrNode.ChildCount == 1)
+                            m_value = Int64.Parse(antlrNode.GetChild(0).Text);
+                        else if ((antlrNode.ChildCount == 2) && (antlrNode.GetChild(1).Text == "-"))
+                            m_value = -Int64.Parse(antlrNode.GetChild(0).Text);
+                        else
+                            throw new SemanticErrorException("Error in line : " + antlrNode.Line + " Expecting integer or integer variable");
+                        break;
+                    default:
+                        throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Expecting integer or integer variable");
+                }
             }
+            catch (OverflowException)
+            {
+                throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Integer value is too large");
+            }
+
+            if (m_value > Config.MAXINT || m_value < Config.MININT)
+                throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Integer value ("+m_value+") is too large and can be supported in the target platform");
         }
         public IntegerValue(IntegerValue o)
         {
@@ -327,6 +333,26 @@ namespace tinyAsn1
             set { m_value = value; }
         }
 
+        public RealValue(ITree tree, Module module, Asn1Type type, int dummy)
+        {
+            m_TypeID = Asn1Value.TypeID.REAL;
+            m_module = module;
+            antlrNode = tree;
+            m_type = type;
+
+            double mantissa = double.Parse(tree.GetChild(0).Text);
+            double bas = double.Parse(tree.GetChild(1).Text);
+            double exp = double.Parse(tree.GetChild(2).Text);
+
+            if (bas == 10 || bas == 2)
+                m_value = mantissa * Math.Pow(bas, exp);
+            else
+                throw new SemanticErrorException("Error line:" + tree.GetChild(1).Line + ", col:" + tree.GetChild(1).CharPositionInLine +
+                    " base must be 2 or 10");
+
+
+        }
+        
         public RealValue(ITree tree, Module module, Asn1Type type)
         {
             m_TypeID = Asn1Value.TypeID.REAL;
@@ -379,7 +405,11 @@ namespace tinyAsn1
         }
         public override string ToString()
         {
-            return Value.ToString();
+//            return Value.ToString("0,0.0");
+            string ret = Value.ToString().Replace(',','.');
+            if (!ret.Contains("."))
+                ret += ".0";
+            return ret;
         }
         public override bool Equals(object obj)
         {
