@@ -130,27 +130,17 @@ namespace tinyAsn1
 //            SemanticCheckConstraints();
         }
 
-        public override IConstraint ParentConstraint
-        {
-            get
-            {
-                return DefaultIntegerConstraint.Instance;
-            }
-        }
 
         public override void checkConstraintsSemantically(ITree antrlConstraint)
         {
             AntlrTreeVisitor visit = new AntlrTreeVisitor();
-            int[] AllowedTokes = { asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
-                asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
-                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR};
-            int[] StopList = { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR };
 
-            visit.visitIfNot(antrlConstraint, AllowedTokes, delegate(ITree root) {
+            visit.visitIfNot(antrlConstraint, AllowedTokensInConstraints, delegate(ITree root)
+            {
                 throw new SemanticErrorException("Error in Line:" + root.Line + ", col:" + root.CharPositionInLine +
                     " . This type of constraint '" + root.Text + "'cannot appear under " + Name);
-                }, 
-                StopList);
+                },
+                StopTokensInConstraints);
         }
     }
 
@@ -186,7 +176,7 @@ namespace tinyAsn1
         /// 
         /// if we call this property for type C this it will return INTEGER (Nor B )
         /// </summary>
-        public Asn1Type Type
+        public virtual Asn1Type Type
         {
             get
             {
@@ -221,7 +211,7 @@ namespace tinyAsn1
         }
 
 
-        public Asn1Type ParentType
+        public override Asn1Type ParentType
         {
             get
             {
@@ -259,14 +249,14 @@ namespace tinyAsn1
         {
         }
 
-        public override IConstraint ParentConstraint
+/*        public override IConstraint ParentConstraint
         {
             get
             {
                 return ParentType.Constraint;
             }
         }
-
+*/
         public override void ResolveConstraints()
         {
             if (AreConstraintsResolved())
@@ -275,14 +265,12 @@ namespace tinyAsn1
             if (!ParentType.AreConstraintsResolved())
                 return;
 
-            m_constraints.Add(ParentConstraint);
-
-            if (m_constraints.Count == 1)
+            if (m_constraints.Count == 0)
             {
                 foreach (ITree tree in m_AntlrConstraints)
                 {
                     checkConstraintsSemantically(tree);
-                    m_constraints.Add(RootConstraint.Create(tree, this, ParentConstraint));
+                    m_constraints.Add(RootConstraint.Create(tree, this));
                 }
             }
 
@@ -303,8 +291,6 @@ namespace tinyAsn1
             if (!ParentType.AreConstraintsResolved())
                 return false;
             if (m_AntlrConstraints.Count > m_constraints.Count)
-                return false;
-            if (m_AntlrConstraints.Count == 0 && m_constraints.Count == 0) // no antlr constraint and ParentType's constraint have not been added yet
                 return false;
             foreach (IConstraint cn in m_constraints)
                 if (!cn.IsResolved())

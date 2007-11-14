@@ -50,6 +50,17 @@ namespace tinyAsn1
                 visit(root.GetChild(i), tokenID, callBack);
         }
 
+        public void visit(ITree root, int tokenID, OnAntrlNode callBack, IEnumerable<int> StopList)
+        {
+            List<int> stopList = new List<int>(StopList);
+            if (root.Type == tokenID)
+                callBack(root);
+            if (stopList.Contains(root.Type))
+                return;
+            for (int i = 0; i < root.ChildCount; i++)
+                visit(root.GetChild(i), tokenID, callBack, StopList);
+        }
+
         public void visit(ITree root, IList<int> tokenIDs, OnAntrlNode callBack)
         {
             if (tokenIDs.Contains(root.Type))

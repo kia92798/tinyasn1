@@ -11,18 +11,11 @@ namespace tinyAsn1
         public virtual void PrintAsn1(StreamWriterLevel o, int lev)
         {
             o.Write(Name);
-        }
-    }
-    public partial class ReferenceType : Asn1Type
-    {
-        public override void PrintAsn1(StreamWriterLevel o, int lev)
-        {
-            o.Write(Name);
             o.Write(" ");
-            o.Write(Constraint.ToString());
+            foreach (IConstraint con in m_constraints)
+                o.Write(con.ToString());
         }
     }
-
     public partial class BitStringType
     {
         public override void PrintAsn1(StreamWriterLevel o, int lev)
@@ -88,7 +81,8 @@ namespace tinyAsn1
             else
                 o.Write("INTEGER ");
 
-            o.Write(Constraint.ToString());
+            foreach (IConstraint con in m_constraints)
+                o.Write(con.ToString());
 /*            if (m_AllowedValueSet != null)
             {
                 o.Write(" ");

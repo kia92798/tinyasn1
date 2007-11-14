@@ -469,12 +469,14 @@ namespace tinyAsn1
             return ret;
         }
 
-        /*
-         * This method takes as input an unresolved variable and 
-         * either returns the same variable if resolving can not be done in this round
-         * or returns a new resolved variable
-         * or throws a SemanticError Exception if resolving cannot be done due to semantic error 
-         * */
+        /// <summary>
+        /// This method takes as input an unresolved variable and 
+        /// either returns the same variable if resolving can not be done in this round
+        /// or returns a new resolved variable
+        /// or throws a SemanticError Exception if resolving cannot be done due to semantic error 
+        /// </summary>
+        /// <param name="val">value to be resolved</param>
+        /// <returns>the resolved variable or the same variable as input</returns>
         internal virtual Asn1Value ResolveVariable(Asn1Value val)
         {
             throw new Exception("Internal Error: abstract function call");
@@ -506,43 +508,7 @@ namespace tinyAsn1
             throw new Exception("Abstact method called: Asn1Type::DoSemanticAnalysis()");
         }
 
-        /// <summary>
-        /// For non reference types e.g. INTEGER, REAL ect it will return the default
-        /// set of allowed values. E.g. for integers this set is (Config.MININT .. Config.MAXINT)
-        /// For a reference type e.g. A::=B, it will return B.Constraint
-        /// </summary>
-        public virtual IConstraint ParentConstraint
-        {
-            get
-            {
-                throw new Exception("Abstact method called: Asn1Type::ParentConstraint");
-            }
-        }
-
-        /// <summary>
-        /// This property returns the constraint associated with the type. 
-        /// If type has more than one constraint, it return the intersection of 
-        /// these constraints
-        /// This property should never return NULL
-        /// 
-        /// </summary>
-        /// 
-        IConstraint m_oneConstraint;
-        public virtual IConstraint Constraint
-        {
-            get
-            {
-                if (!AreConstraintsResolved())
-                    throw new Exception("INTERNAL ERROR");
-                if (m_constraints.Count == 1)
-                    m_oneConstraint = m_constraints[0];
-                else
-                    m_oneConstraint = new AndConstraint(this, ParentConstraint, m_constraints);
-                return m_oneConstraint;
-            }
-        }
-
-        protected List<IConstraint> m_constraints = new List<IConstraint>();
+        public List<IConstraint> m_constraints = new List<IConstraint>();
         
         /// <summary>
         /// This method resolves all constraints associated with this type. 
@@ -555,20 +521,12 @@ namespace tinyAsn1
             if (AreConstraintsResolved())
                 return;
             
-            if (m_AntlrConstraints.Count == 0) // I have no constraints, so I must inlude the allow all constraint
-            {
-                if (!ParentConstraint.IsResolved() || !ParentConstraint.AllowsEverything())
-                    throw new Exception("INERNAL ERROR");
-                m_constraints.Add(ParentConstraint); 
-                return;
-            }
-
             if (m_constraints.Count == 0)
             {
                 foreach (ITree tree in m_AntlrConstraints)
                 {
                     checkConstraintsSemantically(tree);
-                    m_constraints.Add(RootConstraint.Create(tree, this, ParentConstraint));
+                    m_constraints.Add(RootConstraint.Create(tree, this));
                 }
             }
 
@@ -585,13 +543,83 @@ namespace tinyAsn1
         }
 
         /// <summary>
+        /// Checks if a value is allowed or not. 
+        /// </summary>
+        /// <param name="val">the value to be check</param>
+        /// <returns>true if value is allowed</returns>
+        public virtual bool isValueAllowed(Asn1Value val)
+        {
+            if (!AreConstraintsResolved())
+                throw new Exception("Internal Error");
+            if (!val.IsResolved())
+                throw new Exception("Internal Error");
+
+            if (ParentType != null)
+                if (!ParentType.isValueAllowed(val))
+                    return false;
+
+            foreach (IConstraint cn in m_constraints)
+            {
+                if (!cn.isValueAllowed(val))
+                    return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Returns parent type. It must be overwritten in Reference Type
+        /// </summary>
+        public virtual Asn1Type ParentType
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
         /// This method must check weather the constraints are Semantically OK. It actually checks if e.g. under an
         /// Integer SIZE or FROM or pattern constraints are NOT allowed
+        /// The default implementation accepts only Single Value & Type Inclusion constraints
         /// </summary>
+
+        static List<int> m_allowedTokens = new List<int>(new int[]{ asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
+                asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
+                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR});
+        static List<int> m_stopList = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR });
+
+        protected virtual IEnumerable<int> AllowedTokensInConstraints { get { return m_allowedTokens; } }
+        protected virtual IEnumerable<int> StopTokensInConstraints { get { return m_allowedTokens; } }
 
         public virtual void checkConstraintsSemantically(ITree antrlConstraint)
         {
-            throw new Exception("Abstact method called: Asn1Type::DoSemanticAnalysis()");
+            AntlrTreeVisitor visit = new AntlrTreeVisitor();
+
+            //Console.WriteLine();
+            //foreach (int d in StopList)
+            //    Console.Write(d.ToString()+" ");
+            //Console.WriteLine();
+
+            visit.visitIfNot(antrlConstraint, AllowedTokensInConstraints, delegate(ITree root)
+            {
+                throw new SemanticErrorException("Error1 in Line:" + root.Line + ", col:" + root.CharPositionInLine +
+                    " . This type of constraint '" + root.Text + "' cannot appear under " + Name);
+            },
+                StopTokensInConstraints);
+
+            visit.visit(antrlConstraint, asn1Parser.VALUE_RANGE_EXPR, delegate(ITree root)
+            {
+                if (root.ChildCount != 1)
+                    throw new SemanticErrorException("Error2 in Line:" + root.Line + ", col:" + root.CharPositionInLine +
+                    " . This type of constraint '" + root.Text + "' cannot appear under " + Name);
+            }, StopTokensInConstraints);
+
+
+
+            visit.visit(antrlConstraint, asn1Parser.SUBTYPE_EXPR, delegate(ITree root)
+            {
+                throw new Exception("Unimplemented feature");
+            });
         }
 
 
@@ -603,8 +631,6 @@ namespace tinyAsn1
         public virtual bool AreConstraintsResolved() 
         {
             if (m_AntlrConstraints.Count > m_constraints.Count)
-                return false;
-            if (m_AntlrConstraints.Count == 0 && m_constraints.Count == 0) // no antlr constraint and allow all constraint has not yet be added
                 return false;
             foreach (IConstraint cn in m_constraints)
                 if (!cn.IsResolved())
@@ -803,7 +829,6 @@ namespace tinyAsn1
                 m_namedBitsPriv.Remove(ni);
         }
 
-
         internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId = "";
@@ -887,6 +912,14 @@ namespace tinyAsn1
                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting BIT STRING constant or BIT STRING variable");
             }
         }
+
+        static List<int> m_allowedTokens = new List<int>(new int[]{ asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
+                asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
+                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.SIZE_EXPR});
+        static List<int> m_stopList = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.SIZE_EXPR });
+
+        protected override IEnumerable<int> AllowedTokensInConstraints { get { return m_allowedTokens; } }
+        protected override IEnumerable<int> StopTokensInConstraints { get { return m_stopList; }}
     }
 
     public partial class OctetStringType : Asn1Type
@@ -930,6 +963,13 @@ namespace tinyAsn1
         public override void DoSemanticAnalysis()
         {
         }
+        static List<int> m_allowedTokens = new List<int>(new int[]{ asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
+                asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
+                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.SIZE_EXPR});
+        static List<int> m_stopList = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.SIZE_EXPR });
+
+        protected override IEnumerable<int> AllowedTokensInConstraints { get { return m_allowedTokens; } }
+        protected override IEnumerable<int> StopTokensInConstraints { get { return m_stopList; } }
     }
 
     public partial class IA5StringType : Asn1Type
@@ -972,6 +1012,13 @@ namespace tinyAsn1
         public override void DoSemanticAnalysis()
         {
         }
+        static List<int> m_allowedTokens = new List<int>(new int[]{ asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
+                asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
+                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.SIZE_EXPR});
+        static List<int> m_stopList = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.SIZE_EXPR });
+
+        protected override IEnumerable<int> AllowedTokensInConstraints { get { return m_allowedTokens; } }
+        protected override IEnumerable<int> StopTokensInConstraints { get { return m_stopList; } }
     }
 
     public partial class NumericStringType : Asn1Type
@@ -1025,9 +1072,8 @@ namespace tinyAsn1
             {
                 case asn1Parser.NUMERIC_VALUE:
                     return new RealValue(val.antlrNode, m_module, this);
-                case asn1Parser.NAMED_VALUE_LIST: //e.g. {mantissa 2, base 10, exponent 0}
-                    
-                    throw new Exception("Unimplemented feature");
+                case asn1Parser.NUMERIC_VALUE2: //e.g. {mantissa 2, base 10, exponent 0}
+                    return new RealValue(val.antlrNode, m_module, this,0);
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
                     if (m_module.isValueDeclared(referenceId))
@@ -1060,6 +1106,18 @@ namespace tinyAsn1
         {
         }
 
+
+        public override void checkConstraintsSemantically(ITree antrlConstraint)
+        {
+            AntlrTreeVisitor visit = new AntlrTreeVisitor();
+
+            visit.visitIfNot(antrlConstraint, AllowedTokensInConstraints, delegate(ITree root)
+            {
+                throw new SemanticErrorException("Error in Line:" + root.Line + ", col:" + root.CharPositionInLine +
+                    " . This type of constraint '" + root.Text + "'cannot appear under " + Name);
+            },
+                StopTokensInConstraints);
+        }
     }
 
     public partial class EnumeratedType : Asn1Type
@@ -1749,6 +1807,13 @@ namespace tinyAsn1
             }
         }
 
+        static List<int> m_allowedTokens = new List<int>(new int[]{ asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
+                asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
+                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.SIZE_EXPR});
+        static List<int> m_stopList = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.SIZE_EXPR });
+
+        protected override IEnumerable<int> AllowedTokensInConstraints { get { return m_allowedTokens; } }
+        protected override IEnumerable<int> StopTokensInConstraints { get { return m_stopList; } }
     }
 
     public partial class SetOfType : Asn1Type
@@ -1837,6 +1902,13 @@ namespace tinyAsn1
             }
         }
 
+        static List<int> m_allowedTokens = new List<int>(new int[]{ asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
+                asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
+                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.SIZE_EXPR});
+        static List<int> m_stopList = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.SIZE_EXPR });
+
+        protected override IEnumerable<int> AllowedTokensInConstraints { get { return m_allowedTokens; } }
+        protected override IEnumerable<int> StopTokensInConstraints { get { return m_stopList; } }
     }
 
     public partial class ObjectIdentifier : Asn1Type
@@ -1896,7 +1968,6 @@ namespace tinyAsn1
         {
         }
     }
-
 
     public partial class Asn1Value
     {

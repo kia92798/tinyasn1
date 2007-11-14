@@ -17,55 +17,15 @@ namespace tinyAsn1
 
     }
 
-    public partial class ValueRangeExpression
-    {
-        public Asn1Value m_minValue;
-        public Asn1Value m_maxValue;
-        public bool m_minValIsIncluded = false;
-        public bool m_maxValIsIncluded = false;
-
-        static public ValueRangeExpression CreateFromAntlrAst(ITree tree)
-        {
-            ValueRangeExpression ret = new ValueRangeExpression();
-            ret.m_minValue = Asn1Value.CreateFromAntlrAst(tree.GetChild(0));
-            int lineNo = tree.GetChild(0).Line;
-            for (int i = 1; i < tree.ChildCount; i++)
-            {
-                ITree child = tree.GetChild(i);
-                switch (child.Type)
-                {
-                    case asn1Parser.MAX_VAL_PRESENT:
-                        ret.m_maxValue = Asn1Value.CreateFromAntlrAst(child.GetChild(0));
-                        break;
-                    case asn1Parser.MIN_VAL_INCLUDED:
-                        ret.m_minValIsIncluded = true;
-                        break;
-                    case asn1Parser.MAX_VAL_INCLUDED:
-                        ret.m_maxValIsIncluded = true;
-                        break;
-                    default:
-                        throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
-                }
-            }
-
-            //if (ret.m_maxValue != null && ret.m_minValue.m_valType != ret.m_maxValue.m_valType)
-            //    throw new SemanticErrorException("Semantic Error: Both values in a range must be of the same type. Line:" +lineNo.ToString());
-
-            return ret;
-        }
-    }
-
-
     public interface IConstraint
     {
         bool isValueAllowed(Asn1Value val);
         bool isPERVisible();
         IConstraint Simplify();
-        Asn1Value MIN {get;} //applicable only for Integers & Reals & ?Strings
-        Asn1Value MAX {get;} //applicable only for Integers & Reals & ?Strings
+        //Asn1Value MIN {get;} //applicable only for Integers & Reals & ?Strings
+        //Asn1Value MAX {get;} //applicable only for Integers & Reals & ?Strings
         bool IsResolved();
         void DoSemanticAnalysis();
-        bool AllowsEverything();
     }
 
     public class BaseConstraint : IConstraint
@@ -85,18 +45,16 @@ namespace tinyAsn1
         {
             throw new Exception("Abstract method called");
         }
-        //applicable only for Integers & Reals & Strings
-        public virtual Asn1Value MIN { get { throw new Exception("Abstract method called"); }}
-        public virtual Asn1Value MAX { get { throw new Exception("Abstract method called"); }}
+        ////applicable only for Integers & Reals & Strings
+        //public virtual Asn1Value MIN { get { throw new Exception("Abstract method called"); }}
+        //public virtual Asn1Value MAX { get { throw new Exception("Abstract method called"); }}
 
-        protected IConstraint m_parentTypeConstraint;
         protected Asn1Type m_type;
         
-
-        public BaseConstraint(Asn1Type type, IConstraint parentTypeConstraint)
+        
+        public BaseConstraint(Asn1Type type)
         {
             m_type = type;
-            m_parentTypeConstraint = parentTypeConstraint;
         }
 
         public virtual bool IsResolved()
@@ -109,55 +67,54 @@ namespace tinyAsn1
             throw new Exception("Abstract method called");
         }
 
-        public static IConstraint CreateConstraintExpression(ITree tree, Asn1Type type, IConstraint parentTypeConstraint)
+        public static IConstraint CreateConstraintExpression(ITree tree, Asn1Type type)
         {
-            if (tree == null || type == null || parentTypeConstraint == null)
+            if (tree == null || type == null)
                 throw new ArgumentNullException();
             switch (tree.Type)
             {
                 case asn1Parser.VALUE_RANGE_EXPR:
                     if (tree.ChildCount == 1)
-                        return SingleValueConstraint.Create(tree.GetChild(0), type, parentTypeConstraint);
-                    return RangeConstraint.Create(tree, type, parentTypeConstraint);
+                        return SingleValueConstraint.Create(tree.GetChild(0), type);
+                    return RangeConstraint.Create(tree, type);
                 case asn1Parser.UNION_SET:
                 case asn1Parser.UNION_SET_ALL_EXCEPT:
-                    return CreateUnionSet(tree, type, parentTypeConstraint);
+                    return CreateUnionSet(tree, type);
+                case asn1Parser.SIZE_EXPR:
+                    return SizeConstraint.Create(tree, type);
                 default:
                     throw new Exception("Internal Error: unexpectected token: " + tree.Text);
             }
         }
 
-        public static IConstraint CreateUnionSet(ITree tree, Asn1Type type, IConstraint parentTypeConstraint)
+        public static IConstraint CreateUnionSet(ITree tree, Asn1Type type)
         {
-            if (tree == null || type == null || parentTypeConstraint == null)
+            if (tree == null || type == null )
                 throw new ArgumentNullException();
             if (tree.Type == asn1Parser.UNION_SET)
-                return UnionConstraint.Create(tree, type, parentTypeConstraint);
+                return UnionConstraint.Create(tree, type);
             if (tree.Type == asn1Parser.UNION_SET_ALL_EXCEPT)
-                return AllExceptConstraint.Create(tree, type, parentTypeConstraint);
+                return AllExceptConstraint.Create(tree, type);
             throw new Exception("Internal Error");
         }
 
-        protected static IConstraint CreateIntersectionItem(ITree iTree, Asn1Type type, IConstraint parentTypeConstraint)
+        protected static IConstraint CreateIntersectionItem(ITree iTree, Asn1Type type)
         {
-            if (iTree == null || type == null || parentTypeConstraint == null)
+            if (iTree == null || type == null )
                 throw new ArgumentNullException();
             if (iTree.Type!=asn1Parser.INTERSECTION_ELEMENT)
                 throw new Exception("Internal Error");
             if (iTree.ChildCount == 2)
-                return ExceptConstraint.Create(iTree, type, parentTypeConstraint);
-            return BaseConstraint.CreateConstraintExpression(iTree.GetChild(0), type, parentTypeConstraint);
-        }
-        public virtual bool AllowsEverything() 
-        {
-            return false;
+                return ExceptConstraint.Create(iTree, type);
+            return BaseConstraint.CreateConstraintExpression(iTree.GetChild(0), type);
         }
     }
 
+/*   
     public class DefaultIntegerConstraint : BaseConstraint
     {
         static DefaultIntegerConstraint m_instance;
-        private DefaultIntegerConstraint() : base (null,null)
+        private DefaultIntegerConstraint() : base (null)
         {
         }
      
@@ -182,20 +139,6 @@ namespace tinyAsn1
         {
             return true;
         }
-        public override Asn1Value MIN
-        {
-            get
-            {
-                return new IntegerValue(Config.MININT, null, null, null);
-            }
-        }
-        public override Asn1Value MAX
-        {
-            get
-            {
-                return new IntegerValue(Config.MAXINT, null, null, null);
-            }
-        }
         public override bool isValueAllowed(Asn1Value val)
         {
             return true;
@@ -214,26 +157,26 @@ namespace tinyAsn1
             return "";
         }
     }
-
+    */
     public class RootConstraint : BaseConstraint
     {
         IConstraint m_constr;
         IConstraint m_extConstr;
 
-        public RootConstraint(Asn1Type type, IConstraint parentTypeConstraint, IConstraint constr, IConstraint extConstr)
-            : base(type, parentTypeConstraint)
+        public RootConstraint(Asn1Type type, IConstraint constr, IConstraint extConstr)
+            : base(type)
         {
             m_constr = constr;
             m_extConstr = extConstr;
         }
         
-        public static RootConstraint Create(ITree tree, Asn1Type type, IConstraint parentTypeConstraint)
+        public static RootConstraint Create(ITree tree, Asn1Type type)
         {
-            if (tree == null || type == null || parentTypeConstraint == null)
+            if (tree == null || type == null )
                 throw new ArgumentNullException();
             if (tree.Type != asn1Parser.CONSTRAINT)
                 throw new Exception("Internal Error");
-            IConstraint constr = BaseConstraint.CreateUnionSet(tree.GetChild(0), type, parentTypeConstraint);
+            IConstraint constr = BaseConstraint.CreateUnionSet(tree.GetChild(0), type);
             IConstraint extConstr=null;
 
             for (int i = 1; i < tree.ChildCount; i++)
@@ -242,7 +185,7 @@ namespace tinyAsn1
                 {
                     case asn1Parser.UNION_SET:
                     case asn1Parser.UNION_SET_ALL_EXCEPT:
-                        extConstr = BaseConstraint.CreateUnionSet(tree, type, parentTypeConstraint);
+                        extConstr = BaseConstraint.CreateUnionSet(tree, type);
                         break;
                     case asn1Parser.EXT_MARK:
                     case asn1Parser.EXCEPTION_SPEC:
@@ -252,7 +195,7 @@ namespace tinyAsn1
                 }
             }
 
-            return new RootConstraint(type, parentTypeConstraint, constr, extConstr);
+            return new RootConstraint(type, constr, extConstr);
 
         }
         
@@ -268,9 +211,6 @@ namespace tinyAsn1
 
         public override bool IsResolved()
         {
-            if (!m_parentTypeConstraint.IsResolved())
-                return false;
-
             if (m_extConstr != null)
                 return m_constr.IsResolved() && m_extConstr.IsResolved();
             return m_constr.IsResolved();
@@ -308,15 +248,15 @@ namespace tinyAsn1
     {
         List<IConstraint> m_items;
 
-        public UnionConstraint(Asn1Type type, IConstraint parentTypeConstraint, List<IConstraint> items)
-            : base(type, parentTypeConstraint)
+        public UnionConstraint(Asn1Type type, List<IConstraint> items)
+            : base(type)
         {
             m_items = items;
         }
 
-        public static UnionConstraint Create(ITree tree, Asn1Type type, IConstraint parentTypeConstraint)
+        public static UnionConstraint Create(ITree tree, Asn1Type type)
         {
-            if (tree == null || type == null || parentTypeConstraint == null)
+            if (tree == null || type == null)
                 throw new ArgumentNullException();
             if (tree.Type != asn1Parser.UNION_SET)
                 throw new Exception("Internal Error");
@@ -324,23 +264,21 @@ namespace tinyAsn1
             List<IConstraint> items = new List<IConstraint>();
             for (int i = 0; i < tree.ChildCount; i++)
             {
-                items.Add(AndConstraint.Create(tree.GetChild(i), type, parentTypeConstraint));
+                items.Add(AndConstraint.Create(tree.GetChild(i), type));
             }
 
-            return new UnionConstraint(type, parentTypeConstraint, items);
+            return new UnionConstraint(type, items);
         }
 
         public override bool isValueAllowed(Asn1Value val)
         {
             foreach (IConstraint cn in m_items)
-                if (isValueAllowed(val))
+                if (cn.isValueAllowed(val))
                     return true;
             return false;
         }
         public override bool IsResolved()
         {
-            if (!m_parentTypeConstraint.IsResolved())
-                return false;
             foreach (IConstraint cn in m_items)
                 if (!cn.IsResolved())
                     return false;
@@ -378,6 +316,36 @@ namespace tinyAsn1
             ret += m_items[cnt-1].ToString()+")";
             return ret;
         }
+
+/*        public override Asn1Value MIN
+        {
+            get
+            {
+                // return the smallest MIN
+                Asn1Value curMin = m_items[0].MIN;
+                foreach (IConstraint con in m_items)
+                {
+                    if (con.MIN.CompareTo(curMin) < 0)
+                        curMin = con.MIN;
+                }
+                return curMin;
+            }
+        }
+        public override Asn1Value MAX
+        {
+            get
+            {
+                // return maximum MAX
+                Asn1Value curMax = m_items[0].MAX;
+                foreach (IConstraint con in m_items)
+                {
+                    if (con.MAX.CompareTo(curMax) > 0)
+                        curMax = con.MAX;
+                }
+                return curMax;
+            }
+        }
+        */
     }
 
     // Intersection, ^
@@ -385,24 +353,24 @@ namespace tinyAsn1
     {
         List<IConstraint> m_items;
 
-        public AndConstraint(Asn1Type type, IConstraint parentTypeConstraint, List<IConstraint> items)
-            : base(type, parentTypeConstraint)
+        public AndConstraint(Asn1Type type, List<IConstraint> items)
+            : base(type)
         {
             m_items = items;
         }
-        public static AndConstraint Create(ITree tree, Asn1Type type, IConstraint parentTypeConstraint)
+        public static AndConstraint Create(ITree tree, Asn1Type type)
         {
-            if (tree == null || type == null || parentTypeConstraint == null)
+            if (tree == null || type == null )
                 throw new ArgumentNullException();
             if (tree.Type != asn1Parser.INTERSECTION_SET)
                 throw new Exception("Internal Error");
             List<IConstraint> items = new List<IConstraint>();
             for (int i = 0; i < tree.ChildCount; i++)
             {
-                items.Add(BaseConstraint.CreateIntersectionItem(tree.GetChild(i), type, parentTypeConstraint));
+                items.Add(BaseConstraint.CreateIntersectionItem(tree.GetChild(i), type));
             }
 
-            return new AndConstraint(type, parentTypeConstraint, items);
+            return new AndConstraint(type, items);
         }
 
         public override bool isValueAllowed(Asn1Value val)
@@ -415,9 +383,6 @@ namespace tinyAsn1
         }
         public override bool IsResolved()
         {
-            if (!m_parentTypeConstraint.IsResolved())
-                return false;
-
             foreach (IConstraint cn in m_items)
                 if (!cn.IsResolved())
                     return false;
@@ -452,6 +417,36 @@ namespace tinyAsn1
             ret += m_items[cnt - 1].ToString() + ")";
             return ret;
         }
+
+/*        public override Asn1Value MIN
+        {
+            get
+            {
+                //return greatest min
+                Asn1Value curMin = m_items[0].MIN;
+                foreach (IConstraint con in m_items)
+                {
+                    if (con.MIN.CompareTo(curMin) > 0)
+                        curMin = con.MIN;
+                }
+                return curMin;
+            }
+        }
+
+        public override Asn1Value MAX
+        {
+            get
+            {
+                //return the smallest MAX
+                Asn1Value curMax = m_items[0].MAX;
+                foreach (IConstraint con in m_items)
+                {
+                    if (con.MAX.CompareTo(curMax) < 0)
+                        curMax = con.MAX;
+                }
+                return curMax;
+            }
+        }*/
     }
 
     public class ExceptConstraint : BaseConstraint
@@ -459,22 +454,22 @@ namespace tinyAsn1
         IConstraint m_c1;
         IConstraint m_c2;
 
-        public ExceptConstraint(Asn1Type type, IConstraint parentTypeConstraint, IConstraint constr1, IConstraint constr2)
-            : base(type, parentTypeConstraint)
+        public ExceptConstraint(Asn1Type type, IConstraint constr1, IConstraint constr2)
+            : base(type)
         {
             m_c1 = constr1;
             m_c2 = constr2;
         }
-        public static ExceptConstraint Create(ITree tree, Asn1Type type, IConstraint parentTypeConstraint)
+        public static ExceptConstraint Create(ITree tree, Asn1Type type)
         {
-            if (tree == null || type == null || parentTypeConstraint == null)
+            if (tree == null || type == null )
                 throw new ArgumentNullException();
             if (tree.Type != asn1Parser.INTERSECTION_ELEMENT && tree.ChildCount==2)
                 throw new Exception("Internal Error");
-            IConstraint c1 = BaseConstraint.CreateConstraintExpression(tree.GetChild(0), type, parentTypeConstraint);
-            IConstraint c2 = BaseConstraint.CreateConstraintExpression(tree.GetChild(1), type, parentTypeConstraint);
+            IConstraint c1 = BaseConstraint.CreateConstraintExpression(tree.GetChild(0), type);
+            IConstraint c2 = BaseConstraint.CreateConstraintExpression(tree.GetChild(1), type);
 
-            return new ExceptConstraint(type, parentTypeConstraint, c1, c2);
+            return new ExceptConstraint(type, c1, c2);
         }
 
         public override bool isValueAllowed(Asn1Value val)
@@ -485,8 +480,6 @@ namespace tinyAsn1
         }
         public override bool IsResolved()
         {
-            if (!m_parentTypeConstraint.IsResolved())
-                return false;
             return m_c1.IsResolved() && m_c2.IsResolved();
         }
 
@@ -501,6 +494,7 @@ namespace tinyAsn1
         {
             m_c1.Simplify();
             m_c2.Simplify();
+
             return this;
         }
 
@@ -508,6 +502,18 @@ namespace tinyAsn1
         {
             return m_c1.ToString() + " EXCEPT " + m_c2.ToString();
         }
+
+/*        public override Asn1Value MIN
+        {
+            get
+            {
+                //To calculate min and max we have to eliminate Exclude constraints. To achieve
+                // we will use set's algebra
+
+                return base.MIN;
+            }
+        }*/
+        
     }
 
     // m_c1 is the Parent constraint
@@ -515,33 +521,31 @@ namespace tinyAsn1
     {
         IConstraint m_c;
 
-        public AllExceptConstraint(Asn1Type type, IConstraint parentTypeConstraint, IConstraint constraint)
-            : base(type, parentTypeConstraint)
+        public AllExceptConstraint(Asn1Type type, IConstraint constraint)
+            : base(type)
         {
             m_c = constraint;
         }
-        public static AllExceptConstraint Create(ITree tree, Asn1Type type, IConstraint parentTypeConstraint)
+        public static AllExceptConstraint Create(ITree tree, Asn1Type type)
         {
-            if (tree == null || type == null || parentTypeConstraint == null)
+            if (tree == null || type == null)
                 throw new ArgumentNullException();
             if (tree.Type != asn1Parser.UNION_SET_ALL_EXCEPT)
                 throw new Exception("Internal Error");
-            IConstraint c = BaseConstraint.CreateConstraintExpression(tree.GetChild(0), type, parentTypeConstraint);
+            IConstraint c = BaseConstraint.CreateConstraintExpression(tree.GetChild(0), type);
 
-            return new AllExceptConstraint(type, parentTypeConstraint, c);
+            return new AllExceptConstraint(type, c);
         }
 
         public override bool isValueAllowed(Asn1Value val)
         {
-            if (m_parentTypeConstraint.isValueAllowed(val) && !m_c.isValueAllowed(val))
+            if (!m_c.isValueAllowed(val))
                 return true;
             return false;
         }
 
         public override bool IsResolved()
         {
-            if (!m_parentTypeConstraint.IsResolved())
-                return false;
             return m_c.IsResolved();
         }
 
@@ -554,6 +558,7 @@ namespace tinyAsn1
 
         public override IConstraint Simplify()
         {
+
             m_c.Simplify();
             return this;
         }
@@ -567,8 +572,8 @@ namespace tinyAsn1
     {
         Asn1Value m_val;
 
-        public SingleValueConstraint(Asn1Type type, IConstraint parentTypeConstraint, Asn1Value value)
-            : base(type, parentTypeConstraint)
+        public SingleValueConstraint(Asn1Type type, Asn1Value value)
+            : base(type)
         {
             m_val = value;
         }
@@ -577,19 +582,19 @@ namespace tinyAsn1
             return m_val.Equals(val);
         }
 
-        public static SingleValueConstraint Create(ITree tree, Asn1Type type, IConstraint parentTypeConstraint) 
+        public static SingleValueConstraint Create(ITree tree, Asn1Type type) 
         {
-            if (tree == null || type == null || parentTypeConstraint == null)
+            if (tree == null || type == null)
                 throw new ArgumentNullException();
 
             Asn1Value val = Asn1Value.CreateFromAntlrAst(tree);
-            val = type.ResolveVariable(val);
-            return new SingleValueConstraint(type, parentTypeConstraint, val);
+//            val = type.ResolveVariable(val);
+            return new SingleValueConstraint(type, val);
         }
 
         public override bool IsResolved()
         {
-            return m_val.IsResolved() && m_parentTypeConstraint.IsResolved();
+            return m_val.IsResolved();
         }
         
         public override void DoSemanticAnalysis()
@@ -598,11 +603,11 @@ namespace tinyAsn1
                 return;
 
             m_val = m_type.ResolveVariable(m_val);
-            if (m_val.IsResolved() && m_parentTypeConstraint.IsResolved())
+            if (m_val.IsResolved() && m_type.ParentType!=null && m_type.ParentType.AreConstraintsResolved())
             {
-                if (!m_parentTypeConstraint.isValueAllowed(m_val))
+                if (!m_type.ParentType.isValueAllowed(m_val))
                 {
-                    throw new SemanticErrorException("Error in line:" + m_val.antlrNode.Line + ",col: " + m_val.antlrNode.CharPositionInLine +
+                    Console.Error.WriteLine("Warning line:" + m_val.antlrNode.Line + ",col: " + m_val.antlrNode.CharPositionInLine +
                         ". Value: "+m_val.ToString()+" does not belong to parent type");
                 }
             }
@@ -613,7 +618,7 @@ namespace tinyAsn1
             return this;
         }
 
-        public override Asn1Value MIN
+/*        public override Asn1Value MIN
         {
             get
             {
@@ -626,7 +631,7 @@ namespace tinyAsn1
             {
                 return m_val;
             }
-        }
+        }*/
         public override string ToString()
         {
             return m_val.ToString();
@@ -635,14 +640,20 @@ namespace tinyAsn1
 
     public class RangeConstraint : BaseConstraint
     {
+        /// <summary>
+        /// if m_min is null then m_min is MIN
+        /// </summary>
         Asn1Value m_min;
+        /// <summary>
+        /// if m_max is null then m_max is MAX
+        /// </summary>
         Asn1Value m_max;
         bool m_minValIsInluded = true;
         bool m_maxValIsInluded = true;
 
-        public RangeConstraint(Asn1Type type, IConstraint parentTypeConstraint, Asn1Value minVal, Asn1Value maxVal,
+        public RangeConstraint(Asn1Type type, Asn1Value minVal, Asn1Value maxVal,
             bool minValIsInluded, bool maxValIsInluded)
-            : base(type, parentTypeConstraint)
+            : base(type)
         {
             m_min = minVal;
             m_max = maxVal;
@@ -651,19 +662,25 @@ namespace tinyAsn1
         }
         public override bool isValueAllowed(Asn1Value val)
         {
+            if (m_min == null && m_max == null)  //(MIN..MAX)
+                return true;
+            if (m_min == null && (val.CompareTo(m_max) < 0)) // (MIN..value)
+                return true;
+            if ((m_min.CompareTo(val) < 0) && m_max==null)
+                return true;
             if ((m_min.CompareTo(val) < 0) && (val.CompareTo(m_max) < 0))
                 return true;
-            if (m_minValIsInluded && m_min.Equals(val))
+            if (m_minValIsInluded && m_min!=null && m_min.Equals(val))
                 return true;
-            if (m_maxValIsInluded && m_max.Equals(val))
+            if (m_maxValIsInluded && m_max!=null && m_max.Equals(val))
                 return true;
             return false;
         }
 
         
-        public static RangeConstraint Create(ITree tree, Asn1Type type, IConstraint parentTypeConstraint)
+        public static RangeConstraint Create(ITree tree, Asn1Type type )
         {
-            if (tree == null || type == null || parentTypeConstraint == null)
+            if (tree == null || type == null )
                 throw new ArgumentNullException();
             if (tree.Type != asn1Parser.VALUE_RANGE_EXPR)
                 throw new Exception("Internal Error");
@@ -674,19 +691,15 @@ namespace tinyAsn1
             if (tree.GetChild(0).Type != asn1Parser.MIN)
             {
                 minVal = Asn1Value.CreateFromAntlrAst(tree.GetChild(0));
-                minVal = type.ResolveVariable(minVal);
+//                minVal = type.ResolveVariable(minVal);
             }
-            else if (parentTypeConstraint.IsResolved())
-                minVal = parentTypeConstraint.MIN;
 
             Asn1Value maxVal = null;
             if (tree.GetChild(1).GetChild(0).Type != asn1Parser.MAX)
             {
                 maxVal = Asn1Value.CreateFromAntlrAst(tree.GetChild(1).GetChild(0));
-                maxVal = type.ResolveVariable(maxVal);
+//                maxVal = type.ResolveVariable(maxVal);
             }
-            else if (parentTypeConstraint.IsResolved())
-                maxVal = parentTypeConstraint.MAX;
 
             bool minValIsInclude = true;
             bool maxValIsInclude = true;
@@ -698,15 +711,17 @@ namespace tinyAsn1
                 if (tree.GetChild(i).Type == asn1Parser.MAX_VAL_INCLUDED)
                     maxValIsInclude = false;
             }
-            return new RangeConstraint(type, parentTypeConstraint, minVal, maxVal, minValIsInclude, maxValIsInclude);
+            return new RangeConstraint(type, minVal, maxVal, minValIsInclude, maxValIsInclude);
         }
         public override bool IsResolved()
         {
-            if (m_min == null)
-                return false;
-            if (m_max == null)
-                return false;
-            return m_min.IsResolved() && m_max.IsResolved() && m_parentTypeConstraint.IsResolved();
+            if (m_min == null && m_max == null)  //(MIN..MAX)
+                return true;
+            if (m_min == null && m_max != null)
+                return m_max.IsResolved();
+            if (m_min != null && m_max == null)
+                return m_min.IsResolved();
+            return m_min.IsResolved() && m_max.IsResolved();
         }
 
         public override void DoSemanticAnalysis()
@@ -716,29 +731,33 @@ namespace tinyAsn1
 
             if (m_min != null)
                 m_min = m_type.ResolveVariable(m_min);
-            else if (m_parentTypeConstraint.IsResolved())
-                m_min = m_parentTypeConstraint.MIN;
 
-            if (m_min!=null && m_min.IsResolved() && m_parentTypeConstraint.IsResolved())
+            if (m_min != null && m_min.IsResolved() && m_type.ParentType != null && m_type.ParentType.AreConstraintsResolved())
             {
-                if (!m_parentTypeConstraint.isValueAllowed(m_min))
+                if (!m_type.ParentType.isValueAllowed(m_min))
                 {
-                    throw new SemanticErrorException("Error in line:" + m_min.antlrNode.Line + ",col: " + m_min.antlrNode.CharPositionInLine +
-                        ". Value: " + m_min.ToString() + " does not belong to parent type");
+                    if (m_type is SizeConstraint.DummyReferenceType)
+                        throw new SemanticErrorException("Error line:" + m_max.antlrNode.Line + ",col: " + m_max.antlrNode.CharPositionInLine +
+                            ". A Size constraint must not include non negative integer numbers");
+                    else
+                        Console.Error.WriteLine("Warning line:" + m_min.antlrNode.Line + ",col: " + m_min.antlrNode.CharPositionInLine +
+                         ". Value: " + m_min.ToString() + " does not belong to parent type");
                 }
-            }
+            } 
 
             if (m_max != null)
                 m_max = m_type.ResolveVariable(m_max);
-            else if (m_parentTypeConstraint.IsResolved())
-                m_max = m_parentTypeConstraint.MAX;
 
-            if (m_max!=null && m_max.IsResolved() && m_parentTypeConstraint.IsResolved())
+            if (m_max != null && m_max.IsResolved() && m_type.ParentType != null && m_type.ParentType.AreConstraintsResolved())
             {
-                if (!m_parentTypeConstraint.isValueAllowed(m_max))
+                if (!m_type.ParentType.isValueAllowed(m_max))
                 {
-                    throw new SemanticErrorException("Error in line:" + m_max.antlrNode.Line + ",col: " + m_max.antlrNode.CharPositionInLine +
-                        ". Value: " + m_max.ToString() + " does not belong to parent type");
+                    if (m_type is SizeConstraint.DummyReferenceType)
+                        throw new SemanticErrorException("Error line:" + m_max.antlrNode.Line + ",col: " + m_max.antlrNode.CharPositionInLine +
+                            ". A Size constraint must not include non negative integer numbers");
+                    else
+                        Console.Error.WriteLine("Warning line:" + m_max.antlrNode.Line + ",col: " + m_max.antlrNode.CharPositionInLine +
+                            ". Value: " + m_max.ToString() + " does not belong to parent type");
                 }
             }
 
@@ -755,7 +774,7 @@ namespace tinyAsn1
             return this;
         }
 
-        public override Asn1Value MIN
+/*        public override Asn1Value MIN
         {
             get
             {
@@ -781,51 +800,99 @@ namespace tinyAsn1
                 }
                 return m_max;
             }
-        }
+        }*/
 
         public override string ToString()
         {
-            string ret = m_min.ToString();
+            string ret = "";
+            if (m_min==null)
+                ret="MIN";
+            else
+                ret = m_min.ToString();
+
             if (!m_minValIsInluded)
                 ret += "<";
             ret += "..";
             if (!m_maxValIsInluded)
                 ret += "<";
-            ret += m_max.ToString();
+            if (m_max == null)
+                ret += "MAX";
+            else
+                ret += m_max.ToString();
             return ret;
         }
     }
 
     public class SizeConstraint : BaseConstraint
     {
-        ConstraintsSet<Int64> m_allowedSizes;
-        IConstraint m_constraint;       //parent type is INTEGER(0..MAX) where MAX is platform's MAXINT
-        public SizeConstraint(Asn1Type type, IConstraint parentTypeConstraint, IConstraint constraint)
-            : base(type, parentTypeConstraint)
+        public class DummyReferenceType : ReferenceType
         {
-            m_constraint = constraint;
-            m_allowedSizes = CreateFromConstraint(constraint);
-     
+            IntegerType dummyInterger;
+            public DummyReferenceType(Module mod, ITree antlr)
+            {
+                m_module = mod;
+                antlrNode = antlr;
+                dummyInterger = new IntegerType();
+                dummyInterger.antlrNode = antlr;
+                dummyInterger.m_module = mod;
+                dummyInterger.m_constraints.Add(new RangeConstraint(dummyInterger, new IntegerValue(0, mod, antlr, dummyInterger), null, true, true));
+                m_referencedTypeName = "SIZE";
+            }
+            public override Asn1Type ParentType { get { return dummyInterger; } }
+            public override Asn1Type Type { get { return dummyInterger; } }
+            public override string ToString()
+            {
+                string ret = "SIZE ";
+                foreach (IConstraint con in m_constraints)
+                    ret+=con.ToString();
+                return ret;
+            }
         }
 
+        DummyReferenceType sizeCon;
+
+        public SizeConstraint(Asn1Type type, DummyReferenceType sc)
+            : base(type)
+        {
+            sizeCon = sc;
+        }
+
+        public static IConstraint Create(ITree tree, Asn1Type type)
+        {
+            if (tree == null || type == null)
+                throw new ArgumentNullException();
+            if (tree.Type != asn1Parser.SIZE_EXPR)
+                throw new Exception("Internal Error");
+
+            DummyReferenceType sc = new DummyReferenceType(type.m_module, tree);
+            sc.m_AntlrConstraints.Add(tree.GetChild(0));
+            return new SizeConstraint(type, sc);
+        }
+
+        public override bool IsResolved()
+        {
+            return sizeCon.AreConstraintsResolved();
+        }
+        public override void DoSemanticAnalysis()
+        {
+            sizeCon.ResolveConstraints();
+        }
+        public override IConstraint Simplify()
+        {
+            return this;
+        }
         public override bool isValueAllowed(Asn1Value val)
         {
             ISize size = val as ISize;
             if (size == null)
                 throw new ArgumentException("Internal Error, val does not implement Size interface");
-            if (m_allowedSizes.HasValue(size.Size))
-                return true;
-            
-            return false;
+
+            return sizeCon.isValueAllowed(new IntegerValue(size.Size, m_type.m_module, null, sizeCon));
         }
 
-        ConstraintsSet<Int64> CreateFromConstraint(IConstraint constraint)
-        {
-            throw new Exception();
-        }
         public override string ToString()
         {
-            return "SIZE "+ m_constraint.ToString();
+            return sizeCon.ToString();
         }
 
     }
@@ -836,8 +903,8 @@ namespace tinyAsn1
         IConstraint m_constraint;       //parent type is ??
         ConstraintsSet<Char> m_allowedChars;
 
-        public PermittedAlphabetConstraint(Asn1Type type, IConstraint parentTypeConstraint, IConstraint constraint)
-            : base(type, parentTypeConstraint)
+        public PermittedAlphabetConstraint(Asn1Type type, IConstraint constraint)
+            : base(type)
         {
             m_constraint = constraint;
             m_allowedChars = CreateFromConstraint(constraint);
@@ -1103,6 +1170,44 @@ namespace tinyAsn1
                 default:
                     throw new Exception("Unkown constraint expression: " + tree.Text);
             }
+
+            return ret;
+        }
+    }
+
+    public partial class ValueRangeExpression
+    {
+        public Asn1Value m_minValue;
+        public Asn1Value m_maxValue;
+        public bool m_minValIsIncluded = false;
+        public bool m_maxValIsIncluded = false;
+
+        static public ValueRangeExpression CreateFromAntlrAst(ITree tree)
+        {
+            ValueRangeExpression ret = new ValueRangeExpression();
+            ret.m_minValue = Asn1Value.CreateFromAntlrAst(tree.GetChild(0));
+            int lineNo = tree.GetChild(0).Line;
+            for (int i = 1; i < tree.ChildCount; i++)
+            {
+                ITree child = tree.GetChild(i);
+                switch (child.Type)
+                {
+                    case asn1Parser.MAX_VAL_PRESENT:
+                        ret.m_maxValue = Asn1Value.CreateFromAntlrAst(child.GetChild(0));
+                        break;
+                    case asn1Parser.MIN_VAL_INCLUDED:
+                        ret.m_minValIsIncluded = true;
+                        break;
+                    case asn1Parser.MAX_VAL_INCLUDED:
+                        ret.m_maxValIsIncluded = true;
+                        break;
+                    default:
+                        throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
+                }
+            }
+
+            //if (ret.m_maxValue != null && ret.m_minValue.m_valType != ret.m_maxValue.m_valType)
+            //    throw new SemanticErrorException("Semantic Error: Both values in a range must be of the same type. Line:" +lineNo.ToString());
 
             return ret;
         }
