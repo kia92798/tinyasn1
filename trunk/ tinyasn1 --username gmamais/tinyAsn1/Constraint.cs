@@ -170,12 +170,15 @@ namespace tinyAsn1
             m_extConstr = extConstr;
         }
         
-        public static RootConstraint Create(ITree tree, Asn1Type type)
+        public static IConstraint Create(ITree tree, Asn1Type type)
         {
             if (tree == null || type == null )
                 throw new ArgumentNullException();
+            if (tree.Type == asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT)
+                return SizeConstraint.Create(tree, type);
             if (tree.Type != asn1Parser.CONSTRAINT)
                 throw new Exception("Internal Error");
+            
             IConstraint constr = BaseConstraint.CreateUnionSet(tree.GetChild(0), type);
             IConstraint extConstr=null;
 
@@ -842,9 +845,10 @@ namespace tinyAsn1
             public override Asn1Type Type { get { return dummyInterger; } }
             public override string ToString()
             {
-                string ret = "SIZE ";
+                string ret = "SIZE (";
                 foreach (IConstraint con in m_constraints)
                     ret+=con.ToString();
+                ret += ")";
                 return ret;
             }
         }
@@ -861,7 +865,7 @@ namespace tinyAsn1
         {
             if (tree == null || type == null)
                 throw new ArgumentNullException();
-            if (tree.Type != asn1Parser.SIZE_EXPR)
+            if (!(tree.Type == asn1Parser.SIZE_EXPR || tree.Type==asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT))
                 throw new Exception("Internal Error");
 
             DummyReferenceType sc = new DummyReferenceType(type.m_module, tree);

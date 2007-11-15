@@ -247,6 +247,7 @@ namespace tinyAsn1
         
         public override void DoSemanticAnalysis()
         {
+
         }
 
 /*        public override IConstraint ParentConstraint

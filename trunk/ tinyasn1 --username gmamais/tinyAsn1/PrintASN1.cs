@@ -8,12 +8,19 @@ namespace tinyAsn1
 
     public partial class Asn1Type
     {
+        public virtual void PrintAsn1Constraints(StreamWriterLevel o)
+        {
+            if (m_constraints.Count > 0)
+            {
+                o.Write(" ");
+                foreach (IConstraint con in m_constraints)
+                    o.Write("("+con.ToString()+")");
+            }
+        }
         public virtual void PrintAsn1(StreamWriterLevel o, int lev)
         {
             o.Write(Name);
-            o.Write(" ");
-            foreach (IConstraint con in m_constraints)
-                o.Write(con.ToString());
+            PrintAsn1Constraints(o);
         }
     }
     public partial class BitStringType
@@ -36,6 +43,7 @@ namespace tinyAsn1
             }
             else
                 o.Write(" BIT STRING");
+            PrintAsn1Constraints(o);
         }
     }
 
@@ -57,6 +65,7 @@ namespace tinyAsn1
                 o.P(lev);
                 o.Write("}");
             }
+            PrintAsn1Constraints(o);
         }
     }
 
@@ -81,13 +90,8 @@ namespace tinyAsn1
             else
                 o.Write("INTEGER ");
 
-            foreach (IConstraint con in m_constraints)
-                o.Write(con.ToString());
-/*            if (m_AllowedValueSet != null)
-            {
-                o.Write(" ");
-                o.Write(m_AllowedValueSet.ToString());
-            }*/
+            PrintAsn1Constraints(o);
+            
         }
     }
 
@@ -129,6 +133,7 @@ namespace tinyAsn1
 
             o.P(lev);
             o.Write("}");
+            PrintAsn1Constraints(o);
         }
     }
 
@@ -163,6 +168,7 @@ namespace tinyAsn1
 
             o.P(lev);
             o.Write("}");
+            PrintAsn1Constraints(o);
         }
     }
 
@@ -171,7 +177,9 @@ namespace tinyAsn1
 
         public override void PrintAsn1(StreamWriterLevel o, int lev)
         {
-            o.Write("SEQUENCE OF ");
+            o.Write("SEQUENCE");
+            PrintAsn1Constraints(o);
+            o.Write(" OF ");
             m_type.PrintAsn1(o, lev);
         }
     }
@@ -181,7 +189,9 @@ namespace tinyAsn1
 
         public override void PrintAsn1(StreamWriterLevel o, int lev)
         {
-            o.Write("SET OF ");
+            o.Write("SET ");
+            PrintAsn1Constraints(o);
+            o.Write(" OF ");
             m_type.PrintAsn1(o, lev);
         }
     }

@@ -446,10 +446,8 @@ namespace tinyAsn1
                         case asn1Parser.BMPString:
                         case asn1Parser.UTF8String:
                             throw new SemanticErrorException("Error line: " + child.Line + ", col: " + child.CharPositionInLine + ". "+child.Text+" is currently not supported.");
-/*                        case asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT:
-                            if (ret != null)
-                                ret.m_constraints.Add(Constraint.CreateConstraintFromSizeConstraint(child));
-                            break;*/
+                        case asn1Parser.SELECTION_TYPE:
+                            throw new SemanticErrorException("Error line: " + child.GetChild(0).Line + ", col: " + child.GetChild(0).CharPositionInLine + ". Selection types are currently not supported.");
                         case asn1Parser.CONSTRAINT:
                             //if (ret != null)
                             //    ret.m_constraints.Add(Constraint.CreateFromAntlrAst(child));
@@ -1476,6 +1474,32 @@ namespace tinyAsn1
                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting CHOICE variable");
             }
         }
+        public override void ResolveConstraints()
+        {
+            if (AreConstraintsResolved())
+                return;
+            foreach (Child ch in m_children.Values)
+                ch.m_type.ResolveConstraints();
+            base.ResolveConstraints();
+
+        }
+        public override bool AreConstraintsResolved()
+        {
+            foreach (Child ch in m_children.Values)
+                if (!ch.m_type.AreConstraintsResolved())
+                    return false;
+            return base.AreConstraintsResolved();
+        }
+        public override bool isValueAllowed(Asn1Value val)
+        {
+            if (!base.isValueAllowed(val))
+                return false;
+            ChoiceValue v = val as ChoiceValue;
+            if (v == null)
+                throw new Exception("Internal Error");
+
+            return m_children[v.AlternativeName].m_type.isValueAllowed(v.Value);
+        }
     }
 
     public partial class SequenceOrSetType : Asn1Type
@@ -1694,6 +1718,49 @@ namespace tinyAsn1
                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting SEQUENCE variable");
             }
         }
+
+        public override void ResolveConstraints()
+        {
+            if (AreConstraintsResolved())
+                return;
+            foreach (Child ch in m_children.Values)
+                ch.m_type.ResolveConstraints();
+            base.ResolveConstraints();
+
+            if (AreConstraintsResolved())
+            {
+                // I have just been resolved, so check default values
+                foreach (Child ch in m_children.Values)
+                {
+                    if (ch.m_defaultValue != null && !ch.m_type.isValueAllowed(ch.m_defaultValue))
+                        throw new SemanticErrorException("Error: line " + ch.m_type.antlrNode.Line+" Default value does not satisfy type constraints");
+                }
+            }
+        }
+        public override bool AreConstraintsResolved()
+        {
+            foreach (Child ch in m_children.Values)
+                if (!ch.m_type.AreConstraintsResolved())
+                    return false;
+            return base.AreConstraintsResolved();
+        }
+        public override bool isValueAllowed(Asn1Value val)
+        {
+            if (!base.isValueAllowed(val))
+                return false;
+            SequenceOrSetValue v = val as SequenceOrSetValue;
+            if (v == null)
+                throw new Exception("Internal Error");
+
+            foreach (string chName in v.m_children.Keys)
+            {
+                Asn1Value chValue = v.m_children[chName];
+                if (!m_children[chName].m_type.isValueAllowed(chValue))
+                    return false;
+            }
+
+            return true;
+        }
     }
 
     public partial class SequenceType : SequenceOrSetType
@@ -1809,11 +1876,37 @@ namespace tinyAsn1
 
         static List<int> m_allowedTokens = new List<int>(new int[]{ asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
                 asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
-                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.SIZE_EXPR});
-        static List<int> m_stopList = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.SIZE_EXPR });
+                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, 
+                asn1Parser.SIZE_EXPR, asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT});
+        static List<int> m_stopList = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, 
+            asn1Parser.SIZE_EXPR, asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT });
 
         protected override IEnumerable<int> AllowedTokensInConstraints { get { return m_allowedTokens; } }
         protected override IEnumerable<int> StopTokensInConstraints { get { return m_stopList; } }
+
+        public override void ResolveConstraints()
+        {
+            m_type.ResolveConstraints();
+            base.ResolveConstraints();
+        }
+        public override bool AreConstraintsResolved()
+        {
+            return base.AreConstraintsResolved() && m_type.AreConstraintsResolved();
+        }
+        public override bool isValueAllowed(Asn1Value val)
+        {
+            if (!base.isValueAllowed(val))
+                return false;
+            SequenceOfValue v = val as SequenceOfValue;
+            if (v == null)
+                throw new Exception("Internal Error");
+
+            foreach (Asn1Value item in v.m_children)
+                if (!m_type.isValueAllowed(item))
+                    return false;
+            
+            return true;
+        }
     }
 
     public partial class SetOfType : Asn1Type
@@ -1904,11 +1997,36 @@ namespace tinyAsn1
 
         static List<int> m_allowedTokens = new List<int>(new int[]{ asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
                 asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
-                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.SIZE_EXPR});
-        static List<int> m_stopList = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.SIZE_EXPR });
+                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, 
+                asn1Parser.SIZE_EXPR, asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT});
+        static List<int> m_stopList = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, 
+            asn1Parser.SIZE_EXPR, asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT });
 
         protected override IEnumerable<int> AllowedTokensInConstraints { get { return m_allowedTokens; } }
         protected override IEnumerable<int> StopTokensInConstraints { get { return m_stopList; } }
+        public override void ResolveConstraints()
+        {
+            m_type.ResolveConstraints();
+            base.ResolveConstraints();
+        }
+        public override bool AreConstraintsResolved()
+        {
+            return base.AreConstraintsResolved() && m_type.AreConstraintsResolved();
+        }
+        public override bool isValueAllowed(Asn1Value val)
+        {
+            if (!base.isValueAllowed(val))
+                return false;
+            SetOfValue v = val as SetOfValue;
+            if (v == null)
+                throw new Exception("Internal Error");
+
+            foreach (Asn1Value item in v.m_children)
+                if (!m_type.isValueAllowed(item))
+                    return false;
+
+            return true;
+        }
     }
 
     public partial class ObjectIdentifier : Asn1Type
