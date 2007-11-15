@@ -71,6 +71,7 @@ tokens {
 	UNION_SET;
 	INTERSECTION_SET;
 	NUMERIC_VALUE2;
+	SELECTION_TYPE;
 }
 
 
@@ -217,8 +218,13 @@ type	: typeTag?
     |setType	constraint*											-> ^(TYPE_DEF typeTag? setType)
     |setOfType												-> ^(TYPE_DEF typeTag? setOfType)
     |objectIdentifier constraint*							-> ^(TYPE_DEF typeTag? objectIdentifier constraint*)
-    |relativeOID	constraint*										-> ^(TYPE_DEF typeTag? relativeOID)
+    |relativeOID	constraint*								-> ^(TYPE_DEF typeTag? relativeOID constraint*)
+    |selectionType											-> ^(TYPE_DEF typeTag? selectionType)
 )
+;
+
+selectionType	:	
+	identifier '<' type											->^(SELECTION_TYPE identifier type)
 ;
 
 sizeShortConstraint

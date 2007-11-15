@@ -53,7 +53,7 @@ namespace tinyAsn1
                 foreach (Module m in f.m_modules)
                     foreach (ValueAssigment vs in m.m_valuesAssigments.Values)
                         if (!vs.m_type.isValueAllowed(vs.m_value))
-                            Console.Error.WriteLine("Warning: Value defined in line " + vs.m_value.antlrNode.Line +
+                            Console.Error.WriteLine("Warning: value '" + vs.m_name+ "'defined in line " + vs.m_value.antlrNode.Line +
                                 " does not conform to its type constraints");
 
         }

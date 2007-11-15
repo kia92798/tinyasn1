@@ -80,8 +80,6 @@ namespace tinyAsn1
         {
             if (!tas.m_type.SemanticAnalysisFinished())
                 tas.m_type.DoSemanticAnalysis();
-
-           
         }
 
         public void OnAfterTypeAssigment(Asn1File asn1File, Module mod, TypeAssigment tas)

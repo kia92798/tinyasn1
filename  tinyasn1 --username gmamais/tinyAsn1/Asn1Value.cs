@@ -631,7 +631,9 @@ namespace tinyAsn1
 
         public override string ToString()
         {
-            return Value.ToString();
+            if (Value)
+                return "TRUE";
+            return "FALSE";
         }
         public BooleanValue(ITree tree, Module mod, Asn1Type type) 
         {
