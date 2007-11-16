@@ -1,0 +1,4 @@
+- add support for special comments (ie --@this a special comment)
+- add support for type inclusion constraint
+- add support for WITH COMPONENT constraint
+- add support for WITH COMPONENTS constraint
