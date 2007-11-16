@@ -51,6 +51,11 @@ namespace tinyAsn1
 
             foreach (Asn1File f in m_files)
                 foreach (Module m in f.m_modules)
+                    foreach (TypeAssigment tas in m.m_typeAssigments.Values)
+                        tas.m_type.CheckDefaultValues();
+
+            foreach (Asn1File f in m_files)
+                foreach (Module m in f.m_modules)
                     foreach (ValueAssigment vs in m.m_valuesAssigments.Values)
                         if (!vs.m_type.isValueAllowed(vs.m_value))
                             Console.Error.WriteLine("Warning: value '" + vs.m_name+ "'defined in line " + vs.m_value.antlrNode.Line +
@@ -475,7 +480,7 @@ namespace tinyAsn1
         }
     }
 
-    public partial class NumericStringType : Asn1Type
+    public partial class NumericStringType : IA5StringType
     {
         public override string Name
         {

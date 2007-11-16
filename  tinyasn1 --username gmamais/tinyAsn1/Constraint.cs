@@ -82,6 +82,8 @@ namespace tinyAsn1
                     return CreateUnionSet(tree, type);
                 case asn1Parser.SIZE_EXPR:
                     return SizeConstraint.Create(tree, type);
+                case asn1Parser.PERMITTED_ALPHABET_EXPR:
+                    return PermittedAlphabetConstraint.Create(tree, type);
                 default:
                     throw new Exception("Internal Error: unexpectected token: " + tree.Text);
             }
@@ -573,7 +575,7 @@ namespace tinyAsn1
 
     public class SingleValueConstraint : BaseConstraint
     {
-        Asn1Value m_val;
+        protected Asn1Value m_val;
 
         public SingleValueConstraint(Asn1Type type, Asn1Value value)
             : base(type)
@@ -589,9 +591,11 @@ namespace tinyAsn1
         {
             if (tree == null || type == null)
                 throw new ArgumentNullException();
-
+            
             Asn1Value val = Asn1Value.CreateFromAntlrAst(tree);
 //            val = type.ResolveVariable(val);
+            if ((type is IA5StringType) && ( ((IA5StringType)type).IamUsedInPermittedAlphabet))
+                return new SinglePAValueConstraint(type, val);
             return new SingleValueConstraint(type, val);
         }
 
@@ -641,18 +645,40 @@ namespace tinyAsn1
         }
     }
 
+    public class SinglePAValueConstraint : SingleValueConstraint
+    {
+        public SinglePAValueConstraint(Asn1Type type, Asn1Value value)
+            : base(type, value)
+        {
+        }
+        public override bool isValueAllowed(Asn1Value val)
+        {
+            ICharacterString str = val as ICharacterString;
+            ICharacterString set = m_val as ICharacterString;
+            if (str == null || set == null)
+                throw new Exception("Internal Error");
+            if (str.Value.Length != 1)
+                throw new Exception("Internal Error");
+            Char ch = str.Value[0];
+
+            if (!set.Value.Contains(ch.ToString()))
+                return false;
+            return true;
+        }
+    }
+
     public class RangeConstraint : BaseConstraint
     {
         /// <summary>
         /// if m_min is null then m_min is MIN
         /// </summary>
-        Asn1Value m_min;
+        protected Asn1Value m_min;
         /// <summary>
         /// if m_max is null then m_max is MAX
         /// </summary>
-        Asn1Value m_max;
-        bool m_minValIsInluded = true;
-        bool m_maxValIsInluded = true;
+        protected Asn1Value m_max;
+        protected bool m_minValIsInluded = true;
+        protected bool m_maxValIsInluded = true;
 
         public RangeConstraint(Asn1Type type, Asn1Value minVal, Asn1Value maxVal,
             bool minValIsInluded, bool maxValIsInluded)
@@ -714,6 +740,9 @@ namespace tinyAsn1
                 if (tree.GetChild(i).Type == asn1Parser.MAX_VAL_INCLUDED)
                     maxValIsInclude = false;
             }
+
+            if ((type is IA5StringType) && (((IA5StringType)type).IamUsedInPermittedAlphabet))
+                return new RangePAConstraint(type, minVal, maxVal, minValIsInclude, maxValIsInclude);
             return new RangeConstraint(type, minVal, maxVal, minValIsInclude, maxValIsInclude);
         }
         public override bool IsResolved()
@@ -826,6 +855,86 @@ namespace tinyAsn1
         }
     }
 
+    public class RangePAConstraint : RangeConstraint
+    {
+        public RangePAConstraint(Asn1Type type, Asn1Value minVal, Asn1Value maxVal,
+            bool minValIsInluded, bool maxValIsInluded)
+            : base(type, minVal, maxVal, minValIsInluded, maxValIsInluded)
+        {
+        }
+
+        public override void DoSemanticAnalysis()
+        {
+            if (IsResolved())
+                return;
+            base.DoSemanticAnalysis();
+            if (m_min != null && m_min.IsResolved() && Lo.Value.Length!=1)
+            {
+                Console.Error.WriteLine("Warning line: "+m_min.antlrNode.Line+": Permitted alphabet ranges must constain single character string. The constraint will be ignored");
+            }
+
+            if (m_max != null && m_max.IsResolved() && Hi.Value.Length != 1)
+            {
+                Console.Error.WriteLine("Warning line: " + m_max.antlrNode.Line + ": Permitted alphabet ranges must constain single character string. The constraint will be ignored");
+            }
+            
+        }
+        ICharacterString Lo
+        {
+            get { return (ICharacterString)m_min; }
+        }
+        ICharacterString Hi
+        {
+            get { return (ICharacterString)m_max; }
+        }
+        public override bool isValueAllowed(Asn1Value val)
+        {
+            if (m_min != null && Lo.Value.Length != 1)
+                return true; // ignore constraint
+            if (m_max != null && Hi.Value.Length != 1)
+                return true; // ignore constraint
+            ICharacterString str = val as ICharacterString;
+            if (str.Value.Length != 1)
+                throw new Exception("Internal Error");
+
+            if (m_min == null && m_max == null)  //(MIN..MAX)
+                return true;
+
+            Char min;
+            Char max;
+            Char ch = str.Value[0];
+            if (m_min != null && m_max == null) // (value..MAX)
+            {
+                min = Lo.Value[0];
+                if (ch < min)
+                    return false;
+                else if (min == ch && !m_minValIsInluded)
+                    return false;
+            }
+            else if (m_min == null && m_max != null) // (MIN..value)
+            {
+                max = Hi.Value[0];
+                if (ch > max)
+                    return false;
+                else if (ch == max && !m_maxValIsInluded)
+                    return false;
+            }
+            else
+            {
+                min = Lo.Value[0];
+                max = Hi.Value[0];
+                if ((ch < min) || (ch > max))
+                    return false;
+                else if (min == ch && !m_minValIsInluded)
+                    return false;
+                else if (ch == max && !m_maxValIsInluded)
+                    return false;
+            }
+
+            return true;
+        }
+    }
+
     public class SizeConstraint : BaseConstraint
     {
         public class DummyReferenceType : ReferenceType
@@ -903,45 +1012,64 @@ namespace tinyAsn1
 
     public class PermittedAlphabetConstraint : BaseConstraint
     {
+        IA5StringType allowed_char_set;
 
-        IConstraint m_constraint;       //parent type is ??
-        ConstraintsSet<Char> m_allowedChars;
-
-        public PermittedAlphabetConstraint(Asn1Type type, IConstraint constraint)
+        public PermittedAlphabetConstraint(Asn1Type type, IA5StringType allowed_char)
             : base(type)
         {
-            m_constraint = constraint;
-            m_allowedChars = CreateFromConstraint(constraint);
+            allowed_char_set = allowed_char;
         }
 
-        ConstraintsSet<Char> CreateFromConstraint(IConstraint constraint)
+        internal static IConstraint Create(ITree tree, Asn1Type type)
         {
-            throw new Exception();
+            if (tree == null || type == null)
+                throw new ArgumentNullException();
+            if (tree.Type != asn1Parser.PERMITTED_ALPHABET_EXPR)
+                throw new Exception("Internal Error");
+
+            IA5StringType ia = type as IA5StringType;
+            IA5StringType set = ia.CreateForPA(type.m_module, tree);
+            set.m_AntlrConstraints.Add(tree.GetChild(0));
+
+            return new PermittedAlphabetConstraint(type, set);
+        }
+
+        public override bool IsResolved()
+        {
+            return allowed_char_set.AreConstraintsResolved();
+        }
+        public override void DoSemanticAnalysis()
+        {
+            allowed_char_set.ResolveConstraints();
         }
         
         public override bool isValueAllowed(Asn1Value val)
         {
-            ICharacterString charStr = val as ICharacterString;
-            if (charStr == null)
-                throw new ArgumentException("Internal Error, val does not implement ICharacterString interface");
-            
-            if (m_allowedChars.IsNull())
-                return false;
-
-            foreach (Char ch in charStr.Value)
-                if (!m_allowedChars.HasValue(ch))
+            ICharacterString str = val as ICharacterString;
+            if (str == null)
+                throw new Exception("Internal error");
+            foreach (Char ch in str.Value)
+            {
+                IA5StringValue v = new IA5StringValue(ch);
+                if (!allowed_char_set.isValueAllowed(v))
                     return false;
+            }
 
             return true;
         }
         public override string ToString()
         {
-            return "FROM " + m_constraint.ToString();
+            string ret = "FROM (";
+            foreach (IConstraint con in allowed_char_set.m_constraints)
+                ret += con.ToString();
+            ret += ")";
+            return ret;
+        }
+        public override IConstraint Simplify()
+        {
+            return this;
         }
     }
-
-
-
 
 
 /*
