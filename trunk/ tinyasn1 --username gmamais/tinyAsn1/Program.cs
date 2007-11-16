@@ -92,9 +92,13 @@ namespace tinyAsn1
                 Console.Error.WriteLine(ex.Message);
                 return 2;
             }
-
-
-
+            //catch (Exception ex)
+            //{
+            //    Console.Error.WriteLine("Unkown exception ...");
+            //    Console.Error.WriteLine(ex.Message);
+            //    Console.Error.WriteLine(ex.StackTrace);
+            //    return 3;
+            //}
 
             if (debug)
             {

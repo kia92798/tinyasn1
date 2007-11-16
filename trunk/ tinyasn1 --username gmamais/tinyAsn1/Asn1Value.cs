@@ -601,6 +601,19 @@ namespace tinyAsn1
             get { return Value.Length; }
         }
 
+
+        public override int CompareTo(object obj)
+        {
+            IA5StringValue oth = obj as IA5StringValue;
+            if (oth == null)
+                throw new ArgumentException("obj is not an IA5StringValue");
+            return Value.CompareTo(oth.Value);
+        }
+        public IA5StringValue(Char str)
+        {
+            m_TypeID = Asn1Value.TypeID.IA5String;
+            m_value = str.ToString();
+        }
     }
 
     public partial class NumericStringValue : IA5StringValue

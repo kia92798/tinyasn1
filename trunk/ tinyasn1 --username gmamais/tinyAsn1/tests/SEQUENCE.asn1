@@ -100,6 +100,22 @@ MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
 		}
 
 	}
+
+	MySQ2b ::= SEQUENCE {
+		a1	INTEGER {red(0), blue(1)} (red|blue) DEFAULT red,
+		b1 	MyReal	DEFAULT pi,
+		c1	MyEnum	DEFAULT red,
+		d1	MyBitStr2	OPTIONAL
+	}	
+
+	WITCOMPSEQ ::=	SEQUENCE {
+		a	INTEGER {red(0), blue(1)} (red|blue) DEFAULT red,
+		b 	MyReal	DEFAULT pi,
+		c	MyEnum	DEFAULT red,
+		COMPONENTS OF MySQ2b,
+		d	MyBitStr2	OPTIONAL
+	}
+
 	
 	
 	MYCHOICE ::= CHOICE {
@@ -120,7 +136,7 @@ MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
 	MYSQOFCHOICE ::= SEQUENCE OF MYCHOICE
 	
 	mysqofchoice MYSQOFCHOICE ::= {
-				a:10, 
+				a:10,					--warning 10 is out of 0..1
 				e:{ a blue, c red},
 				e:{ a blue, b pi, c red},
 				d:'011'B

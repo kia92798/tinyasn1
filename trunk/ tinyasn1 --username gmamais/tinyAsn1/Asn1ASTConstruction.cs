@@ -466,6 +466,12 @@ namespace tinyAsn1
             }
             return ret;
         }
+        /// <summary>
+        /// SEQUENCE and SET must override this method.
+        /// </summary>
+        public virtual void CheckDefaultValues() 
+        {
+        }
 
         /// <summary>
         /// This method takes as input an unresolved variable and 
@@ -587,7 +593,7 @@ namespace tinyAsn1
         static List<int> m_stopList = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR });
 
         protected virtual IEnumerable<int> AllowedTokensInConstraints { get { return m_allowedTokens; } }
-        protected virtual IEnumerable<int> StopTokensInConstraints { get { return m_allowedTokens; } }
+        protected virtual IEnumerable<int> StopTokensInConstraints { get { return m_stopList; } }
 
         public virtual void checkConstraintsSemantically(ITree antrlConstraint)
         {
@@ -1010,16 +1016,69 @@ namespace tinyAsn1
         public override void DoSemanticAnalysis()
         {
         }
+        
         static List<int> m_allowedTokens = new List<int>(new int[]{ asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
                 asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
-                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.SIZE_EXPR});
-        static List<int> m_stopList = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.SIZE_EXPR });
+                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.SIZE_EXPR, asn1Parser.PERMITTED_ALPHABET_EXPR});
+        static List<int> m_stopList = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.SIZE_EXPR, asn1Parser.PERMITTED_ALPHABET_EXPR });
 
-        protected override IEnumerable<int> AllowedTokensInConstraints { get { return m_allowedTokens; } }
-        protected override IEnumerable<int> StopTokensInConstraints { get { return m_stopList; } }
+        protected override IEnumerable<int> AllowedTokensInConstraints {
+            get
+            {
+                if (m_IamUsedInPermittedAlphabet)
+                    return m_allowedTokensPA;
+                return m_allowedTokens; 
+            } 
+        }
+        protected override IEnumerable<int> StopTokensInConstraints { 
+            get {
+                if (m_IamUsedInPermittedAlphabet)
+                    return m_stopListPA;
+                return m_stopList;
+            } 
+        }
+
+
+        private bool m_IamUsedInPermittedAlphabet = false;
+
+        public bool IamUsedInPermittedAlphabet
+        {
+            get { return m_IamUsedInPermittedAlphabet; }
+            set { m_IamUsedInPermittedAlphabet = value; }
+        }
+        static List<int> m_allowedTokensPA = new List<int>(new int[]{ asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
+                asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
+                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR});
+        static List<int> m_stopListPA = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR });
+
+        public virtual IA5StringType CreateForPA(Module mod, ITree antrl)
+        {
+            IA5StringType ret = new IA5StringType();
+            ret.m_IamUsedInPermittedAlphabet = true;
+            ret.m_module = mod;
+            ret.antlrNode = antrl;
+            return ret;
+        }
+        public override void checkConstraintsSemantically(ITree antrlConstraint)
+        {
+            if (!IamUsedInPermittedAlphabet)
+                base.checkConstraintsSemantically(antrlConstraint);
+            else
+            {
+                AntlrTreeVisitor visit = new AntlrTreeVisitor();
+
+
+                visit.visitIfNot(antrlConstraint, AllowedTokensInConstraints, delegate(ITree root)
+                {
+                    throw new SemanticErrorException("Error1 in Line:" + root.Line + ", col:" + root.CharPositionInLine +
+                        " . This type of constraint '" + root.Text + "' cannot appear under " + Name);
+                },
+                    StopTokensInConstraints);
+            }
+        }
     }
 
-    public partial class NumericStringType : Asn1Type
+    public partial class NumericStringType : IA5StringType
     {
         internal override Asn1Value ResolveVariable(Asn1Value val)
         {
@@ -1051,12 +1110,13 @@ namespace tinyAsn1
                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting NumericString constant or NumericString variable referebce");
             }
         }
-        internal override bool SemanticAnalysisFinished()
+        public override IA5StringType CreateForPA(Module mod, ITree antrl)
         {
-            return true;
-        }
-        public override void DoSemanticAnalysis()
-        {
+            NumericStringType ret = new NumericStringType();
+            ret.IamUsedInPermittedAlphabet = true;
+            ret.m_module = mod;
+            ret.antlrNode = antrl;
+            return ret;
         }
     }
 
@@ -1483,6 +1543,11 @@ namespace tinyAsn1
             base.ResolveConstraints();
 
         }
+        public override void CheckDefaultValues()
+        {
+            foreach (Child ch in m_children.Values)
+                ch.m_type.CheckDefaultValues();
+        }
         public override bool AreConstraintsResolved()
         {
             foreach (Child ch in m_children.Values)
@@ -1504,7 +1569,30 @@ namespace tinyAsn1
 
     public partial class SequenceOrSetType : Asn1Type
     {
-        public partial class Child
+        class ComponentChild : Child
+        {
+            static new public ComponentChild CreateFromAntlrAst(ITree tree, int? version, bool extended)
+            {
+                ComponentChild ret = new ComponentChild();
+                ret.m_version = version;
+                ret.m_extended = extended;
+                for (int i = 0; i < tree.ChildCount; i++)
+                {
+                    ITree child = tree.GetChild(i);
+                    switch (child.Type)
+                    {
+                        case asn1Parser.TYPE_DEF:
+                            ret.m_type = Asn1Type.CreateFromAntlrAst(child);
+                            break;
+                        default:
+                            throw new Exception("Internal Error, unexpected child: " + child.Text + " for node: " + tree.Text);
+                    }
+                }
+                return ret;
+            }
+        }
+        
+        public partial class Child 
         {
 //            bool componentsOf = false;
             //^(SEQUENCE_ITEM identifier type (OPTIONAL|DEFAULT)? value?)
@@ -1584,7 +1672,9 @@ namespace tinyAsn1
                         handleExtension(ret, child);
                         break;
                     case asn1Parser.COMPONENTS_OF:
-                        throw new SemanticErrorException("COMPONENTS OF are not implemented yet. Sorry ...");
+                        ComponentChild comChild = ComponentChild.CreateFromAntlrAst(child, null, false);
+                        ret.m_children.Add("COMPONENTS_OF", comChild);
+                        break;
                     default:
                         throw new Exception("Internal Error, unexpected child: " + child.Text + " for node: " + tree.Text);
                 }
@@ -1614,7 +1704,9 @@ namespace tinyAsn1
                         ret.m_children.Add(ch.m_childVarName, ch);
                         break;
                     case asn1Parser.COMPONENTS_OF:
-                        throw new SemanticErrorException("COMPONENTS OF are not implemented yet. Sorry ...");
+                        ComponentChild comChild = ComponentChild.CreateFromAntlrAst(child, null, !ret.m_extMarkPresent2);
+                        ret.m_children.Add("COMPONENTS_OF", comChild);
+                        break;
                     case asn1Parser.SEQUENCE_EXT_GROUP:
                         handleVersionGroup(ret, child);
                         break;
@@ -1643,7 +1735,9 @@ namespace tinyAsn1
                         ret.m_children.Add(ch.m_childVarName, ch);
                         break;
                     case asn1Parser.COMPONENTS_OF:
-                        throw new SemanticErrorException("COMPONENTS OF are not implemented yet. Sorry ...");
+                        ComponentChild comChild = ComponentChild.CreateFromAntlrAst(child, version, true);
+                        ret.m_children.Add("COMPONENTS_OF", comChild);
+                        break;
                     default:
                         throw new Exception("Internal Error, unexpected child: " + child.Text + " for node: " + tree.Text);
                 }
@@ -1655,6 +1749,11 @@ namespace tinyAsn1
         {
             foreach (Child ch in m_children.Values)
             {
+                if (ch is ComponentChild)
+                    return false;
+            }
+            foreach (Child ch in m_children.Values)
+            {
                 if (!ch.SemanticAnalysisFinished())
                     return false;
             }
@@ -1664,6 +1763,40 @@ namespace tinyAsn1
         {
             if (SemanticAnalysisFinished())
                 return;
+
+            // first get rid off COMPONENTS OF
+            OrderedDictionary<string, Child> newChildren = new OrderedDictionary<string, Child>();
+            bool ReplacementOccurerred = false;
+            foreach (Child ch in m_children.Values)
+            {
+                ComponentChild compChild = ch as ComponentChild;
+                if (compChild != null)
+                {
+                    if (!compChild.m_type.SemanticAnalysisFinished())
+                        return;
+                    SequenceOrSetType sq = compChild.m_type.GetFinalType() as SequenceOrSetType;
+                    if (sq == null)
+                        throw new SemanticErrorException("Error line: " + compChild.m_type.antlrNode.Line + ". " + compChild.m_type.Name + " is not SEQUENCE or SET");
+                    //We have to replace compChild with sq.m_children
+                    foreach (Child otherChild in sq.m_children.Values)
+                    {
+                        if (newChildren.ContainsKey(otherChild.m_childVarName))
+                            throw new SemanticErrorException("Error line: " + compChild.m_type.antlrNode.Line + ". " + compChild.m_type.Name + " can not be expanded. Duplicate child name(" + otherChild.m_childVarName+")");
+                        otherChild.m_version = compChild.m_version;
+                        otherChild.m_extended = compChild.m_extended;
+                        newChildren.Add(otherChild.m_childVarName, otherChild);
+                        ReplacementOccurerred = true;
+                    }
+
+                }
+                else
+                {
+                    newChildren.Add(ch.m_childVarName, ch);
+                }
+            }
+
+            if (ReplacementOccurerred)
+                m_children = newChildren;
 
             foreach (Child ch in m_children.Values)
             {
@@ -1727,16 +1860,17 @@ namespace tinyAsn1
                 ch.m_type.ResolveConstraints();
             base.ResolveConstraints();
 
-            if (AreConstraintsResolved())
+        }
+        public override void CheckDefaultValues()
+        {
+            foreach (Child ch in m_children.Values)
             {
-                // I have just been resolved, so check default values
-                foreach (Child ch in m_children.Values)
-                {
-                    if (ch.m_defaultValue != null && !ch.m_type.isValueAllowed(ch.m_defaultValue))
-                        throw new SemanticErrorException("Error: line " + ch.m_type.antlrNode.Line+" Default value does not satisfy type constraints");
-                }
+                if (ch.m_defaultValue != null && !ch.m_type.isValueAllowed(ch.m_defaultValue))
+                    throw new SemanticErrorException("Error: line " + ch.m_type.antlrNode.Line + " Default value does not satisfy type constraints");
+                ch.m_type.CheckDefaultValues();
             }
         }
+
         public override bool AreConstraintsResolved()
         {
             foreach (Child ch in m_children.Values)
@@ -1907,6 +2041,10 @@ namespace tinyAsn1
             
             return true;
         }
+        public override void CheckDefaultValues()
+        {
+            m_type.CheckDefaultValues();
+        }
     }
 
     public partial class SetOfType : Asn1Type
@@ -2026,6 +2164,10 @@ namespace tinyAsn1
                     return false;
 
             return true;
+        }
+        public override void CheckDefaultValues()
+        {
+            m_type.CheckDefaultValues();
         }
     }
 
