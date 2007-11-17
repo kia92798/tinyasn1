@@ -167,7 +167,7 @@ valueSetAssigment
 	;		
 */	
 typeAssigment 
-	:	typereference '::=' type -> ^(TYPE_ASSIG typereference type)
+	:	SPECIAL_COMMENT* typereference '::=' type -> ^(TYPE_ASSIG typereference type SPECIAL_COMMENT*)
 	;	
 	
 /* ********************************************************************************************************************* */
@@ -669,6 +669,10 @@ WS  :   (' ' | '\t' | '\r' | '\n')+ {$channel=HIDDEN;}
 
 COMMENT
     :   '/*' ( options {greedy=false;} : . )* '*/' {$channel=HIDDEN;}
+    ;
+
+SPECIAL_COMMENT
+    :   '--@' ( options {greedy=false;} : . )* ('--'|'\r'?'\n') 
     ;
 
 COMMENT2

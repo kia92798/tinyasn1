@@ -227,6 +227,7 @@ namespace tinyAsn1
 
     public partial class TypeAssigment
     {
+        public List<string> m_comments = new List<string>();
         public string m_name;
         public Asn1Type m_type;
     }

@@ -315,6 +315,11 @@ namespace tinyAsn1
             TypeAssigment ret = new TypeAssigment();
             ret.m_name = tree.GetChild(0).Text;
             ret.m_type = Asn1Type.CreateFromAntlrAst(tree.GetChild(1));
+            for (int i = 2; i < tree.ChildCount; i++)
+            {
+                string comment = tree.GetChild(i).Text.Replace("--@", "").Replace("\r", "").Replace("\n", "").Replace("--", "");
+                ret.m_comments.Add(comment);
+            }
             return ret;
         }
 

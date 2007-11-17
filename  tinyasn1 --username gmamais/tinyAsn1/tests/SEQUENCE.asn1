@@ -41,7 +41,8 @@ MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
 --	myTest2Var4 MyTest2 ::= {field1 myIntVal3}	error myIntVal3 is an integer
 	
 	
-
+	--@This a special comment that must appear
+	--@just before the definition MySQ22
 	MySQ22 ::= SEQUENCE {
 		a	INTEGER {red(0), blue(1)} (red|blue) DEFAULT red,
 		b 	MyReal,
