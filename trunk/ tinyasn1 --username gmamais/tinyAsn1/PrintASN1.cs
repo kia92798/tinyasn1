@@ -257,6 +257,10 @@ namespace tinyAsn1
 
         public void OnBeforeTypeAssigment(Asn1File asn1File, Module mod, TypeAssigment tas)
         {
+            foreach (string line in tas.m_comments)
+            {
+                o.P(1); o.Write("--"); o.WriteLine(line);
+            }
             o.P(1); o.Write(tas.m_name + " ::= "); tas.m_type.PrintAsn1(o, 1); o.WriteLine();
             o.WriteLine();
 
