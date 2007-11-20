@@ -1,0 +1,12 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+
+	IntegerMatrix ::= SEQUENCE SIZE(2) OF SEQUENCE OF INTEGER(1..10)
+
+	CM ::= IntegerMatrix (WITH COMPONENT (SIZE(3)))
+
+	matrix CM ::= { {5,1,2}, {10,10,5,10}} --second's list size is 4 not 3
+				
+	
+	
+END

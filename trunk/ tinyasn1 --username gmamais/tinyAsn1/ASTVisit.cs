@@ -229,7 +229,7 @@ namespace tinyAsn1
         }
     }
 
-    public partial class SequenceOfType : Asn1Type
+    public partial class SequenceOfType : ArrayType
     {
         public override void visit(IASTVisitor visitor, Asn1File asn1File, Module mod, TypeAssigment tas)
         {
@@ -237,7 +237,7 @@ namespace tinyAsn1
         }
     }
 
-    public partial class SetOfType : Asn1Type
+    public partial class SetOfType : ArrayType
     {
         public override void visit(IASTVisitor visitor, Asn1File asn1File, Module mod, TypeAssigment tas)
         {

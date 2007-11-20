@@ -84,6 +84,12 @@ namespace tinyAsn1
                     return SizeConstraint.Create(tree, type);
                 case asn1Parser.PERMITTED_ALPHABET_EXPR:
                     return PermittedAlphabetConstraint.Create(tree, type);
+                case asn1Parser.SUBTYPE_EXPR:
+                    return TypeInclusionConstraint.Create(tree, type);
+                case asn1Parser.WITH_COMPONENT_CONSTR:
+                    return WithComponentConstraint.Create(tree, type);
+                case asn1Parser.WITH_COMPONENTS_CONSTR:
+                    return WithComponentsConstraint.Create(tree, type);
                 default:
                     throw new Exception("Internal Error: unexpectected token: " + tree.Text);
             }
@@ -1072,324 +1078,260 @@ namespace tinyAsn1
     }
 
 
-/*
-    public partial class Constraint
-    {
-        public UnionSet m_set1;
-        public bool m_extMarkPresent = false;
-        public UnionSet m_set2;
-        public ExceptionSpec m_exception;
-    }
 
-    public partial class UnionSet : ConstraintExpression
+    public class TypeInclusionConstraint : BaseConstraint
     {
-        public List<UnionElement> m_set = new List<UnionElement>();
-    }
+        Asn1Type m_otherType;
 
-    public partial class UnionElement
-    {
-    }
-
-    public partial class UnionElementOfIntersectionItems : UnionElement
-    {
-        public List<IntersectionElement> m_intersectionElements = new List<IntersectionElement>();
-    }
-
-    public partial class UnionElementExceptOf : UnionElement
-    {
-        public ConstraintExpression m_exceptOfThis;
-    }
-
-    public partial class IntersectionElement
-    {
-        public ConstraintExpression m_exp;
-        public ConstraintExpression m_except_exp;
-    }
-
-    public partial class ConstraintExpression
-    {
-    }
-*/
-//    public partial class ValueRangeExpression : ConstraintExpression
-/*
-    public partial class SizeExpression : ConstraintExpression
-    {
-        public Constraint m_sizeConstraint;
-    }
-
-    public partial class WithComponentsExpression : ConstraintExpression
-    {
-    }
-
-    public partial class SubtypeExpression : ConstraintExpression
-    {
-        public Asn1Type m_type;
-        public bool m_includes = false;
-    }
-
-    public partial class PermittedAlphabetExpression : ConstraintExpression
-    {
-        public Constraint m_permittedAlphabetConstraint;
-    }
-    public partial class PatternExpression : ConstraintExpression
-    {
-        public Asn1Value m_pattern;
-    }
-
-*/
-
-
-/// <summary>
-/// 
-/// 
-/// 
-///  Create static classes from ANTLR tree
-/// 
-/// 
-/// 
-/// </summary>
-
-#if defined
-    public partial class ExceptionSpec
-    {
-        static public ExceptionSpec CreateFromAntlrAst(ITree tree)
+        public TypeInclusionConstraint(Asn1Type type, Asn1Type otherType)
+            : base(type)
         {
-            Console.Error.WriteLine("Unimplemented feature ASN.1 Exception are parsed but ignored");
-            return new ExceptionSpec();
+            m_otherType = otherType;
+        }
+
+        internal static IConstraint Create(ITree tree, Asn1Type type)
+        {
+            if (tree == null || type == null)
+                throw new ArgumentNullException();
+            if (tree.Type != asn1Parser.SUBTYPE_EXPR)
+                throw new Exception("Internal Error");
+
+            Asn1Type oth = Asn1Type.CreateFromAntlrAst(tree.GetChild(0));
+            if (oth.SemanticAnalysisFinished())
+            {
+                if (oth.GetFinalType() != type.GetFinalType())
+                    throw new SemanticErrorException("Error, line:" + oth.antlrNode.Line + " .Types '"+oth.Name+"' and '"+type.Name+"' are not compatible");
+            }
+
+            return new TypeInclusionConstraint(type, oth);
+        }
+
+        public override bool IsResolved()
+        {
+            return m_otherType.SemanticAnalysisFinished() && m_otherType.AreConstraintsResolved();
+        }
+        public override void DoSemanticAnalysis()
+        {
+            //if (IsResolved())
+            //    return;
+            if (!m_otherType.SemanticAnalysisFinished())
+                m_otherType.DoSemanticAnalysis();
+
+            if (m_otherType.SemanticAnalysisFinished() && !m_otherType.AreConstraintsResolved())
+                m_otherType.ResolveConstraints();
+
+            if (m_otherType.AreConstraintsResolved())
+            {
+                if (m_otherType.GetFinalType() != m_type.GetFinalType())
+                    throw new SemanticErrorException("Error, line:" + m_otherType.antlrNode.Line + " .Types are not compatible");
+            }
+        }
+
+        public override bool isValueAllowed(Asn1Value val)
+        {
+            return m_otherType.isValueAllowed(val);
+        }
+        public override string ToString()
+        {
+            return m_otherType.Name;
+        }
+        public override IConstraint Simplify()
+        {
+            return this;
         }
     }
 
-    public partial class Constraint
+    public class WithComponentConstraint : BaseConstraint
     {
-        static public Constraint CreateFromAntlrAst(ITree tree)
+        IConstraint m_innerTypeConstraint;
+        Asn1Type m_innerType;
+
+        public WithComponentConstraint(Asn1Type type, Asn1Type innerType, IConstraint innerTypeConstraint)
+            : base(type)
         {
-            if (tree.Type != asn1Parser.CONSTRAINT)
-                throw new Exception(tree.Text + " is not a constraint");
-            Constraint ret = new Constraint();
-            UnionElement element = null;
+            m_innerTypeConstraint = innerTypeConstraint;
+            m_innerType = innerType;
+        }
+
+        internal static IConstraint Create(ITree tree, Asn1Type type)
+        {
+            if (tree == null || type == null)
+                throw new ArgumentNullException();
+            if (tree.Type != asn1Parser.WITH_COMPONENT_CONSTR)
+                throw new Exception("Internal Error");
+            ArrayType arrayType = type.GetFinalType() as ArrayType;
+            if (arrayType==null)
+                throw new SemanticErrorException("Error line:"+tree.Line+" WITH COMPONENT constraint can appear only in reference types which reference a SEQUENCE OF or SET OF");
+            Asn1Type innerType = arrayType.m_type;
+            IConstraint innerConstraint=null;
+            innerType.ResolveExternalConstraints(tree.GetChild(0), ref innerConstraint);
+            if (innerConstraint.IsResolved())
+                innerConstraint = innerConstraint.Simplify();
+            return new WithComponentConstraint(type, innerType, innerConstraint);
+        }
+
+        public override bool IsResolved()
+        {
+            return m_innerTypeConstraint.IsResolved();
+        }
+        public override void DoSemanticAnalysis()
+        {
+            if (IsResolved())
+                return;
+
+            m_innerType.ResolveExternalConstraints(null, ref m_innerTypeConstraint);
+            if (m_innerTypeConstraint.IsResolved())
+                m_innerTypeConstraint = m_innerTypeConstraint.Simplify();
+            
+        }
+
+        public override bool isValueAllowed(Asn1Value val)
+        {
+            ArrayValue arval = val as ArrayValue;
+            if (arval == null)
+                throw new Exception("Internal Error");
+            foreach (Asn1Value v in arval.m_children)
+                if (!m_innerTypeConstraint.isValueAllowed(v))
+                    return false;
+            
+            return true;
+        }
+
+        public override string ToString()
+        {
+            return "WITH COMPONENT (" + m_innerTypeConstraint.ToString() + ")";
+        }
+        public override IConstraint Simplify()
+        {
+            return this;
+        }
+    }
+
+    public class WithComponentsConstraint : BaseConstraint
+    {
+        public class Component
+        {
+            public enum Optionality {
+                Present,
+                Absent,
+                Optional,
+                None
+            }
+            public string m_name;
+            public Optionality m_optionality = Optionality.None;
+            public IConstraint m_constraint = null;
+            public Component(string name, Optionality opt, IConstraint con)
+            {
+                m_name = name;
+                m_optionality = opt;
+                m_constraint = con;
+            }
+        }
+
+        protected bool m_partialSpecification = false; //i.e. ... are not present
+        protected List<Component> m_components = new List<Component>();
+
+        internal static IConstraint Create(ITree tree, Asn1Type type)
+        {
+            if (tree == null || type == null)
+                throw new ArgumentNullException();
+            if (tree.Type != asn1Parser.WITH_COMPONENTS_CONSTR)
+                throw new Exception("Internal Error");
+            if (type.GetFinalType() is SequenceOrSetType)
+                return WithComponentsSeqConstraint.Create2(tree, (SequenceOrSetType)type.GetFinalType());
+            if (type.GetFinalType() is ChoiceType)
+                return WithComponentsChConstraint.Create2(tree, (ChoiceType)type.GetFinalType());
+
+            throw new Exception("Internal Error");
+        }
+
+        public WithComponentsConstraint(Asn1Type type, bool partialSpecification, List<Component> components)
+            : base(type)
+        {
+            m_partialSpecification = partialSpecification;
+            m_components = components;
+        }
+    }
+
+    public class WithComponentsSeqConstraint : WithComponentsConstraint
+    {
+        public WithComponentsSeqConstraint(Asn1Type type, bool partialSpecification, List<Component> components)
+            : base(type, partialSpecification, components)
+        {
+        }
+        internal static IConstraint Create2(ITree tree, SequenceOrSetType type)
+        {
+            List<Component> components = new List<Component>();
+            bool partialSpecification = false;
+
             for (int i = 0; i < tree.ChildCount; i++)
             {
-                ITree child = tree.GetChild(i);
-                switch (child.Type)
+                ITree chTree = tree.GetChild(i);
+                if (chTree.Type == asn1Parser.EXT_MARK)
+                    partialSpecification = true;
+                else if (chTree.Type == asn1Parser.NAME_CONSTRAINT_EXPR)
                 {
-                    case asn1Parser.UNION_ELEMENT:
-                        element = UnionElementOfIntersectionItems.CreateFromAntlrAst(child);
-                        if (!ret.m_extMarkPresent)
-                            ret.m_set1.Add(element);
-                        else
-                            ret.m_set2.Add(element);
-                        break;
-                    case asn1Parser.UNION_ELEMENT_ALL_EXCEPT:
-                        element = UnionElementExceptOf.CreateFromAntlrAst(child);
-                        if (ret.m_extMarkPresent)
-                            ret.m_set2.Add(element);
-                        else
-                            ret.m_set1.Add(element);
-                        break;
-                    case asn1Parser.EXT_MARK:
-                        ret.m_extMarkPresent = true;
-                        break;
-                    case asn1Parser.EXCEPTION_SPEC:
-                        ret.m_exception = ExceptionSpec.CreateFromAntlrAst(child);
-                        break;
-                    default:
-                        throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
+                    string id = null;
+                    Component.Optionality opt = Component.Optionality.None;
+                    if (!partialSpecification)
+                        opt = Component.Optionality.Present;    //default setting if no optionality modifier is present
+                    ITree constraint = null;
+                    for (int j = 0; j < chTree.ChildCount; j++)
+                    {
+                        ITree grChTree = chTree.GetChild(j);
+                        switch (grChTree.Type)
+                        {
+                            case asn1Parser.LID:
+                                id = grChTree.Text;
+                                break;
+                            case asn1Parser.PRESENT:
+                                opt = Component.Optionality.Present;
+                                break;
+                            case asn1Parser.ABSENT:
+                                opt = Component.Optionality.Absent;
+                                break;
+                            case asn1Parser.OPTIONAL:
+                                opt = Component.Optionality.Optional;
+                                break;
+                            case asn1Parser.CONSTRAINT:
+                                constraint = grChTree;
+                                break;
+                            default:
+                                throw new Exception("Internal Error");
+                        }
+                    }
+
+                    if (!type.m_children.ContainsKey(id))
+                        throw new SemanticErrorException("Error: Line:"+chTree.GetChild(0).Line+" ."+id+" is not a child");
+                    
+                    SequenceOrSetType.Child childComp = type.m_children[id];
+
+                    if  (opt != Component.Optionality.None && !childComp.m_optional) 
+                    {
+                        throw new SemanticErrorException("Error");
+                    }
+
+                    IConstraint con = null;
+                    if (constraint!=null)
+                        childComp.m_type.ResolveExternalConstraints(constraint, ref con);
+                    components.Add(new Component(id, opt, con));
                 }
+             
             }
-
-            return ret;
-        }
-
-        static public void HandleBody(Constraint ret, ITree tree)
-        {
-        }
-
-        static public Constraint CreateConstraintFromSizeConstraint(ITree tree)
-        {
-
-
-            Constraint ret = new Constraint();
-            UnionElementOfIntersectionItems un = new UnionElementOfIntersectionItems();
-            ret.m_set1.Add(un);
-            IntersectionElement ir = new IntersectionElement();
-            un.m_intersectionElements.Add(ir);
-            SizeExpression sz = new SizeExpression();
-            ir.m_exp = sz;
-            sz.m_sizeConstraint = Constraint.CreateFromAntlrAst(tree.GetChild(0));
-
-            return ret;
+            return new WithComponentsSeqConstraint(type, partialSpecification, components);
         }
     }
 
-    public partial class UnionElementOfIntersectionItems : UnionElement
+    public class WithComponentsChConstraint : WithComponentsConstraint
     {
-        static new public UnionElementOfIntersectionItems CreateFromAntlrAst(ITree tree)
+        public WithComponentsChConstraint(Asn1Type type, bool partialSpecification, List<Component> components)
+            : base(type, partialSpecification, components)
         {
-            UnionElementOfIntersectionItems ret = new UnionElementOfIntersectionItems();
-            for (int i = 0; i < tree.ChildCount; i++)
-            {
-                ITree child = tree.GetChild(i);
-                switch (child.Type)
-                {
-                    case asn1Parser.INTERSECTION_ELEMENT:
-                        ret.m_intersectionElements.Add(IntersectionElement.CreateFromAntlrAst(child));
-                        break;
-                    default:
-                        throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
-                }
-            }
-            return ret;
+        }
+        internal static IConstraint Create2(ITree tree, ChoiceType type)
+        {
+            throw new Exception();
         }
     }
 
-    public partial class UnionElementExceptOf : UnionElement
-    {
-        static new public UnionElementExceptOf CreateFromAntlrAst(ITree tree)
-        {
-            UnionElementExceptOf ret = new UnionElementExceptOf();
-            ret.m_exceptOfThis = ConstraintExpression.CreateFromAntlrAst(tree.GetChild(0));
-            return ret;
-        }
-    }
-
-    public partial class IntersectionElement
-    {
-        static public IntersectionElement CreateFromAntlrAst(ITree tree)
-        {
-            IntersectionElement ret = new IntersectionElement();
-
-            ret.m_exp = ConstraintExpression.CreateFromAntlrAst(tree.GetChild(0));
-            if (tree.ChildCount > 1)
-                ret.m_except_exp = ConstraintExpression.CreateFromAntlrAst(tree.GetChild(1));
-
-            return ret;
-        }
-    }
-
-    public partial class ConstraintExpression
-    {
-        static public ConstraintExpression CreateFromAntlrAst(ITree tree)
-        {
-            ConstraintExpression ret = null;
-
-            switch (tree.Type)
-            {
-                case asn1Parser.VALUE_RANGE_EXPR:
-                    ret = ValueRangeExpression.CreateFromAntlrAst(tree);
-                    break;
-                case asn1Parser.SIZE_EXPR:
-                    ret = SizeExpression.CreateFromAntlrAst(tree);
-                    break;
-                case asn1Parser.PERMITTED_ALPHABET_EXPR:
-                    ret = PermittedAlphabetExpression.CreateFromAntlrAst(tree);
-                    break;
-                case asn1Parser.SUBTYPE_EXPR:
-                    ret = SubtypeExpression.CreateFromAntlrAst(tree);
-                    break;
-                case asn1Parser.UNION_ELEMENT:
-                    ret = UnionElementOfIntersectionItems.CreateFromAntlrAst(tree);
-                    break;
-                case asn1Parser.UNION_ELEMENT_ALL_EXCEPT:
-                    ret = UnionElementExceptOf.CreateFromAntlrAst(tree);
-                    break;
-                case asn1Parser.PATTERN_EXPR:
-                    ret = PatternExpression.CreateFromAntlrAst(tree);
-                    break;
-                case asn1Parser.INNER_TYPE_EXPR:
-                    Console.Error.WriteLine("Unimplemented feature, 'WITH COMPONENTS' is ignored");
-                    ret = new WithComponentsExpression();
-                    break;
-                default:
-                    throw new Exception("Unkown constraint expression: " + tree.Text);
-            }
-
-            return ret;
-        }
-    }
-
-    public partial class ValueRangeExpression
-    {
-        public Asn1Value m_minValue;
-        public Asn1Value m_maxValue;
-        public bool m_minValIsIncluded = false;
-        public bool m_maxValIsIncluded = false;
-
-        static public ValueRangeExpression CreateFromAntlrAst(ITree tree)
-        {
-            ValueRangeExpression ret = new ValueRangeExpression();
-            ret.m_minValue = Asn1Value.CreateFromAntlrAst(tree.GetChild(0));
-            int lineNo = tree.GetChild(0).Line;
-            for (int i = 1; i < tree.ChildCount; i++)
-            {
-                ITree child = tree.GetChild(i);
-                switch (child.Type)
-                {
-                    case asn1Parser.MAX_VAL_PRESENT:
-                        ret.m_maxValue = Asn1Value.CreateFromAntlrAst(child.GetChild(0));
-                        break;
-                    case asn1Parser.MIN_VAL_INCLUDED:
-                        ret.m_minValIsIncluded = true;
-                        break;
-                    case asn1Parser.MAX_VAL_INCLUDED:
-                        ret.m_maxValIsIncluded = true;
-                        break;
-                    default:
-                        throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
-                }
-            }
-
-            //if (ret.m_maxValue != null && ret.m_minValue.m_valType != ret.m_maxValue.m_valType)
-            //    throw new SemanticErrorException("Semantic Error: Both values in a range must be of the same type. Line:" +lineNo.ToString());
-
-            return ret;
-        }
-    }
-
-    public partial class ValueRangeExpression : ConstraintExpression
-    {
-    }
-
-    public partial class SizeExpression : ConstraintExpression
-    {
-        static public new SizeExpression CreateFromAntlrAst(ITree tree)
-        {
-            SizeExpression ret = new SizeExpression();
-            ret.m_sizeConstraint = Constraint.CreateFromAntlrAst(tree.GetChild(0));
-            return ret;
-        }
-    }
-
-    public partial class SubtypeExpression : ConstraintExpression
-    {
-        static public new SubtypeExpression CreateFromAntlrAst(ITree tree)
-        {
-            SubtypeExpression ret = new SubtypeExpression();
-            ret.m_type = Asn1Type.CreateFromAntlrAst(tree.GetChild(0));
-            if (tree.ChildCount > 1)
-                ret.m_includes = true;
-            return ret;
-        }
-    }
-
-    public partial class PermittedAlphabetExpression : ConstraintExpression
-    {
-        static public new PermittedAlphabetExpression CreateFromAntlrAst(ITree tree)
-        {
-            PermittedAlphabetExpression ret = new PermittedAlphabetExpression();
-            ret.m_permittedAlphabetConstraint = Constraint.CreateFromAntlrAst(tree.GetChild(0));
-            return ret;
-        }
-    }
-
-    public partial class PatternExpression : ConstraintExpression
-    {
-        static public new PatternExpression CreateFromAntlrAst(ITree tree)
-        {
-            PatternExpression ret = new PatternExpression();
-            ret.m_pattern = Asn1Value.CreateFromAntlrAst(tree.GetChild(0));
-            return ret;
-        }
-    }
-
-#endif
 }

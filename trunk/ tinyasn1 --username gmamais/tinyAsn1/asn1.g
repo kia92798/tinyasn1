@@ -72,6 +72,8 @@ tokens {
 	INTERSECTION_SET;
 	NUMERIC_VALUE2;
 	SELECTION_TYPE;
+	WITH_COMPONENT_CONSTR;
+	WITH_COMPONENTS_CONSTR;
 }
 
 
@@ -536,12 +538,12 @@ permittedAlphabetExpression : FROM constraint	-> ^(PERMITTED_ALPHABET_EXPR const
 	;
 
 innerTypeExpression 
-	: WITH COMPONENT constraint											-> ^(INNER_TYPE_EXPR constraint)
+	: WITH COMPONENT constraint											-> ^(WITH_COMPONENT_CONSTR constraint)
 	| WITH COMPONENTS L_BRACKET
 			( EXT_MARK COMMA)?
 			namedConstraintExpression  (COMMA namedConstraintExpression)* 
 		R_BRACKET
-		-> ^(INNER_TYPE_EXPR namedConstraintExpression+)
+		-> ^(WITH_COMPONENTS_CONSTR EXT_MARK? namedConstraintExpression+)
 	;
 
 namedConstraintExpression

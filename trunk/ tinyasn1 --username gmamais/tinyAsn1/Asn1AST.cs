@@ -240,7 +240,8 @@ namespace tinyAsn1
         public SetOfValues m_constr_body;
 
     }
- */ 
+ */
+
 
     public partial class Asn1Type
     {
@@ -445,20 +446,22 @@ namespace tinyAsn1
         }
     }
 
-    public partial class SequenceOfType : Asn1Type
+    public partial class ArrayType : Asn1Type
     {
         public string m_xmlVarName;
         public Asn1Type m_type;
+    }
+
+    public partial class SequenceOfType : ArrayType
+    {
         public override string Name
         {
             get { return "SEQUENCE OF"; }
         }
     }
 
-    public partial class SetOfType : Asn1Type
+    public partial class SetOfType : ArrayType
     {
-        public string m_xmlVarName;
-        public Asn1Type m_type;
         public override string Name
         {
             get { return "SET OF"; }
