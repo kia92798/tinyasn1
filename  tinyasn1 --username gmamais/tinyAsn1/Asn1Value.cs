@@ -962,9 +962,13 @@ namespace tinyAsn1
         }
     }
 
-    public partial class SequenceOfValue : Asn1Value, ISize
+    public partial class ArrayValue : Asn1Value
     {
         public List<Asn1Value> m_children = new List<Asn1Value>();
+    }
+
+    public partial class SequenceOfValue : ArrayValue, ISize
+    {
         public SequenceOfType Type2
         {
             get
@@ -1100,9 +1104,8 @@ namespace tinyAsn1
         
     }
 
-    public partial class SetOfValue : Asn1Value, ISize
+    public partial class SetOfValue : ArrayValue, ISize
     {
-        public List<Asn1Value> m_children = new List<Asn1Value>();
         public SetOfType Type2
         {
             get

@@ -552,6 +552,30 @@ namespace tinyAsn1
         }
 
         /// <summary>
+        /// This method does not change the state of the object. It acts like ResolveConstraints() but
+        /// the results are not stored internally
+        /// </summary>
+        /// <param name="antlrConstr"></param>
+        /// <param name="resultConstraint"></param>
+        /// <returns>true if constraint has been resolved</returns>
+        public bool ResolveExternalConstraints(ITree antlrConstr, ref IConstraint resultConstraint)
+        {
+            if (resultConstraint == null)
+            {
+                checkConstraintsSemantically(antlrConstr);
+                resultConstraint = RootConstraint.Create(antlrConstr, this);
+                resultConstraint.DoSemanticAnalysis();
+            }
+            else
+            {
+                if (!resultConstraint.IsResolved())
+                    resultConstraint.DoSemanticAnalysis();
+            }
+
+            return resultConstraint.IsResolved();
+        }
+
+        /// <summary>
         /// Checks if a value is allowed or not. 
         /// </summary>
         /// <param name="val">the value to be check</param>
@@ -623,12 +647,6 @@ namespace tinyAsn1
                     " . This type of constraint '" + root.Text + "' cannot appear under " + Name);
             }, StopTokensInConstraints);
 
-
-
-            visit.visit(antrlConstraint, asn1Parser.SUBTYPE_EXPR, delegate(ITree root)
-            {
-                throw new Exception("Unimplemented feature");
-            });
         }
 
 
@@ -1922,7 +1940,20 @@ namespace tinyAsn1
         }
     }
 
-    public partial class SequenceOfType : Asn1Type
+    public partial class ArrayType : Asn1Type
+    {
+        static List<int> m_allowedTokens = new List<int>(new int[]{ asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
+                asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
+                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, 
+                asn1Parser.SIZE_EXPR, asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT, asn1Parser.WITH_COMPONENT_CONSTR});
+        static List<int> m_stopList = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, 
+            asn1Parser.SIZE_EXPR, asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT, asn1Parser.WITH_COMPONENT_CONSTR });
+
+        protected override IEnumerable<int> AllowedTokensInConstraints { get { return m_allowedTokens; } }
+        protected override IEnumerable<int> StopTokensInConstraints { get { return m_stopList; } }
+    }
+
+    public partial class SequenceOfType : ArrayType
     {
         //^(SEQUENCE_OF_TYPE (SIMPLIFIED_SIZE_CONSTRAINT $sz)? $gen? identifier? type)
         static public new SequenceOfType CreateFromAntlrAst(ITree tree)
@@ -2013,15 +2044,6 @@ namespace tinyAsn1
             }
         }
 
-        static List<int> m_allowedTokens = new List<int>(new int[]{ asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
-                asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
-                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, 
-                asn1Parser.SIZE_EXPR, asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT});
-        static List<int> m_stopList = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, 
-            asn1Parser.SIZE_EXPR, asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT });
-
-        protected override IEnumerable<int> AllowedTokensInConstraints { get { return m_allowedTokens; } }
-        protected override IEnumerable<int> StopTokensInConstraints { get { return m_stopList; } }
 
         public override void ResolveConstraints()
         {
@@ -2052,7 +2074,7 @@ namespace tinyAsn1
         }
     }
 
-    public partial class SetOfType : Asn1Type
+    public partial class SetOfType : ArrayType
     {
         static public new SetOfType CreateFromAntlrAst(ITree tree)
         {
@@ -2138,15 +2160,6 @@ namespace tinyAsn1
             }
         }
 
-        static List<int> m_allowedTokens = new List<int>(new int[]{ asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
-                asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
-                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, 
-                asn1Parser.SIZE_EXPR, asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT});
-        static List<int> m_stopList = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, 
-            asn1Parser.SIZE_EXPR, asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT });
-
-        protected override IEnumerable<int> AllowedTokensInConstraints { get { return m_allowedTokens; } }
-        protected override IEnumerable<int> StopTokensInConstraints { get { return m_stopList; } }
         public override void ResolveConstraints()
         {
             m_type.ResolveConstraints();
