@@ -7,14 +7,13 @@ MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
 		c INTEGER DEFAULT 4
 	}
 
-	-- PARTIAL, NONE, NONE
+	-- PARTIAL, OPTIONAL, PRESENT
 
-	MYSQ2 ::= MYSQ ( WITH COMPONENTS { ...,	a (1..8)})
+	MYSQ2 ::= MYSQ ( WITH COMPONENTS { ...,	b (1..10) PRESENT})
 
-	a1 MYSQ ::= {a 9, b 2}
+	a1 MYSQ ::= {a 10}
 
-	b1 MYSQ2 ::= {a 9, b 2}
-
+	b2 MYSQ2 ::= a1
 
 	
 END

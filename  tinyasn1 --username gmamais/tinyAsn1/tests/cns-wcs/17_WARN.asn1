@@ -15,6 +15,10 @@ MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
 
 	b1 MYSQ2 ::= {a 9, b 2}
 
+	b2 MYSQ2 ::= a1
+
+
+
 
 	
 END

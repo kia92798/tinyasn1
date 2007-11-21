@@ -26,6 +26,7 @@ namespace tinyAsn1
         //Asn1Value MAX {get;} //applicable only for Integers & Reals & ?Strings
         bool IsResolved();
         void DoSemanticAnalysis();
+        Asn1Type AsnType { get;}
     }
 
     public class BaseConstraint : IConstraint
@@ -116,6 +117,7 @@ namespace tinyAsn1
                 return ExceptConstraint.Create(iTree, type);
             return BaseConstraint.CreateConstraintExpression(iTree.GetChild(0), type);
         }
+        public virtual Asn1Type AsnType { get { return m_type; } }
     }
 
 /*   
@@ -1077,8 +1079,6 @@ namespace tinyAsn1
         }
     }
 
-
-
     public class TypeInclusionConstraint : BaseConstraint
     {
         Asn1Type m_otherType;
@@ -1211,25 +1211,35 @@ namespace tinyAsn1
     {
         public class Component
         {
-            public enum Optionality {
-                Present,
-                Absent,
-                Optional,
+            public enum PresenseConstraint {
+                PRESENT,
+                ABSENT,
+                OPTIONAL,
                 None
             }
             public string m_name;
-            public Optionality m_optionality = Optionality.None;
-            public IConstraint m_constraint = null;
-            public Component(string name, Optionality opt, IConstraint con)
+            public PresenseConstraint m_presenceConstraint = PresenseConstraint.None;
+            public IConstraint m_valueConstraint = null;
+            public Component(string name, PresenseConstraint presCon, IConstraint valCon)
             {
                 m_name = name;
-                m_optionality = opt;
-                m_constraint = con;
+                m_presenceConstraint = presCon;
+                m_valueConstraint = valCon;
+            }
+
+            public override string ToString()
+            {
+                string ret = m_name;
+                if (m_valueConstraint != null)
+                    ret += " ("+ m_valueConstraint.ToString()+")";
+                if (m_presenceConstraint != PresenseConstraint.None)
+                    ret += " " + m_presenceConstraint.ToString();
+                return ret;
             }
         }
 
         protected bool m_partialSpecification = false; //i.e. ... are not present
-        protected List<Component> m_components = new List<Component>();
+        protected OrderedDictionary<string, Component> m_components = new OrderedDictionary<string, Component>();
 
         internal static IConstraint Create(ITree tree, Asn1Type type)
         {
@@ -1241,27 +1251,58 @@ namespace tinyAsn1
                 return WithComponentsSeqConstraint.Create2(tree, (SequenceOrSetType)type.GetFinalType());
             if (type.GetFinalType() is ChoiceType)
                 return WithComponentsChConstraint.Create2(tree, (ChoiceType)type.GetFinalType());
+            
 
             throw new Exception("Internal Error");
         }
 
-        public WithComponentsConstraint(Asn1Type type, bool partialSpecification, List<Component> components)
+        public WithComponentsConstraint(Asn1Type type, bool partialSpecification, OrderedDictionary<string, Component> components)
             : base(type)
         {
             m_partialSpecification = partialSpecification;
             m_components = components;
         }
+
+        public override IConstraint Simplify()
+        {
+            return this;
+        }
+        public override string ToString()
+        {
+            string ret = "WITH COMPONENTS {";
+            if (m_partialSpecification)
+                ret += "..., ";
+            int cnt = m_components.Count;
+            for (int i = 0; i < cnt - 1; i++)
+                ret += m_components.Values[i].ToString() + ", ";
+
+            ret += m_components.Values[cnt-1].ToString() + "}";
+            return ret;
+        }
+        
+        public override bool IsResolved()
+        {
+            foreach (Component c in m_components.Values)
+                if (c.m_valueConstraint != null)
+                    if (!c.m_valueConstraint.IsResolved())
+                        return false;
+            return true;
+        }
     }
 
     public class WithComponentsSeqConstraint : WithComponentsConstraint
     {
-        public WithComponentsSeqConstraint(Asn1Type type, bool partialSpecification, List<Component> components)
+        public WithComponentsSeqConstraint(Asn1Type type, bool partialSpecification, OrderedDictionary<string, Component> components)
             : base(type, partialSpecification, components)
         {
         }
+        SequenceOrSetType  Type
+        {
+            get { return (SequenceOrSetType)m_type; }
+        }
         internal static IConstraint Create2(ITree tree, SequenceOrSetType type)
         {
-            List<Component> components = new List<Component>();
+            OrderedDictionary<string, Component> components = new OrderedDictionary<string, Component>();
             bool partialSpecification = false;
 
             for (int i = 0; i < tree.ChildCount; i++)
@@ -1272,9 +1313,9 @@ namespace tinyAsn1
                 else if (chTree.Type == asn1Parser.NAME_CONSTRAINT_EXPR)
                 {
                     string id = null;
-                    Component.Optionality opt = Component.Optionality.None;
-                    if (!partialSpecification)
-                        opt = Component.Optionality.Present;    //default setting if no optionality modifier is present
+                    Component.PresenseConstraint presenceConstr = Component.PresenseConstraint.None;
+                    //if (!partialSpecification)
+                    //    presenceConstr = Component.PresenseConstraint.Present;    //default setting if no optionality modifier is present
                     ITree constraint = null;
                     for (int j = 0; j < chTree.ChildCount; j++)
                     {
@@ -1285,13 +1326,13 @@ namespace tinyAsn1
                                 id = grChTree.Text;
                                 break;
                             case asn1Parser.PRESENT:
-                                opt = Component.Optionality.Present;
+                                presenceConstr = Component.PresenseConstraint.PRESENT;
                                 break;
                             case asn1Parser.ABSENT:
-                                opt = Component.Optionality.Absent;
+                                presenceConstr = Component.PresenseConstraint.ABSENT;
                                 break;
                             case asn1Parser.OPTIONAL:
-                                opt = Component.Optionality.Optional;
+                                presenceConstr = Component.PresenseConstraint.OPTIONAL;
                                 break;
                             case asn1Parser.CONSTRAINT:
                                 constraint = grChTree;
@@ -1301,36 +1342,397 @@ namespace tinyAsn1
                         }
                     }
 
+                    // check that id is a child of the sequence or set
                     if (!type.m_children.ContainsKey(id))
-                        throw new SemanticErrorException("Error: Line:"+chTree.GetChild(0).Line+" ."+id+" is not a child");
-                    
+                        throw new SemanticErrorException("Error: Line:"+chTree.GetChild(0).Line+". "+id+" is not a child");
+
+                    //check that does not appears twice in the WITH COMPONENTS constraint
+                    if (components.ContainsKey(id))
+                        throw new SemanticErrorException("Error Line: "+chTree.GetChild(0).Line + ". name constraint' "+id+"' appears twice" );
+
                     SequenceOrSetType.Child childComp = type.m_children[id];
 
-                    if  (opt != Component.Optionality.None && !childComp.m_optional) 
+                    //Presence constraint appears on a non optional child --> error 47.8.9.1
+                    if (!childComp.m_optional && presenceConstr!= Component.PresenseConstraint.None)
                     {
-                        throw new SemanticErrorException("Error");
+                        throw new SemanticErrorException("Error Line:" + chTree.GetChild(0).Line + ". Presence constraint '"+presenceConstr.ToString()+"' specified for component '" + id + "' which is not optional");
                     }
 
+                    if (!partialSpecification)
+                    {
+                        if (presenceConstr == Component.PresenseConstraint.None)
+                            presenceConstr = Component.PresenseConstraint.PRESENT;
+                    }
+                    
                     IConstraint con = null;
                     if (constraint!=null)
                         childComp.m_type.ResolveExternalConstraints(constraint, ref con);
-                    components.Add(new Component(id, opt, con));
+                    if (con != null && con.IsResolved())
+                        con = con.Simplify();
+                    components.Add(id, new Component(id, presenceConstr, con));
                 }
              
             }
+            if (!partialSpecification) {
+                foreach (SequenceOrSetType.Child cc in type.m_children.Values)
+                {
+                    //full specification, constraint component name does not appear (hence it ABSENT 47.8.6)
+                    if (!components.ContainsKey(cc.m_childVarName))
+                    {
+                        //if component is not optional
+                        if (cc.m_optional)
+                            components.Add(cc.m_childVarName, new Component(cc.m_childVarName, Component.PresenseConstraint.ABSENT, null));
+                        else
+                            throw new SemanticErrorException("Error line" + tree.Line+" Component '"+cc.m_childVarName+
+                                "' is not listed.\nEither make the WITH COMPONENTS constraint partial by using ... or add"+
+                                " the '"+cc.m_childVarName+"' to the list");
+                    }
+                }
+            }
             return new WithComponentsSeqConstraint(type, partialSpecification, components);
+        }
+
+        public override void DoSemanticAnalysis()
+        {
+            if (IsResolved())
+                return;
+
+            foreach (Component c in m_components.Values)
+            {
+                if (c.m_valueConstraint != null)
+                {
+                    if (!c.m_valueConstraint.IsResolved())
+                    {
+                        SequenceOrSetType.Child childComp = Type.m_children[c.m_name];
+                        childComp.m_type.ResolveExternalConstraints(null, ref c.m_valueConstraint);
+                        if (c.m_valueConstraint.IsResolved())
+                            c.m_valueConstraint = c.m_valueConstraint.Simplify();
+                    }
+                }
+            }
+        }
+
+        public override bool isValueAllowed(Asn1Value val)
+        {
+
+            SequenceOrSetValue sqval = val as SequenceOrSetValue;
+            if (sqval == null)
+                throw new Exception("Internal Error");
+            
+            // Check presence constraint
+            foreach (Component c in m_components.Values)
+            {
+                if (c.m_presenceConstraint == Component.PresenseConstraint.PRESENT && !sqval.m_children.ContainsKey(c.m_name))
+                        return false;
+                if (c.m_presenceConstraint == Component.PresenseConstraint.ABSENT && sqval.m_children.ContainsKey(c.m_name))
+                        return false;
+            }
+                
+
+            //check value constraint
+            foreach (string id in sqval.m_children.Keys)
+            {
+                Asn1Value v = sqval.m_children[id];
+                if (m_components.ContainsKey(id))
+                {
+                    Component c = m_components[id];
+                    if (!c.m_valueConstraint.isValueAllowed(v))
+                        return false;
+                }
+            }
+            return true;
         }
     }
 
     public class WithComponentsChConstraint : WithComponentsConstraint
     {
-        public WithComponentsChConstraint(Asn1Type type, bool partialSpecification, List<Component> components)
+        ChoiceType Type
+        {
+            get { return (ChoiceType)m_type; }
+        }
+        public WithComponentsChConstraint(Asn1Type type, bool partialSpecification, OrderedDictionary<string, Component> components)
             : base(type, partialSpecification, components)
         {
         }
         internal static IConstraint Create2(ITree tree, ChoiceType type)
         {
-            throw new Exception();
+            OrderedDictionary<string, Component> components = new OrderedDictionary<string, Component>();
+            bool partialSpecification = false;
+
+            for (int i = 0; i < tree.ChildCount; i++)
+            {
+                ITree chTree = tree.GetChild(i);
+                if (chTree.Type == asn1Parser.EXT_MARK)
+                    partialSpecification = true;
+                else if (chTree.Type == asn1Parser.NAME_CONSTRAINT_EXPR)
+                {
+                    string id = null;
+                    Component.PresenseConstraint presenceConstr = Component.PresenseConstraint.None;
+                    //if (!partialSpecification)
+                    //    presenceConstr = Component.PresenseConstraint.Present;    //default setting if no optionality modifier is present
+                    ITree constraint = null;
+                    for (int j = 0; j < chTree.ChildCount; j++)
+                    {
+                        ITree grChTree = chTree.GetChild(j);
+                        switch (grChTree.Type)
+                        {
+                            case asn1Parser.LID:
+                                id = grChTree.Text;
+                                break;
+                            case asn1Parser.PRESENT:
+                                presenceConstr = Component.PresenseConstraint.PRESENT;
+                                break;
+                            case asn1Parser.ABSENT:
+                                presenceConstr = Component.PresenseConstraint.ABSENT;
+                                break;
+                            case asn1Parser.OPTIONAL:
+                                throw new SemanticErrorException("Error Line:" + grChTree.Line + " OPTIONAL can not appear in CHOICE types");
+                            case asn1Parser.CONSTRAINT:
+                                constraint = grChTree;
+                                break;
+                            default:
+                                throw new Exception("Internal Error");
+                        }
+                    }
+
+                    // check that id is a child of the choice
+                    if (!type.m_children.ContainsKey(id))
+                        throw new SemanticErrorException("Error: Line:" + chTree.GetChild(0).Line + ". " + id + " is not a child");
+
+                    //check that does not appears twice in the WITH COMPONENTS constraint
+                    if (components.ContainsKey(id))
+                        throw new SemanticErrorException("Error Line: " + chTree.GetChild(0).Line + ". name constraint' " + id + "' appears twice");
+
+                    if (presenceConstr == Component.PresenseConstraint.PRESENT)
+                    {
+                        // make sure that no other past component is declared as PRESENT
+                        foreach (Component c in components.Values)
+                            if (c.m_presenceConstraint == Component.PresenseConstraint.PRESENT)
+                                throw new SemanticErrorException("Error line:" + chTree.GetChild(0).Line + " there can be only one PRESENT constraint");
+                    }
+
+                    ChoiceType.Child childComp = type.m_children[id];
+
+                    IConstraint con = null;
+                    if (constraint != null)
+                        childComp.m_type.ResolveExternalConstraints(constraint, ref con);
+                    if (con != null && con.IsResolved())
+                        con = con.Simplify();
+                    components.Add(id, new Component(id, presenceConstr, con));
+                }
+            }
+
+            if (!partialSpecification)
+            {
+                foreach (ChoiceType.Child cc in type.m_children.Values)
+                {
+                    //full specification, constraint component name does not appear (hence it ABSENT 47.8.6)
+                    if (!components.ContainsKey(cc.m_childVarName))
+                    {
+                        components.Add(cc.m_childVarName, new Component(cc.m_childVarName, Component.PresenseConstraint.ABSENT, null));
+                    }
+                }
+            }
+            return new WithComponentsChConstraint(type, partialSpecification, components);
+        }
+
+        public override void DoSemanticAnalysis()
+        {
+            if (IsResolved())
+                return;
+
+            foreach (Component c in m_components.Values)
+            {
+                if (c.m_valueConstraint != null)
+                {
+                    if (!c.m_valueConstraint.IsResolved())
+                    {
+                        ChoiceType.Child childComp = Type.m_children[c.m_name];
+                        childComp.m_type.ResolveExternalConstraints(null, ref c.m_valueConstraint);
+                        if (c.m_valueConstraint.IsResolved())
+                            c.m_valueConstraint = c.m_valueConstraint.Simplify();
+                    }
+                }
+            }
+        }
+
+        public override bool isValueAllowed(Asn1Value val)
+        {
+
+            ChoiceValue sqval = val as ChoiceValue;
+            if (sqval == null)
+                throw new Exception("Internal Error");
+
+            // Check presence constraint
+
+            if (m_components.ContainsKey(sqval.AlternativeName))
+            {
+                Component c = m_components[sqval.AlternativeName];
+
+                if (c.m_presenceConstraint == Component.PresenseConstraint.ABSENT)
+                    return false;
+                if (!c.m_valueConstraint.isValueAllowed(sqval.Value))
+                    return false;
+            }
+            else
+            {
+                //check if there is another component marked as PRESENT
+                Component presentComponent = m_components.Values.Find(delegate(Component c)
+                {
+                    return c.m_presenceConstraint == Component.PresenseConstraint.PRESENT;
+                });
+                if (presentComponent != null && presentComponent.m_name != sqval.AlternativeName)
+                    return false;
+            }
+
+            return true;
+        }
+    }
+    
+    public class WithComponentsRealConstraint : WithComponentsConstraint
+    {
+        static List<string> realComponents = new List<string>(new string[] { "mantissa", "base", "exponent" });
+        RealType Type
+        {
+            get { return (RealType)m_type; }
+        }
+        public WithComponentsRealConstraint(Asn1Type type, bool partialSpecification, OrderedDictionary<string, Component> components)
+            : base(type, partialSpecification, components)
+        {
+        }
+        internal static IConstraint Create2(ITree tree, RealType type)
+        {
+            OrderedDictionary<string, Component> components = new OrderedDictionary<string, Component>();
+            bool partialSpecification = false;
+            for (int i = 0; i < tree.ChildCount; i++)
+            {
+                ITree chTree = tree.GetChild(i);
+                if (chTree.Type == asn1Parser.EXT_MARK)
+                    partialSpecification = true;
+                else if (chTree.Type == asn1Parser.NAME_CONSTRAINT_EXPR)
+                {
+                    string id = null;
+                    ITree constraint = null;
+                    for (int j = 0; j < chTree.ChildCount; j++)
+                    {
+                        ITree grChTree = chTree.GetChild(j);
+                        switch (grChTree.Type)
+                        {
+                            case asn1Parser.LID:
+                                id = grChTree.Text;
+                                if (!realComponents.Contains(id))
+                                    throw new SemanticErrorException("Error: Line:" + grChTree.Line + ". " + id + " is unknown.");
+                                break;
+                            case asn1Parser.PRESENT:
+                            case asn1Parser.ABSENT:
+                            case asn1Parser.OPTIONAL:
+                                throw new SemanticErrorException("Error Line:" + grChTree.Line+ " "+ grChTree.Text+" can not appear in a REAL types");
+                            case asn1Parser.CONSTRAINT:
+                                constraint = grChTree;
+                                break;
+                            default:
+                                throw new Exception("Internal Error");
+                        }
+                    }
+
+
+                    //check that does not appears twice in the WITH COMPONENTS constraint
+                    if (components.ContainsKey(id))
+                        throw new SemanticErrorException("Error Line: " + chTree.GetChild(0).Line + ". name constraint' " + id + "' appears twice");
+
+
+                    IConstraint con = null;
+                    if (constraint != null)
+                    {
+                        IntegerType dummyIntType = new IntegerType();
+                        dummyIntType.ResolveExternalConstraints(constraint, ref con);
+                    }
+                    if (con != null && con.IsResolved())
+                        con = con.Simplify();
+                    components.Add(id, new Component(id, Component.PresenseConstraint.None, con));
+                }
+            }
+
+            if (!partialSpecification && components.Values.Count!=3)
+            {
+                throw new SemanticErrorException("Error Line:" + tree.Line + ".\n"+
+                    "You must either use partial specification (i.e. use ...) or specify mantissa and base and exponent");
+            }
+            return new WithComponentsChConstraint(type, partialSpecification, components);
+        }
+        
+        public override void DoSemanticAnalysis()
+        {
+            if (IsResolved())
+                return;
+
+            foreach (Component c in m_components.Values)
+            {
+                if (c.m_valueConstraint != null)
+                {
+                    if (!c.m_valueConstraint.IsResolved())
+                    {
+                        c.m_valueConstraint.AsnType.ResolveExternalConstraints(null, ref c.m_valueConstraint);
+                        if (c.m_valueConstraint.IsResolved())
+                            c.m_valueConstraint = c.m_valueConstraint.Simplify();
+                    }
+                }
+            }
+        }
+
+        public override bool isValueAllowed(Asn1Value val)
+        {
+
+            RealValue sqval = val as RealValue;
+            if (sqval == null)
+                throw new Exception("Internal Error");
+            RealValue.SqReal b2 = RealValue.SqReal.FromDouble2(sqval.Value);
+
+            foreach (Component c in m_components.Values)
+            {
+                if (c.m_name == "mantissa")
+                {
+                    if (!c.m_valueConstraint.isValueAllowed(new IntegerValue(b2.m_mantissa, null, null, null)))
+                        goto tryWithBase10;
+                }
+                else if (c.m_name == "base")
+                {
+                    if (!c.m_valueConstraint.isValueAllowed(new IntegerValue(2, null, null, null)))
+                        goto tryWithBase10;
+                }
+                else if (c.m_name == "exponent")
+                {
+                    if (!c.m_valueConstraint.isValueAllowed(new IntegerValue(b2.m_exponent, null, null, null)))
+                        goto tryWithBase10;
+                }
+
+            }
+            return true;
+
+tryWithBase10:
+            RealValue.SqReal b10 = RealValue.SqReal.FromDouble2(sqval.Value);
+
+            foreach (Component c in m_components.Values)
+            {
+                if (c.m_name == "mantissa")
+                {
+                    if (!c.m_valueConstraint.isValueAllowed(new IntegerValue(b10.m_mantissa, null, null, null)))
+                        return false;
+                }
+                else if (c.m_name == "base")
+                {
+                    if (!c.m_valueConstraint.isValueAllowed(new IntegerValue(10, null, null, null)))
+                        return false;
+                }
+                else if (c.m_name == "exponent")
+                {
+                    if (!c.m_valueConstraint.isValueAllowed(new IntegerValue(b10.m_exponent, null, null, null)))
+                        return false;
+                }
+            }
+
+
+            return true;
         }
     }
 
