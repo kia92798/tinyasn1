@@ -13,7 +13,7 @@ MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
 
 	a1 MYSQ ::= {a 9, b 2}
 
-	b1 MYSQ2 ::= {a 9, b 2}
+	b1 MYSQ2 ::= {a 8, b 2}
 
 
 	

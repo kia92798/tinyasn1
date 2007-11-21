@@ -1,20 +1,16 @@
 MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
 
 
-	MYSQ ::= SEQUENCE { 
+	MYSQ ::= CHOICE { 
 		a INTEGER (1..10), 
-		b INTEGER OPTIONAL,
-		c INTEGER DEFAULT 4
+		b INTEGER 
 	}
 
 	-- PARTIAL, NONE, NONE
 
 	MYSQ2 ::= MYSQ ( WITH COMPONENTS { ...,	a (1..8)})
 
-	a1 MYSQ ::= {a 9, b 2}
+	a1 MYSQ ::= a:9
 
-	b1 MYSQ2 ::= {a 9, b 2}
-
-
-	
+	a2 MYSQ2 ::= a:8
 END

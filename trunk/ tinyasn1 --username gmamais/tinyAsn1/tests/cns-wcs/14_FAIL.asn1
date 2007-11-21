@@ -1,0 +1,14 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+
+	MYSQ ::= SEQUENCE { 
+		a INTEGER (1..10), 
+		b INTEGER OPTIONAL,
+		c INTEGER DEFAULT 4
+	}
+
+	-- MYSQ2 and MYSQ3 are equivalent declaration (both require a to absent) ==> ERROR
+--	MYSQ2 ::= MYSQ ( WITH COMPONENTS { a ABSENT, b, c})
+	MYSQ3 ::= MYSQ ( WITH COMPONENTS { b, c})
+
+END

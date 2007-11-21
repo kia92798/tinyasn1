@@ -326,6 +326,27 @@ namespace tinyAsn1
 
     public partial class RealValue : Asn1Value
     {
+        public class SqReal {
+            public Int64 m_mantissa;
+            public Int64 m_base;
+            public Int64 m_exponent;
+            public static SqReal FromDouble2(double d)
+            {
+                SqReal ret = new SqReal();
+                ret.m_base = 2;
+                
+
+                return ret;
+            }
+            public static SqReal FromDouble10(double d)
+            {
+                SqReal ret = new SqReal();
+                ret.m_base = 10;
+
+
+                return ret;
+            }
+        }
         double m_value;
         public virtual double Value
         {
@@ -805,11 +826,11 @@ namespace tinyAsn1
             return true;
         }
 
-        public SequenceOrSetValue(SequenceOrSetValue o)
+        public SequenceOrSetValue(SequenceOrSetValue o, ITree antlr)
         {
             m_TypeID = Asn1Value.TypeID.SEQUENCE_OR_SET;
             m_module = o.m_module;
-            antlrNode = o.antlrNode;
+            antlrNode = antlr;
             m_type = o.m_type;
             m_children = o.m_children;
         }
