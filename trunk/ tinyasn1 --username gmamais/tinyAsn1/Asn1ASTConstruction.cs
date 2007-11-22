@@ -1186,7 +1186,7 @@ namespace tinyAsn1
         public override void DoSemanticAnalysis()
         {
         }
-
+        
 
         public override void checkConstraintsSemantically(ITree antrlConstraint)
         {
@@ -1199,6 +1199,13 @@ namespace tinyAsn1
             },
                 StopTokensInConstraints);
         }
+        static List<int> m_allowedTokens = new List<int>(new int[]{ asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
+                asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
+                asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.WITH_COMPONENTS_CONSTR});
+        static List<int> m_stopList = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, asn1Parser.WITH_COMPONENTS_CONSTR });
+
+        protected override IEnumerable<int> AllowedTokensInConstraints { get { return m_allowedTokens; } }
+        protected override IEnumerable<int> StopTokensInConstraints { get { return m_stopList; } }
     }
 
     public partial class EnumeratedType : Asn1Type

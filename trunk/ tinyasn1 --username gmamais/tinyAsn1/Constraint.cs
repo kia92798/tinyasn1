@@ -1251,6 +1251,8 @@ namespace tinyAsn1
                 return WithComponentsSeqConstraint.Create2(tree, (SequenceOrSetType)type.GetFinalType());
             if (type.GetFinalType() is ChoiceType)
                 return WithComponentsChConstraint.Create2(tree, (ChoiceType)type.GetFinalType());
+            if (type.GetFinalType() is RealType)
+                return WithComponentsRealConstraint.Create2(tree, (RealType)type.GetFinalType());
             
 
             throw new Exception("Internal Error");
@@ -1323,6 +1325,9 @@ namespace tinyAsn1
                         switch (grChTree.Type)
                         {
                             case asn1Parser.LID:
+                            case asn1Parser.MANTISSA:
+                            case asn1Parser.BASE:
+                            case asn1Parser.EXPONENT:
                                 id = grChTree.Text;
                                 break;
                             case asn1Parser.PRESENT:
@@ -1477,6 +1482,9 @@ namespace tinyAsn1
                         switch (grChTree.Type)
                         {
                             case asn1Parser.LID:
+                            case asn1Parser.MANTISSA:
+                            case asn1Parser.BASE:
+                            case asn1Parser.EXPONENT:
                                 id = grChTree.Text;
                                 break;
                             case asn1Parser.PRESENT:
@@ -1619,6 +1627,9 @@ namespace tinyAsn1
                         switch (grChTree.Type)
                         {
                             case asn1Parser.LID:
+                            case asn1Parser.MANTISSA:
+                            case asn1Parser.BASE:
+                            case asn1Parser.EXPONENT:
                                 id = grChTree.Text;
                                 if (!realComponents.Contains(id))
                                     throw new SemanticErrorException("Error: Line:" + grChTree.Line + ". " + id + " is unknown.");
@@ -1638,13 +1649,15 @@ namespace tinyAsn1
 
                     //check that does not appears twice in the WITH COMPONENTS constraint
                     if (components.ContainsKey(id))
-                        throw new SemanticErrorException("Error Line: " + chTree.GetChild(0).Line + ". name constraint' " + id + "' appears twice");
+                        throw new SemanticErrorException("Error Line: " + chTree.GetChild(0).Line + ". '" + id + "' appears twice");
 
 
                     IConstraint con = null;
                     if (constraint != null)
                     {
                         IntegerType dummyIntType = new IntegerType();
+                        dummyIntType.antlrNode = tree;
+                        dummyIntType.m_module = type.m_module;
                         dummyIntType.ResolveExternalConstraints(constraint, ref con);
                     }
                     if (con != null && con.IsResolved())
@@ -1686,6 +1699,14 @@ namespace tinyAsn1
             RealValue sqval = val as RealValue;
             if (sqval == null)
                 throw new Exception("Internal Error");
+
+            // algorith to proceed:
+            // get base (if both 2 and 10 are present try first with 10 and then with 2)
+            // get minimum exponent
+            // get maximum mantissa
+            // Check if the components of the SqReal satisfy the constraints
+
+/*
             RealValue.SqReal b2 = RealValue.SqReal.FromDouble2(sqval.Value);
 
             foreach (Component c in m_components.Values)
@@ -1730,7 +1751,7 @@ tryWithBase10:
                         return false;
                 }
             }
-
+            */
 
             return true;
         }

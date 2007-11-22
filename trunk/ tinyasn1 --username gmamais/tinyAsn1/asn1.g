@@ -403,6 +403,7 @@ value	:
 	|	TRUE
 	|	FALSE
 	|	StringLiteral
+	|	NULL
 	|	val=valuereference										->^(VALUE_REFERENCE $val)
 	|	(s='+'|s='-')? intPart=INT ('.' decPart=INT?)? 					->^(NUMERIC_VALUE $intPart $s? $decPart?)
 	| L_BRACKET MANTISSA mant=INT COMMA BASE bas=INT COMMA EXPONENT exp=INT R_BRACKET -> ^(NUMERIC_VALUE2 $mant $bas $exp)
@@ -499,6 +500,8 @@ intersectionItem
 	:	ex1=constraintExpression (EXCEPT ex2=constraintExpression)?			-> ^(INTERSECTION_ELEMENT $ex1 $ex2?)		
 	;	
 
+//The grammar is unambigues since (NULL) can be interpreted as both single value constraint and Type inclusion constraint
+
 constraintExpression
 	: valueRangeExpression		//single value & range constraint. Single value can be applied to any type.
 								//Range constraint can be applied to INTEGER and REAL
@@ -547,7 +550,8 @@ innerTypeExpression
 	;
 
 namedConstraintExpression
-	:	identifier (constraint)? (eNum=PRESENT|eNum=ABSENT | eNum=OPTIONAL)?		-> ^(NAME_CONSTRAINT_EXPR identifier constraint? $eNum?)
+	:	(identifier | MANTISSA| BASE|EXPONENT) (constraint)? (eNum=PRESENT|eNum=ABSENT | eNum=OPTIONAL)?		
+						-> ^(NAME_CONSTRAINT_EXPR identifier? MANTISSA? BASE? EXPONENT? constraint? $eNum?)
 	;	
 
 patternExpression : PATTERN value		-> ^(PATTERN_EXPR value)
@@ -644,12 +648,12 @@ COMMA		:	',';
 EXT_MARK	: '...';
 
 BitStringLiteral	:
-	'\'' ('0'|'1')* '\'B'
+	'\'' ('0'|'1'|WS)* '\'B'
 	;
 	
 
 OctectStringLiteral	:
-	'\'' ('0'..'9'|'a'..'f'|'A'..'F')* '\'H'
+	'\'' ('0'..'9'|'a'..'f'|'A'..'F'|WS)* '\'H'
 	;
 
 StringLiteral 	: 	STR+ ;

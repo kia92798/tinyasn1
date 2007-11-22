@@ -1,0 +1,18 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+
+	MyInt3 ::= REAL ( WITH COMPONENTS {
+			mantissa (-1000..myIntVae), 
+			base(2), 
+			exponent(-10..10)} )
+
+	MyInt ::= INTEGER (1..1000)
+
+	MyInt2 ::= MyInt(5..200)
+
+	myIntVae MyInt2 ::= 100
+
+	
+
+	
+END
