@@ -16,6 +16,23 @@ namespace tinyAsn1
     {
         static int Main(string[] args)
         {
+            if (System.Diagnostics.Debugger.IsAttached)
+                return Main2(args);
+            try
+            {
+                return Main2(args);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine("Unkown exception ...");
+                Console.Error.WriteLine(ex.Message);
+                Console.Error.WriteLine(ex.StackTrace);
+                return 3;
+            }
+        }
+        
+        static int Main2(string[] args)
+        {
             List<string> inputFiles = new List<string>();
 //            List<Asn1File> ASTs = new List<Asn1File>();
             Asn1CompilerInvokation compInv = Asn1CompilerInvokation.Instance;
@@ -36,7 +53,6 @@ namespace tinyAsn1
                         Console.Error.WriteLine("Unrecognized option: " + args[i]);
                         return Usage();
                     }
-
                 }
                 else
                 {
@@ -73,13 +89,6 @@ namespace tinyAsn1
                 Console.Error.WriteLine(ex.Message);
                 return 2;
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine("Unkown exception ...");
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(ex.StackTrace);
-                return 3;
-            }
 
 // Modify Syntax Tree and make Semantic checks
 
@@ -92,13 +101,7 @@ namespace tinyAsn1
                 Console.Error.WriteLine(ex.Message);
                 return 2;
             }
-            //catch (Exception ex)
-            //{
-            //    Console.Error.WriteLine("Unkown exception ...");
-            //    Console.Error.WriteLine(ex.Message);
-            //    Console.Error.WriteLine(ex.StackTrace);
-            //    return 3;
-            //}
+            
 
             if (debug)
             {
@@ -109,30 +112,13 @@ namespace tinyAsn1
             {
                 for (int i = 0; i < inputFiles.Count; i++)
                 {
-                    try
-                    {
+
                         System.IO.StreamWriter wr = new System.IO.StreamWriter(inputFiles[i] + ".html");
 //                        ASTs[i].GenerateICD(wr);
                         wr.Flush();
                         wr.Close();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.Error.WriteLine("Unkown exception ...");
-                        Console.Error.WriteLine(ex.Message);
-                        Console.Error.WriteLine(ex.StackTrace);
-                        return 3;
-                    }
                 }
             }
-
-            /*
-            SingleValueSet<int> t1 = new SingleValueSet<int>(12);
-            SingleValueSet<double> d1 = new SingleValueSet<double>(3.13);
-            SingleValueSet<char> c1 = new SingleValueSet<char>('a');
-            */
-
-
             return 0;            
         }
 

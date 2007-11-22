@@ -80,13 +80,6 @@ namespace tinyAsn1
                     wr.Flush();
                     wr.Close();
                 }
-                //catch (Exception ex)
-                //{
-                //    Console.Error.WriteLine("Unkown exception ...");
-                //    Console.Error.WriteLine(ex.Message);
-                //    Console.Error.WriteLine(ex.StackTrace);
-                //    return 3;
-                //}
             }
         }
     }

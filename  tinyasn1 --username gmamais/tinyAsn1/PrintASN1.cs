@@ -174,7 +174,6 @@ namespace tinyAsn1
 
     public partial class SequenceOfType : ArrayType
     {
-
         public override void PrintAsn1(StreamWriterLevel o, int lev)
         {
             o.Write("SEQUENCE");
@@ -186,7 +185,6 @@ namespace tinyAsn1
 
     public partial class SetOfType : ArrayType
     {
-
         public override void PrintAsn1(StreamWriterLevel o, int lev)
         {
             o.Write("SET ");

@@ -252,6 +252,7 @@ namespace tinyAsn1
             {
                 m_value = tree.Text.Substring(1);
                 m_value = m_value.Remove(m_value.Length - 2);
+                m_value = m_value.Replace("\r", "").Replace("\n", "").Replace("\t", "").Replace(" ", "");
 
                 while (m_value.Length > 0 && m_value[m_value.Length - 1] == '0')
                     m_value = m_value.Remove(m_value.Length - 1);
@@ -330,21 +331,37 @@ namespace tinyAsn1
             public Int64 m_mantissa;
             public Int64 m_base;
             public Int64 m_exponent;
-            public static SqReal FromDouble2(double d)
+            public SqReal (double d, int newBase, Int64 minExp, Int64 maxMantissa)
             {
-                SqReal ret = new SqReal();
-                ret.m_base = 2;
-                
+                if (d == 0.0 || double.IsInfinity(d))
+                    throw new ArgumentOutOfRangeException();
 
-                return ret;
-            }
-            public static SqReal FromDouble10(double d)
-            {
-                SqReal ret = new SqReal();
-                ret.m_base = 10;
+                m_base = newBase;
+                //Let mantissa be 1
+                // then exponent is the logarithm of the input value.
+                //However, since we need the expoent to be stored in an INT we get the Floor 
+                // Floor return the largest integer less than or equal to the specified double-precision floating-point number
+                m_exponent = (Int64)Math.Floor(Math.Log(Math.Abs(d),m_base));
 
+                //Since exponent was 'Floored' mantissa is not 1 anymore but the following value
+                // now mantissa has a value in the range [1..base)
+                double mantissa = d / Math.Pow((double)m_base, (double)m_exponent);
+                if (mantissa >= m_base)
+                    throw new Exception("Mantissa("+mantissa.ToString()+") is greater or equal to base");
 
-                return ret;
+                while (m_exponent >= minExp)
+                {
+                    mantissa *= m_base;
+                    m_exponent--;
+                    if (mantissa - Math.Floor(mantissa)<Double.Epsilon)
+                        break;
+                    if (mantissa > maxMantissa)
+                        break;
+                }
+                m_mantissa = (Int64)mantissa;
+                if (d < 0)
+                    m_mantissa = -m_mantissa;
+
             }
         }
         double m_value;
@@ -353,6 +370,7 @@ namespace tinyAsn1
             get { return m_value; }
             set { m_value = value; }
         }
+
 
         public RealValue(ITree tree, Module module, Asn1Type type, int dummy)
         {
