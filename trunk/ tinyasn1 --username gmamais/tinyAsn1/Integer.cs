@@ -44,7 +44,7 @@ namespace tinyAsn1
             string referenceId = "";
             switch (val.antlrNode.Type)
             {
-                case asn1Parser.NUMERIC_VALUE:
+                case asn1Parser.INT:
                     return new IntegerValue(val.antlrNode, m_module, this);
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
@@ -54,7 +54,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.INT:
-                                return new IntegerValue(tmp as IntegerValue);
+                                return new IntegerValue(tmp as IntegerValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 return val;
                             default:

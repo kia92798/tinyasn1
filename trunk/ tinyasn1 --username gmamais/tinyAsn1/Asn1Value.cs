@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Antlr.Runtime.Tree;
+using System.Globalization;
 
 namespace tinyAsn1
 {
@@ -100,13 +101,14 @@ namespace tinyAsn1
             {
                 switch (antlrNode.Type)
                 {
-                    case asn1Parser.NUMERIC_VALUE:
-                        if (antlrNode.ChildCount == 1)
+                    case asn1Parser.INT:
+                        m_value = Int64.Parse(antlrNode.Text);
+/*                        if (antlrNode.ChildCount == 1)
                             m_value = Int64.Parse(antlrNode.GetChild(0).Text);
                         else if ((antlrNode.ChildCount == 2) && (antlrNode.GetChild(1).Text == "-"))
                             m_value = -Int64.Parse(antlrNode.GetChild(0).Text);
                         else
-                            throw new SemanticErrorException("Error in line : " + antlrNode.Line + " Expecting integer or integer variable");
+                            throw new SemanticErrorException("Error in line : " + antlrNode.Line + " Expecting integer or integer variable");*/
                         break;
                     default:
                         throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Expecting integer or integer variable");
@@ -120,9 +122,9 @@ namespace tinyAsn1
             if (m_value > Config.MAXINT || m_value < Config.MININT)
                 throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Integer value ("+m_value+") is too large and can be supported in the target platform");
         }
-        public IntegerValue(IntegerValue o)
+        public IntegerValue(IntegerValue o, ITree antlr)
         {
-            antlrNode = o.antlrNode;
+            antlrNode = antlr;
             m_TypeID = Asn1Value.TypeID.INT;
             m_value = o.m_value;
             m_module = o.m_module;
@@ -187,13 +189,13 @@ namespace tinyAsn1
             antlrNode = antlr;
             m_type = type;
         }
-        public EnumeratedValue(EnumeratedValue o)
+        public EnumeratedValue(EnumeratedValue o, ITree antlr)
         {
             m_TypeID = Asn1Value.TypeID.ENUMERATED;
             m_value = o.m_value;
             m_id = o.m_id;
             m_module = o.m_module;
-            antlrNode = o.antlrNode;
+            antlrNode = antlr;
             m_type = o.m_type;
         }
         public override string ToString()
@@ -261,6 +263,7 @@ namespace tinyAsn1
             {
                 string tmp = tree.Text.Substring(1);
                 tmp = tmp.Remove(tmp.Length - 2);
+                tmp = tmp.Replace("\r", "").Replace("\n", "").Replace("\t", "").Replace(" ", "");
 
                 foreach (Char ch in tmp.ToUpper())
                     m_value += lookup[ch];
@@ -290,12 +293,12 @@ namespace tinyAsn1
             }
         }
 
-        public BitStringValue(BitStringValue o)
+        public BitStringValue(BitStringValue o, ITree antlr)
         {
             m_TypeID = Asn1Value.TypeID.BIT_STRING;
             m_value = o.m_value;
             m_module = o.m_module;
-            antlrNode = o.antlrNode;
+            antlrNode = antlr;
             m_type = o.m_type;
         }
 
@@ -379,9 +382,21 @@ namespace tinyAsn1
             antlrNode = tree;
             m_type = type;
 
-            double mantissa = double.Parse(tree.GetChild(0).Text);
-            double bas = double.Parse(tree.GetChild(1).Text);
-            double exp = double.Parse(tree.GetChild(2).Text);
+            int i = 0;
+            double mantissa;
+            double bas;
+            double exp;
+
+            try
+            {
+                mantissa = double.Parse(tree.GetChild(i).Text, NumberFormatInfo.InvariantInfo); i++;
+                bas = double.Parse(tree.GetChild(i).Text, NumberFormatInfo.InvariantInfo); i++;
+                exp = double.Parse(tree.GetChild(i).Text, NumberFormatInfo.InvariantInfo);
+            }
+            catch (OverflowException)
+            {
+                throw new SemanticErrorException("Error line:" + tree.GetChild(i).Line+" number('"+tree.GetChild(i)+"') is too large");
+            }
 
             if (bas == 10 || bas == 2)
                 m_value = mantissa * Math.Pow(bas, exp);
@@ -399,6 +414,9 @@ namespace tinyAsn1
             antlrNode = tree;
             m_type = type;
 
+
+            m_value = double.Parse(tree.Text, NumberFormatInfo.InvariantInfo);
+/*
             double dbValVal;
             dbValVal = double.Parse(tree.GetChild(0).Text);
             bool negate = false;
@@ -424,6 +442,7 @@ namespace tinyAsn1
 
             if (negate)
                 m_value = -m_value;
+ * */
 
         }
         public RealValue(double v, Module m, ITree antlr, Asn1Type type)
@@ -434,11 +453,11 @@ namespace tinyAsn1
             m_value = v;
             m_type = type;
         }
-        public RealValue(RealValue o)
+        public RealValue(RealValue o, ITree antlr)
         {
             m_TypeID = Asn1Value.TypeID.REAL;
             m_module = o.m_module;
-            antlrNode = o.antlrNode;
+            antlrNode = antlr;
             m_value = o.m_value;
             m_type = o.m_type;
         }
@@ -547,11 +566,11 @@ namespace tinyAsn1
         }
 
 
-        public OctectStringValue(OctectStringValue o)
+        public OctectStringValue(OctectStringValue o, ITree antlr)
         {
             m_TypeID = Asn1Value.TypeID.OCTECT_STRING;
             m_module = o.m_module;
-            antlrNode = o.antlrNode;
+            antlrNode = antlr;
             m_value.Clear();
             m_value.AddRange(o.m_value);
             m_type = o.m_type;
@@ -579,7 +598,7 @@ namespace tinyAsn1
 
     public partial class IA5StringValue : Asn1Value, ISize, ICharacterString
     {
-        string m_value;
+        protected string m_value;
         public string Value
         {
             get { return m_value; }
@@ -613,11 +632,11 @@ namespace tinyAsn1
         }
 
 
-        public IA5StringValue(IA5StringValue o)
+        public IA5StringValue(IA5StringValue o, ITree antlr)
         {
             m_TypeID = Asn1Value.TypeID.IA5String;
             m_module = o.m_module;
-            antlrNode = o.antlrNode;
+            antlrNode = antlr;
             m_value = o.m_value;
             m_type = o.m_type;
         }
@@ -663,11 +682,12 @@ namespace tinyAsn1
         {
             m_TypeID = Asn1Value.TypeID.NumericString;
             List<Char> acs = new List<char>(AllowedCharSet);
+            m_value = m_value.Replace("\r", "").Replace("\n", "").Replace("\t", "").Replace(" ", "");
             foreach(Char ch in Value.ToCharArray())
                 if (!acs.Contains(ch))
                     throw new SemanticErrorException("Error in line: "+antlrNode.Line+", col: "+antlrNode.CharPositionInLine+". Character: '"+ch+"' can not be contained in a Numeric string");
         }
-        public NumericStringValue(NumericStringValue o) :base(o)
+        public NumericStringValue(NumericStringValue o,ITree antlr) :base(o,antlr)
         {
             m_TypeID = Asn1Value.TypeID.NumericString;
         }
@@ -702,11 +722,11 @@ namespace tinyAsn1
                 throw new Exception("Internal Error");
             
         }
-        public BooleanValue(BooleanValue o)
+        public BooleanValue(BooleanValue o, ITree antlr)
         {
             m_TypeID = Asn1Value.TypeID.BOOLEAN;
             m_module = o.m_module;
-            antlrNode = o.antlrNode;
+            antlrNode = antlr;
             m_value = o.m_value;
             m_type = o.m_type;
         }
@@ -726,9 +746,19 @@ namespace tinyAsn1
 
     public partial class NullValue : Asn1Value
     {
-        public NullValue()
+        public NullValue(ITree tree, Module mod, Asn1Type type)
         {
             m_TypeID = TypeID.NULL;
+            m_module = mod;
+            antlrNode = tree;
+            m_type = type;
+        }
+        public NullValue(NullValue o, ITree antlr)
+        {
+            m_TypeID = Asn1Value.TypeID.BOOLEAN;
+            m_module = o.m_module;
+            antlrNode = antlr;
+            m_type = o.m_type;
         }
         public override bool Equals(object obj)
         {
@@ -741,6 +771,10 @@ namespace tinyAsn1
         public override int GetHashCode()
         {
             return base.GetHashCode();
+        }
+        public override string ToString()
+        {
+            return "NULL";
         }
     }
     
@@ -761,11 +795,11 @@ namespace tinyAsn1
         {
             get { return m_alternativeName; }
         }
-        public ChoiceValue(ChoiceValue o)
+        public ChoiceValue(ChoiceValue o, ITree antlr)
         {
             m_TypeID = Asn1Value.TypeID.CHOICE;
             m_module = o.m_module;
-            antlrNode = o.antlrNode;
+            antlrNode = antlr;
             m_type = o.m_type;
             m_value = o.m_value;
             m_alternativeName = o.m_alternativeName;
@@ -908,9 +942,9 @@ namespace tinyAsn1
                 ITree grChild = ObjListItem2.GetChild(0);
                 if (grChild.Type == asn1Parser.INT)
                 {
-                    SemanticTreeNode numericValue = new SemanticTreeNode(grChild.CharPositionInLine, grChild.Line, grChild.Text, asn1Parser.NUMERIC_VALUE);
-                    numericValue.AddChild(grChild);
-                    Asn1Value val = Asn1Value.CreateFromAntlrAst(numericValue);
+                    //SemanticTreeNode numericValue = new SemanticTreeNode(grChild.CharPositionInLine, grChild.Line, grChild.Text, asn1Parser.NUMERIC_VALUE);
+                    //numericValue.AddChild(grChild);
+                    Asn1Value val = Asn1Value.CreateFromAntlrAst(grChild);
                     m_children.Add(id, val);
                 }
                 else if (ObjListItem2.GetChild(0).Type == asn1Parser.LID)
@@ -1025,11 +1059,11 @@ namespace tinyAsn1
             return true;
         }
 
-        public SequenceOfValue(SequenceOfValue o)
+        public SequenceOfValue(SequenceOfValue o, ITree antlr)
         {
             m_TypeID = Asn1Value.TypeID.SEQUENCE_OF;
             m_module = o.m_module;
-            antlrNode = o.antlrNode;
+            antlrNode = antlr;
             m_type = o.m_type;
             m_children = o.m_children;
         }
@@ -1091,16 +1125,21 @@ namespace tinyAsn1
                     throw new SemanticErrorException("Error in line:" + antlrNode.Line + " col:" + antlrNode.CharPositionInLine + ". Expecting SEQUENCE OF value");
                 ITree grandChild = antlrNode.GetChild(0).GetChild(0);
 
-                SemanticTreeNode nodeValue;
-                if (grandChild.Type == asn1Parser.INT) 
-                    nodeValue = new SemanticTreeNode(grandChild.CharPositionInLine, grandChild.Line, grandChild.Text, asn1Parser.NUMERIC_VALUE);
+                Asn1Value val;
+                if (grandChild.Type == asn1Parser.INT)
+                {
+                    val = Asn1Value.CreateFromAntlrAst(grandChild);
+                }
                 else if (grandChild.Type == asn1Parser.LID)
+                {
+                    SemanticTreeNode nodeValue;
                     nodeValue = new SemanticTreeNode(grandChild.CharPositionInLine, grandChild.Line, grandChild.Text, asn1Parser.VALUE_REFERENCE);
+                    nodeValue.AddChild(grandChild);
+                    val = Asn1Value.CreateFromAntlrAst(nodeValue);
+                }
                 else
                     throw new Exception("Internal Error");
 
-                nodeValue.AddChild(grandChild);
-                Asn1Value val = Asn1Value.CreateFromAntlrAst(nodeValue);
                 m_children.Add(val);
 
 
@@ -1162,11 +1201,11 @@ namespace tinyAsn1
             return true;
         }
 
-        public SetOfValue(SetOfValue o)
+        public SetOfValue(SetOfValue o, ITree antlr)
         {
             m_TypeID = Asn1Value.TypeID.SET_OF;
             m_module = o.m_module;
-            antlrNode = o.antlrNode;
+            antlrNode = antlr;
             m_type = o.m_type;
             m_children = o.m_children;
         }
@@ -1239,16 +1278,19 @@ namespace tinyAsn1
                     throw new SemanticErrorException("Error in line:" + antlrNode.Line + " col:" + antlrNode.CharPositionInLine + ". Expecting SEQUENCE OF value");
                 ITree grandChild = antlrNode.GetChild(0).GetChild(0);
 
-                SemanticTreeNode nodeValue;
+                Asn1Value val;
                 if (grandChild.Type == asn1Parser.INT)
-                    nodeValue = new SemanticTreeNode(grandChild.CharPositionInLine, grandChild.Line, grandChild.Text, asn1Parser.NUMERIC_VALUE);
+                    val = Asn1Value.CreateFromAntlrAst(grandChild);
                 else if (grandChild.Type == asn1Parser.LID)
+                {
+                    SemanticTreeNode nodeValue;
                     nodeValue = new SemanticTreeNode(grandChild.CharPositionInLine, grandChild.Line, grandChild.Text, asn1Parser.VALUE_REFERENCE);
+                    nodeValue.AddChild(grandChild);
+                    val = Asn1Value.CreateFromAntlrAst(nodeValue);
+                }
                 else
                     throw new Exception("Internal Error");
 
-                nodeValue.AddChild(grandChild);
-                Asn1Value val = Asn1Value.CreateFromAntlrAst(nodeValue);
                 m_children.Add(val);
 
 
@@ -1664,11 +1706,11 @@ namespace tinyAsn1
         {
             return m_components.GetHashCode();
         }
-        public ObjectIdentifierValue(ObjectIdentifierValue o)
+        public ObjectIdentifierValue(ObjectIdentifierValue o, ITree antlr)
         {
             m_TypeID = Asn1Value.TypeID.OBJECT_IDENTIFIER;
             m_module = o.m_module;
-            antlrNode = o.antlrNode;
+            antlrNode = antlr;
             m_type = o.m_type;
             m_components = o.m_components;
         }
