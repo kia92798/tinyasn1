@@ -34,6 +34,16 @@ namespace tinyAsn1
                 ICharStream input = new ANTLRFileStream(inFileName);
                 asn1Lexer lexer = new asn1Lexer(input);
                 CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+                //foreach (IToken token in tokens.GetTokens())
+                //{
+                //    if (token.Type!= asn1Lexer.WS)
+                //        Console.WriteLine("{0}\t{1}", token.Type, token.Text);
+                //}
+
+                
+                
+                
                 asn1Parser parser = new asn1Parser(tokens);
 
                 asn1Parser.moduleDefinitions_return result = parser.moduleDefinitions();
@@ -355,6 +365,8 @@ namespace tinyAsn1
                     {
                         case asn1Parser.INT:
                             ret.m_tag = int.Parse(child.Text);
+                            if (ret.m_tag < 0)
+                                throw new SemanticErrorException("Error Line:"+child.Line+" tags cannot be negative");
                             break;
                         case asn1Parser.UNIVERSAL:
                             ret.m_class = TagClass.UNIVERSAL;
@@ -450,7 +462,10 @@ namespace tinyAsn1
                         case asn1Parser.UniversalString:
                         case asn1Parser.BMPString:
                         case asn1Parser.UTF8String:
-                            throw new SemanticErrorException("Error line: " + child.Line + ", col: " + child.CharPositionInLine + ". "+child.Text+" is currently not supported.");
+                            ret = new IA5StringType();
+                            break;
+
+//                            throw new SemanticErrorException("Error line: " + child.Line + ", col: " + child.CharPositionInLine + ". "+child.Text+" is currently not supported.");
                         case asn1Parser.SELECTION_TYPE:
                             throw new SemanticErrorException("Error line: " + child.GetChild(0).Line + ", col: " + child.GetChild(0).CharPositionInLine + ". Selection types are currently not supported.");
                         case asn1Parser.CONSTRAINT:
@@ -683,9 +698,9 @@ namespace tinyAsn1
                     case asn1Parser.INT:
                         ret.m_valueAsInt = int.Parse(child.Text);
                         break;
-                    case asn1Parser.NUMERIC_VALUE:
-                        ret.m_valueAsInt = Asn1Value.GetValFrom_NUMERIC_VALUE_asInt(child);
-                        break;
+                    //case asn1Parser.NUMERIC_VALUE:
+                    //    ret.m_valueAsInt = Asn1Value.GetValFrom_NUMERIC_VALUE_asInt(child);
+                    //    break;
                     case asn1Parser.LID:
                         ret.m_valueAsReference = child.Text;
                         break;
@@ -706,7 +721,7 @@ namespace tinyAsn1
             switch (val.antlrNode.Type)
             {
                 case asn1Parser.NULL:
-                    return new NullValue();
+                    return new NullValue(val.antlrNode, m_module, this);
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
                     if (m_module.isValueDeclared(referenceId))
@@ -715,7 +730,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.NULL:
-                                return new NullValue();
+                                return new NullValue(tmp as NullValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
@@ -727,7 +742,7 @@ namespace tinyAsn1
                         throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
 
                 default:
-                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting BIT STRING constant or BIT STRING variable");
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting NULL");
             }
         }
         internal override bool SemanticAnalysisFinished()
@@ -757,7 +772,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.BOOLEAN:
-                                return new BooleanValue(tmp as BooleanValue);
+                                return new BooleanValue(tmp as BooleanValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
@@ -769,7 +784,7 @@ namespace tinyAsn1
                         throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
 
                 default:
-                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting BIT STRING constant or BIT STRING variable");
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting TRUE, FALSE or reference to a boolean variable");
             }
         }
 
@@ -924,7 +939,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.BIT_STRING:
-                                return new BitStringValue(tmp as BitStringValue);
+                                return new BitStringValue(tmp as BitStringValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
@@ -967,7 +982,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.OCTECT_STRING:
-                                return new OctectStringValue(tmp as OctectStringValue);
+                                return new OctectStringValue(tmp as OctectStringValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
@@ -979,7 +994,7 @@ namespace tinyAsn1
                         throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
 
                 default:
-                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting BIT STRING constant or BIT STRING variable");
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting OCTECT STRING constant or OCTECT STRING variable");
             }
         }
 
@@ -1016,7 +1031,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.IA5String:
-                                return new IA5StringValue(tmp as IA5StringValue);
+                                return new IA5StringValue(tmp as IA5StringValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
@@ -1028,7 +1043,7 @@ namespace tinyAsn1
                         throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
 
                 default:
-                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting string constant or string variable referebce");
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting string constant or string variable reference");
             }
         }
 
@@ -1118,7 +1133,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.NumericString:
-                                return new NumericStringValue(tmp as NumericStringValue);
+                                return new NumericStringValue(tmp as NumericStringValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
@@ -1130,7 +1145,7 @@ namespace tinyAsn1
                         throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
 
                 default:
-                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting NumericString constant or NumericString variable referebce");
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting NumericString constant or NumericString variable reference");
             }
         }
         public override IA5StringType CreateForPA(Module mod, ITree antrl)
@@ -1151,7 +1166,8 @@ namespace tinyAsn1
             string referenceId = "";
             switch (val.antlrNode.Type)
             {
-                case asn1Parser.NUMERIC_VALUE:
+                case asn1Parser.INT:
+                case asn1Parser.FloatingPointLiteral:
                     return new RealValue(val.antlrNode, m_module, this);
                 case asn1Parser.NUMERIC_VALUE2: //e.g. {mantissa 2, base 10, exponent 0}
                     return new RealValue(val.antlrNode, m_module, this,0);
@@ -1163,7 +1179,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.REAL:
-                                return new RealValue(tmp as RealValue);
+                                return new RealValue(tmp as RealValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
@@ -1283,7 +1299,7 @@ namespace tinyAsn1
                             return val; // not yet resolved. Wait for next round
                         if (tmp.Type.GetFinalType() == this)
                         {
-                            return new EnumeratedValue(tmp as EnumeratedValue);
+                            return new EnumeratedValue(tmp as EnumeratedValue, val.antlrNode.GetChild(0));
 
                         } else
                             throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
@@ -1546,7 +1562,7 @@ namespace tinyAsn1
                                 if (tmp.IsResolved())
                                 {
                                     if (tmp.Type.GetFinalType() == this)
-                                        return new ChoiceValue(tmp as ChoiceValue);
+                                        return new ChoiceValue(tmp as ChoiceValue, val.antlrNode.GetChild(0));
                                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
                                 }
                                 return val; // not yet fully resolved, wait for next round
@@ -2050,7 +2066,7 @@ namespace tinyAsn1
                                 if (tmp.IsResolved())
                                 {
                                     if (tmp.Type.GetFinalType() == this)
-                                        return new SequenceOfValue(tmp as SequenceOfValue);
+                                        return new SequenceOfValue(tmp as SequenceOfValue, val.antlrNode.GetChild(0));
                                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
                                 }
                                 return val; // not yet fully resolved, wait for next round
@@ -2166,7 +2182,7 @@ namespace tinyAsn1
                                 if (tmp.IsResolved())
                                 {
                                     if (tmp.Type.GetFinalType() == this)
-                                        return new SetOfValue(tmp as SetOfValue);
+                                        return new SetOfValue(tmp as SetOfValue, val.antlrNode.GetChild(0));
                                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
                                 }
                                 return val; // not yet fully resolved, wait for next round
@@ -2245,7 +2261,7 @@ namespace tinyAsn1
                                 if (tmp.IsResolved())
                                 {
                                     if (tmp.Type.GetFinalType() == this)
-                                        return new ObjectIdentifierValue(tmp as ObjectIdentifierValue);
+                                        return new ObjectIdentifierValue(tmp as ObjectIdentifierValue, val.antlrNode.GetChild(0));
                                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
                                 }
                                 return val; // not yet fully resolved, wait for next round
@@ -2276,6 +2292,7 @@ namespace tinyAsn1
     {
         
         //^(NUMERIC_VALUE $intPart $s? $decPart?)
+/*
         public static Int64 GetValFrom_NUMERIC_VALUE_asInt(ITree tree)
         {
             Int64 ret = Int64.Parse(tree.GetChild(0).Text);
@@ -2283,7 +2300,7 @@ namespace tinyAsn1
                 ret = -ret;
             return ret;
         }
-
+*/
         static public Asn1Value CreateFromAntlrAst(ITree tree)
         {
 
