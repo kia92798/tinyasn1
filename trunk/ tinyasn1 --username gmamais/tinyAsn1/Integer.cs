@@ -83,11 +83,12 @@ namespace tinyAsn1
                 return false;
             //if (nNumberOfUnresolvedVarsInConstraints > 0)
             //    return false;
-            return true;
+            return base.SemanticAnalysisFinished();
         }
 
         public override void DoSemanticAnalysis()
         {
+            base.DoSemanticAnalysis();
             List<NumberedItem> toBeRemoved = new List<NumberedItem>();
             foreach (NumberedItem ni in m_privNamedValues)
             {
@@ -148,6 +149,14 @@ namespace tinyAsn1
 
     public partial class ReferenceType : Asn1Type
     {
+
+        public override Asn1Type.Tag UniversalTag
+        {
+            get
+            {
+                return new Tag(Tag.TagClass.UNIVERSAL, 2, Module.TaggingMode.EXPLICIT);
+            }
+        }
         static public new ReferenceType CreateFromAntlrAst(ITree tree)
         {
             ReferenceType ret = new ReferenceType();
@@ -226,7 +235,54 @@ namespace tinyAsn1
                 return m_module.GetTypeByName(m_referencedTypeName);
             }
         }
+        public override TagSequence Tags
+        {
+            get
+            {
+                TagSequence ret = new TagSequence();
+                Asn1Type type = this;
+                bool implicitTagging=false;
+                while (type != null)
+                {
+                    Tag outerTag = type.m_tag;
+                    if (outerTag != null)
+                    {
+                        implicitTagging = outerTag.m_taggingMode == Module.TaggingMode.IMPLICIT;
+                        break;
+                    }
+                    type = ParentType;
+                }
 
+                type = this;
+
+                while (type != null)
+                {
+                    Tag tagToAdded = type.m_tag;
+                    if (tagToAdded != null)
+                    {
+                        ret.m_tags.Add(tagToAdded);
+                        if (implicitTagging)
+                            break;
+                    }
+                    if (type.UniversalTag!=null)
+                        ret.m_tags.Add(type.UniversalTag);
+                    type = ParentType;
+                }
+                return ret;
+            }
+        }
+
+        public override bool IsTagged()
+        {
+            Asn1Type type = this;
+            while (type != null)
+            {
+                if (type.m_tag != null)
+                    return true;
+                type = ParentType;
+            }
+            return false;
+        }
 
 
         public override string Name
@@ -242,12 +298,12 @@ namespace tinyAsn1
 
         internal override bool SemanticAnalysisFinished()
         {
-            return true;
+            return base.SemanticAnalysisFinished();
         }
         
         public override void DoSemanticAnalysis()
         {
-
+            base.DoSemanticAnalysis();
         }
 
 /*        public override IConstraint ParentConstraint

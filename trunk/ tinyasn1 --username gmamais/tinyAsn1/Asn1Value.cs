@@ -46,7 +46,9 @@ namespace tinyAsn1
             REL_OBJ_ID,
             IA5String,
             NumericString,
-            NULL
+            NULL,
+            GeneralizedTime,
+            UTCTime
         }
 
 
@@ -414,8 +416,28 @@ namespace tinyAsn1
             antlrNode = tree;
             m_type = type;
 
+            switch (tree.Type) {
+                case asn1Parser.INT:
+                case asn1Parser.FloatingPointLiteral:
+                    try
+                    {
+                        m_value = double.Parse(tree.Text, NumberFormatInfo.InvariantInfo);
+                    }
+                    catch (OverflowException)
+                    {
+                        throw new SemanticErrorException("Error line:"+tree.Line+" value: "+ tree.Text+ " is too large");
+                    }
+                break;
+                case asn1Parser.MINUS_INFINITY:
+                    m_value = double.NegativeInfinity;
+                    break;
+                case asn1Parser.PLUS_INFINITY:
+                    m_value = double.PositiveInfinity;
+                    break;
+                default:
+                    throw new Exception("Internal Error");
+            }
 
-            m_value = double.Parse(tree.Text, NumberFormatInfo.InvariantInfo);
 /*
             double dbValVal;
             dbValVal = double.Parse(tree.GetChild(0).Text);
@@ -463,11 +485,11 @@ namespace tinyAsn1
         }
         public override string ToString()
         {
-//            return Value.ToString("0,0.0");
-            string ret = Value.ToString().Replace(',','.');
-            if (!ret.Contains("."))
-                ret += ".0";
-            return ret;
+            return Value.ToString(NumberFormatInfo.InvariantInfo);
+            //string ret = Value.ToString().Replace(',','.');
+            //if (!ret.Contains("."))
+            //    ret += ".0";
+            //return ret;
         }
         public override bool Equals(object obj)
         {
@@ -690,6 +712,50 @@ namespace tinyAsn1
         public NumericStringValue(NumericStringValue o,ITree antlr) :base(o,antlr)
         {
             m_TypeID = Asn1Value.TypeID.NumericString;
+        }
+    }
+
+    public partial class GeneralizedTimeValue : IA5StringValue
+    {
+        static Char[] AllowedCharSet = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-','Z','.',','};
+
+        public GeneralizedTimeValue(ITree tree, Module mod, Asn1Type type)
+            : base(tree, mod, type)
+        {
+            m_TypeID = Asn1Value.TypeID.GeneralizedTime;
+            List<Char> acs = new List<char>(AllowedCharSet);
+            m_value = m_value.Replace("\r", "").Replace("\n", "").Replace("\t", "").Replace(" ", "");
+            foreach (Char ch in Value.ToCharArray())
+                if (!acs.Contains(ch))
+                    throw new SemanticErrorException("Error in line: " + antlrNode.Line + ", col: " + antlrNode.CharPositionInLine + ". Character: '" + ch + "' can not be contained in a GenaralizedTime string");
+        }
+
+        public GeneralizedTimeValue(GeneralizedTimeValue o, ITree antlr)
+            : base(o, antlr)
+        {
+            m_TypeID = Asn1Value.TypeID.GeneralizedTime;
+        }
+    }
+
+    public partial class UTCTimeValue : IA5StringValue
+    {
+        static Char[] AllowedCharSet = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', 'Z' };
+
+        public UTCTimeValue(ITree tree, Module mod, Asn1Type type)
+            : base(tree, mod, type)
+        {
+            m_TypeID = Asn1Value.TypeID.UTCTime;
+            List<Char> acs = new List<char>(AllowedCharSet);
+            m_value = m_value.Replace("\r", "").Replace("\n", "").Replace("\t", "").Replace(" ", "");
+            foreach (Char ch in Value.ToCharArray())
+                if (!acs.Contains(ch))
+                    throw new SemanticErrorException("Error in line: " + antlrNode.Line + ", col: " + antlrNode.CharPositionInLine + ". Character: '" + ch + "' can not be contained in a UTCTimeValue string");
+        }
+
+        public UTCTimeValue(UTCTimeValue o, ITree antlr)
+            : base(o, antlr)
+        {
+            m_TypeID = Asn1Value.TypeID.UTCTime;
         }
     }
 

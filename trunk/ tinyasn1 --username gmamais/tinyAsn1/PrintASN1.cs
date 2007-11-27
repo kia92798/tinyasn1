@@ -8,6 +8,23 @@ namespace tinyAsn1
 
     public partial class Asn1Type
     {
+        public partial class Tag
+        {
+            public void PrintAsn1(StreamWriterLevel o, int lev)
+            {
+                o.Write("[");
+                if (m_class != TagClass.CONTEXT_SPECIFIC)
+                {
+                    o.Write(m_class);
+                    o.Write(" ");
+                }
+                o.Write(m_tag);
+                o.Write("] ");
+                o.Write(m_taggingMode);
+                o.Write(" ");
+
+            }
+        }        
         public virtual void PrintAsn1Constraints(StreamWriterLevel o)
         {
             if (m_constraints.Count > 0)
@@ -19,6 +36,8 @@ namespace tinyAsn1
         }
         public virtual void PrintAsn1(StreamWriterLevel o, int lev)
         {
+            if (m_tag != null)
+                m_tag.PrintAsn1(o, lev);
             o.Write(Name);
             PrintAsn1Constraints(o);
         }
@@ -27,6 +46,8 @@ namespace tinyAsn1
     {
         public override void PrintAsn1(StreamWriterLevel o, int lev)
         {
+            if (m_tag != null)
+                m_tag.PrintAsn1(o, lev);
             if (m_namedBits.Count > 0)
             {
                 o.WriteLine("BIT STRING {");
@@ -51,6 +72,8 @@ namespace tinyAsn1
     {
         public override void PrintAsn1(StreamWriterLevel o, int lev)
         {
+            if (m_tag != null)
+                m_tag.PrintAsn1(o, lev);
             if (m_enumValues.Count > 0)
             {
                 o.WriteLine("ENUMERATED {");
@@ -73,6 +96,8 @@ namespace tinyAsn1
     {
         public override void PrintAsn1(StreamWriterLevel o, int lev)
         {
+            if (m_tag != null)
+                m_tag.PrintAsn1(o, lev);
             if (m_namedValues.Count > 0)
             {
                 o.WriteLine("INTEGER {");
@@ -117,6 +142,8 @@ namespace tinyAsn1
         public override void PrintAsn1(StreamWriterLevel o, int lev)
         {
             Child ch;
+            if (m_tag != null)
+                m_tag.PrintAsn1(o, lev);
             o.WriteLine(Name + " {");
             for (int i = 0; i < m_children.Values.Count-1;i++ )
             {
@@ -152,6 +179,8 @@ namespace tinyAsn1
         public override void PrintAsn1(StreamWriterLevel o, int lev)
         {
             Child ch;
+            if (m_tag != null)
+                m_tag.PrintAsn1(o, lev);
             o.WriteLine(Name + " {");
             for (int i = 0; i < m_children.Values.Count - 1; i++)
             {
@@ -176,6 +205,8 @@ namespace tinyAsn1
     {
         public override void PrintAsn1(StreamWriterLevel o, int lev)
         {
+            if (m_tag != null)
+                m_tag.PrintAsn1(o, lev);
             o.Write("SEQUENCE");
             PrintAsn1Constraints(o);
             o.Write(" OF ");
@@ -187,6 +218,8 @@ namespace tinyAsn1
     {
         public override void PrintAsn1(StreamWriterLevel o, int lev)
         {
+            if (m_tag != null)
+                m_tag.PrintAsn1(o, lev);
             o.Write("SET ");
             PrintAsn1Constraints(o);
             o.Write(" OF ");
@@ -215,14 +248,14 @@ namespace tinyAsn1
         public void OnBeforeModule(Asn1File asn1File, Module mod)
         {
             o.Write(mod.m_moduleID + " DEFINITIONS ");
-            switch (mod.m_tags) {
-                case Module.Tags.AUTOMATIC:
+            switch (mod.m_taggingMode) {
+                case Module.TaggingMode.AUTOMATIC:
                     o.Write("AUTOMATIC TAGS ");
                     break;
-                case Module.Tags.EXPLICIT:
+                case Module.TaggingMode.EXPLICIT:
                     o.Write(" EXPLICIT TAGS ");
                     break;
-                case Module.Tags.IMPLICIT:
+                case Module.TaggingMode.IMPLICIT:
                     o.Write(" IMPLICIT TAGS ");
                     break;
             }
@@ -242,6 +275,7 @@ namespace tinyAsn1
                     o.WriteLine("\t"+export[i] + ",");
                 }
                 o.WriteLine("\t" + export[export.Count-1] + ";");
+                o.WriteLine();
             }
 
 
