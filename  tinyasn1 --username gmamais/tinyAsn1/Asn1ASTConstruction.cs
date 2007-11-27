@@ -183,13 +183,13 @@ namespace tinyAsn1
                         curModule.m_moduleID = child.Text;
                         break;
                     case asn1Parser.EXPLICIT:
-                        curModule.m_tags = Tags.EXPLICIT;
+                        curModule.m_taggingMode = TaggingMode.EXPLICIT;
                         break;
                     case asn1Parser.IMPLICIT:
-                        curModule.m_tags = Tags.IMPLICIT;
+                        curModule.m_taggingMode = TaggingMode.IMPLICIT;
                         break;
                     case asn1Parser.AUTOMATIC:
-                        curModule.m_tags = Tags.AUTOMATIC;
+                        curModule.m_taggingMode = TaggingMode.AUTOMATIC;
                         break;
                     case asn1Parser.EXTENSIBILITY:
                         curModule.m_extensibilityImplied = true;
@@ -352,8 +352,32 @@ namespace tinyAsn1
 
     public partial class Asn1Type
     {
+        public partial class TagSequence
+        {
+            public List<Tag> m_tags = new List<Tag>();
+
+            public override bool Equals(object obj)
+            {
+                TagSequence o = obj as TagSequence;
+                if (o == null)
+                    return false;
+                if (m_tags.Count != o.m_tags.Count)
+                    return false;
+                for (int i = 0; i < m_tags.Count; i++)
+                    if (!m_tags[i].Equals(o.m_tags[i]))
+                        return false;
+
+                return true;
+            }
+            public override int GetHashCode()
+            {
+                return m_tags.GetHashCode();
+            }
+        }
+
         public partial class Tag
         {
+            private Asn1Value valReference = null;
             //(TYPE_TAG (UNIVERSAL | APPLICATION | PRIVATE)? INT ( IMPLICIT | EXPLICIT)?)
             static public Tag CreateFromAntlrAst(ITree tree)
             {
@@ -368,6 +392,9 @@ namespace tinyAsn1
                             if (ret.m_tag < 0)
                                 throw new SemanticErrorException("Error Line:"+child.Line+" tags cannot be negative");
                             break;
+                        case asn1Parser.VALUE_REFERENCE:
+                            ret.valReference = Asn1Value.CreateFromAntlrAst(child);
+                            break;
                         case asn1Parser.UNIVERSAL:
                             ret.m_class = TagClass.UNIVERSAL;
                             break;
@@ -378,16 +405,63 @@ namespace tinyAsn1
                             ret.m_class = TagClass.PRIVATE;
                             break;
                         case asn1Parser.IMPLICIT:
-                            ret.ImpOrExpl = Module.Tags.IMPLICIT;
+                            ret.m_taggingMode = Module.TaggingMode.IMPLICIT;
                             break;
                         case asn1Parser.EXPLICIT:
-                            ret.ImpOrExpl = Module.Tags.EXPLICIT;
+                            ret.m_taggingMode = Module.TaggingMode.EXPLICIT;
                             break;
                         default:
                             throw new Exception("Unkown child: "+child.Text+" for node: "+tree.Text);
                     }
                 }
                 return ret;
+            }
+            public virtual void DoSemanticAnalysis()
+            {
+                if (SemanticAnalysisFinished())
+                    return;
+
+
+                IntegerType dummy = new IntegerType();
+                valReference = dummy.ResolveVariable(valReference);
+                if (valReference.IsResolved())
+                {
+                    m_tag = (int)((IntegerValue)valReference).Value;
+                    valReference = null;
+                }
+
+                if (m_taggingMode == Module.TaggingMode.AUTOMATIC)
+                {
+                    if (m_type.m_module.m_taggingMode == Module.TaggingMode.EXPLICIT)
+                        m_taggingMode = Module.TaggingMode.EXPLICIT;
+                    else 
+                    {
+                        if (!m_type.IsTagged()) {
+                            if ((m_type is ChoiceType) || ((m_type is ReferenceType) && (m_type.GetFinalType() is ChoiceType)))
+                                m_taggingMode = Module.TaggingMode.EXPLICIT;
+                            else
+                                m_taggingMode = Module.TaggingMode.IMPLICIT;
+                        }
+                        else
+                            m_taggingMode = Module.TaggingMode.IMPLICIT;
+                    }
+                }
+            }
+            public virtual bool SemanticAnalysisFinished()
+            {
+                if (m_taggingMode == Module.TaggingMode.AUTOMATIC)
+                    return false;
+                if (valReference != null)
+                    return false;
+                return true;
+            }
+            public override bool Equals(object obj)
+            {
+                Tag o = obj as Tag;
+                if (o == null)
+                    return false;
+
+                return o.m_class == m_class && o.m_tag == m_tag;
             }
         }
 
@@ -453,6 +527,12 @@ namespace tinyAsn1
                         case asn1Parser.NumericString:
                             ret = new NumericStringType();
                             break;
+                        case asn1Parser.UTCTime:
+                            ret = new UTCTimeType();
+                            break;
+                        case asn1Parser.GeneralizedTime:
+                            ret = new GeneralizedTimeType();
+                            break;
                         case asn1Parser.PrintableString:
                         case asn1Parser.VisibleString:
                         case asn1Parser.TeletexString:
@@ -483,13 +563,48 @@ namespace tinyAsn1
                 ret.m_tag = tag;
                 ret.m_module = Module.CurrentlyConstructModule;
                 ret.antlrNode = tree;
+                if (ret.m_tag != null)
+                    ret.m_tag.m_type = ret;
             }
             return ret;
         }
+
+        public virtual Tag UniversalTag { get { return null; } }
+
+        public virtual TagSequence Tags
+        {
+            get
+            {
+                TagSequence ret = new TagSequence();
+                
+                if (m_tag != null)
+                    ret.m_tags.Add(m_tag);
+                if (m_tag.m_taggingMode == Module.TaggingMode.IMPLICIT)
+                    return ret;
+                
+                if (UniversalTag != null)
+                    ret.m_tags.Add(UniversalTag);
+                return ret;
+            }
+        }
+
+        public virtual bool IsTagged()
+        {
+            return m_tag != null;
+        }
+
         /// <summary>
-        /// SEQUENCE and SET must override this method.
+        /// SEQUENCE, SET, CHOICE, SEQUENCE OF and SET OF must override this method.
         /// </summary>
         public virtual void CheckDefaultValues() 
+        {
+        }
+
+
+        /// <summary>
+        /// SEQUENCE, SET, CHOICE, SEQUENCE OF and SET OF must override this method.
+        /// </summary>
+        public virtual void CheckChildrensTags()
         {
         }
 
@@ -513,7 +628,9 @@ namespace tinyAsn1
          */
         internal virtual bool SemanticAnalysisFinished()
         {
-            throw new Exception("Abstact method called: Asn1Type::SemanticAnalysisFinished()");
+            if (m_tag == null)
+                return true;
+            return m_tag.SemanticAnalysisFinished();
         }
 
         /*
@@ -529,7 +646,8 @@ namespace tinyAsn1
          * */
         public virtual void DoSemanticAnalysis()
         {
-            throw new Exception("Abstact method called: Asn1Type::DoSemanticAnalysis()");
+            if (m_tag != null)
+                m_tag.DoSemanticAnalysis();
         }
 
         public List<IConstraint> m_constraints = new List<IConstraint>();
@@ -715,6 +833,14 @@ namespace tinyAsn1
 
     public partial class NullType : Asn1Type
     {
+        public override Asn1Type.Tag UniversalTag
+        {
+            get
+            {
+                return new Tag(Tag.TagClass.UNIVERSAL, 0, Module.TaggingMode.EXPLICIT);
+            }
+        }
+
         internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId = "";
@@ -747,15 +873,24 @@ namespace tinyAsn1
         }
         internal override bool SemanticAnalysisFinished()
         {
-            return true;
+            return base.SemanticAnalysisFinished();
         }
         public override void DoSemanticAnalysis()
         {
+            base.DoSemanticAnalysis();
         }
     }
 
     public partial class BooleanType : Asn1Type
     {
+        public override Asn1Type.Tag UniversalTag
+        {
+            get
+            {
+                return new Tag(Tag.TagClass.UNIVERSAL, 1, Module.TaggingMode.EXPLICIT);
+            }
+        }
+
         internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId = "";
@@ -790,15 +925,24 @@ namespace tinyAsn1
 
         internal override bool SemanticAnalysisFinished()
         {
-            return true;
+            return base.SemanticAnalysisFinished();
         }
         public override void DoSemanticAnalysis()
         {
+            base.DoSemanticAnalysis();
         }
     }
 
     public partial class BitStringType : Asn1Type
     {
+        public override Asn1Type.Tag UniversalTag
+        {
+            get
+            {
+                return new Tag(Tag.TagClass.UNIVERSAL, 3, Module.TaggingMode.EXPLICIT);
+            }
+        }
+
         static public new BitStringType CreateFromAntlrAst(ITree tree)
         {
             BitStringType ret = new BitStringType();
@@ -821,10 +965,11 @@ namespace tinyAsn1
             if (m_namedBitsPriv.Count > 0)
                 return false;
 
-            return true;
+            return base.SemanticAnalysisFinished();
         }
         public override void DoSemanticAnalysis()
         {
+            base.DoSemanticAnalysis();
             List<NumberedItem> toBeRemoved = new List<NumberedItem>();
             foreach (NumberedItem ni in m_namedBitsPriv)
             {
@@ -966,6 +1111,14 @@ namespace tinyAsn1
 
     public partial class OctetStringType : Asn1Type
     {
+        public override Asn1Type.Tag UniversalTag
+        {
+            get
+            {
+                return new Tag(Tag.TagClass.UNIVERSAL, 4, Module.TaggingMode.EXPLICIT);
+            }
+        }
+
         internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId = "";
@@ -1000,10 +1153,11 @@ namespace tinyAsn1
 
         internal override bool SemanticAnalysisFinished()
         {
-            return true;
+            return base.SemanticAnalysisFinished();
         }
         public override void DoSemanticAnalysis()
         {
+            base.DoSemanticAnalysis();
         }
         static List<int> m_allowedTokens = new List<int>(new int[]{ asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
                 asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
@@ -1016,6 +1170,14 @@ namespace tinyAsn1
 
     public partial class IA5StringType : Asn1Type
     {
+        public override Asn1Type.Tag UniversalTag
+        {
+            get
+            {
+                return new Tag(Tag.TagClass.UNIVERSAL, 22, Module.TaggingMode.EXPLICIT);
+            }
+        }
+
         internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId = "";
@@ -1049,10 +1211,11 @@ namespace tinyAsn1
 
         internal override bool SemanticAnalysisFinished()
         {
-            return true;
+            return base.SemanticAnalysisFinished();
         }
         public override void DoSemanticAnalysis()
         {
+            base.DoSemanticAnalysis();
         }
         
         static List<int> m_allowedTokens = new List<int>(new int[]{ asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
@@ -1118,6 +1281,14 @@ namespace tinyAsn1
 
     public partial class NumericStringType : IA5StringType
     {
+        public override Asn1Type.Tag UniversalTag
+        {
+            get
+            {
+                return new Tag(Tag.TagClass.UNIVERSAL, 18, Module.TaggingMode.EXPLICIT);
+            }
+        }
+
         internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId = "";
@@ -1158,8 +1329,99 @@ namespace tinyAsn1
         }
     }
 
+    public partial class GeneralizedTimeType : IA5StringType
+    {
+        public override Asn1Type.Tag UniversalTag
+        {
+            get
+            {
+                return new Tag(Tag.TagClass.UNIVERSAL, 24, Module.TaggingMode.EXPLICIT);
+            }
+        }
+
+        internal override Asn1Value ResolveVariable(Asn1Value val)
+        {
+            string referenceId = "";
+            switch (val.antlrNode.Type)
+            {
+                case asn1Parser.StringLiteral:
+                    return new GeneralizedTimeValue(val.antlrNode, m_module, this);
+                case asn1Parser.VALUE_REFERENCE:
+                    referenceId = val.antlrNode.GetChild(0).Text;
+                    if (m_module.isValueDeclared(referenceId))
+                    {
+                        Asn1Value tmp = m_module.GetValue(referenceId);
+                        switch (tmp.m_TypeID)
+                        {
+                            case Asn1Value.TypeID.GeneralizedTime:
+                                return new GeneralizedTimeValue(tmp as GeneralizedTimeValue, val.antlrNode.GetChild(0));
+                            case Asn1Value.TypeID.UNRESOLVED:
+                                // not yet resolved, wait for next round
+                                return val;
+                            default:
+                                throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                        }
+                    }
+                    else
+                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
+
+                default:
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting GeneralizedTime constant or GeneralizedTime variable reference");
+            }
+        }
+    }
+
+    public partial class UTCTimeType : IA5StringType
+    {
+        public override Asn1Type.Tag UniversalTag
+        {
+            get
+            {
+                return new Tag(Tag.TagClass.UNIVERSAL, 23, Module.TaggingMode.EXPLICIT);
+            }
+        }
+
+        internal override Asn1Value ResolveVariable(Asn1Value val)
+        {
+            string referenceId = "";
+            switch (val.antlrNode.Type)
+            {
+                case asn1Parser.StringLiteral:
+                    return new UTCTimeValue(val.antlrNode, m_module, this);
+                case asn1Parser.VALUE_REFERENCE:
+                    referenceId = val.antlrNode.GetChild(0).Text;
+                    if (m_module.isValueDeclared(referenceId))
+                    {
+                        Asn1Value tmp = m_module.GetValue(referenceId);
+                        switch (tmp.m_TypeID)
+                        {
+                            case Asn1Value.TypeID.UTCTime:
+                                return new UTCTimeValue(tmp as UTCTimeValue, val.antlrNode.GetChild(0));
+                            case Asn1Value.TypeID.UNRESOLVED:
+                                // not yet resolved, wait for next round
+                                return val;
+                            default:
+                                throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
+                        }
+                    }
+                    else
+                        throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Identifier '" + referenceId + "' is unknown");
+
+                default:
+                    throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting UTCTime constant or UTCTime variable reference");
+            }
+        }
+    }
+    
     public partial class RealType : Asn1Type
     {
+        public override Asn1Type.Tag UniversalTag
+        {
+            get
+            {
+                return new Tag(Tag.TagClass.UNIVERSAL, 9, Module.TaggingMode.EXPLICIT);
+            }
+        }
 
         internal override Asn1Value ResolveVariable(Asn1Value val)
         {
@@ -1168,7 +1430,10 @@ namespace tinyAsn1
             {
                 case asn1Parser.INT:
                 case asn1Parser.FloatingPointLiteral:
+                case asn1Parser.MINUS_INFINITY:
+                case asn1Parser.PLUS_INFINITY:
                     return new RealValue(val.antlrNode, m_module, this);
+
                 case asn1Parser.NUMERIC_VALUE2: //e.g. {mantissa 2, base 10, exponent 0}
                     return new RealValue(val.antlrNode, m_module, this,0);
                 case asn1Parser.VALUE_REFERENCE:
@@ -1197,10 +1462,11 @@ namespace tinyAsn1
 
         internal override bool SemanticAnalysisFinished()
         {
-            return true;
+            return base.SemanticAnalysisFinished();
         }
         public override void DoSemanticAnalysis()
         {
+            base.DoSemanticAnalysis();
         }
         
 
@@ -1226,6 +1492,14 @@ namespace tinyAsn1
 
     public partial class EnumeratedType : Asn1Type
     {
+        public override Asn1Type.Tag UniversalTag
+        {
+            get
+            {
+                return new Tag(Tag.TagClass.UNIVERSAL, 10, Module.TaggingMode.EXPLICIT);
+            }
+        }
+
         //^(ENUMERATED_TYPE enumeratedTypeItems ('...' exceptionSpec? enumeratedTypeItems?) ?)
         static public new EnumeratedType CreateFromAntlrAst(ITree tree)
         {
@@ -1342,10 +1616,12 @@ namespace tinyAsn1
         {
             if (m_enumValuesPriv.Count > 0)
                 return false;
-            return true;
+            return base.SemanticAnalysisFinished();
         }
         public override void DoSemanticAnalysis()
         {
+            base.DoSemanticAnalysis();
+
             List<NumberedItem> toBeRemoved = new List<NumberedItem>();
             foreach (NumberedItem ni in m_enumValuesPriv)
             {
@@ -1399,6 +1675,13 @@ namespace tinyAsn1
 
     public partial class ChoiceType : Asn1Type
     {
+        public override Asn1Type.Tag UniversalTag
+        {
+            get
+            {
+                return null;
+            }
+        }
 
         public partial class Child
         {
@@ -1528,14 +1811,17 @@ namespace tinyAsn1
                 if (!ch.SemanticAnalysisFinished())
                     return false;
             }
-            return true;
+            return base.SemanticAnalysisFinished();
         }
 
         public override void DoSemanticAnalysis()
         {
+            base.DoSemanticAnalysis();
             foreach (Child ch in m_children.Values)
                 ch.DoSemanticAnalysis();
         }
+
+
 
         internal override Asn1Value ResolveVariable(Asn1Value val)
         {
@@ -1594,6 +1880,12 @@ namespace tinyAsn1
             foreach (Child ch in m_children.Values)
                 ch.m_type.CheckDefaultValues();
         }
+        public override void CheckChildrensTags()
+        {
+            foreach (Child ch in m_children.Values)
+                ch.m_type.CheckChildrensTags();
+        }
+
         public override bool AreConstraintsResolved()
         {
             foreach (Child ch in m_children.Values)
@@ -1812,12 +2104,32 @@ namespace tinyAsn1
                 if (!ch.SemanticAnalysisFinished())
                     return false;
             }
-            return true;
+            return base.SemanticAnalysisFinished();
         }
+        
+        private bool m_AutomaticTaggingTransformationCanBeApplied = true; //24.3
+        private bool m_Check243Performed = false;
+
         public override void DoSemanticAnalysis()
         {
             if (SemanticAnalysisFinished())
                 return;
+            base.DoSemanticAnalysis();
+
+            if (!m_Check243Performed)
+            {
+                m_Check243Performed = true;
+                foreach (Child ch in m_children.Values)
+                {
+                    if (ch is ComponentChild)
+                        continue;
+                    if (ch.m_type.IsTagged())
+                    {
+                        m_AutomaticTaggingTransformationCanBeApplied = false;
+                        break;
+                    }
+                }
+            }
 
             // first get rid off COMPONENTS OF
             OrderedDictionary<string, Child> newChildren = new OrderedDictionary<string, Child>();
@@ -1857,7 +2169,32 @@ namespace tinyAsn1
             {
                 ch.DoSemanticAnalysis();
             }
+
+            if (m_AutomaticTaggingTransformationCanBeApplied && 
+                m_module.m_taggingMode == Module.TaggingMode.AUTOMATIC && 
+                SemanticAnalysisFinished())
+            {
+                PerformAutomaticTagging();
+            }
+
         }
+
+        protected void PerformAutomaticTagging() 
+        {
+            int curTag = 0;
+            foreach (Child ch in m_children.Values)
+            {
+                ch.m_type.m_tag = new Tag();
+                ch.m_type.m_tag.m_class = Tag.TagClass.CONTEXT_SPECIFIC;
+                ch.m_type.m_tag.m_tag = curTag;
+                if (ch.m_type.GetFinalType() is ChoiceType)
+                    ch.m_type.m_tag.m_taggingMode = Module.TaggingMode.EXPLICIT;
+                else
+                    ch.m_type.m_tag.m_taggingMode = Module.TaggingMode.IMPLICIT;
+                curTag++;
+            }
+        }
+
         
         internal override Asn1Value ResolveVariable(Asn1Value val)
         {
@@ -1963,21 +2300,53 @@ namespace tinyAsn1
 
     public partial class SequenceType : SequenceOrSetType
     {
+        public override Asn1Type.Tag UniversalTag
+        {
+            get
+            {
+                return new Tag(Tag.TagClass.UNIVERSAL, 16, Module.TaggingMode.EXPLICIT);
+            }
+        }
+
         static public new SequenceType CreateFromAntlrAst(ITree tree)
         {
             SequenceType ret = new SequenceType();
             SequenceOrSetType.CreateFromAntlrAst(ret, tree.GetChild(0));
             return ret;
         }
+        
+        public override void CheckChildrensTags()
+        {
+            foreach (Child ch in m_children.Values)
+            {
+                ch.m_type.CheckChildrensTags();
+            }
+        }
     }
 
     public partial class SetType : SequenceOrSetType
     {
+        public override Asn1Type.Tag UniversalTag
+        {
+            get
+            {
+                return new Tag(Tag.TagClass.UNIVERSAL, 17, Module.TaggingMode.EXPLICIT);
+            }
+        }
+
         static public new SetType CreateFromAntlrAst(ITree tree)
         {
             SetType ret = new SetType();
             SequenceOrSetType.CreateFromAntlrAst(ret, tree.GetChild(0));
             return ret;
+        }
+        public override void CheckChildrensTags()
+        {
+            foreach (Child ch in m_children.Values)
+            {
+                ch.m_type.CheckChildrensTags();
+            }
+            
         }
     }
 
@@ -1992,10 +2361,23 @@ namespace tinyAsn1
 
         protected override IEnumerable<int> AllowedTokensInConstraints { get { return m_allowedTokens; } }
         protected override IEnumerable<int> StopTokensInConstraints { get { return m_stopList; } }
+        
+        public override void CheckChildrensTags()
+        {
+            m_type.CheckChildrensTags();
+        }
     }
 
     public partial class SequenceOfType : ArrayType
     {
+        public override Asn1Type.Tag UniversalTag
+        {
+            get
+            {
+                return new Tag(Tag.TagClass.UNIVERSAL, 16, Module.TaggingMode.EXPLICIT);
+            }
+        }
+
         //^(SEQUENCE_OF_TYPE (SIMPLIFIED_SIZE_CONSTRAINT $sz)? $gen? identifier? type)
         static public new SequenceOfType CreateFromAntlrAst(ITree tree)
         {
@@ -2029,13 +2411,15 @@ namespace tinyAsn1
 
         internal override bool SemanticAnalysisFinished()
         {
-            return m_type.SemanticAnalysisFinished();
+            return m_type.SemanticAnalysisFinished() && base.SemanticAnalysisFinished();
         }
 
         public override void DoSemanticAnalysis()
         {
             if (SemanticAnalysisFinished())
                 return;
+            base.DoSemanticAnalysis();
+
             m_type.DoSemanticAnalysis();
         }
         
@@ -2117,6 +2501,14 @@ namespace tinyAsn1
 
     public partial class SetOfType : ArrayType
     {
+        public override Asn1Type.Tag UniversalTag
+        {
+            get
+            {
+                return new Tag(Tag.TagClass.UNIVERSAL, 17, Module.TaggingMode.EXPLICIT);
+            }
+        }
+
         static public new SetOfType CreateFromAntlrAst(ITree tree)
         {
             SetOfType ret = new SetOfType();
@@ -2147,13 +2539,15 @@ namespace tinyAsn1
         }
         internal override bool SemanticAnalysisFinished()
         {
-            return m_type.SemanticAnalysisFinished();
+            return m_type.SemanticAnalysisFinished() && base.SemanticAnalysisFinished();
         }
 
         public override void DoSemanticAnalysis()
         {
             if (SemanticAnalysisFinished())
                 return;
+            base.DoSemanticAnalysis();
+
             m_type.DoSemanticAnalysis();
         }
         internal override Asn1Value ResolveVariable(Asn1Value val)
@@ -2232,6 +2626,14 @@ namespace tinyAsn1
 
     public partial class ObjectIdentifier : Asn1Type
     {
+        public override Asn1Type.Tag UniversalTag
+        {
+            get
+            {
+                return new Tag(Tag.TagClass.UNIVERSAL, 6, Module.TaggingMode.EXPLICIT);
+            }
+        }
+
         static public new ObjectIdentifier CreateFromAntlrAst(ITree tree)
         {
             return new ObjectIdentifier();
@@ -2281,10 +2683,11 @@ namespace tinyAsn1
         }
         internal override bool SemanticAnalysisFinished()
         {
-            return true;
+            return base.SemanticAnalysisFinished();
         }
         public override void DoSemanticAnalysis()
         {
+            base.DoSemanticAnalysis();
         }
     }
 

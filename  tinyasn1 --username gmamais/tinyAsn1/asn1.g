@@ -196,9 +196,10 @@ typeAssigment
 /* ********************************************************************************************************************* */
 
 typeTag
-	:	a='[' (t=UNIVERSAL | t=APPLICATION | t=PRIVATE)? INT  ']' ( impOrExp=IMPLICIT | impOrExp=EXPLICIT)? 	
-			-> ^(TYPE_TAG[$a] $t? INT $impOrExp?)
+	:	a='[' (t=UNIVERSAL | t=APPLICATION | t=PRIVATE)? (INT|val=valuereference)  ']' ( impOrExp=IMPLICIT | impOrExp=EXPLICIT)? 	
+			-> ^(TYPE_TAG[$a] $t? INT? ^(VALUE_REFERENCE[val.start] $val)? $impOrExp?)
 	;
+	
 /*
 * In a given context, two tags are considered to be diferent if they are of diferent classes or if their respective numbers are diferent.
 * If tagging class is missing (i.e. no UNIVERSAL, or  APPLICATION, or PRIVATE) are of context-specific class --> The tags make sense only inside the scope
@@ -376,6 +377,8 @@ stringType	:
 	|UniversalString
 	|BMPString
 	|UTF8String
+	|GeneralizedTime
+	|UTCTime
 	;
 	
 referencedType
@@ -425,6 +428,8 @@ value	:
 	|	FALSE
 	|	StringLiteral
 	|	NULL
+	|	PLUS_INFINITY
+	|   MINUS_INFINITY
 	|	val=valuereference										->^(VALUE_REFERENCE[val.start] $val)
 	|   INT
 	| 	FloatingPointLiteral
@@ -599,8 +604,11 @@ relativeOID	:	RELATIVE_OID;
 /* ***************************************************************************************************************** */
 /* ***************************************************************************************************************** */
 /* ***************************************************************************************************************** */
-		
 
+PLUS_INFINITY : 'PLUS-INFINITY';
+MINUS_INFINITY	: 'MINUS-INFINITY';		
+GeneralizedTime  :	'GeneralizedTime';
+UTCTime  :	'UTCTime';
 MANTISSA	: 'mantissa';
 BASE		: 'base';
 EXPONENT	: 'exponent';

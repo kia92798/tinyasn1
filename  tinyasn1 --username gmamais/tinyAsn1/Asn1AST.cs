@@ -102,7 +102,7 @@ namespace tinyAsn1
             public List<string> m_importedVariables = new List<string>();
         }
 
-        public enum Tags
+        public enum TaggingMode
         {
             EXPLICIT,
             IMPLICIT,
@@ -110,7 +110,7 @@ namespace tinyAsn1
         }
 
         public string m_moduleID="";
-        public Tags m_tags = Tags.EXPLICIT;     // clause 12.2
+        public TaggingMode m_taggingMode = TaggingMode.EXPLICIT;     // clause 12.2
         public bool m_extensibilityImplied = false;
 
         public Asn1Value GetValue(string valueName)
@@ -250,9 +250,25 @@ namespace tinyAsn1
                 CONTEXT_SPECIFIC
             }
             public int m_tag;
+            internal Asn1Type m_type;
             public TagClass m_class = TagClass.CONTEXT_SPECIFIC;
-            public Module.Tags ImpOrExpl = Module.Tags.EXPLICIT;
+            public Module.TaggingMode m_taggingMode = Module.TaggingMode.AUTOMATIC; //invalid value
+
+            public Tag()
+            {
+            }
+            public Tag(TagClass Class, int tagValue, Module.TaggingMode taggingMode)
+            {
+                m_class = Class;
+                m_tag = tagValue;
+                m_taggingMode = taggingMode;
+            }
+            public override int GetHashCode()
+            {
+                return m_tag;
+            }
         }
+
 
         public Tag m_tag;
 //        public List<Constraint> m_constraints = new List<Constraint>();
@@ -484,6 +500,23 @@ namespace tinyAsn1
             get { return "NumericString"; }
         }
     }
+
+    public partial class GeneralizedTimeType : IA5StringType
+    {
+        public override string Name
+        {
+            get { return "GeneralizedTime"; }
+        }
+    }
+
+    public partial class UTCTimeType : IA5StringType
+    {
+        public override string Name
+        {
+            get { return "UTCTimeType"; }
+        }
+    }
+
 
     public partial class ReferenceType : Asn1Type
     {
