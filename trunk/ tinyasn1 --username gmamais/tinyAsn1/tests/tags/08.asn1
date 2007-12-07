@@ -1,0 +1,20 @@
+MY-MODULE DEFINITIONS ::= BEGIN
+
+-- not tag glass because MySQ0 is a SEQUENCE, if it was choice or set -> tag glass
+
+	MySQ0 ::= SEQUENCE {
+		a	A,
+		b	B
+	}
+
+	A::= CHOICE {
+		d	[0]	NULL,
+		e	[1]	NULL
+	}
+	
+	B::= CHOICE {
+		d	[0]	NULL,
+		e	[1]	NULL
+	}
+
+END

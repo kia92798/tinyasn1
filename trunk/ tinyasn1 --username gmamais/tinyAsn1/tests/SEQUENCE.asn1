@@ -93,11 +93,11 @@ MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
 		b 	MyReal	DEFAULT pi,
 		c	MyEnum	DEFAULT red,
 		d	MyBitStr2	OPTIONAL,
-		e	SEQUENCE {
-			a	INTEGER {red(0), blue(1)} (red|blue) DEFAULT red,
-			b 	MyReal	DEFAULT pi,
-			c	MyEnum	DEFAULT red,
-			d	MyBitStr2	OPTIONAL
+		e	CHOICE {
+			a	INTEGER {red(0), blue(1)} (red|blue),
+			b 	MyReal	,
+			c	MyEnum	,
+			d	MyBitStr2	
 		}
 
 	}

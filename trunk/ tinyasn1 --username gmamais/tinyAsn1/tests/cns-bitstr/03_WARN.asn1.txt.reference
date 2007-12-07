@@ -1,0 +1,40 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyInt,
+	MyBitStr,
+	MyBitStr2,
+	MyBitStr3,
+	myIntVal,
+	myIntVal3,
+	myBitStr1,
+	myBitStr2,
+	myBitStr3,
+	myBitStr4,
+	myInvBitStr;
+
+
+	MyInt ::= INTEGER 
+
+	MyBitStr ::= BIT STRING {
+		a(2),
+		b(3),
+		c(4)
+	}
+
+	MyBitStr2 ::= [APPLICATION 1002] IMPLICIT BIT STRING {
+		aha(6)
+	}
+
+	MyBitStr3 ::= MyBitStr2 (SIZE (5))
+
+
+	myIntVal INTEGER ::= 4
+	myIntVal3 MyInt ::= 6
+	myBitStr1 MyBitStr ::= 0011
+	myBitStr2 MyBitStr ::= 0011
+	myBitStr3 MyBitStr ::= 0011
+	myBitStr4 MyBitStr ::= 0011
+	myInvBitStr MyBitStr3 ::= 101011
+
+END

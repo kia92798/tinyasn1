@@ -25,7 +25,15 @@ namespace tinyAsn1
         //m_module is the module where the variable is declared where it can be different to the module of the type
         public Module m_module;
         protected Asn1Type m_type=null;
-        
+
+
+        static public Asn1Value CreateFromAntlrAst(ITree tree)
+        {
+
+            Asn1Value ret = new Asn1Value();
+            ret.antlrNode = tree;
+            return ret;
+        }
 
         public enum TypeID
         {

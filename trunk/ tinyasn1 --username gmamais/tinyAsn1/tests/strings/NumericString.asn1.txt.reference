@@ -1,0 +1,21 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyStr,
+	MITSOS,
+	myStr1,
+	myStr2;
+
+
+	MyStr ::= NumericString
+
+	MITSOS ::= SEQUENCE {
+		a [0] IMPLICIT MyStr DEFAULT "123456",
+		b [1] IMPLICIT NumericString DEFAULT "123456"
+	}
+
+
+	myStr1 MyStr ::= "123456"
+	myStr2 MyStr ::= "123456"
+
+END

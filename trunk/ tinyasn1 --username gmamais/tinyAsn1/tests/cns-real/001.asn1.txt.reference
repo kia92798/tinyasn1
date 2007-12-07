@@ -1,0 +1,31 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyInt,
+	MyInt2,
+	MyInt3,
+	MyInt4,
+	MyInt5,
+	myIntVar,
+	myIntVar1,
+	myIntVar2,
+	myIntVar3;
+
+
+	MyInt ::= REAL (5..10)
+
+	MyInt2 ::= REAL (5..100.2)
+
+	MyInt3 ::= REAL (100.2)
+
+	MyInt4 ::= REAL (10)
+
+	MyInt5 ::= REAL ((5..100.2|(200..500^250..700)|ALL EXCEPT 200..500))
+
+
+	myIntVar REAL ::= 100.2
+	myIntVar1 REAL ::= 200
+	myIntVar2 REAL ::= 500
+	myIntVar3 REAL ::= 5000
+
+END

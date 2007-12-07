@@ -34,7 +34,6 @@ namespace tinyAsn1
         static int Main2(string[] args)
         {
             List<string> inputFiles = new List<string>();
-//            List<Asn1File> ASTs = new List<Asn1File>();
             Asn1CompilerInvokation compInv = Asn1CompilerInvokation.Instance;
 
             bool debug=false;

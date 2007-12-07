@@ -1519,7 +1519,7 @@ namespace tinyAsn1
                                 throw new SemanticErrorException("Error line:" + chTree.GetChild(0).Line + " there can be only one PRESENT constraint");
                     }
 
-                    ChoiceType.Child childComp = type.m_children[id];
+                    ChoiceChild childComp = type.m_children[id];
 
                     IConstraint con = null;
                     if (constraint != null)
@@ -1532,7 +1532,7 @@ namespace tinyAsn1
 
             if (!partialSpecification)
             {
-                foreach (ChoiceType.Child cc in type.m_children.Values)
+                foreach (ChoiceChild cc in type.m_children.Values)
                 {
                     //full specification, constraint component name does not appear (hence it ABSENT 47.8.6)
                     if (!components.ContainsKey(cc.m_childVarName))
@@ -1555,7 +1555,7 @@ namespace tinyAsn1
                 {
                     if (!c.m_valueConstraint.IsResolved())
                     {
-                        ChoiceType.Child childComp = Type.m_children[c.m_name];
+                        ChoiceChild childComp = Type.m_children[c.m_name];
                         childComp.m_type.ResolveExternalConstraints(null, ref c.m_valueConstraint);
                         if (c.m_valueConstraint.IsResolved())
                             c.m_valueConstraint = c.m_valueConstraint.Simplify();

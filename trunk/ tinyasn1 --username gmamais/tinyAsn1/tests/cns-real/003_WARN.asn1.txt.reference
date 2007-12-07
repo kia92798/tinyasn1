@@ -1,0 +1,14 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyInt,
+	MyInt2;
+
+
+	MyInt ::= INTEGER  (5..MAX)
+
+	MyInt2 ::= MyInt (0..100)
+
+
+
+END

@@ -1,0 +1,16 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MYSQ,
+	myArray;
+
+
+	MYSQ ::= SEQUENCE {
+		a [0] IMPLICIT INTEGER  (1..10),
+		b [1] IMPLICIT INTEGER 
+	}
+
+
+	myArray MYSQ ::= { a 0, b 1 }
+
+END

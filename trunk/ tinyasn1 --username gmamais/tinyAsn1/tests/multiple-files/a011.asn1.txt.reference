@@ -1,0 +1,37 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyInt3,
+	MyInt2,
+	myIntVal3;
+
+
+	MyInt3 ::= [APPLICATION 1003] IMPLICIT MyInt2
+
+
+	myIntVal3 MyInt3 ::= 1
+
+END
+MY-MODULE2 DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyInt2,
+	MyInt3,
+	myIntVal,
+	myIntVal3;
+
+
+	MyInt2 ::= [APPLICATION 1001] IMPLICIT INTEGER {
+		ab(1),
+		ac(3),
+		ad(4),
+		kala(1)
+	}
+
+	MyInt3 ::= [APPLICATION 1003] IMPLICIT MyInt2
+
+
+	myIntVal INTEGER ::= 4
+	myIntVal3 MyInt3 ::= 1
+
+END
