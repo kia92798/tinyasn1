@@ -1,0 +1,26 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MySQ0,
+	A,
+	B;
+
+
+	MySQ0 ::= SET {
+		a [0] EXPLICIT A,
+		b [1] EXPLICIT B
+	}
+
+	A ::= CHOICE {
+		d [0] IMPLICIT NULL,
+		e [1] IMPLICIT NULL
+	}
+
+	B ::= CHOICE {
+		d [0] IMPLICIT NULL,
+		e [1] IMPLICIT NULL
+	}
+
+
+
+END

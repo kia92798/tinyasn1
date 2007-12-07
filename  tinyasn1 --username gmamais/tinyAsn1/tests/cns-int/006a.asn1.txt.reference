@@ -1,0 +1,13 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyInt,
+	a;
+
+
+	MyInt ::= INTEGER  (1..10 EXCEPT (0..2|9..11))
+
+
+	a MyInt ::= 3
+
+END

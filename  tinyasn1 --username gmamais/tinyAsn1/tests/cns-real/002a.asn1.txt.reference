@@ -1,0 +1,14 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyInta,
+	MyIntb;
+
+
+	MyInta ::= REAL (2..4)
+
+	MyIntb ::= REAL (2..40000000000)
+
+
+
+END

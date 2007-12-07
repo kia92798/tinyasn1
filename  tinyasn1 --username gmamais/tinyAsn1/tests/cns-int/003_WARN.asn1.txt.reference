@@ -1,0 +1,27 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyInta,
+	MyInt,
+	MyInt2,
+	myIntVar,
+	myIntVar1,
+	myIntVar2,
+	myIntVar3,
+	myRealVar2;
+
+
+	MyInta ::= INTEGER 
+
+	MyInt ::= INTEGER  (5..MAX)
+
+	MyInt2 ::= MyInt (0..100)
+
+
+	myIntVar INTEGER ::= 100
+	myIntVar1 INTEGER ::= 200
+	myIntVar2 INTEGER ::= 500
+	myIntVar3 INTEGER ::= 5000
+	myRealVar2 REAL ::= 500
+
+END
