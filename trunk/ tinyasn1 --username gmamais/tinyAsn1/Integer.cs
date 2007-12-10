@@ -189,5 +189,90 @@ namespace tinyAsn1
 
 
 
+    public partial class IntegerValue : Asn1Value
+    {
+        Int64 m_value;
+        public virtual Int64 Value
+        {
+            get { return m_value; }
+            set { m_value = value; }
+        }
+
+        public IntegerValue(ITree antlrNode, Module module, Asn1Type type)
+        {
+            m_TypeID = Asn1Value.TypeID.INT;
+            this.antlrNode = antlrNode;
+            m_module = module;
+            m_type = type;
+            try
+            {
+                switch (antlrNode.Type)
+                {
+                    case asn1Parser.INT:
+                        m_value = Int64.Parse(antlrNode.Text);
+                        /*                        if (antlrNode.ChildCount == 1)
+                                                    m_value = Int64.Parse(antlrNode.GetChild(0).Text);
+                                                else if ((antlrNode.ChildCount == 2) && (antlrNode.GetChild(1).Text == "-"))
+                                                    m_value = -Int64.Parse(antlrNode.GetChild(0).Text);
+                                                else
+                                                    throw new SemanticErrorException("Error in line : " + antlrNode.Line + " Expecting integer or integer variable");*/
+                        break;
+                    default:
+                        throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Expecting integer or integer variable");
+                }
+            }
+            catch (OverflowException)
+            {
+                throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Integer value is too large");
+            }
+
+            if (m_value > Config.MAXINT || m_value < Config.MININT)
+                throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Integer value (" + m_value + ") is too large and can be supported in the target platform");
+        }
+        public IntegerValue(IntegerValue o, ITree antlr)
+        {
+            antlrNode = antlr;
+            m_TypeID = Asn1Value.TypeID.INT;
+            m_value = o.m_value;
+            m_module = o.m_module;
+            m_type = o.m_type;
+        }
+
+        public IntegerValue(Int64 val, Module m, ITree antlr, Asn1Type type)
+        {
+            m_TypeID = Asn1Value.TypeID.INT;
+            m_value = val;
+            m_module = m;
+            antlrNode = antlr;
+            m_type = type;
+        }
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
+
+        public override bool Equals(object obj)
+        {
+            IntegerValue oth = obj as IntegerValue;
+            if (oth == null)
+                return false;
+            return oth.m_value == m_value;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_value.GetHashCode();
+        }
+        public override int CompareTo(object obj)
+        {
+            IntegerValue oth = obj as IntegerValue;
+            if (oth == null)
+                throw new ArgumentException("obj is not an IntegerValue");
+            return Value.CompareTo(oth.Value);
+        }
+
+    }
+
+
 
 }

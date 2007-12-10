@@ -158,9 +158,15 @@ namespace tinyAsn1
                 TagSequence o = obj as TagSequence;
                 if (o == null)
                     return false;
+                // new implementation
+                // if first tag matches return true else return false;
+                if (m_tags.Count == 0 || o.m_tags.Count==0)
+                    throw new Exception("Internal error");
 
+                return m_tags[0].Equals(o.m_tags[0]);
 
-
+/*
+                // old implementation: Two tag sequences are identical if every tag matches
                 if (m_tags.Count != o.m_tags.Count)
                     return false;
                 for (int i = 0; i < m_tags.Count; i++)
@@ -168,6 +174,7 @@ namespace tinyAsn1
                         return false;
 
                 return true;
+ */ 
             }
             public override int GetHashCode()
             {
@@ -542,7 +549,7 @@ namespace tinyAsn1
             {
                 o.Write(" ");
                 foreach (IConstraint con in m_constraints)
-                    o.Write("(" + con.ToString() + ")");
+                    o.Write(con.ToString(true));
             }
         }
         
@@ -553,6 +560,91 @@ namespace tinyAsn1
             o.Write(Name);
             PrintAsn1Constraints(o);
         }
+    }
+
+
+
+    public interface ISize
+    {
+        Int64 Size { get;}
+    }
+
+    public interface ICharacterString
+    {
+        string Value { get;}
+    }
+
+
+    public partial class Asn1Value : IComparable
+    {
+        internal ITree antlrNode;
+        //m_module is the module where the variable is declared where it can be different to the module of the type
+        public Module m_module;
+        protected Asn1Type m_type = null;
+
+
+        static public Asn1Value CreateFromAntlrAst(ITree tree)
+        {
+
+            Asn1Value ret = new Asn1Value();
+            ret.antlrNode = tree;
+            return ret;
+        }
+
+        public enum TypeID
+        {
+            INT,
+            REAL,
+            BIT_STRING,
+            OCTECT_STRING,
+            BOOLEAN,
+            STRING,
+            VALUE_REFERENCE,
+            ENUMERATED,
+            UNRESOLVED,
+            SEQUENCE_OR_SET,
+            SEQUENCE_OF,
+            SET_OF,
+            CHOICE,
+            OBJECT_IDENTIFIER,
+            REL_OBJ_ID,
+            IA5String,
+            NumericString,
+            NULL,
+            GeneralizedTime,
+            UTCTime
+        }
+
+
+        public TypeID m_TypeID = TypeID.UNRESOLVED;
+
+        public Asn1Type Type
+        {
+            get { return m_type; }
+        }
+
+        //to be removed
+
+
+        public override string ToString()
+        {
+            throw new Exception("Internal Error: Value is undifined type");
+        }
+
+        public virtual bool IsResolved()
+        {
+            return m_TypeID != TypeID.UNRESOLVED;
+        }
+
+        #region IComparable Members
+
+        public virtual int CompareTo(object obj)
+        {
+            throw new Exception("Internal Error: Abstract Method Called.");
+        }
+
+        #endregion
+
     }
 
 

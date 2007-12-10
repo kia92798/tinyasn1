@@ -155,6 +155,8 @@ namespace tinyAsn1
         {
             if (m_enumValuesPriv.Count > 0)
                 return false;
+            if (m_exceptionSpec != null && !m_exceptionSpec.isResolved())
+                return false;
             return base.SemanticAnalysisFinished();
         }
         public override void DoSemanticAnalysis()
@@ -209,6 +211,9 @@ namespace tinyAsn1
             if (SemanticAnalysisFinished())
                 FixNumbers();
 
+            if (m_exceptionSpec != null && !m_exceptionSpec.isResolved())
+                m_exceptionSpec.DoSemanticAnalysis();
+
         }
 
 
@@ -233,4 +238,57 @@ namespace tinyAsn1
             PrintAsn1Constraints(o);
         }
     }
+
+
+    public partial class EnumeratedValue : Asn1Value
+    {
+        Int64 m_value;
+        public virtual Int64 Value
+        {
+            get { return m_value; }
+        }
+
+        string m_id;
+        public virtual string ID
+        {
+            get { return m_id; }
+        }
+
+        public EnumeratedValue(Int64 val, string id, ITree antlr, Module module, Asn1Type type)
+        {
+            m_TypeID = Asn1Value.TypeID.ENUMERATED;
+            m_value = val;
+            m_id = id;
+            m_module = module;
+            antlrNode = antlr;
+            m_type = type;
+        }
+        public EnumeratedValue(EnumeratedValue o, ITree antlr)
+        {
+            m_TypeID = Asn1Value.TypeID.ENUMERATED;
+            m_value = o.m_value;
+            m_id = o.m_id;
+            m_module = o.m_module;
+            antlrNode = antlr;
+            m_type = o.m_type;
+        }
+        public override string ToString()
+        {
+            return ID + "(" + Value.ToString() + ")";
+        }
+
+        public override bool Equals(object obj)
+        {
+            EnumeratedValue oth = obj as EnumeratedValue;
+            if (oth == null)
+                return false;
+            return oth.m_value == m_value;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_value.GetHashCode();
+        }
+    }
+
 }

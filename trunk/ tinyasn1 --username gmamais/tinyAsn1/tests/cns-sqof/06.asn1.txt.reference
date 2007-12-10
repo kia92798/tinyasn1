@@ -5,7 +5,7 @@ EXPORTS
 	myArray;
 
 
-	MYSQOF ::= SEQUENCE (SIZE (1..10 EXCEPT ((8..10 EXCEPT 9)))) OF INTEGER  (1..10)
+	MYSQOF ::= SEQUENCE (SIZE (1..10 EXCEPT (8..10 EXCEPT (9)))) OF INTEGER  (1..10)
 
 
 	myArray MYSQOF ::= { 1, 2, 3, 4, 5,6 }

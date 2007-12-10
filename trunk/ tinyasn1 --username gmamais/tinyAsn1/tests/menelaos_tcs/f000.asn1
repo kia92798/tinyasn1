@@ -1,0 +1,115 @@
+F000 DEFINITIONS AUTOMATIC TAGS::=
+BEGIN
+
+
+	T01::= BOOLEAN
+	vT01 T01 ::= TRUE
+	vT02 T01 ::= FALSE
+	T02::= NULL
+	vT03 T02 ::= NULL
+	T03::= INTEGER
+	vT03-1 T03 ::= -1
+	vT03-2 T03 ::= 0
+	vT03-3 T03 ::= 1
+	MachineState ::= INTEGER {operational(1), needs-maintenance(2), broken(3)}
+	maxMachineState MachineState ::= needs-maintenance
+	T03B ::=INTEGER (1..maxMachineState) -- make sure maxMachineState is used
+	unnamedNewState MachineState ::= 23
+	T03C ::=INTEGER (1..unnamedNewState) -- make sure unnamedNewState is used
+	T04::= REAL
+	T05::= ENUMERATED {a(1),b(2),c(3)}
+	T05B::= ENUMERATED {a(1),b(2),c(3),...} -- ability to extend enumerations
+	T05C::= ENUMERATED {c1, c2, c3,...} -- automatic numbering
+	T05D::= ENUMERATED {c1, c2, c3,...,c4,c5} -- automatic numbering
+	pi REAL ::= { mantissa 314159, base 10, exponent -5 }
+	e REAL ::= { mantissa 271828128459045235360287,	base 10, exponent -23 }
+	zero REAL ::= 0
+	vReal00 REAL ::= PLUS-INFINITY
+	vReal01 REAL ::= MINUS-INFINITY
+	vReal02 REAL ::= 3
+	vReal03 REAL ::= 3.1
+	vReal04 REAL ::= -3
+	--vReal05 REAL ::= +.3
+	--vReal06 REAL ::= -.3
+	vReal07 REAL ::= 3.0E1
+	vReal08 REAL ::= 23.E23
+	BinaryReal ::= REAL (WITH COMPONENTS {..., base (2)})
+	RestrictedReal ::= REAL (WITH COMPONENTS {
+		mantissa (-16777215..16777215),
+		base (2),
+		exponent (-125..128) })
+	UnlikelyRestrictedReal ::= REAL (WITH COMPONENTS {
+		mantissa (-135..7238),
+		base (7),
+		exponent (12..3888) })
+	a-bit-String BIT STRING ::= '00101001001010001010010100110'B
+	a-bit-String-spanning-multiple-lines BIT STRING ::= '01001011010
+                                                  01011101010
+                                                  10010101010'B
+	a-hex-String BIT STRING ::= '0108443ABCDEF02302139039000'H
+	NoMoreThan10Bits ::= BIT STRING(SIZE(10))
+	noMoreThan10Bits NoMoreThan10Bits ::= '1010100101'B
+	NamedBits ::= BIT STRING {a(1), b(2), c(3), d(4), e(5)}
+	whichBits NamedBits ::= {a, d}	
+	--whichBits2 NamedBits ::= {a, d, 4} core at asn1.c
+	-- emptyString NoMoreThan10Bits ::= {}  asn1.c cannot handled NULL empty strings
+	octetString1 OCTET STRING ::= '0001011101110010011001000110011'B
+	octetString2 OCTET STRING ::= '987313ABCD'H
+	octetString2-spanning-multiple-lines OCTET STRING ::= '230942A9898
+                                                               9238749872
+                                                                23948923847ABCDEF'H
+	LimitedOctetString ::= OCTET STRING (SIZE (4))
+	objIdentifier OBJECT IDENTIFIER ::= { a(1) b(23) c(234) e(34) }
+	objIdentifier2 OBJECT IDENTIFIER ::= { iso member-body} -- identifiers assumed known by ASN.1 tools
+	objIdentifier3 OBJECT IDENTIFIER ::= {2 23 34 2 1 0 } -- no arc name
+	ID ::= OBJECT IDENTIFIER
+	id01 ID ::= {iso member-body 23}
+	id02 ID ::= {id01 23 23}
+--	perDescriptor ObjectDescriptor ::= "Packed Encoding Rules description of an ASN.1 type"
+--	relativeOID RELATIVE-OID ::= {2, 234, 234}
+	numericString1 NumericString ::= "23034234 234"
+	numericString2 NumericString ::= "23034234 234 
+						23423"
+	printableString1 PrintableString ::="45987sdkfjh SDKFHKHJ FSD"
+	printableString2 PrintableString ::="45987sdkfjh SDKFHKHJ
+							FSD"
+	visibleString1 VisibleString ::="sdf sfd adsfdfs"
+	visibleString2 VisibleString ::="sdf 
+					sfd adsfdfs"
+	ia5String IA5String ::= "sdf2k3jh 4k23jh4 kljhsf lskjhf"
+--	carriageReturn IA5String ::= {0, 13}
+	--ia5StringThreeLines IA5String ::= {"sfsdfkjhkjh", carriageReturn, "sfdd sdf", carriageReturn, "234k23987"}
+	T800 ::= TeletexString
+	teletexString T800 ::= "sdf 234"
+--	T801 ::= T61String
+--	t61String T801 ::= "sdhf lskdj"
+	T802 ::= VideotexString
+	videotexString T802 ::= "sdfsd"
+	T803 ::= GraphicString 
+	graphicString T803 ::= "sdfkj sdf"
+	T804 ::= GeneralString
+	generalString T804 ::="sdf "
+	T805 ::= UniversalString
+	--latinCapitalLetterA T805 ::= {0,0,0,65}
+--	anotherUniversalString T805 ::= {"strings can be ", " concatenated; this is capital alpha: ", latinCapitalLetterA}
+
+--	C0 ::= UniversalString (FROM ({0,0,0,0}..{0,0,0,31}))
+--	C1 ::= UniversalString (FROM ({0,0,0,128}..{0,0,0,159}))
+--	VanillaUniversalString ::= UniversalString	(FROM (ALL EXCEPT (C0|C1)))
+	T806 ::= BMPString
+	t806 T806 ::= "sfd "
+	T807 ::= UTF8String
+	t807 T807 ::= "sfd "
+	T808 ::= GeneralizedTime
+	t808a T808 ::= "19980528142905.1"
+	t808b T808 ::= "19980528142905,1"
+	t808c T808 ::= "19980528142905Z"
+	t808d T808 ::= "19980528142905+0200"
+	
+	T809 ::= UTCTime
+	t809a T809 ::= "0401181823"
+	t809b T809 ::= "0401181823Z"
+	t809c T809 ::= "0401181823-0300"
+
+END
+

@@ -146,4 +146,153 @@ namespace tinyAsn1
             m_type.PrintAsn1(o, lev);
         }
     }
+
+    public partial class SetOfValue : ArrayValue, ISize
+    {
+        public SetOfType Type2
+        {
+            get
+            {
+                return (SetOfType)Type;
+            }
+        }
+
+        public override bool IsResolved()
+        {
+            foreach (Asn1Value v in m_children)
+                if (!v.IsResolved())
+                    return false;
+
+            return true;
+        }
+
+        public SetOfValue(SetOfValue o, ITree antlr)
+        {
+            m_TypeID = Asn1Value.TypeID.SET_OF;
+            m_module = o.m_module;
+            antlrNode = antlr;
+            m_type = o.m_type;
+            m_children = o.m_children;
+        }
+
+        internal void FixChildrenVars()
+        {
+            for (int i = 0; i < m_children.Count; i++)
+            {
+                Asn1Value childVal = m_children[i];
+                if (childVal.IsResolved())
+                    continue;
+
+                Asn1Type childType = Type2.m_type;
+                m_children[i] = childType.ResolveVariable(childVal);
+            }
+
+            //check if a value exists twice in the set
+            int cnt = m_children.Count;
+            for (int i = 0; i < cnt; i++)
+            {
+                for (int j = i + 1; j < cnt; j++)
+                {
+                    if (m_children[i].Equals(m_children[j]))
+                        throw new SemanticErrorException("Error: SET declared in line :" + antlrNode.Line + " contains value :" + m_children[i].ToString() + " more than once");
+                }
+            }
+
+        }
+
+
+        public override string ToString()
+        {
+
+            System.IO.StringWriter w = new System.IO.StringWriter();
+
+            w.Write("{");
+            int cnt = m_children.Count;
+            for (int i = 0; i < cnt - 1; i++)
+            {
+                w.Write(" " + m_children[i].ToString() + ",");
+            }
+
+            w.Write(m_children[cnt - 1].ToString() + " }");
+
+            w.Flush();
+            return w.ToString();
+        }
+        public SetOfValue(ITree antlrNode, Module module, Asn1Type type)
+        {
+            m_TypeID = Asn1Value.TypeID.SET_OF;
+            this.antlrNode = antlrNode;
+            m_module = module;
+            m_type = type;
+
+            if (antlrNode.Type == asn1Parser.VALUE_LIST)
+            {
+                for (int i = 0; i < antlrNode.ChildCount; i++)
+                {
+                    Asn1Value val = Asn1Value.CreateFromAntlrAst(antlrNode.GetChild(i));
+
+                    m_children.Add(val);
+                }
+            }
+            else if (antlrNode.Type == asn1Parser.OBJECT_ID_VALUE)
+            {
+                //we expect only one child either INT or identifier
+                if (antlrNode.ChildCount != 1)
+                    throw new SemanticErrorException("Error in line:" + antlrNode.Line + " col:" + antlrNode.CharPositionInLine + ". Expecting SEQUENCE OF value");
+                if (antlrNode.GetChild(0).ChildCount != 1)
+                    throw new SemanticErrorException("Error in line:" + antlrNode.Line + " col:" + antlrNode.CharPositionInLine + ". Expecting SEQUENCE OF value");
+                ITree grandChild = antlrNode.GetChild(0).GetChild(0);
+
+                Asn1Value val;
+                if (grandChild.Type == asn1Parser.INT)
+                    val = Asn1Value.CreateFromAntlrAst(grandChild);
+                else if (grandChild.Type == asn1Parser.LID)
+                {
+                    SemanticTreeNode nodeValue;
+                    nodeValue = new SemanticTreeNode(grandChild.CharPositionInLine, grandChild.Line, grandChild.Text, asn1Parser.VALUE_REFERENCE);
+                    nodeValue.AddChild(grandChild);
+                    val = Asn1Value.CreateFromAntlrAst(nodeValue);
+                }
+                else
+                    throw new Exception("Internal Error");
+
+                m_children.Add(val);
+
+
+            }
+            else
+                throw new Exception("Internal Error: SetOfValue called with wrong antlr node type");
+
+
+
+        }
+
+        public override bool Equals(object obj)
+        {
+            SetOfValue oth = obj as SetOfValue;
+            if (oth == null)
+                return false;
+            if (oth.m_children.Count != m_children.Count)
+                return false;
+
+            for (int i = 0; i < m_children.Count; i++)
+            {
+                if (!m_children[i].Equals(oth.m_children[i]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_children.GetHashCode();
+        }
+
+        public long Size
+        {
+            get { return m_children.Count; }
+        }
+    }
+
 }

@@ -1,0 +1,6 @@
+F042 DEFINITIONS AUTOMATIC TAGS	
+	EXTENSIBILITY IMPLIED ::= BEGIN	
+	MorseCodeAlphabet ::= PrintableString( FROM ("."|"-"))
+	sos MorseCodeAlphabet ::= "...---..."
+END
+

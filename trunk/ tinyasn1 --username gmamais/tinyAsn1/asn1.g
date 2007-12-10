@@ -74,6 +74,9 @@ tokens {
 	SELECTION_TYPE;
 	WITH_COMPONENT_CONSTR;
 	WITH_COMPONENTS_CONSTR;
+	EXCEPTION_SPEC_CONST_INT;
+	EXCEPTION_SPEC_VAL_REF;
+	EXCEPTION_SPEC_TYPE_VALUE;
 }
 
 
@@ -502,11 +505,11 @@ constraint
 exceptionSpec 
 	:	'!' 
 	(
-		 INT
-		|valuereference
-				|type ':' value
+		 INT											-> ^(EXCEPTION_SPEC  ^(EXCEPTION_SPEC_CONST_INT INT))
+		|val=valuereference									-> ^(EXCEPTION_SPEC  ^(EXCEPTION_SPEC_VAL_REF ^(VALUE_REFERENCE[val.start] $val)))
+		|type ':' value									-> ^(EXCEPTION_SPEC  ^(EXCEPTION_SPEC_TYPE_VALUE type value))
 	)
-														->^(EXCEPTION_SPEC INT? valuereference? type? value?)
+														
 	;
 
 

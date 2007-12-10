@@ -110,6 +110,9 @@ namespace tinyAsn1
 
             if (!m_Check243Performed)
                 return false;
+            if (m_exceptionSpec != null && !m_exceptionSpec.isResolved())
+                return false;
+
             return base.SemanticAnalysisFinished();
         }
 
@@ -140,6 +143,8 @@ namespace tinyAsn1
             foreach (ChoiceChild ch in m_children.Values)
                 ch.DoSemanticAnalysis();
 
+            if (m_exceptionSpec != null && !m_exceptionSpec.isResolved())
+                m_exceptionSpec.DoSemanticAnalysis();
 
         }
 
@@ -375,6 +380,87 @@ namespace tinyAsn1
             m_type.DoSemanticAnalysis();
         }
 
+    }
+
+
+    public partial class ChoiceValue : Asn1Value
+    {
+        public ChoiceType ChoiceType
+        {
+            get { return (ChoiceType)m_type; }
+        }
+        Asn1Value m_value;
+        public virtual Asn1Value Value
+        {
+            get { return m_value; }
+        }
+
+        string m_alternativeName;
+        public virtual string AlternativeName
+        {
+            get { return m_alternativeName; }
+        }
+        public ChoiceValue(ChoiceValue o, ITree antlr)
+        {
+            m_TypeID = Asn1Value.TypeID.CHOICE;
+            m_module = o.m_module;
+            antlrNode = antlr;
+            m_type = o.m_type;
+            m_value = o.m_value;
+            m_alternativeName = o.m_alternativeName;
+        }
+
+        public ChoiceValue(ITree antlrNode, Module module, Asn1Type type)
+        {
+            m_TypeID = Asn1Value.TypeID.CHOICE;
+            this.antlrNode = antlrNode;
+            m_module = module;
+            m_type = type;
+
+            if (antlrNode.Type != asn1Parser.CHOICE_VALUE)
+                throw new Exception("Internal Error: ChoiceValue called with wrong antlr node type");
+
+
+            m_alternativeName = antlrNode.GetChild(0).Text;
+
+            m_value = Asn1Value.CreateFromAntlrAst(antlrNode.GetChild(1));
+
+            if (!ChoiceType.m_children.ContainsKey(m_alternativeName))
+                throw new SemanticErrorException("Error in line :" + antlrNode.Line + ". '" + m_alternativeName + "' is not a member of the choice");
+        }
+        public override bool IsResolved()
+        {
+            return m_value.IsResolved();
+        }
+
+
+        internal void FixChildrenVars()
+        {
+            if (IsResolved())
+                return;
+
+            Asn1Type childType = ChoiceType.m_children[m_alternativeName].m_type;
+            m_value = childType.ResolveVariable(m_value);
+        }
+
+        public override string ToString()
+        {
+            return m_alternativeName + ":" + m_value.ToString();
+        }
+
+
+        public override bool Equals(object obj)
+        {
+            ChoiceValue oth = obj as ChoiceValue;
+            if (oth == null)
+                return false;
+            return (oth.m_value == m_value) && (oth.m_alternativeName == m_alternativeName);
+        }
+
+        public override int GetHashCode()
+        {
+            return m_value.GetHashCode();
+        }
     }
 
 

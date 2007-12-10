@@ -1,0 +1,37 @@
+F020 DEFINITIONS  IMPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	ExtensibleSequence,
+	AnotherSequence,
+	AnotherSequence2,
+	anExtensibleSequence,
+	anotherSequence,
+	anotherSequence2;
+
+
+	ExtensibleSequence ::= SEQUENCE {
+		one INTEGER ,
+		two INTEGER ,
+		three INTEGER 
+	}
+
+	AnotherSequence ::= SEQUENCE {
+		one INTEGER ,
+		two INTEGER ,
+		three INTEGER ,
+		four INTEGER 
+	}
+
+	AnotherSequence2 ::= SEQUENCE {
+		one INTEGER ,
+		two INTEGER ,
+		three INTEGER ,
+		four INTEGER 
+	}
+
+
+	anExtensibleSequence ExtensibleSequence ::= { one 123, two -32, three 39 }
+	anotherSequence AnotherSequence ::= { one 1, two 2, three 3, four 4 }
+	anotherSequence2 AnotherSequence ::= { one 1, two 2, three 3, four 4 }
+
+END

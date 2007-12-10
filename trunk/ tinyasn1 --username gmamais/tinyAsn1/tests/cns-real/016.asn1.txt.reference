@@ -27,7 +27,7 @@ EXPORTS
 
 	MyInt4 ::= REAL (10)
 
-	MyInt5 ::= REAL ((5..100|(200..500^250..Infinity)|ALL EXCEPT 200..MAX))
+	MyInt5 ::= REAL ((5..100|(200..500^250..Infinity)|ALL EXCEPT (200..MAX)))
 
 
 	myIntVar REAL ::= 100

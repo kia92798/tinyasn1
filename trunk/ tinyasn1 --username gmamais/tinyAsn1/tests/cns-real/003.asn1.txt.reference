@@ -17,7 +17,7 @@ EXPORTS
 
 	MyInt2 ::= MyInt (0..100)
 
-	MyInt3 ::= MyInt2 (ALL EXCEPT 10..50)
+	MyInt3 ::= MyInt2 (ALL EXCEPT (10..50))
 
 
 	myIntVar REAL ::= 100

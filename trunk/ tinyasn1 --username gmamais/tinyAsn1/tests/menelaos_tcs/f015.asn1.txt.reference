@@ -1,0 +1,16 @@
+F015 DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	Person,
+	person;
+
+
+	Person ::= CHOICE {
+		man [0] IMPLICIT IA5String,
+		woman [1] IMPLICIT IA5String
+	}
+
+
+	person Person ::= woman:"Joanne Doe"
+
+END

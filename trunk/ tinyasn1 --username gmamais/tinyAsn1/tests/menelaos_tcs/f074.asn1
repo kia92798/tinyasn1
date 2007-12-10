@@ -1,0 +1,8 @@
+F074 DEFINITIONS AUTOMATIC TAGS	::= BEGIN
+
+    --IntegerTypeA ::= INTEGER (10|11,...,12)
+    --IntegerTypeB ::= INTEGER (10..1100,...,2100)
+    AStringType ::= PrintableString (SIZE(1..10,...))
+
+
+END

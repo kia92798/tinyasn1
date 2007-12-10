@@ -8,6 +8,11 @@ namespace tinyAsn1
 {
     public partial class SequenceOrSetType : Asn1Type
     {
+        public OrderedDictionary<string, Child> m_children = new OrderedDictionary<string, Child>();
+        public bool m_extMarkPresent = false;
+        public ExceptionSpec m_exceptionSpec;
+        public bool m_extMarkPresent2 = false;
+
         public partial class Child 
         {
             public string m_childVarName;
@@ -117,10 +122,6 @@ namespace tinyAsn1
         }
 
 
-        public OrderedDictionary<string, Child> m_children = new OrderedDictionary<string, Child>();
-        public bool m_extMarkPresent = false;
-        public ExceptionSpec m_exceptionSpec;
-        public bool m_extMarkPresent2 = false;
 
         public int GetNumberOfOptionalOrDefaultFields()
         {
@@ -249,6 +250,8 @@ namespace tinyAsn1
             }
             if (!m_Check243Performed)
                 return false;
+            if (m_exceptionSpec != null && !m_exceptionSpec.isResolved())
+                return false;
             return base.SemanticAnalysisFinished();
         }
 
@@ -315,6 +318,8 @@ namespace tinyAsn1
             {
                 ch.DoSemanticAnalysis();
             }
+            if (m_exceptionSpec != null && !m_exceptionSpec.isResolved())
+                m_exceptionSpec.DoSemanticAnalysis();
 
         }
 
@@ -448,9 +453,18 @@ namespace tinyAsn1
             if (m_tag != null)
                 m_tag.PrintAsn1(o, lev);
             o.WriteLine(Name + " {");
+            bool extMark1Printed=false;
             for (int i = 0; i < m_children.Values.Count - 1; i++)
             {
                 ch = m_children.Values[i];
+
+                if (m_extMarkPresent && !extMark1Printed && ch.m_extended)
+                {
+                    extMark1Printed = true;
+                    o.P(lev);
+                    o.Write
+                }
+
                 ch.PrintAsn1(o, lev + 1);
                 o.WriteLine(",");
             }
@@ -466,4 +480,183 @@ namespace tinyAsn1
             PrintAsn1Constraints(o);
         }
     }
+
+    public partial class SequenceOrSetValue : Asn1Value
+    {
+        public OrderedDictionary<string, Asn1Value> m_children = new OrderedDictionary<string, Asn1Value>();
+        public SequenceOrSetType Type2
+        {
+            get
+            {
+                return (SequenceOrSetType)Type;
+            }
+        }
+
+        public override bool IsResolved()
+        {
+            foreach (Asn1Value v in m_children.Values)
+                if (!v.IsResolved())
+                    return false;
+
+            return true;
+        }
+
+        public SequenceOrSetValue(SequenceOrSetValue o, ITree antlr)
+        {
+            m_TypeID = Asn1Value.TypeID.SEQUENCE_OR_SET;
+            m_module = o.m_module;
+            antlrNode = antlr;
+            m_type = o.m_type;
+            m_children = o.m_children;
+        }
+
+        public SequenceOrSetValue(ITree antlrNode, Module module, Asn1Type type, bool checkChildrenOrder)
+        {
+            m_TypeID = Asn1Value.TypeID.SEQUENCE_OR_SET;
+            this.antlrNode = antlrNode;
+            m_module = module;
+            m_type = type;
+
+
+            if (antlrNode.Type == asn1Parser.NAMED_VALUE_LIST)
+            {
+
+                for (int i = 0; i < antlrNode.ChildCount; i++)
+                {
+                    ITree namedValue = antlrNode.GetChild(i);
+                    if (namedValue.Type != asn1Parser.NAMED_VALUE)
+                        throw new Exception("Internal Error");
+
+                    string id = namedValue.GetChild(0).Text;
+
+                    if (m_children.ContainsKey(id))
+                        throw new SemanticErrorException("Error in line :" + antlrNode.GetChild(i).Line + ". '" + id + "' already exists");
+
+                    if (!Type2.m_children.ContainsKey(id))
+                        throw new SemanticErrorException("Error in line :" + antlrNode.GetChild(i).Line + ". '" + id + "' is not a member");
+
+                    Asn1Value val = Asn1Value.CreateFromAntlrAst(namedValue.GetChild(1));
+
+                    m_children.Add(id, val);
+                }
+            }
+            else if (antlrNode.Type == asn1Parser.OBJECT_ID_VALUE)
+            {
+                //we expect two children, no more no less
+                if (antlrNode.ChildCount != 2)
+                    throw new SemanticErrorException("Error in line :" + antlrNode.Line + ", col:" + antlrNode.CharPositionInLine + ". Expecting a SEQUENCE variable");
+                // first child must be an identifier and nothing else
+                ITree ObjListItem1 = antlrNode.GetChild(0);
+                if (ObjListItem1.ChildCount != 1)
+                    throw new SemanticErrorException("Error in line :" + antlrNode.Line + ", col:" + antlrNode.CharPositionInLine + ". Expecting a SEQUENCE variable");
+                ITree identifier = ObjListItem1.GetChild(0);
+                if (identifier.Type != asn1Parser.LID)
+                    throw new SemanticErrorException("Error in line :" + identifier.Line + ", col:" + identifier.CharPositionInLine + ". Expecting identifier");
+
+                string id = identifier.Text;
+                if (m_children.ContainsKey(id))
+                    throw new SemanticErrorException("Error in line :" + identifier.Line + ",col:" + identifier.CharPositionInLine + ". '" + id + "' already exists");
+                if (!Type2.m_children.ContainsKey(id))
+                    throw new SemanticErrorException("Error in line :" + identifier.Line + ",col:" + identifier.CharPositionInLine + ". '" + id + "' is not a member");
+                //second child must be an INT or valuereference
+                ITree ObjListItem2 = antlrNode.GetChild(1);
+                if (ObjListItem2.ChildCount != 1)
+                    throw new SemanticErrorException("Error in line :" + antlrNode.Line + ", col:" + antlrNode.CharPositionInLine + ". Expecting a SEQUENCE variable");
+                ITree grChild = ObjListItem2.GetChild(0);
+                if (grChild.Type == asn1Parser.INT)
+                {
+                    //SemanticTreeNode numericValue = new SemanticTreeNode(grChild.CharPositionInLine, grChild.Line, grChild.Text, asn1Parser.NUMERIC_VALUE);
+                    //numericValue.AddChild(grChild);
+                    Asn1Value val = Asn1Value.CreateFromAntlrAst(grChild);
+                    m_children.Add(id, val);
+                }
+                else if (ObjListItem2.GetChild(0).Type == asn1Parser.LID)
+                {
+                    SemanticTreeNode valueReference = new SemanticTreeNode(grChild.CharPositionInLine, grChild.Line, grChild.Text, asn1Parser.VALUE_REFERENCE);
+                    valueReference.AddChild(grChild);
+                    Asn1Value val = Asn1Value.CreateFromAntlrAst(valueReference);
+                    m_children.Add(id, val);
+                }
+                else
+                    throw new Exception("Internal Error");
+
+
+            }
+            else
+                throw new Exception("Internal Error: SequenceOrSetValue called with wrong antlr node type");
+
+            foreach (string typeChildName in Type2.m_children.Keys)
+            {
+                SequenceOrSetType.Child child = Type2.m_children[typeChildName];
+                if (child.m_optional || child.m_default)
+                    continue;
+                if (!m_children.ContainsKey(typeChildName))
+                    throw new SemanticErrorException("Error in line :" + antlrNode.Line + ". Mandatory child '" + typeChildName + "' missing");
+            }
+
+            if (checkChildrenOrder)
+            {
+                //to be implemented
+            }
+
+        }
+
+        internal void FixChildrenVars()
+        {
+            foreach (string id in m_children.Keys)
+            {
+                Asn1Value childVal = m_children[id];
+                if (childVal.IsResolved())
+                    continue;
+
+                Asn1Type childType = Type2.m_children[id].m_type;
+                m_children[id] = childType.ResolveVariable(childVal);
+            }
+        }
+
+        public override string ToString()
+        {
+
+            System.IO.StringWriter w = new System.IO.StringWriter();
+
+            string key;
+            w.Write("{");
+            int cnt = m_children.Count;
+            for (int i = 0; i < cnt - 1; i++)
+            {
+                key = m_children.Keys[i];
+                w.Write(" " + key + " " + m_children[key].ToString() + ",");
+            }
+
+            key = m_children.Keys[cnt - 1];
+            w.Write(" " + key + " " + m_children[key].ToString() + " }");
+
+            w.Flush();
+            return w.ToString();
+        }
+        public override bool Equals(object obj)
+        {
+            SequenceOrSetValue oth = obj as SequenceOrSetValue;
+            if (oth == null)
+                return false;
+            if (oth.m_children.Count != m_children.Count)
+                return false;
+
+            for (int i = 0; i < m_children.Count; i++)
+            {
+                if (m_children.Keys[i] != oth.m_children.Keys[i])
+                    return false;
+                if (!m_children.Values[i].Equals(oth.m_children.Values[i]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_children.GetHashCode();
+        }
+    }
+
 }

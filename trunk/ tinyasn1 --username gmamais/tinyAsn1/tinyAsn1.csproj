@@ -50,13 +50,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Array.cs" />
-    <Compile Include="Asn1AST.cs" />
-    <Compile Include="Asn1ASTConstruction.cs" />
     <Compile Include="Asn1File.cs" />
     <Compile Include="asn1Lexer.cs" />
     <Compile Include="asn1Parser.cs" />
     <Compile Include="Asn1Type.cs" />
-    <Compile Include="Asn1Value.cs" />
     <Compile Include="ASTVisit.cs" />
     <Compile Include="BitString.cs" />
     <Compile Include="Boolean.cs" />

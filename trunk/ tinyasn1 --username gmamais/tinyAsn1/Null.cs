@@ -62,4 +62,40 @@ namespace tinyAsn1
             base.DoSemanticAnalysis();
         }
     }
+
+
+    public partial class NullValue : Asn1Value
+    {
+        public NullValue(ITree tree, Module mod, Asn1Type type)
+        {
+            m_TypeID = TypeID.NULL;
+            m_module = mod;
+            antlrNode = tree;
+            m_type = type;
+        }
+        public NullValue(NullValue o, ITree antlr)
+        {
+            m_TypeID = Asn1Value.TypeID.BOOLEAN;
+            m_module = o.m_module;
+            antlrNode = antlr;
+            m_type = o.m_type;
+        }
+        public override bool Equals(object obj)
+        {
+            NullValue oth = obj as NullValue;
+            if (oth == null)
+                return false;
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+        public override string ToString()
+        {
+            return "NULL";
+        }
+    }
+
 }

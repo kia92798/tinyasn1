@@ -9,10 +9,55 @@ namespace tinyAsn1
 
     public partial class ExceptionSpec
     {
+        public Asn1Type m_type = null;
+        public Asn1Value m_value = null;
+        public Module m_module = null;
         static public ExceptionSpec CreateFromAntlrAst(ITree tree)
         {
-            Console.Error.WriteLine("Unimplemented feature ASN.1 Exception are parsed but ignored");
-            return new ExceptionSpec();
+            if (tree.Type != asn1Parser.EXCEPTION_SPEC)
+                throw new Exception("Internal Error");
+            ExceptionSpec ret = new ExceptionSpec();
+            IntegerType dummyInt;
+            switch (tree.GetChild(0).Type)
+            {
+                case asn1Parser.EXCEPTION_SPEC_CONST_INT:
+                case asn1Parser.EXCEPTION_SPEC_VAL_REF:
+                    dummyInt = new IntegerType();
+                    dummyInt.m_module = Module.CurrentlyConstructModule;
+                    dummyInt.antlrNode = tree.GetChild(0);
+                    ret.m_type = dummyInt;
+                    ret.m_value = Asn1Value.CreateFromAntlrAst(tree.GetChild(0).GetChild(0));
+                    
+                    break;
+                case asn1Parser.EXCEPTION_SPEC_TYPE_VALUE:
+                    ret.m_type = Asn1Type.CreateFromAntlrAst(tree.GetChild(0).GetChild(0));
+                    ret.m_value = Asn1Value.CreateFromAntlrAst(tree.GetChild(0).GetChild(1));
+                    break;
+            }
+            ret.m_module = Module.CurrentlyConstructModule;
+            return ret;
+        }
+
+        public bool isResolved()
+        {
+            return m_type.SemanticAnalysisFinished() && m_value.IsResolved();
+        }
+
+        public void DoSemanticAnalysis()
+        {
+            m_type.DoSemanticAnalysis();
+            m_value = m_type.ResolveVariable(m_value);
+        }
+
+        public override string ToString()
+        {
+            string ret ="!";
+            if (m_type is IntegerType)
+                ret += m_value.ToString();
+            else
+                ret += m_type.ToString() + ":" + m_value.ToString();
+            
+            return ret;
         }
 
     }
@@ -27,6 +72,7 @@ namespace tinyAsn1
         bool IsResolved();
         void DoSemanticAnalysis();
         Asn1Type AsnType { get;}
+        string ToString(bool includeParenthesis);
     }
 
     public class BaseConstraint : IConstraint
@@ -118,6 +164,14 @@ namespace tinyAsn1
             return BaseConstraint.CreateConstraintExpression(iTree.GetChild(0), type);
         }
         public virtual Asn1Type AsnType { get { return m_type; } }
+
+        public virtual string ToString(bool includeParenthesis) 
+        {
+            if (includeParenthesis)
+                return "(" + ToString() + ")";
+            return ToString();
+        }
+
     }
 
 /*   
@@ -172,12 +226,16 @@ namespace tinyAsn1
     {
         IConstraint m_constr;
         IConstraint m_extConstr;
+        ExceptionSpec m_exceptionSpec;
+        bool m_extended = false;
 
-        public RootConstraint(Asn1Type type, IConstraint constr, IConstraint extConstr)
+        public RootConstraint(Asn1Type type, IConstraint constr, bool extended, IConstraint extConstr, ExceptionSpec exceptionSpec)
             : base(type)
         {
             m_constr = constr;
+            m_extended = extended;
             m_extConstr = extConstr;
+            m_exceptionSpec = exceptionSpec;
         }
         
         public static IConstraint Create(ITree tree, Asn1Type type)
@@ -191,24 +249,28 @@ namespace tinyAsn1
             
             IConstraint constr = BaseConstraint.CreateUnionSet(tree.GetChild(0), type);
             IConstraint extConstr=null;
-
+            ExceptionSpec exceptionSpec = null;
+            bool extended = false;
             for (int i = 1; i < tree.ChildCount; i++)
             {
-                switch (tree.Type)
+                switch (tree.GetChild(i).Type)
                 {
                     case asn1Parser.UNION_SET:
                     case asn1Parser.UNION_SET_ALL_EXCEPT:
-                        extConstr = BaseConstraint.CreateUnionSet(tree, type);
+                        extConstr = BaseConstraint.CreateUnionSet(tree.GetChild(i), type);
                         break;
                     case asn1Parser.EXT_MARK:
+                        extended = true;
+                        break;
                     case asn1Parser.EXCEPTION_SPEC:
+                        exceptionSpec = ExceptionSpec.CreateFromAntlrAst(tree.GetChild(i));
                         break;
                     default:
                         throw new Exception("Internal Error");
                 }
             }
 
-            return new RootConstraint(type, constr, extConstr);
+            return new RootConstraint(type, constr, extended, extConstr, exceptionSpec);
 
         }
         
@@ -224,6 +286,8 @@ namespace tinyAsn1
 
         public override bool IsResolved()
         {
+            if (m_exceptionSpec != null && !m_exceptionSpec.isResolved())
+                return false;
             if (m_extConstr != null)
                 return m_constr.IsResolved() && m_extConstr.IsResolved();
             return m_constr.IsResolved();
@@ -236,22 +300,28 @@ namespace tinyAsn1
             m_constr.DoSemanticAnalysis();
             if (m_extConstr != null)
                 m_extConstr.DoSemanticAnalysis();
+            if (m_exceptionSpec != null && !m_exceptionSpec.isResolved())
+                m_exceptionSpec.DoSemanticAnalysis();
         }
         public override IConstraint Simplify()
         {
-            if (m_extConstr == null)
+            if (!m_extended && m_extConstr == null && m_exceptionSpec == null)
                 return m_constr.Simplify();
             m_constr.Simplify();
-            m_extConstr.Simplify();
+            if (m_extConstr!=null)
+                m_extConstr.Simplify();
             return this;
         }
         public override string ToString()
         {
             string ret = "";
-            ret = "(" + m_constr.ToString();
+            ret = m_constr.ToString();
+            if (m_extended)
+                ret += ",...";
             if (m_extConstr != null)
-                ret += ",...," + m_extConstr.ToString();
-            ret += ")";
+                ret += "," + m_extConstr.ToString();
+            if (m_exceptionSpec != null)
+                ret += m_exceptionSpec.ToString();
             return ret;
         }
     }
@@ -319,14 +389,20 @@ namespace tinyAsn1
         }
         public override string ToString()
         {
-            string ret = "(";
+            string ret ="";
             int cnt = m_items.Count;
+            if (cnt>1)
+                ret = "(";
             for (int i = 0; i < cnt - 1; i++)
             {
                 ret += m_items[i].ToString() + "|";
             }
 
-            ret += m_items[cnt-1].ToString()+")";
+            ret += m_items[cnt-1].ToString();
+            
+            if (cnt > 1)
+                ret += ")";
+            
             return ret;
         }
 
@@ -420,14 +496,19 @@ namespace tinyAsn1
         }
         public override string ToString()
         {
-            string ret = "(";
+            string ret = "";
             int cnt = m_items.Count;
+            if (cnt>1)
+                ret += "(";
             for (int i = 0; i < cnt - 1; i++)
             {
                 ret += m_items[i].ToString() + "^";
             }
 
-            ret += m_items[cnt - 1].ToString() + ")";
+            ret += m_items[cnt - 1].ToString();
+
+            if (cnt > 1)
+                ret += ")";
             return ret;
         }
 
@@ -513,7 +594,7 @@ namespace tinyAsn1
 
         public override string ToString()
         {
-            return m_c1.ToString() + " EXCEPT " + m_c2.ToString();
+            return m_c1.ToString() + " EXCEPT " + m_c2.ToString(true);
         }
 
 /*        public override Asn1Value MIN
@@ -577,7 +658,7 @@ namespace tinyAsn1
         }
         public override string ToString()
         {
-            return "ALL EXCEPT " + m_c.ToString();
+            return "ALL EXCEPT " + m_c.ToString(true);
         }
     }
 

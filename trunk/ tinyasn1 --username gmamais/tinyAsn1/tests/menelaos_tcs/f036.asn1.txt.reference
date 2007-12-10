@@ -1,0 +1,14 @@
+F036 DEFINITIONS AUTOMATIC TAGS  EXTENSIBILITY IMPLIED  ::=
+BEGIN
+EXPORTS
+	AnIntegerType,
+	AnOctetBitString;
+
+
+	AnIntegerType ::= INTEGER 
+
+	AnOctetBitString ::=  BIT STRING (SIZE (8))
+
+
+
+END
