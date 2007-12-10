@@ -1,0 +1,37 @@
+F023 DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	A,
+	B,
+	C,
+	ExceptionClass,
+	exceptionExtension;
+
+
+	A ::= CHOICE {
+		one [0] IMPLICIT INTEGER ,
+		two [1] IMPLICIT INTEGER ,
+		three [2] IMPLICIT INTEGER 
+	}
+
+	B ::= CHOICE {
+		one [0] IMPLICIT INTEGER ,
+		two [1] IMPLICIT INTEGER ,
+		three [2] IMPLICIT INTEGER 
+	}
+
+	C ::= CHOICE {
+		one [0] IMPLICIT INTEGER ,
+		two [1] IMPLICIT INTEGER ,
+		three [2] IMPLICIT INTEGER 
+	}
+
+	ExceptionClass ::= ENUMERATED {
+		newChoice(1),
+		missingChoice(2)
+	}
+
+
+	exceptionExtension INTEGER ::= 123
+
+END

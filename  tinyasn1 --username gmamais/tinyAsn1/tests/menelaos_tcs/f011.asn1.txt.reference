@@ -1,0 +1,38 @@
+F011 DEFINITIONS  IMPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	Client,
+	ClientMoreInfo,
+	client1,
+	client2,
+	clientMoreInfo;
+
+
+	Client ::= SEQUENCE {
+		name IA5String,
+		surname IA5String,
+		street IA5String,
+		number [12] IMPLICIT INTEGER  OPTIONAL,
+		age INTEGER  OPTIONAL
+	}
+
+	ClientMoreInfo ::= SEQUENCE {
+		name IA5String,
+		surname IA5String,
+		street IA5String,
+		number [12] IMPLICIT INTEGER  OPTIONAL,
+		age INTEGER  OPTIONAL,
+		marital-status ENUMERATED {
+			single(1),
+			married(2),
+			divorced(3),
+			widowed(4)
+		}
+	}
+
+
+	client1 Client ::= { name "John", surname "Smith", street "Baker", number 122, age 23 }
+	client2 Client ::= { name "John", surname "Smith", street "Baker", number 122 }
+	clientMoreInfo ClientMoreInfo ::= { name "Menelaos", surname "Perdikeas", street "Serron", age 33, marital-status married(2) }
+
+END

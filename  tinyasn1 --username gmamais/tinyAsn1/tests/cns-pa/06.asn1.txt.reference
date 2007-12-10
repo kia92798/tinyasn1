@@ -5,7 +5,7 @@ EXPORTS
 	MITSOS;
 
 
-	ID ::= NumericString (FROM (ALL EXCEPT ""))
+	ID ::= NumericString (FROM (ALL EXCEPT ("")))
 
 	MITSOS ::= SEQUENCE {
 		a [0] IMPLICIT ID DEFAULT "12345",

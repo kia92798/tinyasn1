@@ -99,4 +99,50 @@ namespace tinyAsn1
             }
         }
     }
+
+    public partial class GeneralizedTimeValue : IA5StringValue
+    {
+        static Char[] AllowedCharSet = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', 'Z', '.', ',' };
+
+        public GeneralizedTimeValue(ITree tree, Module mod, Asn1Type type)
+            : base(tree, mod, type)
+        {
+            m_TypeID = Asn1Value.TypeID.GeneralizedTime;
+            List<Char> acs = new List<char>(AllowedCharSet);
+            m_value = m_value.Replace("\r", "").Replace("\n", "").Replace("\t", "").Replace(" ", "");
+            foreach (Char ch in Value.ToCharArray())
+                if (!acs.Contains(ch))
+                    throw new SemanticErrorException("Error in line: " + antlrNode.Line + ", col: " + antlrNode.CharPositionInLine + ". Character: '" + ch + "' can not be contained in a GenaralizedTime string");
+        }
+
+        public GeneralizedTimeValue(GeneralizedTimeValue o, ITree antlr)
+            : base(o, antlr)
+        {
+            m_TypeID = Asn1Value.TypeID.GeneralizedTime;
+        }
+    }
+
+    public partial class UTCTimeValue : IA5StringValue
+    {
+        static Char[] AllowedCharSet = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', 'Z' };
+
+        public UTCTimeValue(ITree tree, Module mod, Asn1Type type)
+            : base(tree, mod, type)
+        {
+            m_TypeID = Asn1Value.TypeID.UTCTime;
+            List<Char> acs = new List<char>(AllowedCharSet);
+            m_value = m_value.Replace("\r", "").Replace("\n", "").Replace("\t", "").Replace(" ", "");
+            foreach (Char ch in Value.ToCharArray())
+                if (!acs.Contains(ch))
+                    throw new SemanticErrorException("Error in line: " + antlrNode.Line + ", col: " + antlrNode.CharPositionInLine + ". Character: '" + ch + "' can not be contained in a UTCTimeValue string");
+        }
+
+        public UTCTimeValue(UTCTimeValue o, ITree antlr)
+            : base(o, antlr)
+        {
+            m_TypeID = Asn1Value.TypeID.UTCTime;
+        }
+    }
+
+
 }

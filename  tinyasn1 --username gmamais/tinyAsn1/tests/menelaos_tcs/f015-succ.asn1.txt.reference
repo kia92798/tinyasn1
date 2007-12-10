@@ -1,0 +1,30 @@
+F015 DEFINITIONS  IMPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	Person,
+	WisePerson,
+	SetOfPersons,
+	person,
+	wisePerson;
+
+
+	Person ::= CHOICE {
+		man [1] IMPLICIT IA5String,
+		woman [2] IMPLICIT IA5String
+	}
+
+	WisePerson ::= CHOICE {
+		wiseman [2] IMPLICIT IA5String,
+		wisewoman [3] IMPLICIT IA5String
+	}
+
+	SetOfPersons ::= SET {
+		person [4] IMPLICIT Person,
+		wisePerson [5] IMPLICIT WisePerson
+	}
+
+
+	person Person ::= woman:"Joanne Doe"
+	wisePerson WisePerson ::= wisewoman:"Cathrine Doe"
+
+END

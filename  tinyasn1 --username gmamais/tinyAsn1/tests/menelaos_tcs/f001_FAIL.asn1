@@ -1,0 +1,4 @@
+F001 DEFINITIONS ::=
+BEGIN	
+	TagClash ::= CHOICE {cheese IA5String, dessert IA5String}
+END

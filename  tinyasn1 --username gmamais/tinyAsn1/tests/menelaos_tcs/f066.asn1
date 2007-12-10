@@ -1,0 +1,8 @@
+F066 DEFINITIONS AUTOMATIC TAGS	EXTENSIBILITY IMPLIED ::= BEGIN
+
+    StrangeIntegerType ::= SEQUENCE OF INTEGER (1..3|5|12)
+    anInteger StrangeIntegerType ::= 12
+
+
+
+END

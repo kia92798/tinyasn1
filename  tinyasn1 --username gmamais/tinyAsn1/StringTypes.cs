@@ -179,4 +179,106 @@ namespace tinyAsn1
             return ret;
         }
     }
+
+
+    public partial class IA5StringValue : Asn1Value, ISize, ICharacterString
+    {
+        protected string m_value;
+        public string Value
+        {
+            get { return m_value; }
+        }
+
+        public override string ToString()
+        {
+            return "\"" + Value + "\"";
+        }
+
+        public IA5StringValue(ITree tree, Module mod, Asn1Type type)
+        {
+            m_TypeID = Asn1Value.TypeID.IA5String;
+            m_module = mod;
+            antlrNode = tree;
+            m_type = type;
+
+            if (antlrNode.Type != asn1Parser.StringLiteral)
+                throw new Exception("INTERNAL ERROR");
+
+            m_value = antlrNode.Text;
+            if (m_value == null)
+                m_value = "";
+
+            m_value = m_value.Replace("\"\"", "\"");
+            if (m_value.StartsWith("\""))
+                m_value = m_value.Substring(1);
+            if (m_value.EndsWith("\""))
+                m_value = m_value.Substring(0, m_value.Length - 1);
+
+        }
+
+
+        public IA5StringValue(IA5StringValue o, ITree antlr)
+        {
+            m_TypeID = Asn1Value.TypeID.IA5String;
+            m_module = o.m_module;
+            antlrNode = antlr;
+            m_value = o.m_value;
+            m_type = o.m_type;
+        }
+        public override bool Equals(object obj)
+        {
+            IA5StringValue oth = obj as IA5StringValue;
+            if (oth == null)
+                return false;
+            return oth.m_value == m_value;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_value.GetHashCode();
+        }
+
+
+        public long Size
+        {
+            get { return Value.Length; }
+        }
+
+
+        public override int CompareTo(object obj)
+        {
+            IA5StringValue oth = obj as IA5StringValue;
+            if (oth == null)
+                throw new ArgumentException("obj is not an IA5StringValue");
+            return Value.CompareTo(oth.Value);
+        }
+        public IA5StringValue(Char str)
+        {
+            m_TypeID = Asn1Value.TypeID.IA5String;
+            m_value = str.ToString();
+        }
+    }
+
+    public partial class NumericStringValue : IA5StringValue
+    {
+        static Char[] AllowedCharSet = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ' };
+
+        public NumericStringValue(ITree tree, Module mod, Asn1Type type)
+            : base(tree, mod, type)
+        {
+            m_TypeID = Asn1Value.TypeID.NumericString;
+            List<Char> acs = new List<char>(AllowedCharSet);
+            m_value = m_value.Replace("\r", "").Replace("\n", "").Replace("\t", "").Replace(" ", "");
+            foreach (Char ch in Value.ToCharArray())
+                if (!acs.Contains(ch))
+                    throw new SemanticErrorException("Error in line: " + antlrNode.Line + ", col: " + antlrNode.CharPositionInLine + ". Character: '" + ch + "' can not be contained in a Numeric string");
+        }
+        public NumericStringValue(NumericStringValue o, ITree antlr)
+            : base(o, antlr)
+        {
+            m_TypeID = Asn1Value.TypeID.NumericString;
+        }
+    }
+
+
 }

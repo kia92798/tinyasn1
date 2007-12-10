@@ -1,0 +1,14 @@
+F037 DEFINITIONS AUTOMATIC TAGS  EXTENSIBILITY IMPLIED  ::=
+BEGIN
+EXPORTS
+	AnIntegerType,
+	PeculiarOctetBitString;
+
+
+	AnIntegerType ::= INTEGER 
+
+	PeculiarOctetBitString ::=  BIT STRING (SIZE (3..8))
+
+
+
+END

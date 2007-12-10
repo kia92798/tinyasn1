@@ -1,0 +1,14 @@
+F063 DEFINITIONS AUTOMATIC TAGS	EXTENSIBILITY IMPLIED ::= BEGIN
+ShortINTEGER ::= INTEGER (0..6)
+
+   AbstractType ::= SEQUENCE {
+	    alpha INTEGER,
+	    beta INTEGER,
+	    gamma INTEGER}
+
+	    proprietaryEncoding OBJECT IDENTIFIER ::= {my(1) proprietary(2) encoding(3)} 
+
+	    AbstractTypeEncodedAsAnOctetA ::= OCTET STRING (ENCODED BY proprietaryEncoding)
+
+    
+    END

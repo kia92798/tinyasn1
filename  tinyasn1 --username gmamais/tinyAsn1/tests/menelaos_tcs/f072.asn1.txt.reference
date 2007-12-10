@@ -1,0 +1,14 @@
+F072 DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	IntegerTypeA,
+	IntegerTypeB;
+
+
+	IntegerTypeA ::= INTEGER  ((10|11),...)
+
+	IntegerTypeB ::= INTEGER  (10..1100,...)
+
+
+
+END

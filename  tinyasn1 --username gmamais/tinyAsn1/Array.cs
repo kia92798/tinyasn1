@@ -35,4 +35,11 @@ namespace tinyAsn1
             m_type.PerformAutomaticTagging();
         }
     }
+
+
+    public partial class ArrayValue : Asn1Value
+    {
+        public List<Asn1Value> m_children = new List<Asn1Value>();
+    }
+
 }

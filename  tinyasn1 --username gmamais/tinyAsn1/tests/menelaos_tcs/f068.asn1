@@ -1,0 +1,10 @@
+F068 DEFINITIONS AUTOMATIC TAGS	EXTENSIBILITY IMPLIED ::= BEGIN
+
+    StrangeIntegerType ::= SEQUENCE OF INTEGER ((1..100) ^ (30..1050))
+    anInteger StrangeIntegerType ::= 50
+
+    StrangeStringType ::= IA5String ((FROM ("abcdefg")) ^ (FROM ("fghijk")))
+    aString StrangeStringType ::= "fgfgfg"
+
+
+END

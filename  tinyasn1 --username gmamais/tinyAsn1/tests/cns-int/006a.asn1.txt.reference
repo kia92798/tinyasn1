@@ -5,7 +5,7 @@ EXPORTS
 	a;
 
 
-	MyInt ::= INTEGER  (1..10 EXCEPT (0..2|9..11))
+	MyInt ::= INTEGER  (1..10 EXCEPT ((0..2|9..11)))
 
 
 	a MyInt ::= 3

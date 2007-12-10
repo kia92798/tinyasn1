@@ -1,0 +1,14 @@
+F032 DEFINITIONS AUTOMATIC TAGS  EXTENSIBILITY IMPLIED  ::=
+BEGIN
+EXPORTS
+	AnIntegerType,
+	ARangeConstrainedInteger;
+
+
+	AnIntegerType ::= INTEGER 
+
+	ARangeConstrainedInteger ::= AnIntegerType (1..10)
+
+
+
+END

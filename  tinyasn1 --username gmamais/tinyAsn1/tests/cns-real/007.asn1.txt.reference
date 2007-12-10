@@ -4,7 +4,7 @@ EXPORTS
 	MyInt;
 
 
-	MyInt ::= REAL (1..10 EXCEPT ((8..10 EXCEPT 9)))
+	MyInt ::= REAL (1..10 EXCEPT (8..10 EXCEPT (9)))
 
 
 

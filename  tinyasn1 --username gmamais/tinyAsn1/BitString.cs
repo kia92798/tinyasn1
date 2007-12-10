@@ -212,4 +212,117 @@ namespace tinyAsn1
             PrintAsn1Constraints(o);
         }
     }
+
+
+    public partial class BitStringValue : Asn1Value, ISize
+    {
+        static Dictionary<char, string> lookup = new Dictionary<char, string>();
+        static BitStringValue()
+        {
+            lookup.Add('0', "0000");
+            lookup.Add('1', "0001");
+            lookup.Add('2', "0010");
+            lookup.Add('3', "0011");
+            lookup.Add('4', "0100");
+            lookup.Add('5', "0101");
+            lookup.Add('6', "0110");
+            lookup.Add('7', "0111");
+            lookup.Add('8', "1000");
+            lookup.Add('9', "1001");
+            lookup.Add('A', "1010");
+            lookup.Add('B', "1011");
+            lookup.Add('C', "1100");
+            lookup.Add('D', "1101");
+            lookup.Add('E', "1110");
+            lookup.Add('F', "1111");
+        }
+        string m_value = "";
+        public virtual string Value
+        {
+            get { return m_value; }
+        }
+
+        public BitStringValue(ITree tree, Module mod, Asn1Type type)
+        {
+            m_TypeID = TypeID.BIT_STRING;
+            m_type = type;
+            antlrNode = tree;
+            if (tree.Type == asn1Parser.BitStringLiteral)
+            {
+                m_value = tree.Text.Substring(1);
+                m_value = m_value.Remove(m_value.Length - 2);
+                m_value = m_value.Replace("\r", "").Replace("\n", "").Replace("\t", "").Replace(" ", "");
+
+                while (m_value.Length > 0 && m_value[m_value.Length - 1] == '0')
+                    m_value = m_value.Remove(m_value.Length - 1);
+            }
+            else if (tree.Type == asn1Parser.OctectStringLiteral)
+            {
+                string tmp = tree.Text.Substring(1);
+                tmp = tmp.Remove(tmp.Length - 2);
+                tmp = tmp.Replace("\r", "").Replace("\n", "").Replace("\t", "").Replace(" ", "");
+
+                foreach (Char ch in tmp.ToUpper())
+                    m_value += lookup[ch];
+
+                while (m_value.Length > 0 && m_value[m_value.Length - 1] == '0')
+                    m_value = m_value.Remove(m_value.Length - 1);
+            }
+            else
+                throw new Exception("Internal Error");
+        }
+        public BitStringValue(List<Int64> ids, ITree tree, Module mod, Asn1Type type)
+        {
+            m_TypeID = TypeID.BIT_STRING;
+            m_type = type;
+            antlrNode = tree;
+
+            Int64 max = Int64.MinValue;
+            foreach (Int64 i in ids)
+                if (i > max)
+                    max = i;
+            for (int i = 0; i <= max; i++)
+            {
+                if (ids.Contains(i))
+                    m_value += "1";
+                else
+                    m_value += "0";
+            }
+        }
+
+        public BitStringValue(BitStringValue o, ITree antlr)
+        {
+            m_TypeID = Asn1Value.TypeID.BIT_STRING;
+            m_value = o.m_value;
+            m_module = o.m_module;
+            antlrNode = antlr;
+            m_type = o.m_type;
+        }
+
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
+        public override bool Equals(object obj)
+        {
+            BitStringValue oth = obj as BitStringValue;
+            if (oth == null)
+                return false;
+            return oth.m_value == m_value;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_value.GetHashCode();
+        }
+
+
+
+        public long Size
+        {
+            get { return m_value.Length; }
+        }
+
+    }
+
 }

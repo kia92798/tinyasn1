@@ -1,0 +1,20 @@
+MY-MODULE DEFINITIONS ::= BEGIN
+
+-- tag glass although a is optional and its tag conflicts with A.d and B.d
+
+	MySQ0 ::= SEQUENCE {
+		a	[0] A	OPTIONAL, 
+		b	B
+	}
+
+	A::= CHOICE {
+		d	[0]	NULL,
+		e	[1]	NULL
+	}
+	
+	B::= CHOICE {
+		d	[0]	NULL,
+		e	[1]	NULL
+	}
+
+END

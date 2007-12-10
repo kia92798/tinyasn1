@@ -1,0 +1,5 @@
+F043 DEFINITIONS AUTOMATIC TAGS	
+	EXTENSIBILITY IMPLIED ::= BEGIN	
+	CapitalLetters ::= PrintableString(FROM ("A".."Z"))
+	aStringOfCapitalLetters CapitalLetters ::= "ABCXYZ"
+END
