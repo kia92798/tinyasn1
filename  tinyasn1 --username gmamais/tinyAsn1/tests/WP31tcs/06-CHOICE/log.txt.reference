@@ -1,0 +1,17 @@
+Deviated from reference: ./6001.asn1
+Stderr changed in ./6001.asn1
+Deviated from reference: ./6002.asn1
+Stderr changed in ./6002.asn1
+Deviated from reference: ./6003.asn1
+Stderr changed in ./6003.asn1
+Deviated from reference: ./6004.asn1
+Stderr changed in ./6004.asn1
+Deviated from reference: ./6005.asn1
+Stderr changed in ./6005.asn1
+Deviated from reference: ./6006.asn1
+Stderr changed in ./6006.asn1
+Deviated from reference: ./6007.asn1
+Stderr changed in ./6007.asn1
+Semantic error: ./6008.asn1
+Stderr changed in ./6008.asn1
+Stderr changed in ./6009_FAIL.asn1

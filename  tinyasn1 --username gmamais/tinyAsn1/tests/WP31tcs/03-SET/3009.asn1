@@ -1,0 +1,25 @@
+--FExensions support
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;myvalue INTEGER ::= 10
+--E&nbsp;&nbsp;MySeq ::= SET {
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a1 [100] INTEGER ,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s1 [101] OCTET STRING,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;... ! OCTET STRING : '10FF'H ,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a2 [102] INTEGER ,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s2 [103] OCTET STRING
+--E&nbsp;&nbsp;&nbsp;&nbsp;}
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+	myvalue INTEGER ::= 10
+	
+	MySeq ::= SET {
+			a1 [100] INTEGER ,
+			s1 [101] OCTET STRING,
+			... ! OCTET STRING : '10FF'H ,
+			a2 [102] INTEGER ,
+			s2 [103] OCTET STRING
+			
+			
+		}
+END

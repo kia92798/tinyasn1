@@ -1,0 +1,24 @@
+--FVariables support for SETs
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;MySeq ::= SET {
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a1&nbsp;&nbsp;INTEGER ,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s1&nbsp;&nbsp;OCTET STRING
+--E&nbsp;&nbsp;&nbsp;&nbsp;}
+--E&nbsp;&nbsp;mySeqValue MySeq ::= {
+--E&nbsp;&nbsp;&nbsp;&nbsp;a1 10,
+--E&nbsp;&nbsp;&nbsp;&nbsp;s1 'A10F'H
+--E&nbsp;&nbsp;}
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+	
+	MySeq ::= SET {
+			a1	INTEGER ,
+			s1	OCTET STRING
+		}
+		
+	mySeqValue MySeq ::= {
+		a1 10,
+		s1 'A10F'H
+	}
+END

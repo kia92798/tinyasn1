@@ -140,12 +140,20 @@ namespace tinyAsn1
                 if (i.m_valCalculated)
                     continue;
 
-                while (IsValueDefined(proposedVal))
-                    proposedVal++;
+//                while (IsValueDefined(proposedVal))
 
                 i.m_value = proposedVal;
                 i.m_valCalculated = true;
 
+                proposedVal++;
+            }
+            int cnt = m_enumValues.Values.Count;
+            for (int i = 0; i < cnt; i++)
+            {
+                for (int j = i + 1; j < cnt; j++)
+                    if (m_enumValues.Values[j].m_value == m_enumValues.Values[i].m_value)
+                        throw new SemanticErrorException("Error in line:" + antlrNode.Line.ToString() + 
+                            " Enumerated items: " + m_enumValues.Values[i].m_id +" and " + m_enumValues.Values[j].m_id + " have the same value("+m_enumValues.Values[j].m_value+")");
             }
 
 
@@ -219,6 +227,7 @@ namespace tinyAsn1
 
         public override void PrintAsn1(StreamWriterLevel o, int lev)
         {
+            bool extMark1Printed = false;
             if (m_tag != null)
                 m_tag.PrintAsn1(o, lev);
             if (m_enumValues.Count > 0)
@@ -228,10 +237,41 @@ namespace tinyAsn1
                 for (int i = 0; i < m_enumValues.Count - 1; i++)
                 {
                     o.P(lev + 1);
+                    if (m_extMarkPresent && !extMark1Printed && m_enumValues.Values[i].m_isExtended)
+                    {
+                        extMark1Printed = true;
+                        o.P(lev + 1);
+                        o.Write("...");
+                        if (m_exceptionSpec != null)
+                            o.Write(m_exceptionSpec.ToString());
+                        o.WriteLine(",");
+                    }
+
                     o.WriteLine(m_enumValues.Keys[i] + "(" + m_enumValues.Values[i].m_value + "),");
+                }
+
+                if (m_extMarkPresent && !extMark1Printed && m_enumValues.Values[cnt - 1].m_isExtended)
+                {
+                    extMark1Printed = true;
+                    o.P(lev + 1);
+                    o.Write("...");
+                    if (m_exceptionSpec != null)
+                        o.Write(m_exceptionSpec.ToString());
+                    o.WriteLine(",");
                 }
                 o.P(lev + 1);
                 o.WriteLine(m_enumValues.Keys[cnt - 1] + "(" + m_enumValues.Values[cnt - 1].m_value + ")");
+
+                if (m_extMarkPresent && !extMark1Printed)
+                {
+                    extMark1Printed = true;
+                    o.P(lev + 1);
+                    o.Write(",...");
+                    if (m_exceptionSpec != null)
+                        o.Write(m_exceptionSpec.ToString());
+                    o.WriteLine();
+                }
+                
                 o.P(lev);
                 o.Write("}");
             }

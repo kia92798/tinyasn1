@@ -1,0 +1,11 @@
+--FSemantix Error: Infinite recursion
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;alpha INTEGER ::= beta
+--E&nbsp;&nbsp;beta INTEGER ::= alpha
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+
+	alpha INTEGER ::= beta
+	beta INTEGER ::= alpha
+END

@@ -1,0 +1,19 @@
+MY-MODULE DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	MySeq,
+	myvalue;
+
+
+	MySeq ::= SEQUENCE {
+		a1 INTEGER ,
+		s1 OCTET STRING,
+		...,
+		a2 INTEGER ,
+		s2 OCTET STRING
+	}
+
+
+	myvalue INTEGER ::= 10
+
+END

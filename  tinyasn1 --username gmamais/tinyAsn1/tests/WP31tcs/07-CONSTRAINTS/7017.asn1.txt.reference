@@ -1,0 +1,11 @@
+MyMod DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	Str;
+
+
+	Str ::= IA5String (FROM ("A".."Z"))
+
+
+
+END

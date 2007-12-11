@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Antlr.Runtime.Tree;
 using Antlr.Runtime;
+using System.IO;
 
 namespace tinyAsn1
 {
@@ -92,11 +93,32 @@ namespace tinyAsn1
             
 //Phase 1: Resolve type & variables, but not constraints
 //The AST may be traversed multiple times during phase 1
+            int loops = 0;
             while (!Phase1Finished())
             {
                 foreach (Asn1File f in m_files)
                     foreach (Module m in f.m_modules)
                         m.DoPhase1SemanticAnalysis();
+                loops++;
+                if (loops > 100)
+                {
+                    StringWriter er = new StringWriter();
+                    er.WriteLine("Error: grammar contains cyclic references. Unresolved types or variables are:");
+                    foreach (Asn1File f in m_files)
+                        foreach (Module m in f.m_modules)
+                        {
+                            foreach (TypeAssigment tas in m.m_typeAssigments.Values)
+                                if (!tas.m_type.SemanticAnalysisFinished())
+                                    er.WriteLine("File {0}, line {1}, type {2}", f.m_fileName, tas.m_type.antlrNode.Line, tas.m_type.Name);
+
+                            foreach (ValueAssigment vas in m.m_valuesAssigments.Values)
+                                if (!vas.m_value.IsResolved())
+                                    er.WriteLine("File {0}, line {1}", f.m_fileName, vas.m_type.antlrNode.Line);
+                        }
+                    throw new SemanticErrorException(er.ToString());
+                    
+                }
+
             }
 
 

@@ -1,0 +1,9 @@
+--FUniversalString string support
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;MyVr ::= UniversalString
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+	MyVr ::= UniversalString
+
+END

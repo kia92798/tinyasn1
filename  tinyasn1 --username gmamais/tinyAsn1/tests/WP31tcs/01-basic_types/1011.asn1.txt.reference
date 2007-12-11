@@ -1,0 +1,15 @@
+MY-MODULE DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	MyBitString,
+	myBitStrVal,
+	myBitStrVal2;
+
+
+	MyBitString ::=  BIT STRING
+
+
+	myBitStrVal BIT STRING ::= '101101'B
+	myBitStrVal2 BIT STRING ::= '101011111100000100011101'B
+
+END

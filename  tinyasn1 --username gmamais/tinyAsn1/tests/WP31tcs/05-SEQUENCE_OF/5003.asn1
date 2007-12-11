@@ -1,0 +1,11 @@
+--FSEQUENCE OF support with size constraint
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;MyVar ::= SEQUENCE SIZE(4) OF INTEGER
+--E&nbsp;&nbsp;myvar MyVar ::= {1,1,4,5}
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+	MyVar ::= SEQUENCE SIZE(4) OF INTEGER
+	
+	myvar MyVar ::= {1,1,4,5}
+END

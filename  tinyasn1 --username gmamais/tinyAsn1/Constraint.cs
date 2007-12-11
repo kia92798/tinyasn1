@@ -55,7 +55,7 @@ namespace tinyAsn1
             if (m_type is IntegerType)
                 ret += m_value.ToString();
             else
-                ret += m_type.ToString() + ":" + m_value.ToString();
+                ret += m_type.Name + ":" + m_value.ToString();
             
             return ret;
         }

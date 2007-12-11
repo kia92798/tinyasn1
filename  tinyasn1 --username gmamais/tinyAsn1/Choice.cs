@@ -256,7 +256,7 @@ namespace tinyAsn1
                 asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, 
                 asn1Parser.WITH_COMPONENTS_CONSTR});
         static List<int> m_stopList = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, 
-            asn1Parser.WITH_COMPONENTS_CONSTR });
+            asn1Parser.WITH_COMPONENTS_CONSTR, asn1Parser.EXCEPTION_SPEC });
 
         protected override IEnumerable<int> AllowedTokensInConstraints { get { return m_allowedTokens; } }
         protected override IEnumerable<int> StopTokensInConstraints { get { return m_stopList; } }
@@ -266,20 +266,68 @@ namespace tinyAsn1
         public override void PrintAsn1(StreamWriterLevel o, int lev)
         {
             ChoiceChild ch;
+            bool extMark1Printed = false;
+            bool extMark2Printed = false;
             if (m_tag != null)
                 m_tag.PrintAsn1(o, lev);
             o.WriteLine(Name + " {");
             for (int i = 0; i < m_children.Values.Count - 1; i++)
             {
                 ch = m_children.Values[i];
+                if (m_extMarkPresent && !extMark1Printed && ch.m_extended)
+                {
+                    extMark1Printed = true;
+                    o.P(lev + 1);
+                    o.Write("...");
+                    if (m_exceptionSpec != null)
+                        o.Write(m_exceptionSpec.ToString());
+                    o.WriteLine(",");
+                }
+                if (m_extMarkPresent2 && extMark1Printed && !extMark2Printed && !ch.m_extended)
+                {
+                    extMark2Printed = true;
+                    o.P(lev + 1);
+                    o.WriteLine("...,");
+                }
+
                 ch.PrintAsn1(o, lev + 1);
                 o.WriteLine(",");
             }
             if (m_children.Values.Count > 0)
             {
                 ch = m_children.Values[m_children.Values.Count - 1];
+                if (m_extMarkPresent && !extMark1Printed && ch.m_extended)
+                {
+                    extMark1Printed = true;
+                    o.P(lev + 1);
+                    o.Write("...");
+                    if (m_exceptionSpec != null)
+                        o.Write(m_exceptionSpec.ToString());
+                    o.WriteLine(",");
+                }
+                if (m_extMarkPresent2 && extMark1Printed && !extMark2Printed && !ch.m_extended)
+                {
+                    extMark2Printed = true;
+                    o.P(lev + 1);
+                    o.WriteLine("...,");
+                }
                 ch.PrintAsn1(o, lev + 1);
                 o.WriteLine();
+            }
+            if (m_extMarkPresent && !extMark1Printed)
+            {
+                extMark1Printed = true;
+                o.P(lev + 1);
+                o.Write(",...");
+                if (m_exceptionSpec != null)
+                    o.WriteLine(m_exceptionSpec.ToString());
+            }
+
+            if (m_extMarkPresent2 && extMark1Printed && !extMark2Printed)
+            {
+                extMark2Printed = true;
+                o.P(lev + 1);
+                o.WriteLine(",...");
             }
 
             o.P(lev);
@@ -339,8 +387,12 @@ namespace tinyAsn1
         public void PrintAsn1(StreamWriterLevel o, int lev)
         {
             o.P(lev);
+            if (m_version != null)
+                o.Write("[[{0}: ", m_version);
             o.Write(m_childVarName); o.Write(" ");
             m_type.PrintAsn1(o, lev);
+            if (m_version != null)
+                o.Write("]]", m_version);
         }
 
         //^(CHOICE_ITEM identifier type )

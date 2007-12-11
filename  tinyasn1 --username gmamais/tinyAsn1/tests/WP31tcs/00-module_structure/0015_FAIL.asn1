@@ -1,0 +1,21 @@
+--FPrevention of declaring two modules with the same name
+--EModuleDuplicate	DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;Type ::= INTEGER	
+--EEND
+--EModuleDuplicate	DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;Type2 ::= INTEGER	
+--EEND
+
+ModuleDuplicate	DEFINITIONS ::=
+BEGIN
+
+	Type ::= INTEGER	
+
+END
+
+ModuleDuplicate	DEFINITIONS ::=
+BEGIN
+
+	Type2 ::= INTEGER	
+
+END

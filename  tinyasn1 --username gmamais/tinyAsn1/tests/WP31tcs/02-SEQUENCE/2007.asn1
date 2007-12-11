@@ -1,0 +1,19 @@
+--Fexceptions support
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;myvalue INTEGER ::= 10
+--E&nbsp;&nbsp;MySeq ::= SEQUENCE {
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a1&nbsp;&nbsp;INTEGER ,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s1&nbsp;&nbsp;OCTET STRING,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;... !myvalue
+--E&nbsp;&nbsp;&nbsp;&nbsp;}
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+	myvalue INTEGER ::= 10
+	
+	MySeq ::= SEQUENCE {
+			a1	INTEGER ,
+			s1	OCTET STRING,
+			... !myvalue
+		}
+END

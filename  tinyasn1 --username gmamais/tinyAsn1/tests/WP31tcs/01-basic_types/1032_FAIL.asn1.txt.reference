@@ -1,0 +1,14 @@
+MY-MODULE DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	Enum1;
+
+
+	Enum1 ::= ENUMERATED {
+		red(5),
+		blue(5)
+	}
+
+
+
+END

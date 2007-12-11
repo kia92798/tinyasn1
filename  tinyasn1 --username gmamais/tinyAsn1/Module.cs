@@ -19,6 +19,13 @@ namespace tinyAsn1
         public TaggingMode m_taggingMode = TaggingMode.EXPLICIT;     // clause 12.2
         public bool m_extensibilityImplied = false;
 
+        public List<string> m_exportedTypes = new List<string>();
+        public List<string> m_exportedVariables = new List<string>();
+        public List<ImportedModule> m_imports = new List<ImportedModule>();
+
+        public OrderedDictionary<string, TypeAssigment> m_typeAssigments = new OrderedDictionary<string, TypeAssigment>();
+        public OrderedDictionary<string, ValueAssigment> m_valuesAssigments = new OrderedDictionary<string, ValueAssigment>();
+
         public Asn1Value GetValue(string valueName)
         {
             if (!isValueDeclared(valueName))
@@ -95,12 +102,6 @@ namespace tinyAsn1
             throw new SemanticErrorException("Error: '" + typeName + "' is undefined");
         }
 
-        public List<string> m_exportedTypes = new List<string>();
-        public List<string> m_exportedVariables = new List<string>();
-        public List<ImportedModule> m_imports = new List<ImportedModule>();
-
-        public OrderedDictionary<string, TypeAssigment> m_typeAssigments = new OrderedDictionary<string, TypeAssigment>();
-        public OrderedDictionary<string, ValueAssigment> m_valuesAssigments = new OrderedDictionary<string, ValueAssigment>();
         //        public OrderedDictionary<string, ValueSetAssigment> m_valueSetsAssigments = new OrderedDictionary<string, ValueSetAssigment>();
 
         internal Dictionary<string, Int64> m_resolvedIntegerVars = new Dictionary<string, Int64>();

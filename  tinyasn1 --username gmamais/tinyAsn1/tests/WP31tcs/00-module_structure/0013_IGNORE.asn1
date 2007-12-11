@@ -1,0 +1,21 @@
+--FASN.1 Comments support
+MY-MODULE DEFINITIONS ::= BEGIN
+	T ::= CHOICE {
+		t-a  INTEGER,
+		t-b  OCTET STRING
+/*		t-c  [1] Choice1, t-d  Choice2 */
+	}
+
+	-- this is a comment too -- This-Is-Not-A-Comment 
+	::= [5] INTEGER
+
+/*
+	ISO/IEC 8824-1 #11.6.4
+
+	blah blah blah
+	/* nested comment */
+	-- this is an insignificant coment
+	-- this is a comment too -- and this is a comment
+
+ */
+END

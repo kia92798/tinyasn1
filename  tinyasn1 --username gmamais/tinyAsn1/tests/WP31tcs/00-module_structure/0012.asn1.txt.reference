@@ -1,0 +1,10 @@
+MY-MODULE DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	MyInt,
+	myIntVal;
+
+
+
+
+END

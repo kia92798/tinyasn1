@@ -1,0 +1,10 @@
+--FSemantic Error: Permitted alphabet constraint in an INTEGER type
+--EMyMod&nbsp;&nbsp;DEFINITIONS ::=
+--EBEGIN
+--E&nbsp;&nbsp;Int ::= INTEGER (FROM("abc"))
+--EEND
+
+MyMod	DEFINITIONS ::=
+BEGIN
+	Int ::= INTEGER (FROM("abc"))
+END

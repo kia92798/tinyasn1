@@ -1,0 +1,13 @@
+MY-MODULE DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	MyNull,
+	myNullVal;
+
+
+	MyNull ::= NULL
+
+
+	myNullVal NULL ::= NULL
+
+END

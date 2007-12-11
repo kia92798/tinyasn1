@@ -1,0 +1,28 @@
+MY-MODULE DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	MySeq,
+	myvalue;
+
+
+	MySeq ::= SEQUENCE {
+		a4 INTEGER ,
+		s4 OCTET STRING,
+		myNestedSeq1 SEQUENCE {
+			a4 INTEGER ,
+			s4 OCTET STRING,
+			myNestedSeq1 SEQUENCE {
+				a4 INTEGER ,
+				s4 OCTET STRING,
+				myNestedSeq1 SEQUENCE {
+					a4 INTEGER ,
+					s4 OCTET STRING
+				}
+			}
+		}
+	}
+
+
+	myvalue INTEGER ::= 10
+
+END

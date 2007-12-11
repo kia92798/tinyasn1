@@ -1,0 +1,14 @@
+--FANY support
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;T ::= SEQUENCE {
+--E&nbsp;&nbsp;&nbsp;&nbsp;i1&nbsp;&nbsp;INTEGER ,
+--E&nbsp;&nbsp;&nbsp;&nbsp;any&nbsp;&nbsp;ANY
+--E&nbsp;&nbsp;}
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+	T ::= SEQUENCE {
+		i1	INTEGER ,
+		any	ANY
+	}
+END

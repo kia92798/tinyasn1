@@ -1,0 +1,13 @@
+--FConstraint with extensions and exception
+--EMyMod&nbsp;&nbsp;DEFINITIONS ::=
+--EBEGIN
+--E&nbsp;&nbsp;Int ::= INTEGER (5..MAX,...,1..4 !100)&nbsp;&nbsp;
+--EEND
+
+
+MyMod	DEFINITIONS ::=
+BEGIN
+	
+	Int ::= INTEGER (5..MAX,...,1..4 !100)	
+
+END

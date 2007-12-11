@@ -1,0 +1,13 @@
+--FPermitted alphabet support
+--EMyMod&nbsp;&nbsp;DEFINITIONS ::=
+--EBEGIN
+--E&nbsp;&nbsp;Str ::= IA5String(SIZE(10..27))(FROM("ABC"|"def"))
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (SIZE(10..20,25..27))(FROM("ABCdef"))
+--EEND
+
+
+MyMod	DEFINITIONS ::=
+BEGIN
+	Str ::= IA5String(SIZE(10..27))(FROM("ABC"|"def"))
+					-- (SIZE(10..20,25..27))(FROM("ABCdef"))
+END

@@ -24,7 +24,8 @@ namespace tinyAsn1
         static public new SequenceType CreateFromAntlrAst(ITree tree)
         {
             SequenceType ret = new SequenceType();
-            SequenceOrSetType.CreateFromAntlrAst(ret, tree.GetChild(0));
+            if (tree.ChildCount>0)
+                SequenceOrSetType.CreateFromAntlrAst(ret, tree.GetChild(0));
             return ret;
         }
 

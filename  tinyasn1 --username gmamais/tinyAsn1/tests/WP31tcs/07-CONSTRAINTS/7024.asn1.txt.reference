@@ -1,0 +1,11 @@
+MyMod DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	Int;
+
+
+	Int ::= INTEGER  (1..32)(MIN..63)
+
+
+
+END
