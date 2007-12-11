@@ -1,0 +1,13 @@
+Unkown exception ...
+Object reference not set to an instance of an object.
+   at tinyAsn1.PermittedAlphabetConstraint.Create(ITree tree, Asn1Type type) in C:\prj\DataModeling\tinyAsn1\tinyAsn1\Constraint.cs:line 1120
+   at tinyAsn1.BaseConstraint.CreateConstraintExpression(ITree tree, Asn1Type type) in C:\prj\DataModeling\tinyAsn1\tinyAsn1\Constraint.cs:line 133
+   at tinyAsn1.BaseConstraint.CreateIntersectionItem(ITree iTree, Asn1Type type) in C:\prj\DataModeling\tinyAsn1\tinyAsn1\Constraint.cs:line 164
+   at tinyAsn1.AndConstraint.Create(ITree tree, Asn1Type type) in C:\prj\DataModeling\tinyAsn1\tinyAsn1\Constraint.cs:line 459
+   at tinyAsn1.UnionConstraint.Create(ITree tree, Asn1Type type) in C:\prj\DataModeling\tinyAsn1\tinyAsn1\Constraint.cs:line 350
+   at tinyAsn1.BaseConstraint.CreateUnionSet(ITree tree, Asn1Type type) in C:\prj\DataModeling\tinyAsn1\tinyAsn1\Constraint.cs:line 150
+   at tinyAsn1.RootConstraint.Create(ITree tree, Asn1Type type) in C:\prj\DataModeling\tinyAsn1\tinyAsn1\Constraint.cs:line 250
+   at tinyAsn1.ReferenceType.ResolveConstraints() in C:\prj\DataModeling\tinyAsn1\tinyAsn1\ReferenceType.cs:line 185
+   at tinyAsn1.Asn1CompilerInvokation.SemanticParse() in C:\prj\DataModeling\tinyAsn1\tinyAsn1\Asn1File.cs:line 132
+   at tinyAsn1.Program.Main2(String[] args) in C:\prj\DataModeling\tinyAsn1\tinyAsn1\Program.cs:line 96
+   at tinyAsn1.Program.Main(String[] args) in C:\prj\DataModeling\tinyAsn1\tinyAsn1\Program.cs:line 23

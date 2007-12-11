@@ -425,12 +425,12 @@ namespace tinyAsn1
 
             w.Write("{");
             int cnt = m_components.Count;
-            for (int i = 0; i < cnt - 1; i++)
+            for (int i = 0; i < cnt; i++)
             {
-                w.Write(" " + m_components[i].ToString() + ",");
+                w.Write(m_components[i].ToString() + " ");
             }
 
-            w.Write(m_components[cnt - 1].ToString() + " }");
+            w.Write(" }");
 
             w.Flush();
             return w.ToString();

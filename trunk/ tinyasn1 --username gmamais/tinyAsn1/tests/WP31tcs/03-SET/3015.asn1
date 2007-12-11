@@ -1,0 +1,41 @@
+--FNested SETS
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;myvalue INTEGER ::= 10
+--E&nbsp;&nbsp;MySeq ::= SET {
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a4&nbsp;&nbsp;INTEGER ,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s4&nbsp;&nbsp;OCTET STRING,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myNestedSeq1 SET {
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a4&nbsp;&nbsp;INTEGER ,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s4&nbsp;&nbsp;OCTET STRING,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myNestedSeq1 SET {
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a4&nbsp;&nbsp;INTEGER ,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s4&nbsp;&nbsp;OCTET STRING,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;myNestedSeq1 SET {
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a4&nbsp;&nbsp;INTEGER ,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s4&nbsp;&nbsp;OCTET STRING
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+--E&nbsp;&nbsp;&nbsp;&nbsp;}
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+	myvalue INTEGER ::= 10
+	
+	MySeq ::= SET {
+			a4	INTEGER ,
+			s4	OCTET STRING,
+			myNestedSeq1 SET {
+					a4	INTEGER ,
+					s4	OCTET STRING,
+					myNestedSeq1 SET {
+							a4	INTEGER ,
+							s4	OCTET STRING,
+							myNestedSeq1 SET {
+									a4	INTEGER ,
+									s4	OCTET STRING
+								}
+						}
+				}
+		}
+END

@@ -1,0 +1,17 @@
+--F INTERSECTION support
+--EMyMod&nbsp;&nbsp;DEFINITIONS ::=
+--EBEGIN
+--E&nbsp;&nbsp;Str1 ::= IA5String
+--E&nbsp;&nbsp;Str2 ::= Str1 (SIZE(MIN..20 | 25..30))&nbsp;&nbsp;
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Means (SIZE(0..20 | 25..30))
+--EEND
+
+
+MyMod	DEFINITIONS ::=
+BEGIN
+	
+
+	Str1 ::= IA5String
+	Str2 ::= Str1 (SIZE(MIN..20 | 25..30))	
+					-- Means (SIZE(0..20 | 25..30))
+END

@@ -1,0 +1,11 @@
+MyMod DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	Int1;
+
+
+	Int1 ::= INTEGER  (0..MAX)
+
+
+
+END

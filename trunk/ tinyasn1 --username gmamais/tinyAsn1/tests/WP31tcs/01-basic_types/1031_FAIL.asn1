@@ -1,0 +1,15 @@
+--FSemantic Error: Enumeration with non ascending order in extended values
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E-- The values for all enumerations which follow an ellipsis (...) 
+--E-- must be in ascending order, but the value of 'blue(6)' is less than '7', 
+--E-- the value of the preceding AdditionalEnumeration.
+--E&nbsp;&nbsp;Enum1 ::= ENUMERATED { red(5), ..., green(7), blue(6) }
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+-- The values for all enumerations which follow an ellipsis (...) 
+-- must be in ascending order, but the value of 'blue(6)' is less than '7', 
+-- the value of the preceding AdditionalEnumeration.
+
+	Enum1 ::= ENUMERATED { red(5), ..., green(7), blue(6) }
+END

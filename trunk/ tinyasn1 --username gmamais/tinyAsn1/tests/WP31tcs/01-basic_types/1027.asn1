@@ -1,0 +1,20 @@
+--FEnumerated type with extensions, exceptions and additional values support
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;MyEnum ::= ENUMERATED &nbsp;&nbsp;{ 
+--E&nbsp;&nbsp;&nbsp;&nbsp;monday, tuesday(4),
+--E&nbsp;&nbsp;&nbsp;&nbsp;...
+--E&nbsp;&nbsp;&nbsp;&nbsp;!5,
+--E&nbsp;&nbsp;&nbsp;&nbsp;wed(7)
+--E&nbsp;&nbsp;}
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+
+	MyEnum ::= ENUMERATED 	{ 
+		monday, tuesday(4),
+		...
+		!5,
+		wed(7)
+	}
+	
+END

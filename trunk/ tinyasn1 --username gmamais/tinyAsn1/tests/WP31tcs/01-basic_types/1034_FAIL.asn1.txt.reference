@@ -1,0 +1,15 @@
+MY-MODULE DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	Int;
+
+
+	Int ::= INTEGER {
+		value1(0),
+		value2(2),
+		value3(2)
+	}
+
+
+
+END

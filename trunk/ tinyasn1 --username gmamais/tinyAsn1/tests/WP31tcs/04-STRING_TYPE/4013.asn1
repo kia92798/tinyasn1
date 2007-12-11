@@ -1,0 +1,9 @@
+--FVisibleString string support
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;MyVr ::= VisibleString
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+	MyVr ::= VisibleString
+
+END

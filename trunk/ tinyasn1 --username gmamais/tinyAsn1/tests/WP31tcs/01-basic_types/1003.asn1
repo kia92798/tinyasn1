@@ -1,0 +1,10 @@
+--FINTEGER type and variable support
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;MyInt ::= INTEGER
+--E&nbsp;&nbsp;myIntVal INTEGER ::= 12
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+	MyInt ::= INTEGER
+	myIntVal INTEGER ::= 12
+END

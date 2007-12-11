@@ -1,0 +1,10 @@
+--FSupport of definite identifier in the module reference
+--EMY-MODULE { <b>iso standard(0) dod(6) internet (1) private(4) 
+--E&nbsp;&nbsp;enterprise(1)semantix(1233) software(1) icdgen(5) 
+--E&nbsp;&nbsp;test(1) 1 </b>}
+--EDEFINITIONS ::= BEGIN
+--EEND
+MY-MODULE { iso standard(0) dod(6) internet (1) private(4) enterprise(1)
+		semantix(1233) software(1) icdgen(5) test(1) 1 }
+DEFINITIONS ::= BEGIN
+END

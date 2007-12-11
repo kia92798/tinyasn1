@@ -1,0 +1,7 @@
+--FIINTEGER type with range support
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;MyInt4 ::= INTEGER (3..40)
+--EEND
+MY-MODULE DEFINITIONS ::= BEGIN
+	MyInt4 ::= INTEGER (3..40)
+END

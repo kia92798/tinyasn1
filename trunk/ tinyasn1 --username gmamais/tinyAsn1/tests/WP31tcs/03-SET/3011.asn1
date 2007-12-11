@@ -1,0 +1,24 @@
+--FExensions support with version grouping
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;myvalue INTEGER ::= 10
+--E&nbsp;&nbsp;MySeq ::= SET {
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a1&nbsp;&nbsp;INTEGER ,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s1&nbsp;&nbsp;OCTET STRING,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;... ! OCTET STRING : '10FF'H ,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[2: a3&nbsp;&nbsp;[100] INTEGER ,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s3&nbsp;&nbsp;[101] OCTET STRING ]]
+--E&nbsp;&nbsp;&nbsp;&nbsp;}
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+	myvalue INTEGER ::= 10
+	
+	MySeq ::= SET {
+			a1	INTEGER ,
+			s1	OCTET STRING,
+			... ! OCTET STRING : '10FF'H ,
+			[[2: a3	[100] INTEGER ,
+				s3	[101] OCTET STRING ]]
+			
+		}
+END

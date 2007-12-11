@@ -144,6 +144,22 @@ namespace tinyAsn1
             foreach (NumberedItem ni in toBeRemoved)
                 m_privNamedValues.Remove(ni);
 
+            if (SemanticAnalysisFinished())
+            {
+                int cnt = m_namedValues.Count;
+                for (int i = 0; i < cnt; i++)
+                {
+                    for (int j = i + 1; j < cnt; j++)
+                    {
+                        if (m_namedValues.Values[i] == m_namedValues.Values[j])
+                        {
+                            throw new SemanticErrorException("Error in line:" + antlrNode.Line.ToString() +
+                                " named number items: " + m_namedValues.Keys[i] + " and " + m_namedValues.Keys[j] + " have the same value(" + m_namedValues.Values[j] + ")");
+                        }
+                    }
+                }
+            }
+
 //            SemanticCheckConstraints();
         }
 

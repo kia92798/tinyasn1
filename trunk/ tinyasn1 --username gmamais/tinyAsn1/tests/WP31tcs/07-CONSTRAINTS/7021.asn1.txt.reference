@@ -1,0 +1,11 @@
+MyMod DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	SequenceOf;
+
+
+	SequenceOf ::= SEQUENCE (SIZE (1..2)) OF INTEGER 
+
+
+
+END

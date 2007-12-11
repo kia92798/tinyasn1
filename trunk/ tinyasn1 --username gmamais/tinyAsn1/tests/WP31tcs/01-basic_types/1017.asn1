@@ -1,0 +1,16 @@
+--FOBJECT IDENTIFIER support
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;internet-id OBJECT IDENTIFIER ::={ iso(1) identified-organization(3) dod(6) internet(1) }
+--E&nbsp;&nbsp;francetelecom-id OBJECT IDENTIFIER ::={ iso member-body f(250) type-org(1) ft(16) }
+--E&nbsp;&nbsp;ber-id OBJECT IDENTIFIER ::= { 2 1 1 }
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+
+	internet-id OBJECT IDENTIFIER ::={ iso(1) identified-organization(3) dod(6) internet(1) }
+	
+	francetelecom-id OBJECT IDENTIFIER ::={ iso member-body f(250) type-org(1) ft(16) }
+	
+	ber-id OBJECT IDENTIFIER ::= { 2 1 1 }
+	
+END

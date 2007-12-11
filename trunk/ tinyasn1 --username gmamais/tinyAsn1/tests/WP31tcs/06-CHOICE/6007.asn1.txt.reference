@@ -1,0 +1,20 @@
+MY-MODULE DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	MyType;
+
+
+	MyType ::= CHOICE {
+		a1 [10] EXPLICIT INTEGER ,
+		a2 [11] EXPLICIT INTEGER ,
+		...!100,
+		[[2: a3 [12] EXPLICIT INTEGER ]],
+		[[2: a4 [13] EXPLICIT INTEGER ]],
+		[[3: a5 [14] EXPLICIT INTEGER ]],
+		[[3: a6 [15] EXPLICIT INTEGER ]]
+		,...
+	}
+
+
+
+END

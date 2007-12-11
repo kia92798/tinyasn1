@@ -23,9 +23,26 @@ namespace tinyAsn1
             public bool m_extended = false;
             public int? m_version=null;
 
+            public Child()
+            {
+            }
+            
+            public Child(Child o)
+            {
+                m_childVarName = o.m_childVarName;
+                m_type = o.m_type;
+                m_optional = o.m_optional;
+                m_default = o.m_default;
+                m_defaultValue = o.m_defaultValue;
+                m_extended = o.m_extended;
+                m_version = o.m_version;
+            }
+
             public void PrintAsn1(StreamWriterLevel o, int lev)
             {
                 o.P(lev);
+                if (m_version != null)
+                    o.Write("[[{0}: ", m_version);
                 o.Write(m_childVarName); o.Write(" ");
                 m_type.PrintAsn1(o, lev);
                 if (m_defaultValue != null)
@@ -34,6 +51,8 @@ namespace tinyAsn1
                 }
                 else if (m_optional)
                     o.Write(" OPTIONAL");
+                if (m_version != null)
+                    o.Write("]]");
 
             }
 
@@ -298,9 +317,12 @@ namespace tinyAsn1
                     {
                         if (newChildren.ContainsKey(otherChild.m_childVarName))
                             throw new SemanticErrorException("Error line: " + compChild.m_type.antlrNode.Line + ". " + compChild.m_type.Name + " can not be expanded. Duplicate child name(" + otherChild.m_childVarName + ")");
-                        otherChild.m_version = compChild.m_version;
-                        otherChild.m_extended = compChild.m_extended;
-                        newChildren.Add(otherChild.m_childVarName, otherChild);
+                        if (otherChild.m_extended)
+                            continue;
+                        Child childCopy = new Child(otherChild);
+                        childCopy.m_version = compChild.m_version;
+                        childCopy.m_extended = compChild.m_extended;
+                        newChildren.Add(childCopy.m_childVarName, childCopy);
                         ReplacementOccurerred = true;
                     }
 
@@ -442,7 +464,7 @@ namespace tinyAsn1
                 asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, 
                 asn1Parser.WITH_COMPONENTS_CONSTR});
         static List<int> m_stopList = new List<int>(new int[] { asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, 
-            asn1Parser.WITH_COMPONENTS_CONSTR });
+            asn1Parser.WITH_COMPONENTS_CONSTR , asn1Parser.EXCEPTION_SPEC});
 
         protected override IEnumerable<int> AllowedTokensInConstraints { get { return m_allowedTokens; } }
         protected override IEnumerable<int> StopTokensInConstraints { get { return m_stopList; } }
@@ -453,7 +475,8 @@ namespace tinyAsn1
             if (m_tag != null)
                 m_tag.PrintAsn1(o, lev);
             o.WriteLine(Name + " {");
-            bool extMark1Printed=false;
+            bool extMark1Printed = false;
+            bool extMark2Printed = false;
             for (int i = 0; i < m_children.Values.Count - 1; i++)
             {
                 ch = m_children.Values[i];
@@ -461,8 +484,17 @@ namespace tinyAsn1
                 if (m_extMarkPresent && !extMark1Printed && ch.m_extended)
                 {
                     extMark1Printed = true;
-                    o.P(lev);
-                    o.Write
+                    o.P(lev+1);
+                    o.Write("...");
+                    if (m_exceptionSpec != null) 
+                        o.Write(m_exceptionSpec.ToString());
+                    o.WriteLine(",");
+                }
+                if (m_extMarkPresent2 && extMark1Printed && !extMark2Printed && !ch.m_extended)
+                {
+                    extMark2Printed = true;
+                    o.P(lev+1);
+                    o.WriteLine("...,");
                 }
 
                 ch.PrintAsn1(o, lev + 1);
@@ -471,8 +503,39 @@ namespace tinyAsn1
             if (m_children.Values.Count > 0)
             {
                 ch = m_children.Values[m_children.Values.Count - 1];
+                if (m_extMarkPresent && !extMark1Printed && ch.m_extended)
+                {
+                    extMark1Printed = true;
+                    o.P(lev+1);
+                    o.Write("...");
+                    if (m_exceptionSpec != null)
+                        o.Write(m_exceptionSpec.ToString());
+                    o.WriteLine(",");
+                }
+                if (m_extMarkPresent2 && extMark1Printed && !extMark2Printed && !ch.m_extended)
+                {
+                    extMark2Printed = true;
+                    o.P(lev+1);
+                    o.WriteLine("...,");
+                }
+
                 ch.PrintAsn1(o, lev + 1);
                 o.WriteLine();
+            }
+            if (m_extMarkPresent && !extMark1Printed)
+            {
+                extMark1Printed = true;
+                o.P(lev+1);
+                o.Write(",...");
+                if (m_exceptionSpec != null)
+                    o.WriteLine(m_exceptionSpec.ToString());
+            }
+
+            if (m_extMarkPresent2 && extMark1Printed && !extMark2Printed )
+            {
+                extMark2Printed = true;
+                o.P(lev+1);
+                o.WriteLine(",...");
             }
 
             o.P(lev);
