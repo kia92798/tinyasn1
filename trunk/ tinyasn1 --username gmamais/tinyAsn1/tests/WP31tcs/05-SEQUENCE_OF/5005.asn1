@@ -1,9 +1,0 @@
---FSEQUENCE OF support with name elements
---EMY-MODULE DEFINITIONS ::= BEGIN
---E&nbsp;&nbsp;MyVar ::= SEQUENCE SIZE(4..10) OF xmlTag INTEGER
---EEND
-
-MY-MODULE DEFINITIONS ::= BEGIN
-	MyVar ::= SEQUENCE SIZE(4..10) OF xmlTag INTEGER
-	
-END

@@ -1,5 +1,0 @@
-F015 DEFINITIONS IMPLICIT TAGS::= BEGIN	
-    Person ::= CHOICE {man IA5String,
-			woman IA5String}
-    person Person ::= woman:"Joanne Doe"
-END

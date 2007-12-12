@@ -1116,7 +1116,7 @@ namespace tinyAsn1
             if (tree.Type != asn1Parser.PERMITTED_ALPHABET_EXPR)
                 throw new Exception("Internal Error");
 
-            IA5StringType ia = type as IA5StringType;
+            IA5StringType ia = type.GetFinalType() as IA5StringType;
             IA5StringType set = ia.CreateForPA(type.m_module, tree);
             set.m_AntlrConstraints.Add(tree.GetChild(0));
 
@@ -1180,7 +1180,7 @@ namespace tinyAsn1
             Asn1Type oth = Asn1Type.CreateFromAntlrAst(tree.GetChild(0));
             if (oth.SemanticAnalysisFinished())
             {
-                if (oth.GetFinalType() != type.GetFinalType())
+                if (!type.Compatible(oth))
                     throw new SemanticErrorException("Error, line:" + oth.antlrNode.Line + " .Types '"+oth.Name+"' and '"+type.Name+"' are not compatible");
             }
 
@@ -1522,7 +1522,7 @@ namespace tinyAsn1
                 if (m_components.ContainsKey(id))
                 {
                     Component c = m_components[id];
-                    if (!c.m_valueConstraint.isValueAllowed(v))
+                    if (c.m_valueConstraint!=null && !c.m_valueConstraint.isValueAllowed(v))
                         return false;
                 }
             }

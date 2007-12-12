@@ -1,5 +1,0 @@
-Example1
-DEFINITIONS ::=
-BEGIN
-Str1 ::= PrintableString
-END

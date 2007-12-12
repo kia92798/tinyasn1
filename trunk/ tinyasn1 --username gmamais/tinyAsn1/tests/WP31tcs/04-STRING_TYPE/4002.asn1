@@ -1,8 +1,0 @@
---FGeneralString string support
---EMY-MODULE DEFINITIONS ::= BEGIN
---E&nbsp;&nbsp;MyVr ::= GeneralString
---EEND
-
-MY-MODULE DEFINITIONS ::= BEGIN
-	MyVr ::= GeneralString
-END

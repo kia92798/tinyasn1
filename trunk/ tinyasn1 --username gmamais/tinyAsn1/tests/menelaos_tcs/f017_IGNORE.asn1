@@ -1,5 +1,0 @@
-F017 DEFINITIONS IMPLICIT TAGS	::= BEGIN	
-    ThisCanBeAnyType ::= ANY
-    v ANY ::= INTEGER:10
-    boolean ANY ::= BOOLEAN:TRUE
-END

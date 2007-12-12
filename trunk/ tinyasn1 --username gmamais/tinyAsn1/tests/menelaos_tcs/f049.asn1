@@ -1,6 +1,0 @@
-F049 DEFINITIONS AUTOMATIC TAGS	
-	EXTENSIBILITY IMPLIED ::= BEGIN	
-	TextBlock ::= SEQUENCE OF IA5String
-	NumericBlock ::= TextBlock (WITH COMPONENT (NumericString))
-END
-

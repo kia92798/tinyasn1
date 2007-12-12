@@ -68,6 +68,7 @@ namespace tinyAsn1
             SetOfValue sqVal = val as SetOfValue;
             switch (val.antlrNode.Type)
             {
+                case asn1Parser.EMPTY_LIST:
                 case asn1Parser.VALUE_LIST:
                 case asn1Parser.OBJECT_ID_VALUE: //for catching case {valref} or {23}
                     if (sqVal == null)
@@ -145,6 +146,14 @@ namespace tinyAsn1
             o.Write(" OF ");
             m_type.PrintAsn1(o, lev);
         }
+        public override bool Compatible(Asn1Type other)
+        {
+            SetOfType o = other.GetFinalType() as SetOfType;
+            if (o == null)
+                return false;
+
+            return base.Compatible(other);
+        }
     }
 
     public partial class SetOfValue : ArrayValue, ISize
@@ -213,7 +222,9 @@ namespace tinyAsn1
                 w.Write(" " + m_children[i].ToString() + ",");
             }
 
-            w.Write(m_children[cnt - 1].ToString() + " }");
+            if (cnt-1>=0)
+                w.Write(m_children[cnt - 1].ToString());
+            w.Write(" }");
 
             w.Flush();
             return w.ToString();
@@ -225,7 +236,7 @@ namespace tinyAsn1
             m_module = module;
             m_type = type;
 
-            if (antlrNode.Type == asn1Parser.VALUE_LIST)
+            if (antlrNode.Type == asn1Parser.VALUE_LIST || antlrNode.Type == asn1Parser.EMPTY_LIST)
             {
                 for (int i = 0; i < antlrNode.ChildCount; i++)
                 {

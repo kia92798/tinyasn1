@@ -69,6 +69,14 @@ namespace tinyAsn1
         protected override IEnumerable<int> AllowedTokensInConstraints { get { return m_allowedTokens; } }
         protected override IEnumerable<int> StopTokensInConstraints { get { return m_stopList; } }
 
+        public override bool Compatible(Asn1Type other)
+        {
+            OctetStringType o = other.GetFinalType() as OctetStringType;
+            if (o == null)
+                return false;
+
+            return true;
+        }
     }
 
 

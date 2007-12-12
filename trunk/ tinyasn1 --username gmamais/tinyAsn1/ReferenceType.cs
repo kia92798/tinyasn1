@@ -224,5 +224,9 @@ namespace tinyAsn1
             Type.PerformAutomaticTagging();
         }
 
+        public override bool Compatible(Asn1Type other)
+        {
+            return GetFinalType().Compatible(other.GetFinalType());
+        }
     }
 }

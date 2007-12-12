@@ -51,6 +51,10 @@ namespace tinyAsn1
                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting GeneralizedTime constant or GeneralizedTime variable reference");
             }
         }
+        public override bool Compatible(Asn1Type other)
+        {
+            return other.GetFinalType() is GeneralizedTimeType;
+        }
     }
 
     public partial class UTCTimeType : IA5StringType
@@ -97,6 +101,10 @@ namespace tinyAsn1
                 default:
                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Expecting UTCTime constant or UTCTime variable reference");
             }
+        }
+        public override bool Compatible(Asn1Type other)
+        {
+            return other.GetFinalType() is UTCTimeType;
         }
     }
 

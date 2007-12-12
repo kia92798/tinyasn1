@@ -1,6 +1,0 @@
-F022 DEFINITIONS AUTOMATIC TAGS	::= BEGIN	
-    ExtensibleChoice ::= CHOICE {one INTEGER, two INTEGER, three INTEGER, ... }
-    ExtensibleChoice2 ::= CHOICE {one INTEGER, two INTEGER, three INTEGER, ..., four INTEGER}
-    a ExtensibleChoice ::= one:1
-END
-

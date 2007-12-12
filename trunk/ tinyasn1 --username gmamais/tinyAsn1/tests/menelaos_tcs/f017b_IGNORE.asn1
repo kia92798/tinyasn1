@@ -1,3 +1,0 @@
-F017 DEFINITIONS IMPLICIT TAGS	::= BEGIN	
-    ThisCanBeAnyType ::= ANY
-END

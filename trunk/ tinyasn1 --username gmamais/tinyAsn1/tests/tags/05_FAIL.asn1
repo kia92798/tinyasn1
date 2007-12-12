@@ -1,9 +1,0 @@
-MY-MODULE DEFINITIONS ::= BEGIN
-
---error tag class
-	MySQ0 ::= SET {
-		int1	INTEGER,
-		int2  INTEGER
-	}
-
-END

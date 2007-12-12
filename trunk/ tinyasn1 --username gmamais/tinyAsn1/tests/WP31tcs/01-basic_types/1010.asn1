@@ -1,8 +1,0 @@
---FSupport of REAL type with range constraints
---EMY-MODULE DEFINITIONS ::= BEGIN
---E&nbsp;&nbsp;MyReal ::= REAL(2.1..4.9)
---EEND
-
-MY-MODULE DEFINITIONS ::= BEGIN
-	MyReal ::= REAL(2.1..4.9)
-END

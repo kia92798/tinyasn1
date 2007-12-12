@@ -1,9 +1,0 @@
-F071 DEFINITIONS AUTOMATIC TAGS	EXTENSIBILITY IMPLIED ::= BEGIN
-
-    ExoticStringType ::= PrintableString ( SIZE (1..5) | FROM ("abcd"))
-    exoticStringA ExoticStringType ::= "abacdadaadadadadada"
-    exoticStringB ExoticStringType ::= "floor"
-
-
-
-END

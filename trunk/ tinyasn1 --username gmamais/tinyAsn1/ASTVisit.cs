@@ -6,6 +6,7 @@ using Antlr.Runtime.Tree;
 
 namespace tinyAsn1
 {
+    /*
     public interface IASTVisitor
     {
         bool Finished();
@@ -39,7 +40,7 @@ namespace tinyAsn1
 
 
 
-
+*/
 
 
 

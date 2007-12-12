@@ -1,8 +1,0 @@
-F039 DEFINITIONS AUTOMATIC TAGS	
-	EXTENSIBILITY IMPLIED ::= BEGIN	
-
-	AnIntegerType	::= INTEGER
-	AListOfIntegers ::= SEQUENCE OF AnIntegerType
-	ConstrainedList ::= AListOfIntegers SIZE (2..10)
-END
-

@@ -77,6 +77,7 @@ tokens {
 	EXCEPTION_SPEC_CONST_INT;
 	EXCEPTION_SPEC_VAL_REF;
 	EXCEPTION_SPEC_TYPE_VALUE;
+	EMPTY_LIST;
 }
 
 
@@ -307,6 +308,7 @@ choiceExtensionBody
 choiceItemsList
 	:	choiceItem (COMMA choiceItem)*	-> choiceItem+
 	;
+	
 choiceItem
 	:	identifier type				->  ^(CHOICE_ITEM identifier type)
 	;	
@@ -437,6 +439,7 @@ value	:
 	|   INT
 	| 	FloatingPointLiteral
 //	|	(s='+'|s='-')? intPart=INT ('.' decPart=INT?)? 					->^(NUMERIC_VALUE $intPart $s? $decPart?)
+	| a=L_BRACKET R_BRACKET 									-> ^(EMPTY_LIST[$a] )
 	| a=L_BRACKET MANTISSA mant=INT COMMA BASE bas=INT COMMA EXPONENT exp=INT R_BRACKET -> ^(NUMERIC_VALUE2[$a] $mant $bas $exp)
 //	|	('+'|'-')? INT ('.' INT?)? ( ('E'|'e') ('+'|'-')? INT)?
 	| a=L_BRACKET objectIdentifierComponent+ R_BRACKET		->^(OBJECT_ID_VALUE[$a] objectIdentifierComponent+ )
