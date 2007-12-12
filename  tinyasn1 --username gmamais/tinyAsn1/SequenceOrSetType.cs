@@ -115,6 +115,16 @@ namespace tinyAsn1
 
                 }
             }
+
+            internal bool Compatible(Child child)
+            {
+                bool ret = true;
+                if (m_defaultValue != null)
+                    ret = m_defaultValue.Equals(child.m_default);
+                ret =  m_childVarName == child.m_childVarName && m_optional == child.m_optional &&
+                    m_type.Compatible(child.m_type) && ret;
+                return ret;
+            }
         }
         
         class ComponentChild : Child
@@ -375,6 +385,7 @@ namespace tinyAsn1
             switch (val.antlrNode.Type)
             {
                 case asn1Parser.NAMED_VALUE_LIST:
+                case asn1Parser.EMPTY_LIST:
                 case asn1Parser.OBJECT_ID_VALUE:    // for catching cases {id id2} or {id 4}
                     if (sqVal == null)
                         if (this is SequenceType)
@@ -542,6 +553,28 @@ namespace tinyAsn1
             o.Write("}");
             PrintAsn1Constraints(o);
         }
+
+        public override bool Compatible(Asn1Type other)
+        {
+            SequenceOrSetType o = other.GetFinalType() as SequenceOrSetType;
+            if (o == null)
+                return false;
+
+
+            if (m_children.Count != o.m_children.Count)
+                return false;
+
+            foreach (string id in m_children.Keys)
+            {
+                if (!o.m_children.ContainsKey(id))
+                    return false;
+
+                if (!m_children[id].Compatible(o.m_children[id]))
+                    return false;
+            }
+
+            return true;
+        }
     }
 
     public partial class SequenceOrSetValue : Asn1Value
@@ -581,7 +614,7 @@ namespace tinyAsn1
             m_type = type;
 
 
-            if (antlrNode.Type == asn1Parser.NAMED_VALUE_LIST)
+            if (antlrNode.Type == asn1Parser.NAMED_VALUE_LIST || antlrNode.Type == asn1Parser.EMPTY_LIST)
             {
 
                 for (int i = 0; i < antlrNode.ChildCount; i++)

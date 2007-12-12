@@ -1,7 +1,0 @@
-MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
-
-
-	MyInt ::= INTEGER ( 5..MAX )
-	MyInt2 ::= MyInt ( 0..100) -- Warning : 0 doesn't belong to parents allowed values
-	
-END

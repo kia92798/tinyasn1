@@ -1,9 +1,0 @@
-MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
-
-
-	MYSQOF ::= SEQUENCE SIZE(3) OF SEQUENCE { a INTEGER, b INTEGER}
-
-	myArray MYSQOF ::= { {a 1, b 1}, {a 2, b 2}, {a 3, b 3} }
-
-	
-END

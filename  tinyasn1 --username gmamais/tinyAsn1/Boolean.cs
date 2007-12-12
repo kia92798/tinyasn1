@@ -62,6 +62,14 @@ namespace tinyAsn1
             base.DoSemanticAnalysis();
         }
 
+        public override bool Compatible(Asn1Type other)
+        {
+            BooleanType o = other.GetFinalType() as BooleanType;
+            if (o == null)
+                return false;
+
+            return true;
+        }
     }
 
     public partial class BooleanValue : Asn1Value

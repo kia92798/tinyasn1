@@ -1,9 +1,0 @@
---FNumericString string support
---EMY-MODULE DEFINITIONS ::= BEGIN
---E&nbsp;&nbsp;MyVr ::= NumericString
---EEND
-
-MY-MODULE DEFINITIONS ::= BEGIN
-	MyVr ::= NumericString
-
-END

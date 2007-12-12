@@ -560,6 +560,12 @@ namespace tinyAsn1
             o.Write(Name);
             PrintAsn1Constraints(o);
         }
+
+        public virtual bool Compatible(Asn1Type o)
+        {
+            throw new Exception("Abstract method called: Compatible()");
+        }
+
     }
 
 

@@ -61,6 +61,14 @@ namespace tinyAsn1
         {
             base.DoSemanticAnalysis();
         }
+        public override bool Compatible(Asn1Type other)
+        {
+            NullType o = other.GetFinalType() as NullType;
+            if (o == null)
+                return false;
+
+            return true;
+        }
     }
 
 

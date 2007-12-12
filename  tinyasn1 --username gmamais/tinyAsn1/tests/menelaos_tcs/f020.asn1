@@ -1,8 +1,0 @@
-F020 DEFINITIONS IMPLICIT TAGS	::= BEGIN	
-    ExtensibleSequence ::= SEQUENCE {one INTEGER, two INTEGER, three INTEGER, ... }
-    anExtensibleSequence ExtensibleSequence ::= {one 123, two -32, three 39}
-    AnotherSequence ::= SEQUENCE {one INTEGER, two INTEGER, three INTEGER, ..., four INTEGER}
-    anotherSequence AnotherSequence ::= {one 1, two 2, three 3, four 4} 
-
-END
-

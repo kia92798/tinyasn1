@@ -1,5 +1,0 @@
-F017 DEFINITIONS IMPLICIT TAGS	::= BEGIN	
-    ThisCanBeAnyType ::= ANY
-    ASequence ::= SEQUENCE  {a BOOLEAN, b INTEGER, c REAL}
-    a ThisCanBeAnyType ::= ASequence:{a TRUE, b 23, c {23,23,-2}}
-END

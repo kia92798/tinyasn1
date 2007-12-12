@@ -1,9 +1,0 @@
-MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
-
-
-	MyInt ::= INTEGER ( 1..10 EXCEPT (0..2|9..11))
-	
-	MyInt2 ::= MyInt(MIN..MAX)
-
-	
-END

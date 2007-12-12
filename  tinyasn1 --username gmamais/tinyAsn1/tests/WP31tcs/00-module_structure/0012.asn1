@@ -1,4 +1,0 @@
---Ability to import types or variables from another module
-MY-MODULE DEFINITIONS ::= BEGIN
-	IMPORTS MyInt, myIntVal FROM MY-MODULE2;
-END

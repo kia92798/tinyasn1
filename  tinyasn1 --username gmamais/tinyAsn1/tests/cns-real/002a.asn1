@@ -1,6 +1,0 @@
-MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
-
-	MyInta ::= REAL ( 2..4 )
-	MyIntb ::= REAL ( 2.0..4.e+10 )
-
-END

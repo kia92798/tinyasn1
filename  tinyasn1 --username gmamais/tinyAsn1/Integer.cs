@@ -201,6 +201,28 @@ namespace tinyAsn1
             PrintAsn1Constraints(o);
 
         }
+
+        public override bool Compatible(Asn1Type other)
+        {
+            IntegerType o = other.GetFinalType() as IntegerType;
+            if (o == null)
+                return false;
+
+
+            if (m_namedValues.Count != o.m_namedValues.Count)
+                return false;
+
+            foreach (string id in m_namedValues.Keys)
+            {
+                if (!o.m_namedValues.ContainsKey(id))
+                    return false;
+
+                if (m_namedValues[id] != o.m_namedValues[id])
+                    return false;
+            }
+
+            return true;
+        }
     }
 
 

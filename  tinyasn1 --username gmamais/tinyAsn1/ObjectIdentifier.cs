@@ -77,6 +77,16 @@ namespace tinyAsn1
         {
             base.DoSemanticAnalysis();
         }
+
+        public override bool Compatible(Asn1Type other)
+        {
+            ObjectIdentifier o = other.GetFinalType() as ObjectIdentifier;
+            if (o == null)
+                return false;
+            
+
+            return true;
+        }
     }
 
     public partial class ObjectIdentifierValue : Asn1Value

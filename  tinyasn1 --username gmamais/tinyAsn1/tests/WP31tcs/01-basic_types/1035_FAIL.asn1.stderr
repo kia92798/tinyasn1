@@ -1,4 +1,0 @@
-Error: grammar contains cyclic references. Unresolved types or variables are:
-File 1035_FAIL.asn1, line 9
-File 1035_FAIL.asn1, line 10
-

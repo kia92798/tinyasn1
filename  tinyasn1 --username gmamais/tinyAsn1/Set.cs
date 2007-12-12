@@ -71,6 +71,13 @@ namespace tinyAsn1
             }
 
         }
+        public override bool Compatible(Asn1Type other)
+        {
+            SetType o = other.GetFinalType() as SetType;
+            if (o == null)
+                return false;
+            return base.Compatible(other);
+        }
     }
 
 

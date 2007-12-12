@@ -1,7 +1,0 @@
-F046 DEFINITIONS AUTOMATIC TAGS	
-	EXTENSIBILITY IMPLIED ::= BEGIN	
-	DateString ::= VisibleString(PATTERN "\d#4-\d#2-\d#2 \d#2:\d#2")
-	aDate DateString ::= "2007-02-13 14:42"
-
-END
-

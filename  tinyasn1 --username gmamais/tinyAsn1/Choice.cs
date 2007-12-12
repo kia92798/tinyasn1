@@ -374,6 +374,28 @@ namespace tinyAsn1
             }
 
         }
+        
+        public override bool Compatible(Asn1Type other)
+        {
+            ChoiceType o = other.GetFinalType() as ChoiceType;
+            if (o == null)
+                return false;
+
+
+            if (m_children.Count != o.m_children.Count)
+                return false;
+
+            foreach (string id in m_children.Keys)
+            {
+                if (!o.m_children.ContainsKey(id))
+                    return false;
+
+                if (!m_children[id].Compatible(o.m_children[id]))
+                    return false;
+            }
+
+            return true;
+        }
 
     }
 
@@ -432,6 +454,11 @@ namespace tinyAsn1
             m_type.DoSemanticAnalysis();
         }
 
+
+        internal bool Compatible(ChoiceChild other)
+        {
+            return m_childVarName==other.m_childVarName && m_type.Compatible(other.m_type);
+        }
     }
 
 

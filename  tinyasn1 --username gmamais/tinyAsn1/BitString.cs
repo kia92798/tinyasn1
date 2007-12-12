@@ -211,6 +211,27 @@ namespace tinyAsn1
                 o.Write(" BIT STRING");
             PrintAsn1Constraints(o);
         }
+
+        public override bool Compatible(Asn1Type other)
+        {
+            BitStringType o = other.GetFinalType() as BitStringType;
+            if (o == null)
+                return false;
+            if (m_namedBits.Count != o.m_namedBits.Count)
+                return false;
+            
+            foreach (string id in m_namedBits.Keys)
+            {
+                if (!o.m_namedBits.ContainsKey(id))
+                    return false;
+
+                if (m_namedBits[id] != o.m_namedBits[id])
+                    return false;
+            }
+
+            return true;
+        }
+
     }
 
 

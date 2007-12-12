@@ -1,7 +1,0 @@
-F045 DEFINITIONS AUTOMATIC TAGS	
-	EXTENSIBILITY IMPLIED ::= BEGIN	
-	CapitalLettersOrMorse ::= PrintableString(FROM ("ABCDEFGHIJKLMNOPQRSTUVXWYZ.-"))
-	aStringOfCapitalLettersAndSOS CapitalLettersOrMorse ::= "ABCXYZ...---..."
-
-END
-

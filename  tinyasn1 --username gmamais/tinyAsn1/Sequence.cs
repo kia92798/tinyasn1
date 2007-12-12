@@ -118,5 +118,12 @@ namespace tinyAsn1
             }
         }
 
+        public override bool Compatible(Asn1Type other)
+        {
+            SequenceType o = other.GetFinalType() as SequenceType;
+            if (o == null)
+                return false;
+            return base.Compatible(other);
+        }
     }
 }

@@ -1,8 +1,0 @@
---FIA5String string support
---EMY-MODULE DEFINITIONS ::= BEGIN
---E&nbsp;&nbsp;MyVr ::= IA5String
---EEND
-
-MY-MODULE DEFINITIONS ::= BEGIN
-	MyVr ::= IA5String
-END

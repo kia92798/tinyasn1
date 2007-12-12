@@ -1,6 +1,0 @@
-F006 DEFINITIONS AUTOMATIC TAGS ::= BEGIN	
-	TagClash ::= CHOICE {
-			cheese IA5String,
-			dessert IA5String
-			}
-END

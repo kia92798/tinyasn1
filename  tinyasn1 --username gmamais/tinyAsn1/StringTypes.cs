@@ -123,6 +123,11 @@ namespace tinyAsn1
                     StopTokensInConstraints);
             }
         }
+
+        public override bool Compatible(Asn1Type other)
+        {
+            return other.GetFinalType() is IA5StringType;
+        }
     }
 
     public partial class NumericStringType : IA5StringType
@@ -177,6 +182,10 @@ namespace tinyAsn1
             ret.m_module = mod;
             ret.antlrNode = antrl;
             return ret;
+        }
+        public override bool Compatible(Asn1Type other)
+        {
+            return other.GetFinalType() is NumericStringType;
         }
     }
 

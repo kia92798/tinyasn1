@@ -107,13 +107,19 @@ namespace tinyAsn1
                     foreach (Asn1File f in m_files)
                         foreach (Module m in f.m_modules)
                         {
+
+                            string fname = f.m_fileName;
+                            try {
+                                fname = fname.Substring(fname.LastIndexOf('\\')+1);
+                            } catch(Exception) {}
+                            
                             foreach (TypeAssigment tas in m.m_typeAssigments.Values)
                                 if (!tas.m_type.SemanticAnalysisFinished())
-                                    er.WriteLine("File {0}, line {1}, type {2}", f.m_fileName, tas.m_type.antlrNode.Line, tas.m_type.Name);
+                                    er.WriteLine("File {0}, line {1}, type {2}", fname, tas.m_type.antlrNode.Line, tas.m_type.Name);
 
                             foreach (ValueAssigment vas in m.m_valuesAssigments.Values)
                                 if (!vas.m_value.IsResolved())
-                                    er.WriteLine("File {0}, line {1}", f.m_fileName, vas.m_type.antlrNode.Line);
+                                    er.WriteLine("File {0}, line {1}", fname, vas.m_type.antlrNode.Line);
                         }
                     throw new SemanticErrorException(er.ToString());
                     
@@ -184,7 +190,6 @@ namespace tinyAsn1
 
         public void debug()
         {
-            Console.WriteLine("Debugging ...");
             PrintAsn1();
 
         }

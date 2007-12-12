@@ -1,6 +1,0 @@
-F005 DEFINITIONS EXPLICIT TAGS ::= BEGIN	
-	TagClash ::= CHOICE {
-			cheese [0] IA5String,
-			dessert [1] IA5String
-			}
-END

@@ -1,1 +1,0 @@
-Error: import type 'MyInt3' which appears in the import list of module 'MY-MODULE' is not exported in module:'MY-MODULE3'

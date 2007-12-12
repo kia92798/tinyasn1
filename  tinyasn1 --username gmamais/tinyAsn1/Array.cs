@@ -34,6 +34,14 @@ namespace tinyAsn1
         {
             m_type.PerformAutomaticTagging();
         }
+        public override bool Compatible(Asn1Type other)
+        {
+            ArrayType o = other.GetFinalType() as ArrayType;
+            if (o == null)
+                return false;
+
+            return m_type.Compatible(o.m_type);
+        }
     }
 
 
