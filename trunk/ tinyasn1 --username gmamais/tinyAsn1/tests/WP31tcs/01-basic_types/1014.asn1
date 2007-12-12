@@ -1,0 +1,7 @@
+--FSyntax support for the BIT STRING type to declare special positions of bits
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;MyBitString ::= BIT STRING { alpha(1), beta(2)} 
+--EEND
+MY-MODULE DEFINITIONS ::= BEGIN
+	MyBitString ::= BIT STRING { alpha(1), beta(2)} 
+END

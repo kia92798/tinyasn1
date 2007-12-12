@@ -1,0 +1,2 @@
+Error line26 Component 'delta' is not listed.
+Either make the WITH COMPONENTS constraint partial by using ... or add the 'delta' to the list

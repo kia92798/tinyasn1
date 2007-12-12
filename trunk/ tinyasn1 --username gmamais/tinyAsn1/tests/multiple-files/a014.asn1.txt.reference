@@ -1,0 +1,148 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyInt,
+	MyReal,
+	MyInt2,
+	MyBitStr,
+	MyInt3,
+	MySQ0,
+	MySQ,
+	MySQ2,
+	MYCHOICE,
+	MYSQOFCHOICE,
+	SQOF,
+	SQOFOF,
+	SETOF,
+	SETSETOF,
+	MyEnum,
+	MyBitStr2,
+	myIntVal,
+	pi,
+	myIntVal3,
+	mySQvar1,
+	varMyso,
+	myChoice,
+	mysqofchoice,
+	sqof,
+	setsetof,
+	setof,
+	myEnumVar,
+	myEnumVar2;
+
+
+	MyInt ::= INTEGER 
+
+	MyReal ::= REAL
+
+	MyInt2 ::= [APPLICATION 1001] IMPLICIT INTEGER {
+		ab(1),
+		ac(3),
+		ad(4)
+	}
+
+	MyBitStr ::= BIT STRING {
+		a(1),
+		b(2),
+		c(4)
+	}
+
+	MyInt3 ::= [APPLICATION 1003] IMPLICIT MyInt2
+
+	MySQ0 ::= SEQUENCE {
+		int1 [0] IMPLICIT INTEGER ,
+		int2 [1] IMPLICIT INTEGER 
+	}
+
+	MySQ ::= SEQUENCE {
+		a [0] IMPLICIT INTEGER {
+			red(0),
+			blue(1)
+		} ((0|1)) DEFAULT 0,
+		b [1] IMPLICIT MyReal DEFAULT 3.1,
+		c [2] IMPLICIT MyEnum DEFAULT red(0),
+		d [3] IMPLICIT MyBitStr2 OPTIONAL,
+		e [4] IMPLICIT SEQUENCE {
+			a [0] IMPLICIT INTEGER {
+				red(0),
+				blue(1)
+			} ((0|1)) DEFAULT 0,
+			b [1] IMPLICIT MyReal DEFAULT 3.1,
+			c [2] IMPLICIT MyEnum DEFAULT red(0),
+			d [3] IMPLICIT MyBitStr2 OPTIONAL
+		}
+	}
+
+	MySQ2 ::= SEQUENCE {
+		a [0] IMPLICIT INTEGER {
+			red(0),
+			blue(1)
+		} ((0|1)) DEFAULT 0,
+		b [1] IMPLICIT MyReal DEFAULT 3.1,
+		c [2] IMPLICIT MyEnum DEFAULT red(0),
+		d [3] IMPLICIT MyBitStr2 OPTIONAL,
+		e [4] IMPLICIT SEQUENCE {
+			a [0] IMPLICIT INTEGER {
+				red(0),
+				blue(1)
+			} ((0|1)) DEFAULT 0,
+			b [1] IMPLICIT MyReal DEFAULT 3.1,
+			c [2] IMPLICIT MyEnum DEFAULT red(0),
+			d [3] IMPLICIT MyBitStr2 OPTIONAL
+		}
+	}
+
+	MYCHOICE ::= CHOICE {
+		a [0] IMPLICIT INTEGER {
+			red(0),
+			blue(1)
+		} ((0|1)),
+		b [1] IMPLICIT MyReal,
+		c [2] IMPLICIT MyEnum,
+		d [3] IMPLICIT MyBitStr2,
+		e [4] IMPLICIT SEQUENCE {
+			a [0] IMPLICIT INTEGER {
+				red(0),
+				blue(1)
+			} ((0|1)) DEFAULT 0,
+			b [1] IMPLICIT MyReal DEFAULT 3.1,
+			c [2] IMPLICIT MyEnum DEFAULT red(0),
+			d [3] IMPLICIT MyBitStr2 OPTIONAL
+		}
+	}
+
+	MYSQOFCHOICE ::= SEQUENCE OF MYCHOICE
+
+	SQOF ::= SEQUENCE OF INTEGER 
+
+	SQOFOF ::= SEQUENCE OF SEQUENCE OF INTEGER 
+
+	SETOF ::= SET  OF INTEGER 
+
+	SETSETOF ::= SET  OF SET  OF INTEGER 
+
+	MyEnum ::= ENUMERATED {
+		red(0),
+		blue(1),
+		green(4)
+	}
+
+	MyBitStr2 ::= [APPLICATION 1002] IMPLICIT BIT STRING {
+		aha(1)
+	}
+
+
+	myIntVal INTEGER ::= 4
+	pi REAL ::= 3.1
+	myIntVal3 MyInt3 ::= 1
+	mySQvar1 MySQ0 ::= { int1 10, int2 4 }
+	varMyso MySQ ::= { a 1, b 3.1, c green(4), d '011'B, e { a 0, b 45.2, c blue(1), d '001'B } }
+	myChoice MYCHOICE ::= e:{ a 1, c red(0) }
+	mysqofchoice MYSQOFCHOICE ::= { a:10, e:{ a 1, c red(0) }, e:{ a 1, b 3.1, c red(0) },d:'011'B }
+	sqof SQOF ::= { 1, 2, 3, 4, 1, 1,1 }
+	setsetof SETSETOF ::= { { 1, 2, 3, 4,5 }, { 1, 2, 3, 4, 5,6 },{ 1, 2, 3, 4, 5, 6,7 } }
+	setof SETOF ::= { 1, 2, 3, 4,5 }
+	myEnumVar MyEnum ::= red(0)
+	myEnumVar2 MyEnum ::= red(0)
+
+END

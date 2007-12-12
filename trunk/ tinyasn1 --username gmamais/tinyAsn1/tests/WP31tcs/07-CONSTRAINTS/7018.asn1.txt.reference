@@ -1,0 +1,14 @@
+MyMod DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	Str,
+	Str1;
+
+
+	Str ::= IA5String (FROM ("A".."Z"))
+
+	Str1 ::= Str (FROM (("A".."Z"|"a".."z")))
+
+
+
+END

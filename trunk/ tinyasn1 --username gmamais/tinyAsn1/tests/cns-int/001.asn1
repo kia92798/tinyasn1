@@ -1,0 +1,17 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+	myIntVar INTEGER ::= 100
+	myIntVar1 INTEGER ::= 200
+	myIntVar2 INTEGER ::= 500
+	myIntVar3 INTEGER ::= 5000
+	myRealVar2 REAL ::= 500.0
+	
+	MyInt ::= INTEGER ( 5..10 )
+	MyInt2 ::= INTEGER ( 5..myIntVar )
+	MyInt3 ::= INTEGER ( myIntVar )
+	MyInt4 ::= INTEGER ( 10)
+	MyInt5 ::= INTEGER ( 5..myIntVar | myIntVar1..500 ^ 250..700  | (ALL EXCEPT myIntVar1..myIntVar2) )
+
+--	MyInt2 ::= INTEGER ( FROM ("A".."Z") )
+	
+END

@@ -1,0 +1,13 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+	
+	
+	AllCapsOrAllSmall ::= IA5String ( FROM ("A".."Z") |FROM("a".."z") )
+
+
+	MITSOS ::= SEQUENCE {
+		a  AllCapsOrAllSmall	DEFAULT "Thanassis",	--error
+		b  AllCapsOrAllSmall	DEFAULT "thanassis"	--OK
+	}
+	
+	
+END

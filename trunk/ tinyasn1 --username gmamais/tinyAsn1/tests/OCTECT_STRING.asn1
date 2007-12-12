@@ -1,0 +1,14 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+	
+	
+	MyOctStr ::= OCTET STRING 
+
+	myOctStr1 MyOctStr ::= '00110'B
+	myOctStr2 MyOctStr ::= '00111'B
+	myOctStr3 MyOctStr ::= '00111011010101011'B
+	myOctStr20 MyOctStr ::= '123'H
+	
+	myOctStr4 MyOctStr ::= myOctStr3
+	
+	
+END

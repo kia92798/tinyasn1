@@ -1,0 +1,10 @@
+--FNULL type support
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;MyNull ::= NULL
+--E&nbsp;&nbsp;myNullVal NULL ::= NULL
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+	MyNull ::= NULL
+	myNullVal NULL ::= NULL
+END

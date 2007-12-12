@@ -1,0 +1,56 @@
+Deviated from reference: ./7001.asn1
+Stderr changed in ./7001.asn1
+Deviated from reference: ./7002.asn1
+Stderr changed in ./7002.asn1
+Deviated from reference: ./7003.asn1
+Stderr changed in ./7003.asn1
+Semantic error: ./7004.asn1
+Stderr changed in ./7004.asn1
+Deviated from reference: ./7005.asn1
+Stderr changed in ./7005.asn1
+Semantic error: ./7006.asn1
+Stderr changed in ./7006.asn1
+Stderr changed in ./7007_FAIL.asn1
+Deviated from reference: ./7008.asn1
+Stderr changed in ./7008.asn1
+Deviated from reference: ./7009.asn1
+Stderr changed in ./7009.asn1
+Deviated from reference: ./7010.asn1
+Stderr changed in ./7010.asn1
+Deviated from reference: ./7011.asn1
+Stderr changed in ./7011.asn1
+Deviated from reference: ./7012.asn1
+Stderr changed in ./7012.asn1
+Deviated from reference: ./7013.asn1
+Stderr changed in ./7013.asn1
+Deviated from reference: ./7014.asn1
+Stderr changed in ./7014.asn1
+Deviated from reference: ./7015.asn1
+Stderr changed in ./7015.asn1
+Deviated from reference: ./7016.asn1
+Stderr changed in ./7016.asn1
+Deviated from reference: ./7017.asn1
+Stderr changed in ./7017.asn1
+BOOM: ./7018.asn1
+Stderr changed in ./7018.asn1
+Deviated from reference: ./7019.asn1
+Stderr changed in ./7019.asn1
+Deviated from reference: ./7020.asn1
+Stderr changed in ./7020.asn1
+Deviated from reference: ./7021.asn1
+Stderr changed in ./7021.asn1
+Stderr changed in ./7022_FAIL.asn1
+Stderr changed in ./7023_FAIL.asn1
+Deviated from reference: ./7024.asn1
+Stderr changed in ./7024.asn1
+Stderr changed in ./7025_FAIL.asn1
+Deviated from reference: ./7026.asn1
+Stderr changed in ./7026.asn1
+Semantic error: ./7027.asn1
+Stderr changed in ./7027.asn1
+Deviated from reference: ./7028.asn1
+Stderr changed in ./7028.asn1
+Deviated from reference: ./7029.asn1
+Stderr changed in ./7029.asn1
+Semantic error: ./7030.asn1
+Stderr changed in ./7030.asn1

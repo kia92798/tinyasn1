@@ -1,0 +1,11 @@
+MyMod DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	Str;
+
+
+	Str ::= IA5String (SIZE (10..27))(FROM (("ABC"|"def")))
+
+
+
+END

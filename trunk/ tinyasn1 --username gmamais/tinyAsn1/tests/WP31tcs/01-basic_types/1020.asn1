@@ -1,0 +1,12 @@
+--FTagging support
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--ETagging
+--E&nbsp;&nbsp;MyType ::= [1] INTEGER
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+
+-- Tagging
+	MyType ::= [1] INTEGER
+	
+END

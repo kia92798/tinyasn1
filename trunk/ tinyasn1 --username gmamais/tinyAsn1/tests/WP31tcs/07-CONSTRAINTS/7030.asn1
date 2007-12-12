@@ -1,0 +1,15 @@
+--FWITH COMPONENT support
+--EMyMod&nbsp;&nbsp;DEFINITIONS ::=
+--EBEGIN
+--E&nbsp;&nbsp;TextBlock ::= [1] SEQUENCE OF VisibleString
+--E&nbsp;&nbsp;DigitBlock ::= [2] TextBlock (WITH COMPONENT (NumericString))&nbsp;&nbsp;
+--EEND
+
+
+MyMod	DEFINITIONS ::=
+BEGIN
+	TextBlock ::= [1] SEQUENCE OF VisibleString
+	
+	DigitBlock ::= [2] TextBlock (WITH COMPONENT (NumericString))	
+END
+

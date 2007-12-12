@@ -1,0 +1,27 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyEnum,
+	JustRed,
+	JustBlue,
+	myIntVal,
+	myEnumVar,
+	myEnumVar2;
+
+
+	MyEnum ::= ENUMERATED {
+		red(0),
+		blue(1),
+		green(4)
+	}
+
+	JustRed ::= MyEnum (red(0))
+
+	JustBlue ::= JustRed (blue(1))
+
+
+	myIntVal INTEGER ::= 4
+	myEnumVar MyEnum ::= red(0)
+	myEnumVar2 MyEnum ::= red(0)
+
+END

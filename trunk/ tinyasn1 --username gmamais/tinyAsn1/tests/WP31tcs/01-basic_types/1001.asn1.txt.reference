@@ -1,0 +1,13 @@
+MY-MODULE DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	MyBool,
+	myBoolVal;
+
+
+	MyBool ::= BOOLEAN
+
+
+	myBoolVal BOOLEAN ::= TRUE
+
+END

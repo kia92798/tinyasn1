@@ -1,0 +1,49 @@
+F023 DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	A,
+	C,
+	ExceptionClass,
+	D,
+	E,
+	exceptionExtension;
+
+
+	A ::= CHOICE {
+		one [0] IMPLICIT INTEGER ,
+		two [1] IMPLICIT INTEGER ,
+		three [2] IMPLICIT INTEGER 
+		,...!23
+	}
+
+	C ::= CHOICE {
+		one [0] IMPLICIT INTEGER ,
+		two [1] IMPLICIT INTEGER ,
+		three [2] IMPLICIT INTEGER 
+		,...!IA5String:"exception message"
+	}
+
+	ExceptionClass ::= ENUMERATED {
+		newChoice(0),
+		missingChoice(1)
+		,...
+	}
+
+	D ::= CHOICE {
+		one [0] IMPLICIT INTEGER ,
+		two [1] IMPLICIT INTEGER ,
+		three [2] IMPLICIT INTEGER 
+		,...!ExceptionClass:newChoice(0)
+	}
+
+	E ::= CHOICE {
+		one [0] IMPLICIT INTEGER ,
+		two [1] IMPLICIT INTEGER ,
+		three [2] IMPLICIT INTEGER 
+		,...!23
+	}
+
+
+	exceptionExtension INTEGER ::= 123
+
+END

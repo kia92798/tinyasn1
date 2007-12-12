@@ -1,0 +1,14 @@
+F005 DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	TagClash;
+
+
+	TagClash ::= CHOICE {
+		cheese [0] EXPLICIT IA5String,
+		dessert [1] EXPLICIT IA5String
+	}
+
+
+
+END

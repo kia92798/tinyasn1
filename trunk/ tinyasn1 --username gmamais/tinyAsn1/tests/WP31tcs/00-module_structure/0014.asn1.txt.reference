@@ -1,0 +1,22 @@
+ModuleDuplicateTypes1 DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	Type;
+
+
+	Type ::= INTEGER 
+
+
+
+END
+ModuleDuplicateTypes2 DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	Type;
+
+
+	Type ::= INTEGER 
+
+
+
+END

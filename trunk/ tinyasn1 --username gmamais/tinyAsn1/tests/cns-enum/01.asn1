@@ -1,0 +1,14 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+	
+	myIntVal INTEGER ::= 4
+	
+	MyEnum ::= ENUMERATED {red, blue(1), green(myIntVal)}
+	
+	myEnumVar  MyEnum ::= red
+	
+	myEnumVar2  MyEnum ::= myEnumVar
+
+	JustRed ::= MyEnum(red)
+
+	
+END

@@ -1,0 +1,13 @@
+MY-MODULE DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	MyInt,
+	myIntVal;
+
+
+	MyInt ::= INTEGER 
+
+
+	myIntVal INTEGER ::= 12
+
+END

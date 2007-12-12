@@ -1,0 +1,22 @@
+MY-MODULE DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	OneType;
+
+
+	OneType ::= SEQUENCE {
+		one-1 INTEGER ,
+		one-2 [1] EXPLICIT BOOLEAN,
+		one-3 SEQUENCE {
+			alpha INTEGER ,
+			beta INTEGER 
+			,...		},
+		...,
+		ignored-in-SecondType [2] EXPLICIT INTEGER ,
+		...,
+		one-4 INTEGER 
+	}
+
+
+
+END

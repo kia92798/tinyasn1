@@ -1,0 +1,8 @@
+--FBIT STRING support with SIZE constraint
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;MyBitString ::= BIT STRING (SIZE(5))
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+	MyBitString ::= BIT STRING (SIZE(5))
+END

@@ -1,0 +1,20 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+	
+	
+	Day ::= ENUMERATED {monday, tuesday, wednesday, thursday, friday, saturday, sunday}
+
+	Colors ::= ENUMERATED {red, green, blue}
+
+	GreenOrRed ::= Colors(red|green)
+
+	Weekend ::= Day(saturday | sunday)
+
+	FrenchWeekend ::=Day(Weekend)
+
+	LongWeekend ::=Day(GreenOrRed|friday)	-- error GreenOrRed and Day are not compatible types
+
+	holiday LongWeekend ::= sunday
+	
+
+	
+END

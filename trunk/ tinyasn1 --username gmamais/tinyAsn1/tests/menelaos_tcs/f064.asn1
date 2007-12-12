@@ -1,0 +1,8 @@
+F064 DEFINITIONS AUTOMATIC TAGS	EXTENSIBILITY IMPLIED ::= BEGIN
+
+    ShortBinaryNumericStrings ::= NumericString (FROM ("0"|"1")) (SIZE(1..5))
+    shortBinNumString ShortBinaryNumericStrings ::= "0101"
+
+
+
+END

@@ -1,0 +1,13 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+	
+	
+	ID ::= NumericString ( FROM(ALL EXCEPT " ") )
+
+
+	MITSOS ::= SEQUENCE {
+		a  ID	DEFAULT "12345",
+		b  ID	DEFAULT "67890"
+	}
+	
+	
+END

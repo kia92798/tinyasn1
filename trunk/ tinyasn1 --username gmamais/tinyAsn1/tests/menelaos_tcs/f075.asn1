@@ -1,0 +1,8 @@
+F075 DEFINITIONS AUTOMATIC TAGS	::= BEGIN
+
+    IntegerType  ::= INTEGER (1..5,...!10)
+    IntegerTypeA ::= INTEGER (10|11,...!Exception:a)
+    IntegerTypeB ::= INTEGER (10..1100,...!Exception:b)
+    Exception ::= ENUMERATED {a, b, ...}
+
+END

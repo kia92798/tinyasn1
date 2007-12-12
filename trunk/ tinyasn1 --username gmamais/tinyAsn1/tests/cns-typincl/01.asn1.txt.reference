@@ -1,0 +1,30 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	Day,
+	Weekend,
+	FrenchWeekend,
+	LongWeekend,
+	holiday;
+
+
+	Day ::= ENUMERATED {
+		monday(0),
+		tuesday(1),
+		wednesday(2),
+		thursday(3),
+		friday(4),
+		saturday(5),
+		sunday(6)
+	}
+
+	Weekend ::= Day ((saturday(5)|sunday(6)))
+
+	FrenchWeekend ::= Day (Weekend)
+
+	LongWeekend ::= Day ((Weekend|friday(4)))
+
+
+	holiday LongWeekend ::= sunday(6)
+
+END

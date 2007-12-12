@@ -1,0 +1,14 @@
+MyMod DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	Int,
+	Int2;
+
+
+	Int ::= INTEGER  (MIN..5)
+
+	Int2 ::= INTEGER  (Int)
+
+
+
+END

@@ -1,0 +1,11 @@
+--FPermitted alphabet on UTF8String
+--EMyMod&nbsp;&nbsp;DEFINITIONS ::=
+--EBEGIN
+--E&nbsp;&nbsp;Str ::= UTF8String (FROM("A".."Z"))&nbsp;&nbsp;
+--EEND
+
+
+MyMod	DEFINITIONS ::=
+BEGIN
+	Str ::= UTF8String (FROM("A".."Z"))	
+END

@@ -1,0 +1,12 @@
+--F BIT STRING support
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;MyBitString ::= BIT STRING
+--E&nbsp;&nbsp;myBitStrVal BIT STRING ::= '101101'B
+--E&nbsp;&nbsp;myBitStrVal2 BIT STRING ::= 'AFC11D'H
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+	MyBitString ::= BIT STRING
+	myBitStrVal BIT STRING ::= '101101'B
+	myBitStrVal2 BIT STRING ::= 'AFC11D'H
+END

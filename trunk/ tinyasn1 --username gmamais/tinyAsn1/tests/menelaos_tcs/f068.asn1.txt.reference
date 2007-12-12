@@ -1,0 +1,18 @@
+F068 DEFINITIONS AUTOMATIC TAGS  EXTENSIBILITY IMPLIED  ::=
+BEGIN
+EXPORTS
+	StrangeIntegerType,
+	StrangeStringType,
+	anInteger,
+	aString;
+
+
+	StrangeIntegerType ::= SEQUENCE OF INTEGER  ((1..100^30..1050))
+
+	StrangeStringType ::= IA5String ((FROM ("abcdefg")^FROM ("fghijk")))
+
+
+	anInteger StrangeIntegerType ::= {50 }
+	aString StrangeStringType ::= "fgfgfg"
+
+END

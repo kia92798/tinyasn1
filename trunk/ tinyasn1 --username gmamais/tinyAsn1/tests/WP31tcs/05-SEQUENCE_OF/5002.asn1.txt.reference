@@ -1,0 +1,13 @@
+MY-MODULE DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	MyVar,
+	myvar;
+
+
+	MyVar ::= SEQUENCE OF INTEGER 
+
+
+	myvar MyVar ::= { 1, 1, 4,5 }
+
+END

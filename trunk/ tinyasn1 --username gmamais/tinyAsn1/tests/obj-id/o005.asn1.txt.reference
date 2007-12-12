@@ -1,0 +1,20 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	OI,
+	OI2,
+	myIntVar,
+	oi1,
+	oi2;
+
+
+	OI ::= OBJECT IDENTIFIER
+
+	OI2 ::= OI
+
+
+	myIntVar INTEGER ::= 5
+	oi1 OBJECT IDENTIFIER ::= {1 2 3 4 5  }
+	oi2 OI2 ::= {a(1) 2 5  }
+
+END

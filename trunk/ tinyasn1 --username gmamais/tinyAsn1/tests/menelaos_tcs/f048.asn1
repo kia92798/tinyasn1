@@ -1,0 +1,7 @@
+F048 DEFINITIONS AUTOMATIC TAGS	
+	EXTENSIBILITY IMPLIED ::= BEGIN	
+	TextBlock ::= SEQUENCE OF IA5String
+	shortWordLimit INTEGER ::= 5
+	TextBlockOfShortWords ::= TextBlock (WITH COMPONENT (SIZE(1..shortWordLimit)))
+END
+

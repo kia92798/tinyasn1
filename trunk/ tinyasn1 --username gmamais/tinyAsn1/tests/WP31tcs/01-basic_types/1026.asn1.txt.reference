@@ -1,0 +1,15 @@
+MY-MODULE DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	MyEnum;
+
+
+	MyEnum ::= ENUMERATED {
+		monday(0),
+		tuesday(4)
+		,...!5
+	}
+
+
+
+END

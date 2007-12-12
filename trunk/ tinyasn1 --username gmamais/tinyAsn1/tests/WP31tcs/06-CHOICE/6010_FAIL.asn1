@@ -1,0 +1,13 @@
+
+MY-MODULE DEFINITIONS ::= BEGIN
+	T1 ::= CHOICE {
+		t-a  INTEGER,
+		t-b  OCTET STRING,
+		t-c  Choice1
+	}
+
+	Choice1 ::= CHOICE {			-- One more level
+		c-a OCTET STRING,
+		c-b INTEGER
+	}
+END

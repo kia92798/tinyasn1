@@ -1,0 +1,14 @@
+MyMod DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	TextBlock,
+	AddressBlock;
+
+
+	TextBlock ::= [1] EXPLICIT SEQUENCE OF IA5String
+
+	AddressBlock ::= [2] EXPLICIT TextBlock (WITH COMPONENT (SIZE (1..32)))
+
+
+
+END

@@ -1,0 +1,12 @@
+F078 DEFINITIONS AUTOMATIC TAGS	::= BEGIN
+
+PDV-List ::= SEQUENCE {
+    transfer-syntax-name INTEGER OPTIONAL,
+    presentation-context-identifier INTEGER, 
+	presentation-data-values CHOICE {
+	    single-ASN1-type INTEGER
+	       	(CONSTRAINED BY {-- Type corresponding -- -- to presentation-context-identifier -- single-ASN1-type} ),
+	    octet-aligned INTEGER,
+	    arbitrary INTEGER
+	} }
+END

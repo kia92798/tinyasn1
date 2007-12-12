@@ -1,0 +1,11 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+
+	MYSQOF ::= SEQUENCE (SIZE(1..10 EXCEPT (8..10 EXCEPT 9))) OF SEQUENCE { a INTEGER, b INTEGER}
+
+	--myArray has 8 elements which is not allowed
+	myArray MYSQOF ::= { {a 1, b 1}, {a 2, b 2}, {a 3, b 3}, {a 2, b 2}, 
+				   {a 3, b 3}, {a 2, b 2}, {a 3, b 3}, {a 3, b 3} }
+
+	
+END

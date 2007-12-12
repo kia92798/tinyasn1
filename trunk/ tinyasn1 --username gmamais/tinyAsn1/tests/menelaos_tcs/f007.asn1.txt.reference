@@ -1,0 +1,19 @@
+F007 DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	Client,
+	client;
+
+
+	Client ::= SEQUENCE {
+		name [0] IMPLICIT IA5String,
+		surname [1] IMPLICIT IA5String,
+		street [2] IMPLICIT IA5String,
+		number [3] IMPLICIT INTEGER ,
+		age [4] IMPLICIT INTEGER 
+	}
+
+
+	client Client ::= { name "John", surname "Smith", street "Baker", number 122, age 23 }
+
+END

@@ -1,0 +1,14 @@
+MyMod DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	TextBlock,
+	DigitBlock;
+
+
+	TextBlock ::= [1] EXPLICIT SEQUENCE OF IA5String
+
+	DigitBlock ::= [2] EXPLICIT TextBlock (WITH COMPONENT (NumericString))
+
+
+
+END

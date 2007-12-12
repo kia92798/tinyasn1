@@ -1,0 +1,8 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+
+	MyInt ::= REAL ( 5..MAX )
+	MyInt2 ::= MyInt ( 9..100)
+	MyInt3 ::= MyInt2 ( MIN..100)
+	
+END

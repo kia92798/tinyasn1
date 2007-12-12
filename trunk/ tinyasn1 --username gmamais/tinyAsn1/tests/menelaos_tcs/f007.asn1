@@ -1,0 +1,10 @@
+F007 DEFINITIONS AUTOMATIC TAGS ::= BEGIN	
+	Client ::= SEQUENCE {
+			name IA5String,
+			surname IA5String,
+			street IA5String,
+			number INTEGER,
+			age 	INTEGER
+			}
+	client Client ::= {name "John", surname "Smith", street "Baker", number 122, age 23}
+END

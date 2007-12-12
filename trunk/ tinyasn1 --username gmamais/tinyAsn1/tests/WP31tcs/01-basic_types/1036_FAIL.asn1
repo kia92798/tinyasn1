@@ -1,0 +1,9 @@
+--FSemantic Error: beta value is not defined anywhere
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;alpha INTEGER ::= beta
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+
+	alpha INTEGER ::= beta
+END

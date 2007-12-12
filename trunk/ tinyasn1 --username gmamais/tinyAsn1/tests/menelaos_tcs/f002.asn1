@@ -1,0 +1,4 @@
+F002 DEFINITIONS ::=
+BEGIN	
+	TagClash ::= CHOICE {cheese [0] IMPLICIT IA5String, dessert [1] IA5String}
+END

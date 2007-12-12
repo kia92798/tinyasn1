@@ -1,0 +1,11 @@
+MY-MODULE DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	MyVr;
+
+
+	MyVr ::= NumericString
+
+
+
+END

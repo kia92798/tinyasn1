@@ -1,0 +1,34 @@
+F056 DEFINITIONS AUTOMATIC TAGS  EXTENSIBILITY IMPLIED  ::=
+BEGIN
+EXPORTS
+	ShortINTEGER,
+	Citizen,
+	GreekCitizenWithIndicationOfMarriage,
+	MarriedGreekCitizen,
+	aGreek,
+	bGreek;
+
+
+	ShortINTEGER ::= INTEGER  (0..6)
+
+	Citizen ::= SEQUENCE {
+		country [0] IMPLICIT ENUMERATED {
+			france(0),
+			greece(1),
+			italy(2),
+			germany(3)
+		},
+		yearOfBirth [1] IMPLICIT INTEGER ,
+		married [2] IMPLICIT BOOLEAN OPTIONAL,
+		nOfChildren [3] IMPLICIT ShortINTEGER
+	}
+
+	GreekCitizenWithIndicationOfMarriage ::= Citizen (WITH COMPONENTS {..., country (greece(1)), married PRESENT})
+
+	MarriedGreekCitizen ::= Citizen (WITH COMPONENTS {..., country (greece(1)), married (TRUE) PRESENT})
+
+
+	aGreek GreekCitizenWithIndicationOfMarriage ::= { country greece(1), yearOfBirth 1960, married TRUE, nOfChildren 2 }
+	bGreek MarriedGreekCitizen ::= { country greece(1), yearOfBirth 1960, married TRUE, nOfChildren 2 }
+
+END

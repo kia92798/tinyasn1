@@ -1,0 +1,56 @@
+--FCOMPONENTS OF support
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;OneType ::= SEQUENCE {
+--E&nbsp;&nbsp;&nbsp;&nbsp;one-1&nbsp;&nbsp;    INTEGER,
+--E&nbsp;&nbsp;&nbsp;&nbsp;one-2&nbsp;&nbsp;[1] BOOLEAN,
+--E&nbsp;&nbsp;&nbsp;&nbsp;one-3   SEQUENCE {
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;alpha&nbsp;&nbsp;INTEGER,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;beta&nbsp;&nbsp;INTEGER,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...
+--E&nbsp;&nbsp;&nbsp;&nbsp;},
+--E&nbsp;&nbsp;&nbsp;&nbsp;...,
+--E&nbsp;&nbsp;&nbsp;&nbsp;ignored-in-SecondType&nbsp;&nbsp;[2] INTEGER,
+--E&nbsp;&nbsp;&nbsp;&nbsp;...,
+--E&nbsp;&nbsp;&nbsp;&nbsp;one-4&nbsp;&nbsp;INTEGER
+--E&nbsp;&nbsp;}
+--E&nbsp;&nbsp;SecondType ::= SEQUENCE {
+--E&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;&nbsp;IA5String,
+--E&nbsp;&nbsp;&nbsp;&nbsp;COMPONENTS OF OneType,
+--E&nbsp;&nbsp;&nbsp;&nbsp;b&nbsp;&nbsp;UniversalString
+--E&nbsp;&nbsp;}
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+	
+	OneType ::= SEQUENCE {
+		one-1	    INTEGER,
+		one-2	[1] BOOLEAN,
+		one-3   SEQUENCE {
+			alpha	INTEGER,
+			beta	INTEGER,
+			...
+		},
+		...,
+		ignored-in-SecondType	[2] INTEGER,
+		...,
+		one-4	INTEGER
+	}
+
+	SecondType ::= SEQUENCE {
+		a	IA5String,
+		COMPONENTS OF OneType,
+		b	UniversalString
+	}
+
+	var SecondType ::= {
+				  a "george",
+				  one-1 1, 
+				  one-2 TRUE,
+				  one-3 {alpha 1, beta 2},
+				  one-4 4,
+				  b "gm"
+				}
+				
+
+		
+END
