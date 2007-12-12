@@ -1,0 +1,15 @@
+F055 DEFINITIONS AUTOMATIC TAGS	
+EXTENSIBILITY IMPLIED ::= BEGIN
+ShortINTEGER ::= INTEGER (0..6)
+Citizen ::= SEQUENCE { country ENUMERATED {france, greece, italy, germany},
+	    yearOfBirth	INTEGER,
+	    married BOOLEAN OPTIONAL,
+	    nOfChildren ShortINTEGER}
+
+	    GreekCitizenWithIndicationOfMarriage ::= Citizen (WITH COMPONENTS {...,
+					country (greece),
+					married PRESENT})
+
+	    aGreek GreekCitizenWithIndicationOfMarriage ::= {country greece, yearOfBirth 1980, married TRUE, nOfChildren 2}
+
+END

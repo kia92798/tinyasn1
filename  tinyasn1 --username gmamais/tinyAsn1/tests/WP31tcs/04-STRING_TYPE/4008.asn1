@@ -1,0 +1,9 @@
+--FTeletexString string support
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;MyVr ::= TeletexString
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+	MyVr ::= TeletexString
+
+END

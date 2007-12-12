@@ -1,0 +1,13 @@
+F070 DEFINITIONS AUTOMATIC TAGS  EXTENSIBILITY IMPLIED  ::=
+BEGIN
+EXPORTS
+	StrangeIntegerType,
+	anInteger;
+
+
+	StrangeIntegerType ::= SEQUENCE OF INTEGER  (ALL EXCEPT (30..40))
+
+
+	anInteger StrangeIntegerType ::= {50 }
+
+END

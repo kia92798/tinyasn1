@@ -1,0 +1,29 @@
+F019 DEFINITIONS  IMPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	ExtensibleEnumeration,
+	ExtensibleEnumeration2,
+	anExtensibleEnumerationValue,
+	anotherValue;
+
+
+	ExtensibleEnumeration ::= ENUMERATED {
+		one(0),
+		two(1),
+		three(2)
+		,...
+	}
+
+	ExtensibleEnumeration2 ::= ENUMERATED {
+		one(0),
+		two(1),
+		three(2),
+		...,
+		four(3)
+	}
+
+
+	anExtensibleEnumerationValue ExtensibleEnumeration ::= two(1)
+	anotherValue ExtensibleEnumeration2 ::= four(3)
+
+END

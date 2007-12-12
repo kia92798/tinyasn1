@@ -1,0 +1,12 @@
+MY-MODULE DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	MySeq;
+
+
+	MySeq ::= SEQUENCE {
+	}
+
+
+
+END

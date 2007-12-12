@@ -1,0 +1,11 @@
+--FSIZE constraint in SEQUENCES OF
+--EMyMod&nbsp;&nbsp;DEFINITIONS ::=
+--EBEGIN
+--E&nbsp;&nbsp;SequenceOf ::= SEQUENCE (SIZE(1..2)) OF INTEGER
+--EEND
+
+
+MyMod	DEFINITIONS ::=
+BEGIN
+	SequenceOf ::= SEQUENCE (SIZE(1..2)) OF INTEGER
+END

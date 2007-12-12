@@ -1,0 +1,13 @@
+MY-MODULE DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	MyReal,
+	myRealVal;
+
+
+	MyReal ::= REAL
+
+
+	myRealVal REAL ::= 3.14
+
+END

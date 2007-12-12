@@ -1,0 +1,15 @@
+F023 DEFINITIONS AUTOMATIC TAGS	::= BEGIN	
+    A ::= SEQUENCE {one INTEGER, two INTEGER, three INTEGER, ... !23}
+    B ::= SEQUENCE {one INTEGER, two INTEGER, three INTEGER, ... !exceptionExtension}
+    --C ::= SEQUENCE {one INTEGER, two INTEGER, three INTEGER, ... !IA5String:"exception message"}
+    ExceptionClass ::= ENUMERATED{newChoice, missingChoice, ...}
+    --D ::= SEQUENCE {one INTEGER, two INTEGER, three INTEGER, ... !ExceptionClass:newChoice}
+
+    exceptionExtension INTEGER ::= 123
+
+
+    E ::= SEQUENCE {one INTEGER, two INTEGER, three INTEGER, ... !INTEGER:23}
+
+
+END
+

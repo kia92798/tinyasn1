@@ -1,0 +1,11 @@
+MY-MODULE DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	MyReal;
+
+
+	MyReal ::= REAL (2.1..4.9)
+
+
+
+END

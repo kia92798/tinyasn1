@@ -1,0 +1,23 @@
+F034 DEFINITIONS AUTOMATIC TAGS  EXTENSIBILITY IMPLIED  ::=
+BEGIN
+EXPORTS
+	AnIntegerType,
+	ARangeConstrainedInteger,
+	MoreConstrained,
+	MoreConstrainedB,
+	MoreConstrainedC;
+
+
+	AnIntegerType ::= INTEGER 
+
+	ARangeConstrainedInteger ::= AnIntegerType (1..10)
+
+	MoreConstrained ::= ARangeConstrainedInteger (2..<10)
+
+	MoreConstrainedB ::= MoreConstrained (3<..7)
+
+	MoreConstrainedC ::= MoreConstrainedB (5<..<7)
+
+
+
+END

@@ -1,0 +1,46 @@
+F013 DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	Client,
+	ClientMoreInfo,
+	ListOfClientMoreInfo,
+	ListOfNumbers,
+	client1,
+	clientMoreInfo,
+	aListOfNumbers,
+	anotherListOfNumbers;
+
+
+	Client ::= SET {
+		name [0] IMPLICIT IA5String,
+		surname [1] IMPLICIT IA5String,
+		street [2] IMPLICIT IA5String,
+		number [3] IMPLICIT INTEGER  OPTIONAL,
+		age [4] IMPLICIT INTEGER  OPTIONAL
+	}
+
+	ClientMoreInfo ::= SET {
+		name [0] IMPLICIT IA5String,
+		surname [1] IMPLICIT IA5String,
+		street [2] IMPLICIT IA5String,
+		number [3] IMPLICIT INTEGER  OPTIONAL,
+		age [4] IMPLICIT INTEGER  OPTIONAL,
+		marital-status [5] IMPLICIT ENUMERATED {
+			single(0),
+			married(1),
+			divorced(2),
+			widowed(3)
+		}
+	}
+
+	ListOfClientMoreInfo ::= SEQUENCE OF ClientMoreInfo
+
+	ListOfNumbers ::= SEQUENCE OF INTEGER 
+
+
+	client1 Client ::= { name "John", surname "Smith", street "Baker", number 122, age 23 }
+	clientMoreInfo ClientMoreInfo ::= { name "Menelaos", surname "Perdikeas", street "Serron", age 33, marital-status married(1) }
+	aListOfNumbers ListOfNumbers ::= { 23, 23, 23, 1, 423,32 }
+	anotherListOfNumbers ListOfNumbers ::= { }
+
+END

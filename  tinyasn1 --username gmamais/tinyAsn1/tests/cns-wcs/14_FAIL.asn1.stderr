@@ -1,0 +1,2 @@
+Error line12 Component 'a' is not listed.
+Either make the WITH COMPONENTS constraint partial by using ... or add the 'a' to the list

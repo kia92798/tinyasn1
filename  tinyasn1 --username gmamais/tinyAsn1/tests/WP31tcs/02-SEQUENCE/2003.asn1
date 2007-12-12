@@ -1,0 +1,14 @@
+--FOPTIONAL support
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;MySeq ::= SEQUENCE {
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a1&nbsp;&nbsp;INTEGER OPTIONAL,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s1&nbsp;&nbsp;OCTET STRING
+--E&nbsp;&nbsp;&nbsp;&nbsp;}
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+	MySeq ::= SEQUENCE {
+			a1	INTEGER OPTIONAL,
+			s1	OCTET STRING
+		}
+END

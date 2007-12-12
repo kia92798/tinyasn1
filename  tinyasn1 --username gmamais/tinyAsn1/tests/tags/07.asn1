@@ -1,0 +1,20 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+-- not tag glass thanks to AUTOMATIC TAGS
+
+	MySQ0 ::= SET {
+		a	A,
+		b	B
+	}
+
+	A::= CHOICE {
+		d	[0]	NULL,
+		e	[1]	NULL
+	}
+	
+	B::= CHOICE {
+		d	[0]	NULL,
+		e	[1]	NULL
+	}
+
+END

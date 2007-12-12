@@ -1,0 +1,18 @@
+F044 DEFINITIONS AUTOMATIC TAGS  EXTENSIBILITY IMPLIED  ::=
+BEGIN
+EXPORTS
+	CapitalLettersOrMorse,
+	TelephoneNumbers,
+	aStringOfCapitalLettersAndSOS,
+	aNumber;
+
+
+	CapitalLettersOrMorse ::= IA5String (FROM (("-"|"."|"A".."Z")))
+
+	TelephoneNumbers ::= IA5String (FROM (("0".."9"|"#"|"*")))
+
+
+	aStringOfCapitalLettersAndSOS CapitalLettersOrMorse ::= "ABCXYZ...---..."
+	aNumber TelephoneNumbers ::= "2102342##*"
+
+END

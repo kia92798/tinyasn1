@@ -1,0 +1,14 @@
+--FDEFAULT value support
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;MySeq ::= SET {
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a1&nbsp;&nbsp;INTEGER DEFAULT 5,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s1&nbsp;&nbsp;OCTET STRING
+--E&nbsp;&nbsp;&nbsp;&nbsp;}
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+	MySeq ::= SET {
+			a1	INTEGER DEFAULT 5,
+			s1	OCTET STRING
+		}
+END

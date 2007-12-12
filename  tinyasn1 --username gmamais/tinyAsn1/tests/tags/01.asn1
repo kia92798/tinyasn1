@@ -1,0 +1,8 @@
+MY-MODULE DEFINITIONS ::= BEGIN
+
+	MySQ0 ::= SEQUENCE {
+		int1	INTEGER,
+		int2  INTEGER
+	}
+
+END

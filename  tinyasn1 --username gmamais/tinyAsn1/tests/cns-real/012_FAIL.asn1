@@ -1,0 +1,10 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+
+	MyInt ::= REAL ( WITH COMPONENTS {
+			base(2), 
+			exponent(-10..10)} )
+	
+
+	
+END

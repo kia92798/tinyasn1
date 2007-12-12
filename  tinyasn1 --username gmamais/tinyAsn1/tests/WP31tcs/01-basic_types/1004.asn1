@@ -1,0 +1,9 @@
+--FNamed INTEGER variables 
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;MyInt2 ::= INTEGER <b>{ one(1), two(2), minusone(-1) }</b>
+--E&nbsp;&nbsp;myIntVal2 MyInt2 ::= one
+--EEND
+MY-MODULE DEFINITIONS ::= BEGIN
+	MyInt2 ::= INTEGER { one(1), two(2), minusone(-1) }
+	myIntVal2 MyInt2 ::= one
+END

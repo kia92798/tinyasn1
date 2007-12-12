@@ -1,0 +1,7 @@
+F050 DEFINITIONS AUTOMATIC TAGS	
+	EXTENSIBILITY IMPLIED ::= BEGIN	
+	IntegerTable ::= SEQUENCE SIZE (10) OF INTEGER	
+	TwoDimensionalIntegerTable ::= SEQUENCE SIZE (10) OF IntegerTable
+	TwoDimensionalIntegerTableConstrained ::= TwoDimensionalIntegerTable (WITH COMPONENT (WITH COMPONENT (0..9)))
+END
+

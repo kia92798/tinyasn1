@@ -1,0 +1,10 @@
+F032 DEFINITIONS AUTOMATIC TAGS	
+	EXTENSIBILITY IMPLIED ::= BEGIN	
+
+	AnIntegerType	::= INTEGER
+	ARangeConstrainedInteger ::= AnIntegerType (1..10)
+--	MoreConstrained	::= AnIntegerType (1<..<10)
+--	MoreConstrainedB::= AnIntegerType (1..<10)
+--	MoreConstrainedC::= AnIntegerType (<1..10)
+END
+

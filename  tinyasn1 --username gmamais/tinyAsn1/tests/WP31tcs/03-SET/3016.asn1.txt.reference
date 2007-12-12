@@ -1,0 +1,16 @@
+MY-MODULE DEFINITIONS  EXPLICIT TAGS  ::=
+BEGIN
+EXPORTS
+	MySeq,
+	mySeqValue;
+
+
+	MySeq ::= SET {
+		a1 INTEGER ,
+		s1 OCTET STRING
+	}
+
+
+	mySeqValue MySeq ::= { a1 10, s1 'A10F'H }
+
+END

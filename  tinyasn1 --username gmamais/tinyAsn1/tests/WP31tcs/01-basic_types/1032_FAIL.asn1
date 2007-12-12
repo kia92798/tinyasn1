@@ -1,0 +1,9 @@
+--FSemantix Error: Enumerated with the same value
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;Enum1 ::= ENUMERATED { red(5), blue(5) }
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+
+	Enum1 ::= ENUMERATED { red(5), blue(5) }
+END

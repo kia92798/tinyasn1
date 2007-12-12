@@ -1,0 +1,1 @@
+Error: Tag clash for type defined in line 2.The type contains has two children (or grandchilden a choice child) with the same tag. The child that clashes are located in lines: 2 and 3

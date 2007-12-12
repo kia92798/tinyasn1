@@ -1,0 +1,9 @@
+F038 DEFINITIONS AUTOMATIC TAGS	
+	EXTENSIBILITY IMPLIED ::= BEGIN	
+
+	AnIntegerType	::= INTEGER
+	PeculiarOctetBitString ::= BIT STRING (SIZE(3..8))
+	OddIntegers ::= INTEGER (1 |3 |5 |7 |9)
+	OddOctetString ::= BIT STRING (SIZE(OddIntegers))
+END
+

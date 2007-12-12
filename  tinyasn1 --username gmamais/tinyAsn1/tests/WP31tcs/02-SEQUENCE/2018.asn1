@@ -1,0 +1,25 @@
+--FCOMPONENTS OF support
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;MySeq1 ::= SEQUENCE {
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a1&nbsp;&nbsp;INTEGER ,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s1&nbsp;&nbsp;OCTET STRING
+--E&nbsp;&nbsp;&nbsp;&nbsp;}
+--E&nbsp;&nbsp;MySeq2 ::= SEQUENCE {
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;COMPONENTS OF MySeq1,
+--E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r REAL
+--E&nbsp;&nbsp;&nbsp;&nbsp;}
+--EEND
+
+MY-MODULE DEFINITIONS ::= BEGIN
+	
+	MySeq1 ::= SEQUENCE {
+			a1	INTEGER ,
+			s1	OCTET STRING
+		}
+	
+	MySeq2 ::= SEQUENCE {
+			COMPONENTS OF MySeq1,
+			r REAL
+		}
+		
+END

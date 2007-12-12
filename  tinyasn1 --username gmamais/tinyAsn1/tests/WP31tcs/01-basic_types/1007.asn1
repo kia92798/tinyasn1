@@ -1,0 +1,7 @@
+--FENUMERATED type support
+--EMY-MODULE DEFINITIONS ::= BEGIN
+--E&nbsp;&nbsp;MyEnum ::= ENUMERATED { monday, tuesday(4)}
+--EEND
+MY-MODULE DEFINITIONS ::= BEGIN
+	MyEnum ::= ENUMERATED { monday, tuesday(4)}
+END

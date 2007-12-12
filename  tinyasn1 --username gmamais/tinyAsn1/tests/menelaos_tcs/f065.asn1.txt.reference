@@ -1,0 +1,14 @@
+F065 DEFINITIONS AUTOMATIC TAGS  EXTENSIBILITY IMPLIED  ::=
+BEGIN
+EXPORTS
+	IntegerSequence,
+	IntegerMatric;
+
+
+	IntegerSequence ::= SEQUENCE OF INTEGER 
+
+	IntegerMatric ::= SEQUENCE (SIZE (10)) OF IntegerSequence (SIZE (10))(WITH COMPONENT (-100..100))
+
+
+
+END

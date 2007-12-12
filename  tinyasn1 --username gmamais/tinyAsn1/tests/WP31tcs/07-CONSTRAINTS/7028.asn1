@@ -1,0 +1,29 @@
+--FWITH COMPONENTS support
+--EMyMod&nbsp;&nbsp;DEFINITIONS ::=
+--EBEGIN
+--E&nbsp;&nbsp;Choice ::= CHOICE { 
+--E&nbsp;&nbsp;&nbsp;&nbsp;a [1] INTEGER,
+--E&nbsp;&nbsp;&nbsp;&nbsp;b [2] INTEGER,
+--E&nbsp;&nbsp;&nbsp;&nbsp;c [3] INTEGER,
+--E&nbsp;&nbsp;&nbsp;&nbsp;d [4] INTEGER 
+--E&nbsp;&nbsp;}
+--E&nbsp;&nbsp;Choice2 ::= Choice (
+--E&nbsp;&nbsp;&nbsp;&nbsp;WITH COMPONENTS { a ABSENT, b ABSENT}
+--E&nbsp;&nbsp;)
+--EEND
+
+
+MyMod	DEFINITIONS ::=
+BEGIN
+	Choice ::= CHOICE { 
+		a [1] INTEGER,
+		b [2] INTEGER,
+		c [3] INTEGER,
+		d [4] INTEGER 
+	}
+	
+	Choice2 ::= Choice (
+		WITH COMPONENTS { a ABSENT, b ABSENT}
+	)
+END
+

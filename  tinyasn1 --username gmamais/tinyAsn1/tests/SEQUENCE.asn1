@@ -1,0 +1,193 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+	
+	MyInt ::= INTEGER
+	myIntVal INTEGER ::= 4
+	
+	MyReal ::= REAL
+	
+	pi REAL ::= 3.1
+	
+
+	MyInt2 ::= [APPLICATION 1001] INTEGER { ab(1), ac(3), ad(myIntVal)}
+	
+	
+	MyBitStr ::= BIT STRING { a(1), b(2), c(myIntVal) }
+	
+	MyInt3 ::= [APPLICATION 1003] MyInt2 
+	
+	myIntVal3 MyInt3 ::= ab
+
+	MySQ0 ::= SEQUENCE {
+		int1	INTEGER,
+		int2  INTEGER
+	}
+
+	mySQvar1 MySQ0 ::= { int1 10, int2 myIntVal}
+
+	MyTest ::= SEQUENCE {
+		field1	INTEGER	
+	}
+	
+	myTestVar MyTest ::= {field1 5}
+	myTestVar2 MyTest ::= {field1 myIntVal3}
+
+	MyTest2 ::= SEQUENCE {
+		field1	MyTest	
+	}
+	
+	myTest2Var1 MyTest2 ::= {field1 myTestVar}
+	myTest2Var2 MyTest2 ::= {field1 myTestVar2}
+	myTest2Var3 MyTest2 ::= {field1 {field1 myIntVal3}}
+--	myTest2Var4 MyTest2 ::= {field1 myIntVal3}	error myIntVal3 is an integer
+	
+	
+	--@This a special comment that must appear
+	--@just before the definition MySQ22
+	MySQ22 ::= SEQUENCE {
+		a	INTEGER {red(0), blue(1)} (red|blue) DEFAULT red,
+		b 	MyReal,
+		c	MyEnum	DEFAULT red,
+		d	MyBitStr	OPTIONAL
+	}
+
+	mySQ2 MySQ22 ::= { 
+		a blue, 
+		b 2.7, 
+		c green, 
+		d {a,b} 
+	}
+
+	mySQ22 MySQ22 ::= mySQ2
+
+	--mySQ23 MySQ22 ::= mySQvar1
+
+
+	MySQ ::= SEQUENCE {
+		a	INTEGER {red(0), blue(1)} (red|blue) DEFAULT red,
+		b 	MyReal	DEFAULT pi,
+		c	MyEnum	DEFAULT red,
+		d	MyBitStr2	OPTIONAL,
+		e	SEQUENCE {
+			a	INTEGER {red(0), blue(1)} (red|blue) DEFAULT red,
+			b 	MyReal	DEFAULT pi,
+			c	MyEnum	DEFAULT red,
+			d	MyBitStr2	OPTIONAL
+		}
+	}
+	
+	varMyso MySQ ::= {
+		a	blue,
+		b 	pi,
+		c	green,
+		d	'011'B,
+		e	{
+			a	red,
+			b 	45.2,
+			c	blue,
+			d	'001'B
+		}
+	}
+
+	MySQ2 ::= SEQUENCE {
+		a	INTEGER {red(0), blue(1)} (red|blue) DEFAULT red,
+		b 	MyReal	DEFAULT pi,
+		c	MyEnum	DEFAULT red,
+		d	MyBitStr2	OPTIONAL,
+		e	CHOICE {
+			a	INTEGER {red(0), blue(1)} (red|blue),
+			b 	MyReal	,
+			c	MyEnum	,
+			d	MyBitStr2	
+		}
+
+	}
+
+	MySQ2b ::= SEQUENCE {
+		a1	INTEGER {red(0), blue(1)} (red|blue) DEFAULT red,
+		b1 	MyReal	DEFAULT pi,
+		c1	MyEnum	DEFAULT red,
+		d1	MyBitStr2	OPTIONAL
+	}	
+
+	WITCOMPSEQ ::=	SEQUENCE {
+		a	INTEGER {red(0), blue(1)} (red|blue) DEFAULT red,
+		b 	MyReal	DEFAULT pi,
+		c	MyEnum	DEFAULT red,
+		COMPONENTS OF MySQ2b,
+		d	MyBitStr2	OPTIONAL
+	}
+
+	
+	
+	MYCHOICE ::= CHOICE {
+		a	INTEGER {red(0), blue(1)} (red|blue),
+		b 	MyReal	,
+		c	MyEnum	,
+		d	MyBitStr2	,
+		e	SEQUENCE {
+			a	INTEGER {red(0), blue(1)} (red|blue) DEFAULT red,
+			b 	MyReal	DEFAULT pi,
+			c	MyEnum	DEFAULT red,
+			d	MyBitStr2	OPTIONAL
+		}
+	}
+	
+	myChoice MYCHOICE ::= e:{ a blue, c red}
+	
+	MYSQOFCHOICE ::= SEQUENCE OF MYCHOICE
+	
+	mysqofchoice MYSQOFCHOICE ::= {
+				a:10,					--warning 10 is out of 0..1
+				e:{ a blue, c red},
+				e:{ a blue, b pi, c red},
+				d:'011'B
+				}
+	
+	SQOF ::= SEQUENCE OF INTEGER
+	
+	sqof1 SQOF ::= {myIntVal}
+	sqof2 SQOF ::= {10}
+	
+	SQOFOF ::= SEQUENCE OF SEQUENCE OF INTEGER
+	
+	sqof SQOF::= {1,2,3,4,1,1,1}
+	sqofof SQOFOF::= {{1,2,3,4,1,1,1},
+		{
+		10,
+		20,
+		myIntVal,
+		40,
+		10,
+		10,
+		10}}
+		
+	SETOF ::= SET OF INTEGER
+	
+	setof2 SETOF ::= {myIntVal}
+	setof1 SETOF ::= {12}
+	
+	SETSETOF ::= SET OF SET OF INTEGER
+	
+	setsetof SETSETOF ::= { {1,2,3,4,5}, {1,2,3,4,5,6}, {1,2,3,4,5,6,7} } 
+--	setsetof SETSETOF ::= { {1,2,3,4,5}, {1,2,3,4,5}, {1,2,3,4,5,6,7} } 
+	
+	setof SETOF ::= {1,2,3,4,5}
+--	setof SETOF ::= {1,2,3,4,4,5}
+	
+	MyEnum ::= ENUMERATED {red, blue(1), green(myIntVal)}
+	
+	myEnumVar  MyEnum ::= red
+	
+	myEnumVar2  MyEnum ::= myEnumVar
+
+	MyBitStr2 ::= [APPLICATION 1002] BIT STRING { aha(myIntVal3)}
+	
+	
+	-- The following is invalid
+	-- myIntVal2 INTEGER ::= a			
+	
+	-- The following is invalid
+	--myIntVal4 INTEGER ::= ab
+	
+	
+END
