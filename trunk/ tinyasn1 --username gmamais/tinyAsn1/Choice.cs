@@ -397,6 +397,14 @@ namespace tinyAsn1
             return true;
         }
 
+        public override void ComputePEREffectiveConstraints()
+        {
+            base.ComputePEREffectiveConstraints();
+            foreach (ChoiceChild child in m_children.Values)
+            {
+                child.m_type.ComputePEREffectiveConstraints();
+            }
+        }
     }
 
     public partial class ChoiceChild

@@ -167,6 +167,13 @@ namespace tinyAsn1
                             Console.Error.WriteLine("Warning: value '" + vs.m_name + "'defined in line " + vs.m_value.antlrNode.Line +
                                 " does not conform to its type constraints");
 
+//Phase 7: Compute PER effective constraints
+            foreach (Asn1File f in m_files)
+                foreach (Module m in f.m_modules)
+                    foreach (TypeAssigment tas in m.m_typeAssigments.Values)
+                        tas.m_type.ComputePEREffectiveConstraints();
+
+        
         }
 
         private bool Phase1Finished()
@@ -191,7 +198,6 @@ namespace tinyAsn1
         public void debug()
         {
             PrintAsn1();
-
         }
         
         public virtual void PrintAsn1()

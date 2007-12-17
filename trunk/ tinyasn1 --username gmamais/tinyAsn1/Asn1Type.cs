@@ -14,6 +14,7 @@ namespace tinyAsn1
         public Tag m_tag;
         public List<ITree> m_AntlrConstraints = new List<ITree>();
         public List<IConstraint> m_constraints = new List<IConstraint>();
+        
 
         public partial class Tag
         {
@@ -550,9 +551,16 @@ namespace tinyAsn1
                 o.Write(" ");
                 foreach (IConstraint con in m_constraints)
                     o.Write(con.ToString(true));
+                PEREffectiveConstraint dummy = PEREffectiveConstraint;
+                if (dummy != null)
+                {
+                    o.Write("--");
+                    dummy.PrintAsn1(o);
+                    o.Write("--");
+                }
             }
         }
-        
+
         public virtual void PrintAsn1(StreamWriterLevel o, int lev)
         {
             if (m_tag != null)
@@ -565,6 +573,33 @@ namespace tinyAsn1
         {
             throw new Exception("Abstract method called: Compatible()");
         }
+
+// PER related methods
+
+        /// <summary>
+        /// This method must be overriden in types that include other types (i.e. SEQUENCE etc)
+        /// </summary>
+        public virtual void ComputePEREffectiveConstraints()
+        {
+            PEREffectiveConstraint dummy = PEREffectiveConstraint;
+        }
+        
+        public bool IsPERExtensible()
+        {
+            if (PEREffectiveConstraint!=null)
+                return PEREffectiveConstraint.Extensible;
+            return false;
+        }
+
+        public virtual PEREffectiveConstraint PEREffectiveConstraint
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+
 
     }
 
