@@ -228,5 +228,31 @@ namespace tinyAsn1
         {
             return GetFinalType().Compatible(other.GetFinalType());
         }
+
+
+// PER related methods
+
+        private PEREffectiveConstraint m_perEffectiveConstraint = null;
+        public override PEREffectiveConstraint PEREffectiveConstraint
+        {
+            get
+            {
+                if (m_perEffectiveConstraint != null)
+                    return m_perEffectiveConstraint;
+                m_perEffectiveConstraint = Type.PEREffectiveConstraint.Compute(m_constraints);
+
+                Asn1Type parType = ParentType;
+                while (parType != null)
+                {
+                    m_perEffectiveConstraint = PEREffectiveConstraint.Intersection(m_perEffectiveConstraint, ParentType.PEREffectiveConstraint);
+
+                    parType = parType.ParentType;
+                }
+
+
+                return m_perEffectiveConstraint;
+            }
+        }
+    
     }
 }

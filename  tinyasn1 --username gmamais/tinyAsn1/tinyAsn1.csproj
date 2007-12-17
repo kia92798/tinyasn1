@@ -65,6 +65,7 @@
     <Compile Include="NumberedItem.cs" />
     <Compile Include="ObjectIdentifier.cs" />
     <Compile Include="OctetString.cs" />
+    <Compile Include="PER.cs" />
     <Compile Include="Real.cs" />
     <Compile Include="ReferenceType.cs" />
     <Compile Include="Program.cs" />

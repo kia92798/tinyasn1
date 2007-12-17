@@ -12,6 +12,8 @@ namespace tinyAsn1
         internal List<NumberedItem> m_privNamedValues = new List<NumberedItem>();
         public OrderedDictionary<string, Int64> m_namedValues = new OrderedDictionary<string, Int64>();
 
+
+
         public override string Name
         {
             get { return "INTEGER"; }
@@ -223,6 +225,22 @@ namespace tinyAsn1
 
             return true;
         }
+
+
+        private PERIntegerEffectiveConstraint m_perEffectiveConstraint = null;
+        public override PEREffectiveConstraint PEREffectiveConstraint
+        {
+            get
+            {
+                if (m_perEffectiveConstraint != null)
+                    return m_perEffectiveConstraint;
+                m_perEffectiveConstraint = new PERIntegerEffectiveConstraint();
+                m_perEffectiveConstraint = (PERIntegerEffectiveConstraint)m_perEffectiveConstraint.Compute(m_constraints);
+                return m_perEffectiveConstraint;
+            }
+        }
+
+
     }
 
 

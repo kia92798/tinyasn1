@@ -73,6 +73,9 @@ namespace tinyAsn1
         void DoSemanticAnalysis();
         Asn1Type AsnType { get;}
         string ToString(bool includeParenthesis);
+        PERIntegerEffectiveConstraint PEREffectiveIntegerRange { get;}
+        PERSizeEffectiveConstraint PEREffectiveSizeConstraint { get;}
+        PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint { get;}
     }
 
     public class BaseConstraint : IConstraint
@@ -172,56 +175,30 @@ namespace tinyAsn1
             return ToString();
         }
 
-    }
 
-/*   
-    public class DefaultIntegerConstraint : BaseConstraint
-    {
-        static DefaultIntegerConstraint m_instance;
-        private DefaultIntegerConstraint() : base (null)
+
+
+        public virtual PERIntegerEffectiveConstraint PEREffectiveIntegerRange
         {
-        }
-     
-        public static DefaultIntegerConstraint Instance
-        {
-            get
-            {
-                if (m_instance == null)
-                    m_instance = new DefaultIntegerConstraint();
-                return m_instance;
-            }
-        }
-        public override void DoSemanticAnalysis()
-        {
-        }
-        
-        public override bool isPERVisible()
-        {
-            return true;
-        }
-        public override bool IsResolved()
-        {
-            return true;
-        }
-        public override bool isValueAllowed(Asn1Value val)
-        {
-            return true;
-        }
-        public override IConstraint Simplify()
-        {
-            return this;
-        }
-        public override bool AllowsEverything()
-        {
-            return true;
+            get { throw new Exception("The method or operation is not implemented."); }
         }
 
-        public override string ToString()
+
+
+
+        public virtual PERSizeEffectiveConstraint PEREffectiveSizeConstraint
         {
-            return "";
+            get { throw new Exception("The method or operation is not implemented."); }
         }
+
+        public virtual PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint
+        {
+            get { throw new Exception("The method or operation is not implemented."); }
+        }
+
     }
-    */
+
+
     public class RootConstraint : BaseConstraint
     {
         IConstraint m_constr;
@@ -324,6 +301,26 @@ namespace tinyAsn1
                 ret += m_exceptionSpec.ToString();
             return ret;
         }
+
+        public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
+        {
+            get {
+                PERIntegerEffectiveConstraint ret = new PERIntegerEffectiveConstraint();
+
+                ret.m_rootRange = m_constr.PEREffectiveIntegerRange.m_rootRange;
+                ret.m_hasExtension = m_extended;
+                if (m_extConstr != null)
+                    ret.m_extRange = m_extConstr.PEREffectiveIntegerRange.m_rootRange;
+                return ret;
+            }
+        }
+
+        public override PERSizeEffectiveConstraint PEREffectiveSizeConstraint
+        {
+            get {
+                return m_constr.PEREffectiveSizeConstraint;
+            }
+        }
     }
     
     // Union, I
@@ -406,35 +403,39 @@ namespace tinyAsn1
             return ret;
         }
 
-/*        public override Asn1Value MIN
+        public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
         {
             get
             {
-                // return the smallest MIN
-                Asn1Value curMin = m_items[0].MIN;
+                PERIntegerEffectiveConstraint ret = new PERIntegerEffectiveConstraint();
+                ret.m_rootRange = new IntegerRange();
+                
+
                 foreach (IConstraint con in m_items)
-                {
-                    if (con.MIN.CompareTo(curMin) < 0)
-                        curMin = con.MIN;
-                }
-                return curMin;
+                    ret = PERIntegerEffectiveConstraint.Union(ret, con.PEREffectiveIntegerRange);
+
+                return ret;
             }
         }
-        public override Asn1Value MAX
+
+        public override PERSizeEffectiveConstraint PEREffectiveSizeConstraint
         {
             get
             {
-                // return maximum MAX
-                Asn1Value curMax = m_items[0].MAX;
+                PERSizeEffectiveConstraint ret = PERSizeEffectiveConstraint.Empty;
+
                 foreach (IConstraint con in m_items)
                 {
-                    if (con.MAX.CompareTo(curMax) > 0)
-                        curMax = con.MAX;
+                    PERSizeEffectiveConstraint c = con.PEREffectiveSizeConstraint;
+                    if (c == null) //if there is just one non size constraint --> return non per visible constraint
+                        return null;
+                    ret = PERSizeEffectiveConstraint.Union(ret, c);
                 }
-                return curMax;
+                    
+                return ret;
             }
         }
-        */
+
     }
 
     // Intersection, ^
@@ -512,35 +513,35 @@ namespace tinyAsn1
             return ret;
         }
 
-/*        public override Asn1Value MIN
+        public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
         {
             get
             {
-                //return greatest min
-                Asn1Value curMin = m_items[0].MIN;
+                PERIntegerEffectiveConstraint ret = PERIntegerEffectiveConstraint.UncostraintInteger;
+
                 foreach (IConstraint con in m_items)
-                {
-                    if (con.MIN.CompareTo(curMin) > 0)
-                        curMin = con.MIN;
-                }
-                return curMin;
+                    ret = PERIntegerEffectiveConstraint.Intersection(ret, con.PEREffectiveIntegerRange);
+
+                return ret;
             }
         }
-
-        public override Asn1Value MAX
+        public override PERSizeEffectiveConstraint PEREffectiveSizeConstraint
         {
             get
             {
-                //return the smallest MAX
-                Asn1Value curMax = m_items[0].MAX;
+                PERSizeEffectiveConstraint ret = PERSizeEffectiveConstraint.Full;
+
                 foreach (IConstraint con in m_items)
                 {
-                    if (con.MAX.CompareTo(curMax) < 0)
-                        curMax = con.MAX;
+                    PERSizeEffectiveConstraint c = con.PEREffectiveSizeConstraint;
+                    if (c == null) //if there is one non size constraint ignore it
+                        continue;
+                    ret = PERSizeEffectiveConstraint.Intersection(ret, c);
                 }
-                return curMax;
+
+                return ret;
             }
-        }*/
+        }
     }
 
     public class ExceptConstraint : BaseConstraint
@@ -607,7 +608,22 @@ namespace tinyAsn1
                 return base.MIN;
             }
         }*/
-        
+
+        public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
+        {
+            get
+            {
+                return m_c1.PEREffectiveIntegerRange;
+            }
+        }
+
+        public override PERSizeEffectiveConstraint PEREffectiveSizeConstraint
+        {
+            get
+            {
+                return m_c1.PEREffectiveSizeConstraint;
+            }
+        }
     }
 
     // m_c1 is the Parent constraint
@@ -659,6 +675,20 @@ namespace tinyAsn1
         public override string ToString()
         {
             return "ALL EXCEPT " + m_c.ToString(true);
+        }
+        public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
+        {
+            get
+            {
+                return PERIntegerEffectiveConstraint.UncostraintInteger;
+            }
+        }
+        public override PERSizeEffectiveConstraint PEREffectiveSizeConstraint
+        {
+            get
+            {
+                return PERSizeEffectiveConstraint.Full;
+            }
         }
     }
 
@@ -714,24 +744,35 @@ namespace tinyAsn1
             return this;
         }
 
-/*        public override Asn1Value MIN
-        {
-            get
-            {
-                return m_val;
-            }
-        }
-        public override Asn1Value MAX
-        {
-            get
-            {
-                return m_val;
-            }
-        }*/
+
         public override string ToString()
         {
             return m_val.ToString();
         }
+
+        public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
+        {
+            get
+            {
+                PERIntegerEffectiveConstraint ret = new PERIntegerEffectiveConstraint();
+                ret.m_rootRange = new IntegerRange();
+                ret.m_rootRange.m_max = ((IntegerValue)m_val).Value;
+                ret.m_rootRange.m_min = ((IntegerValue)m_val).Value;
+                ret.m_rootRange.m_maxIsIncluded = true;
+                ret.m_rootRange.m_maxIsInfinite = false;
+                ret.m_rootRange.m_minIsIncluded = true;
+                ret.m_rootRange.m_minIsInfinite = false;
+                return ret;
+            }
+        }
+        public override PERSizeEffectiveConstraint PEREffectiveSizeConstraint
+        {
+            get
+            {
+                return null;
+            }
+        }
+
     }
 
     public class SinglePAValueConstraint : SingleValueConstraint
@@ -753,6 +794,13 @@ namespace tinyAsn1
             if (!set.Value.Contains(ch.ToString()))
                 return false;
             return true;
+        }
+        public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
+        {
+            get
+            {
+                throw new Exception("Internal Error");
+            }
         }
     }
 
@@ -895,34 +943,6 @@ namespace tinyAsn1
             return this;
         }
 
-/*        public override Asn1Value MIN
-        {
-            get
-            {
-                IntegerValue v = m_min as IntegerValue;
-                if (!m_minValIsInluded && v!=null) {
-                    IntegerValue vp1 = new IntegerValue(v);
-                    vp1.Value++;
-                    return vp1;
-                }
-                return m_min;
-            }
-        }
-        public override Asn1Value MAX
-        {
-            get
-            {
-                IntegerValue v = m_max as IntegerValue;
-                if (!m_maxValIsInluded && v != null)
-                {
-                    IntegerValue vp1 = new IntegerValue(v);
-                    vp1.Value--;
-                    return vp1;
-                }
-                return m_max;
-            }
-        }*/
-
         public override string ToString()
         {
             string ret = "";
@@ -942,6 +962,40 @@ namespace tinyAsn1
                 ret += m_max.ToString();
             return ret;
         }
+
+        public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
+        {
+            get
+            {
+                PERIntegerEffectiveConstraint ret = new PERIntegerEffectiveConstraint();
+                ret.m_rootRange = new IntegerRange();
+                if (m_min == null)
+                    ret.m_rootRange.m_minIsInfinite = true;
+                else
+                {
+                    ret.m_rootRange.m_min = ((IntegerValue)m_min).Value;
+                    ret.m_rootRange.m_minIsIncluded = m_minValIsInluded;
+                }
+
+                if (m_max == null)
+                    ret.m_rootRange.m_maxIsInfinite = true;
+                else
+                {
+                    ret.m_rootRange.m_max = ((IntegerValue)m_max).Value;
+                    ret.m_rootRange.m_maxIsIncluded = m_maxValIsInluded;
+                }
+
+                return ret;
+            }
+        }
+        public override PERSizeEffectiveConstraint PEREffectiveSizeConstraint
+        {
+            get
+            {
+                return null;
+            }
+        }
+
     }
 
     public class RangePAConstraint : RangeConstraint
@@ -1022,6 +1076,14 @@ namespace tinyAsn1
 
             return true;
         }
+
+        public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
+        {
+            get
+            {
+                throw new Exception("Internal Error");
+            }
+        }
     }
 
     public class SizeConstraint : BaseConstraint
@@ -1097,6 +1159,21 @@ namespace tinyAsn1
             return sizeCon.ToString();
         }
 
+        public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
+        {
+            get
+            {
+                throw new Exception("Internal Error");
+            }
+        }
+        public override PERSizeEffectiveConstraint PEREffectiveSizeConstraint
+        {
+            get
+            {
+                return new PERSizeEffectiveConstraint(sizeCon.PEREffectiveConstraint as PERIntegerEffectiveConstraint);
+            }
+        }
+
     }
 
     public class PermittedAlphabetConstraint : BaseConstraint
@@ -1157,6 +1234,21 @@ namespace tinyAsn1
         public override IConstraint Simplify()
         {
             return this;
+        }
+        public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
+        {
+            get
+            {
+                throw new Exception("Internal Error");
+            }
+        }
+
+        public override PERSizeEffectiveConstraint PEREffectiveSizeConstraint
+        {
+            get
+            {
+                return null;
+            }
         }
     }
 
@@ -1219,6 +1311,21 @@ namespace tinyAsn1
         public override IConstraint Simplify()
         {
             return this;
+        }
+
+        public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
+        {
+            get
+            {
+                return (PERIntegerEffectiveConstraint)m_otherType.PEREffectiveConstraint;
+            }
+        }
+        public override PERSizeEffectiveConstraint PEREffectiveSizeConstraint
+        {
+            get
+            {
+                return m_otherType.PEREffectiveConstraint as PERSizeEffectiveConstraint;
+            }
         }
     }
 
@@ -1285,6 +1392,20 @@ namespace tinyAsn1
         public override IConstraint Simplify()
         {
             return this;
+        }
+        public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
+        {
+            get
+            {
+                throw new Exception("Internal Error");
+            }
+        }
+        public override PERSizeEffectiveConstraint PEREffectiveSizeConstraint
+        {
+            get
+            {
+                return null;
+            }
         }
     }
 
@@ -1370,6 +1491,20 @@ namespace tinyAsn1
                     if (!c.m_valueConstraint.IsResolved())
                         return false;
             return true;
+        }
+        public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
+        {
+            get
+            {
+                throw new Exception("Internal Error");
+            }
+        }
+        public override PERSizeEffectiveConstraint PEREffectiveSizeConstraint
+        {
+            get
+            {
+                return null;
+            }
         }
     }
 

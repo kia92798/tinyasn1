@@ -42,7 +42,27 @@ namespace tinyAsn1
 
             return m_type.Compatible(o.m_type);
         }
-    }
+        public override void ComputePEREffectiveConstraints()
+        {
+            base.ComputePEREffectiveConstraints();
+            m_type.ComputePEREffectiveConstraints();
+        }
+
+        private PERSizeEffectiveConstraint m_perEffectiveConstraint = null;
+        public override PEREffectiveConstraint PEREffectiveConstraint
+        {
+            get
+            {
+                if (m_perEffectiveConstraint != null)
+                    return m_perEffectiveConstraint;
+                m_perEffectiveConstraint = new PERSizeEffectiveConstraint();
+                m_perEffectiveConstraint = (PERSizeEffectiveConstraint)m_perEffectiveConstraint.Compute(m_constraints);
+                return m_perEffectiveConstraint;
+            }
+        }
+
+    
+   }
 
 
     public partial class ArrayValue : Asn1Value

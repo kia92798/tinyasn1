@@ -232,6 +232,18 @@ namespace tinyAsn1
             return true;
         }
 
+        private PERSizeEffectiveConstraint m_perEffectiveConstraint = null;
+        public override PEREffectiveConstraint PEREffectiveConstraint
+        {
+            get
+            {
+                if (m_perEffectiveConstraint != null)
+                    return m_perEffectiveConstraint;
+                m_perEffectiveConstraint = new PERSizeEffectiveConstraint();
+                m_perEffectiveConstraint = (PERSizeEffectiveConstraint)m_perEffectiveConstraint.Compute(m_constraints);
+                return m_perEffectiveConstraint;
+            }
+        }
     }
 
 
