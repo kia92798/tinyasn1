@@ -1,0 +1,6 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+	MyStr ::= IA5String ( FROM("AB") ^ SIZE(1..2) |
+				    FROM("DE") ^ SIZE(3) |
+				    FROM("AXE") ^ SIZE(1..5))
+END
