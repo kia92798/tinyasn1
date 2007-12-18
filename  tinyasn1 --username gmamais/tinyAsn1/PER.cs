@@ -42,6 +42,7 @@ namespace tinyAsn1
                 return ret;
             }
         }
+        
         public void PrintAsn1(StreamWriterLevel o)
         {
             if (m_minIsInfinite)
@@ -65,7 +66,7 @@ namespace tinyAsn1
             }
         }
 
-        public bool IsValid()
+/*        public bool IsValid()
         {
             if (m_max == Config.MININT)
                 return false;
@@ -75,6 +76,7 @@ namespace tinyAsn1
                 return true;
             return m_min <= m_max;
         }
+ */ 
 
         public IntegerRange Clone()
         {
@@ -231,7 +233,7 @@ namespace tinyAsn1
 
     public class PEREffectiveConstraint
     {
-        public virtual PEREffectiveConstraint  Compute(List<IConstraint> cons) 
+        public virtual PEREffectiveConstraint  Compute(List<IConstraint> cons, Asn1Type type) 
         {
             throw new Exception("Abstract Method Called");
         }
@@ -245,7 +247,10 @@ namespace tinyAsn1
             throw new Exception("Internal Error");
         }
 
-        public virtual bool Extensible { get { throw new Exception("Abstract Method Called"); } }
+        public virtual bool Extensible { 
+            get { throw new Exception("Abstract Method Called"); } 
+            set { throw new Exception("Abstract Method Called"); } 
+        }
 
 
         public virtual void PrintAsn1(StreamWriterLevel o)
@@ -260,18 +265,22 @@ namespace tinyAsn1
     public class PERIntegerEffectiveConstraint : PEREffectiveConstraint
     {
         public IntegerRange m_rootRange=null;
-        public bool m_hasExtension=false;
+        public bool m_isExtended=false;
         public IntegerRange m_extRange=null;
 
-        public override bool Extensible { get { return m_hasExtension; } }
+        public override bool Extensible { 
+            get { return m_isExtended; } 
+            set { m_isExtended = value; } 
+        }
 
-
+/*
         public bool IsValid()
         {
             if (m_extRange != null)
                 return m_rootRange.IsValid() && m_extRange.IsValid();
             return m_rootRange.IsValid();
         }
+ */ 
 
         public static PERIntegerEffectiveConstraint UncostraintInteger
         {
@@ -299,13 +308,13 @@ namespace tinyAsn1
             PERIntegerEffectiveConstraint c = new PERIntegerEffectiveConstraint();
             c.m_rootRange = IntegerRange.Union(a.m_rootRange, b.m_rootRange);
 
-            c.m_hasExtension = a.m_hasExtension || b.m_hasExtension;
+            c.m_isExtended = a.m_isExtended || b.m_isExtended;
 
-            if (a.m_hasExtension && !b.m_hasExtension)
+            if (a.m_extRange!=null && b.m_extRange==null)
                 c.m_extRange = a.m_extRange.Clone();
-            else if (!a.m_hasExtension && b.m_hasExtension)
+            else if (a.m_extRange==null && b.m_extRange!=null)
                 c.m_extRange = b.m_extRange.Clone();
-            else if (a.m_hasExtension && b.m_hasExtension)
+            else if (a.m_extRange != null && b.m_extRange != null)
                 c.m_extRange = IntegerRange.Union(a.m_extRange, b.m_extRange);
 
             return c;
@@ -317,19 +326,19 @@ namespace tinyAsn1
             PERIntegerEffectiveConstraint c = new PERIntegerEffectiveConstraint();
             c.m_rootRange = IntegerRange.Intersection(a.m_rootRange, b.m_rootRange);
 
-            c.m_hasExtension = a.m_hasExtension || b.m_hasExtension;
+            c.m_isExtended = a.m_isExtended || b.m_isExtended;
 
-            if (a.m_hasExtension && !b.m_hasExtension)
+            if (a.m_extRange != null && b.m_extRange == null)
                 c.m_extRange = a.m_extRange.Clone();
-            else if (!a.m_hasExtension && b.m_hasExtension)
+            else if (a.m_extRange == null && b.m_extRange != null)
                 c.m_extRange = b.m_extRange.Clone();
-            else if (a.m_hasExtension && b.m_hasExtension)
+            else if (a.m_extRange != null && b.m_extRange != null)
                 c.m_extRange = IntegerRange.Intersection(a.m_extRange, b.m_extRange);
 
             return c;
         }
 
-        public override PEREffectiveConstraint Compute(List<IConstraint> cons)
+        public override PEREffectiveConstraint Compute(List<IConstraint> cons, Asn1Type type)
         {
             PERIntegerEffectiveConstraint ret = PERIntegerEffectiveConstraint.UncostraintInteger;
             
@@ -395,18 +404,22 @@ namespace tinyAsn1
             get {
                 PERSizeEffectiveConstraint ret = new PERSizeEffectiveConstraint();
                 ret.m_size = new PERIntegerEffectiveConstraint();
+                ret.m_size.m_rootRange = new IntegerRange();
                 return ret; 
             }
         }
 
-        public override bool Extensible { get { return m_size.Extensible; } }
+        public override bool Extensible { 
+            get { return m_size.Extensible; } 
+            set { m_size.Extensible = value; } 
+        }
 
-
+/*
         public bool IsValid()
         {
             return m_size.IsValid();
         }
-
+*/
 
         public static PERSizeEffectiveConstraint Union(PERSizeEffectiveConstraint a, PERSizeEffectiveConstraint b)
         {
@@ -427,7 +440,7 @@ namespace tinyAsn1
         }
 
 
-        public override PEREffectiveConstraint Compute(List<IConstraint> cons)
+        public override PEREffectiveConstraint Compute(List<IConstraint> cons, Asn1Type type)
         {
             PERSizeEffectiveConstraint ret = PERSizeEffectiveConstraint.Full;
 
@@ -467,8 +480,252 @@ namespace tinyAsn1
 
     }
 
+
+    public class CharSet
+    {
+        public List<Char> m_set = new List<char>();
+
+
+        public CharSet()
+        {
+        }
+
+        public CharSet(List<Char> set)
+        {
+            m_set = new List<char>(set);
+        }
+
+        public CharSet(Char min, Char max)
+        {
+            m_set = new List<char>();
+            for (Char ch = min; ch <= max; ch++)
+                m_set.Add(ch);
+        }
+
+        public static CharSet GetEmptySet()
+        {
+            return new CharSet();
+        }
+        
+        public static CharSet FullSet(Asn1Type type)
+        {
+            IStringType strType = type as IStringType;
+            if (strType == null)
+                throw new Exception("Internal Error");
+
+            return new CharSet(new List<char>(strType.AllowedCharSet));
+        }
+
+        public void PrintAsn1(StreamWriterLevel o)
+        {
+        }
+
+
+        public CharSet Clone()
+        {
+            return new CharSet(m_set);
+        }
+
+
+        public static CharSet Union(CharSet a, CharSet b)
+        {
+            CharSet c = a.Clone();
+
+            foreach (Char ch in b.m_set)
+                if (!c.m_set.Contains(ch))
+                    c.m_set.Add(ch);
+            
+
+            return c;
+        }
+
+        public static CharSet Intersection(CharSet a, CharSet b)
+        {
+            CharSet c = new CharSet();
+
+            foreach (Char ch in a.m_set)
+                if (b.m_set.Contains(ch))
+                    c.m_set.Add(ch);
+
+
+            return c;
+        }
+
+        public override string ToString()
+        {
+            string ret="";
+            foreach(Char ch in m_set)
+                    ret+=ch.ToString();
+
+            return ret;
+        }
+
+
+    }
+
+
     public class PERAlphabetAndSizeEffectiveConstraint : PEREffectiveConstraint
     {
+        PERIntegerEffectiveConstraint m_size = null;
+        CharSet m_from = null;
+
+        public PERAlphabetAndSizeEffectiveConstraint()
+        {
+        }
+
+        public PERAlphabetAndSizeEffectiveConstraint(PERIntegerEffectiveConstraint size)
+        {
+            m_size = size;
+        }
+
+        public PERAlphabetAndSizeEffectiveConstraint(List<Char> charSet)
+        {
+            m_from = new CharSet(charSet);
+        }
+
+        public PERAlphabetAndSizeEffectiveConstraint(Char? min, Char? max, IStringType strType)
+        {
+            if (strType == null)
+                throw new Exception("Internal Error");
+            if (min ==null && max ==null)
+                throw new Exception("Internal Error");
+
+            if (min != null && max != null)
+            {
+                m_from = new CharSet(min.Value, max.Value);
+            }
+            else if (min != null && max == null)
+            {
+                m_from = new CharSet(min.Value, strType.AllowedCharSet[strType.AllowedCharSet.Length - 1]);
+            }
+            else if (min == null && max != null)
+            {
+                m_from = new CharSet(strType.AllowedCharSet[0], max.Value);
+            }
+            
+        }
+
+        public static PERAlphabetAndSizeEffectiveConstraint Full(Asn1Type type)
+        {
+            PERAlphabetAndSizeEffectiveConstraint ret = new PERAlphabetAndSizeEffectiveConstraint();
+
+            ret.m_size = PERIntegerEffectiveConstraint.UncostraintPosInteger;
+            ret.m_from = null;
+
+            return ret;
+        }
+
+        public static PERAlphabetAndSizeEffectiveConstraint Empty
+        {
+            get
+            {
+                PERAlphabetAndSizeEffectiveConstraint ret = new PERAlphabetAndSizeEffectiveConstraint();
+                ret.m_size = new PERIntegerEffectiveConstraint();
+                ret.m_size.m_rootRange = new IntegerRange();
+                ret.m_from = CharSet.GetEmptySet();
+                return ret;
+            }
+        }
+
+        public override bool Extensible
+        {
+            get { return m_size.Extensible; }
+            set { 
+                m_size.Extensible = value;
+                if (value)
+                    m_from = null;
+            }
+        }
+
+        public static PERAlphabetAndSizeEffectiveConstraint Union(PERAlphabetAndSizeEffectiveConstraint a, PERAlphabetAndSizeEffectiveConstraint b)
+        {
+            PERAlphabetAndSizeEffectiveConstraint c = new PERAlphabetAndSizeEffectiveConstraint();
+            if (a == null || b==null)
+                return null;
+
+
+            if (a.m_size != null && b.m_size != null)
+                c.m_size = PERIntegerEffectiveConstraint.Union(a.m_size, b.m_size);
+
+            if (a.m_from != null && b.m_from != null)
+                c.m_from = CharSet.Union(a.m_from, b.m_from);
+            if (c.m_size == null && c.m_from == null)
+                return null;
+            return c;
+        }
+
+        public static PERAlphabetAndSizeEffectiveConstraint Intersection(PERAlphabetAndSizeEffectiveConstraint a, PERAlphabetAndSizeEffectiveConstraint b)
+        {
+            PERAlphabetAndSizeEffectiveConstraint c = new PERAlphabetAndSizeEffectiveConstraint();
+            if (a == null)
+                return b;
+            if (b == null)
+                return a;
+            
+            if (a.m_size != null && b.m_size != null)
+                c.m_size = PERIntegerEffectiveConstraint.Intersection(a.m_size, b.m_size);
+            else if (a.m_size != null && b.m_size == null)
+                c.m_size = a.m_size;
+            else if (a.m_size == null && b.m_size != null)
+                c.m_size = b.m_size;
+            
+            if (a.m_from != null && b.m_from != null)
+                c.m_from = CharSet.Intersection(a.m_from, b.m_from);
+            else if (a.m_from != null && b.m_from == null)
+                c.m_from = a.m_from;
+            else if (a.m_from == null && b.m_from != null)
+                c.m_from = b.m_from;
+
+            if (c.m_size == null && c.m_from == null)
+                return null;
+            return c;
+        }
+
+        public override PEREffectiveConstraint Compute(List<IConstraint> cons, Asn1Type type)
+        {
+            PERAlphabetAndSizeEffectiveConstraint ret = PERAlphabetAndSizeEffectiveConstraint.Full(type);
+
+            foreach (IConstraint con in cons)
+            {
+                PERAlphabetAndSizeEffectiveConstraint c = con.PEREffectiveAlphabetAndSizeConstraint;
+                if (c != null)
+                    ret = Intersection(ret, c);
+            }
+            return ret;
+
+        }
+        public override void PrintAsn1(StreamWriterLevel o)
+        {
+            if (m_size != null)
+            {
+
+                o.Write("SIZE [");
+                m_size.m_rootRange.PrintAsn1(o);
+                if (m_size.Extensible)
+                    o.Write(",...");
+                if (m_size.m_extRange != null)
+                {
+                    o.Write(",");
+                    m_size.m_extRange.PrintAsn1(o);
+                }
+                o.Write("]");
+            }
+            if (m_from != null)
+            {
+                o.Write("FROM [\"");
+                o.Write(m_from.ToString());
+                o.Write("\"]");
+            }
+        }
+        public override string ToString()
+        {
+            string ret = "null";
+            if (m_size !=null)
+                ret+= "SIZE[" + m_size.ToString() + "]";
+            if (m_from != null)
+                ret += " FROM[\"" + m_from.ToString() + "\"]";
+            return ret;
+        }
     }
 
 
