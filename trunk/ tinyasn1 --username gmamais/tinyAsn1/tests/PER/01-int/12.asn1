@@ -1,0 +1,8 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+	MyInt ::= INTEGER (1..32,...,33..128) (1..128)
+
+	MyInt2 ::= INTEGER (1..64,...,MyInt)(1..32)
+
+
+END
