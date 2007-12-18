@@ -308,7 +308,7 @@ namespace tinyAsn1
                 PERIntegerEffectiveConstraint ret = new PERIntegerEffectiveConstraint();
 
                 ret.m_rootRange = m_constr.PEREffectiveIntegerRange.m_rootRange;
-                ret.m_hasExtension = m_extended;
+                ret.m_isExtended = m_extended;
                 if (m_extConstr != null)
                     ret.m_extRange = m_extConstr.PEREffectiveIntegerRange.m_rootRange;
                 return ret;
@@ -318,7 +318,18 @@ namespace tinyAsn1
         public override PERSizeEffectiveConstraint PEREffectiveSizeConstraint
         {
             get {
-                return m_constr.PEREffectiveSizeConstraint;
+                PERSizeEffectiveConstraint ret = m_constr.PEREffectiveSizeConstraint;
+                ret.Extensible = m_extended;
+                return ret;
+            }
+        }
+
+        public override PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint
+        {
+            get {
+                PERAlphabetAndSizeEffectiveConstraint ret = m_constr.PEREffectiveAlphabetAndSizeConstraint;
+                ret.Extensible = m_extended;
+                return ret;
             }
         }
     }
@@ -435,6 +446,21 @@ namespace tinyAsn1
                 return ret;
             }
         }
+        public override PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint
+        {
+            get
+            {
+                PERAlphabetAndSizeEffectiveConstraint ret = PERAlphabetAndSizeEffectiveConstraint.Empty;
+                foreach (IConstraint con in m_items)
+                {
+                    PERAlphabetAndSizeEffectiveConstraint c = con.PEREffectiveAlphabetAndSizeConstraint;
+                    if (c == null) //if there is just one non size constraint --> return non per visible constraint
+                        return null;
+                    ret = PERAlphabetAndSizeEffectiveConstraint.Union(ret, c);
+                }
+                return ret;
+            }
+        }
 
     }
 
@@ -542,6 +568,22 @@ namespace tinyAsn1
                 return ret;
             }
         }
+
+        public override PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint
+        {
+            get
+            {
+                PERAlphabetAndSizeEffectiveConstraint ret = PERAlphabetAndSizeEffectiveConstraint.Full(m_type);
+                foreach (IConstraint con in m_items)
+                {
+                    PERAlphabetAndSizeEffectiveConstraint c = con.PEREffectiveAlphabetAndSizeConstraint;
+                    if (c == null) //if there is one non size constraint ignore it
+                        continue;
+                    ret = PERAlphabetAndSizeEffectiveConstraint.Intersection(ret, c);
+                }
+                return ret;
+            }
+        }
     }
 
     public class ExceptConstraint : BaseConstraint
@@ -624,6 +666,14 @@ namespace tinyAsn1
                 return m_c1.PEREffectiveSizeConstraint;
             }
         }
+
+        public override PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint
+        {
+            get
+            {
+                return m_c1.PEREffectiveAlphabetAndSizeConstraint;
+            }
+        }
     }
 
     // m_c1 is the Parent constraint
@@ -688,6 +738,13 @@ namespace tinyAsn1
             get
             {
                 return PERSizeEffectiveConstraint.Full;
+            }
+        }
+        public override PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint
+        {
+            get
+            {
+                return PERAlphabetAndSizeEffectiveConstraint.Full(m_type);
             }
         }
     }
@@ -772,6 +829,13 @@ namespace tinyAsn1
                 return null;
             }
         }
+        public override PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint
+        {
+            get
+            {
+                return null;
+            }
+        }
 
     }
 
@@ -800,6 +864,16 @@ namespace tinyAsn1
             get
             {
                 throw new Exception("Internal Error");
+            }
+        }
+        public override PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint
+        {
+            get
+            {
+                ICharacterString set = m_val as ICharacterString;
+                if (set == null)
+                    throw new Exception("Internal Error");
+                return new PERAlphabetAndSizeEffectiveConstraint(new List<Char>(set.Value.ToCharArray()));
             }
         }
     }
@@ -995,6 +1069,13 @@ namespace tinyAsn1
                 return null;
             }
         }
+        public override PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint
+        {
+            get
+            {
+                return null;
+            }
+        }
 
     }
 
@@ -1082,6 +1163,20 @@ namespace tinyAsn1
             get
             {
                 throw new Exception("Internal Error");
+            }
+        }
+
+        public override PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint
+        {
+            get
+            {
+                Char? min = null;
+                if (m_min != null)
+                    min = Lo.Value[0];
+                Char? max = null;
+                if (m_max != null)
+                    max = Hi.Value[0];
+                return new PERAlphabetAndSizeEffectiveConstraint(min,max, m_type as IStringType);
             }
         }
     }
@@ -1173,6 +1268,13 @@ namespace tinyAsn1
                 return new PERSizeEffectiveConstraint(sizeCon.PEREffectiveConstraint as PERIntegerEffectiveConstraint);
             }
         }
+        public override PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint
+        {
+            get
+            {
+                return new PERAlphabetAndSizeEffectiveConstraint(sizeCon.PEREffectiveConstraint as PERIntegerEffectiveConstraint);
+            }
+        }
 
     }
 
@@ -1247,7 +1349,18 @@ namespace tinyAsn1
         {
             get
             {
-                return null;
+                throw new Exception("Internal Error");
+            }
+        }
+
+
+        public override PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint
+        {
+            get
+            {
+                PERAlphabetAndSizeEffectiveConstraint ret = new PERAlphabetAndSizeEffectiveConstraint();
+                ret = (PERAlphabetAndSizeEffectiveConstraint)ret.Compute(allowed_char_set.m_constraints, allowed_char_set);
+                return ret;
             }
         }
     }
@@ -1327,6 +1440,13 @@ namespace tinyAsn1
                 return m_otherType.PEREffectiveConstraint as PERSizeEffectiveConstraint;
             }
         }
+        public override PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint
+        {
+            get
+            {
+                return m_otherType.PEREffectiveConstraint as PERAlphabetAndSizeEffectiveConstraint;
+            }
+        }
     }
 
     public class WithComponentConstraint : BaseConstraint
@@ -1401,6 +1521,13 @@ namespace tinyAsn1
             }
         }
         public override PERSizeEffectiveConstraint PEREffectiveSizeConstraint
+        {
+            get
+            {
+                return null;
+            }
+        }
+        public override PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint
         {
             get
             {
@@ -1500,6 +1627,13 @@ namespace tinyAsn1
             }
         }
         public override PERSizeEffectiveConstraint PEREffectiveSizeConstraint
+        {
+            get
+            {
+                return null;
+            }
+        }
+        public override PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint
         {
             get
             {

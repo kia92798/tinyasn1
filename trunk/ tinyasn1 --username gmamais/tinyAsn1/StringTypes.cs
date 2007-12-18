@@ -6,7 +6,12 @@ using Antlr.Runtime;
 
 namespace tinyAsn1
 {
-    public partial class IA5StringType : Asn1Type
+    public interface IStringType
+    {
+        Char[] AllowedCharSet { get;}
+    }
+
+    public partial class IA5StringType : Asn1Type, IStringType
     {
         public override string Name
         {
@@ -128,6 +133,39 @@ namespace tinyAsn1
         {
             return other.GetFinalType() is IA5StringType;
         }
+
+        List<Char> m_allowedCharSet = null;
+        public virtual char[] AllowedCharSet
+        {
+            get {
+                if (m_allowedCharSet == null)
+                {
+                    m_allowedCharSet = new List<char>();
+
+                    Char ch = Char.MinValue;
+                    for(int i=0;i<128;i++)
+                    {
+                        m_allowedCharSet.Add(ch);
+                        ch++;
+                    }
+                }
+                return m_allowedCharSet.ToArray();
+            }
+        }
+
+        private PERAlphabetAndSizeEffectiveConstraint m_perEffectiveConstraint = null;
+        public override PEREffectiveConstraint PEREffectiveConstraint
+        {
+            get
+            {
+                if (m_perEffectiveConstraint != null)
+                    return m_perEffectiveConstraint;
+                m_perEffectiveConstraint = new PERAlphabetAndSizeEffectiveConstraint();
+                m_perEffectiveConstraint = (PERAlphabetAndSizeEffectiveConstraint)m_perEffectiveConstraint.Compute(m_constraints, this);
+                return m_perEffectiveConstraint;
+            }
+        }
+
     }
 
     public partial class NumericStringType : IA5StringType
@@ -186,6 +224,12 @@ namespace tinyAsn1
         public override bool Compatible(Asn1Type other)
         {
             return other.GetFinalType() is NumericStringType;
+        }
+
+        static Char[] m_allowedCharSet = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ' };
+        public override char[] AllowedCharSet
+        {
+            get { return m_allowedCharSet; }
         }
     }
 
