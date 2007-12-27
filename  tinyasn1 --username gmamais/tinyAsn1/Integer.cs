@@ -326,6 +326,36 @@ namespace tinyAsn1
                 throw new ArgumentException("obj is not an IntegerValue");
             return Value.CompareTo(oth.Value);
         }
+ 
+        public override  List<bool> Encode()
+        {
+            List<bool> ret = new List<bool>();
+            PERIntegerEffectiveConstraint cn = (PERIntegerEffectiveConstraint)Type.PEREffectiveConstraint;
+            if (cn == null) //unconstraint integer
+            {
+                ret = PER.EncodeUnConstraintWholeNumber(Value);
+            }
+            else
+            {
+                if (cn.Extensible)
+                {
+                    if (cn.m_extRange != null && cn.m_extRange.isValueWithinRange(Value))
+                        ret.Add(true);
+                    else
+                        ret.Add(false);
+                } 
+
+
+                if (!cn.m_rootRange.m_minIsInfinite && !cn.m_rootRange.m_maxIsInfinite)
+                    ret.AddRange(PER.EncodeConstraintWholeNumber(Value, cn.m_rootRange.m_min, cn.m_rootRange.m_max));
+                else if (!cn.m_rootRange.m_minIsInfinite && cn.m_rootRange.m_maxIsInfinite)
+                    ret.AddRange(PER.EncodeSemiConstraintWholeNumber(Value, cn.m_rootRange.m_min));
+                else
+                    ret.AddRange(PER.EncodeUnConstraintWholeNumber(Value));
+
+            }
+            return ret;
+        }
 
     }
 

@@ -134,28 +134,40 @@ namespace tinyAsn1
             {
                 foreach (Asn1File f in m_files)
                     foreach (Module m in f.m_modules)
+                    {
                         foreach (TypeAssigment tas in m.m_typeAssigments.Values)
                             tas.m_type.ResolveConstraints();
+                        foreach (ValueAssigment vas in m.m_valuesAssigments.Values)
+                            vas.m_type.ResolveConstraints();
+                    }
             }
 
 //Phase 3: Check default vaules
             foreach (Asn1File f in m_files)
                 foreach (Module m in f.m_modules)
+                {
                     foreach (TypeAssigment tas in m.m_typeAssigments.Values)
                         tas.m_type.CheckDefaultValues();
+                    foreach (ValueAssigment vas in m.m_valuesAssigments.Values)
+                        vas.m_type.CheckDefaultValues();
+                }
 
 //Phase 4: Apply AUTOMATIC TAGGING if necessary
             foreach (Asn1File f in m_files)
                 foreach (Module m in f.m_modules)
                 {
                     if (m.m_taggingMode == TaggingMode.AUTOMATIC)
+                    {
                         foreach (TypeAssigment tas in m.m_typeAssigments.Values)
                             tas.m_type.PerformAutomaticTagging();
+                        foreach (ValueAssigment vas in m.m_valuesAssigments.Values)
+                            vas.m_type.PerformAutomaticTagging();
+                    }
                 }
 
 //Phase 5: Check Tags
             foreach (Asn1File f in m_files)
-                foreach (Module m in f.m_modules)
+                foreach (Module m in f.m_modules) 
                     foreach (TypeAssigment tas in m.m_typeAssigments.Values)
                         tas.m_type.CheckChildrensTags();
 
@@ -170,8 +182,13 @@ namespace tinyAsn1
 //Phase 7: Compute PER effective constraints
             foreach (Asn1File f in m_files)
                 foreach (Module m in f.m_modules)
+                {
                     foreach (TypeAssigment tas in m.m_typeAssigments.Values)
                         tas.m_type.ComputePEREffectiveConstraints();
+                    foreach (ValueAssigment vas in m.m_valuesAssigments.Values)
+                        vas.m_type.ComputePEREffectiveConstraints();
+                }
+
 
         
         }
@@ -188,9 +205,14 @@ namespace tinyAsn1
         {
             foreach (Asn1File f in m_files)
                 foreach (Module m in f.m_modules)
+                {
                     foreach (TypeAssigment t in m.m_typeAssigments.Values)
                         if (!t.m_type.AreConstraintsResolved())
                             return false;
+                    foreach (ValueAssigment v in m.m_valuesAssigments.Values)
+                        if (!v.m_type.AreConstraintsResolved())
+                            return false;
+                }
             return true;
         }
 
@@ -205,6 +227,12 @@ namespace tinyAsn1
             foreach (Asn1File file in m_files)
                 file.PrintAsn1();
 
+        }
+
+        internal void EncodeVars()
+        {
+            foreach (Asn1File file in m_files)
+                file.EncodeVars();
         }
 
     }
@@ -225,6 +253,12 @@ namespace tinyAsn1
             wr.Flush();
             wr.Close();
 
+        }
+
+        public void EncodeVars()
+        {
+            foreach (Module m in m_modules)
+                m.EncodeVars(m_fileName);
         }
 
         ITree tree;
@@ -250,6 +284,7 @@ namespace tinyAsn1
                     return false;
             return true;
         }
+
 
     }
 
