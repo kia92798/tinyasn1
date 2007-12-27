@@ -739,31 +739,97 @@ namespace tinyAsn1
         public static List<bool> EncodeNonNegativeInteger(UInt64 v) 
         {
             List<bool> ret = new List<bool>();
+
+
+            UInt64 mask=1;
+
+            while (v>0)
+            {
+                bool curBit = (v & mask) > 0;
+                ret.Insert(0,curBit);
+                v >>= 1;
+            }
+
             return ret;
         }
 
         public static List<bool> Encode2ndComplementInteger(Int64 v)
         {
             List<bool> ret = new List<bool>();
+            if (v >= 0)
+            {
+                ret.Add(false);
+                ret.AddRange(EncodeNonNegativeInteger((UInt64)v));
+            }
+            else
+            {
+                ret.Add(true);
+                List<bool> ret2 = EncodeNonNegativeInteger((UInt64)(-v - 1));
+                foreach (bool bit in ret2)
+                    ret.Add(!bit);
+            }
+                
             return ret;
         }
 
         public static int GetNumberOfBitsForNonNegativeInteger(UInt64 v)
         {
-            return EncodeNonNegativeInteger(v).Count;
+            int ret = 0;
+            
+            while (v > 0)
+            {
+                v >>= 1;
+                ret++;
+            }
+            return ret;
         }
 
-        public static int GetNumberOfBits2ndComplementInteger(Int64 v)
+
+        public static int GetLengthInBytesOfUInt(UInt64 v)
         {
-            return Encode2ndComplementInteger(v).Count;
+            UInt64 curLimit=0xFF;
+            for (int i = 1; i <= 7; i++)
+            {
+                if (v <= curLimit)
+                    return i;
+                curLimit <<= 8;
+                curLimit |= 0xFF;
+            }
+            return 8;
         }
 
+        public static int GetLengthSIntHelper(UInt64 v)
+        {
+            if (v > Int64.MaxValue)
+                throw new Exception("Internal Error");
+            UInt64 curLimit = 0x7F;
+            for (int i = 1; i <= 7; i++)
+            {
+                if (v <= curLimit)
+                    return i;
+                curLimit <<= 8;
+                curLimit |= 0xFF;
+            }
+            return 8;
+        }
+
+        public static int GetLengthInBytesOfSInt(Int64 v)
+        {
+            if (v >= 0)
+                return GetLengthSIntHelper((UInt64)v);
+
+            return GetLengthSIntHelper((UInt64)(-v - 1));
+        }
+        
+ 
         public static List<bool> EncodeConstraintWholeNumber(Int64 v, Int64 min, Int64 max)
         {
             if (min > max)
                 throw new ArgumentException();
-            
-            UInt64 range = (UInt64)(max-min+1);
+            if (min == max)
+                return new List<bool>();
+
+            UInt64 range = (UInt64)(max - min );
             int nBits = GetNumberOfBitsForNonNegativeInteger(range);
 
             List<bool> ret = EncodeNonNegativeInteger((UInt64)(v - min));
@@ -793,12 +859,15 @@ namespace tinyAsn1
         public static List<bool> EncodeSemiConstraintWholeNumber(Int64 v, Int64 min)
         {
             List<bool> ret = null;
-            UInt64 nBits = (UInt64)GetNumberOfBitsForNonNegativeInteger((UInt64)(v-min));
-            if (nBits >= 128)
+            int nBytes = GetLengthInBytesOfUInt((UInt64)(v - min));
+            if (nBytes >= 9)
                 throw new Exception("Internal Error");
 
-            ret = EncodeLength12(nBits); //8 bits, first bit is always 0
-            ret.AddRange(EncodeNonNegativeInteger((UInt64)(v - min)));
+            ret = EncodeLength12((UInt64)nBytes); //8 bits, first bit is always 0
+            List<bool> realContent = EncodeNonNegativeInteger((UInt64)(v - min));
+            while (realContent.Count < 8 * nBytes)
+                realContent.Insert(0, false);
+            ret.AddRange(realContent);
 
             return ret;
         }
@@ -806,11 +875,15 @@ namespace tinyAsn1
         public static List<bool> EncodeUnConstraintWholeNumber(Int64 v)
         {
             List<bool> ret = null;
-            UInt64 nBits = (UInt64)GetNumberOfBits2ndComplementInteger(v);
-            if (nBits >= 16384)
+            int nBytes = GetLengthInBytesOfSInt(v);
+            if (nBytes >= 9)
                 throw new Exception("Internal Error");
-            ret = EncodeLength12(nBits);   //8 bits, first bit is always 0
-            ret.AddRange(Encode2ndComplementInteger(v));
+            ret = EncodeLength12((UInt64)nBytes);   //8 bits, first bit is always 0
+            List<bool> realContent = Encode2ndComplementInteger(v);
+            bool signBit = v < 0;
+            while (realContent.Count < 8 * nBytes)
+                realContent.Insert(0, signBit);
+            ret.AddRange(realContent);
             return ret;
         }
 

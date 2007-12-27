@@ -29,7 +29,9 @@ namespace tinyAsn1
 
         internal override Asn1Value ResolveVariable(Asn1Value val)
         {
-            return Type.ResolveVariable(val);
+            Asn1Value ret = Type.ResolveVariable(val);
+            ret.m_type = this;
+            return ret;
         }
 
         /// <summary>

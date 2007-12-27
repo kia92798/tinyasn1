@@ -230,9 +230,12 @@ namespace tinyAsn1
                     return false;
 
             foreach (ValueAssigment v in m_valuesAssigments.Values)
+            {
+                if (!v.m_type.SemanticAnalysisFinished())
+                    return false;
                 if (!v.m_value.IsResolved())
                     return false;
-
+            }
             return true;
         }
 
@@ -326,11 +329,27 @@ namespace tinyAsn1
 
             foreach (ValueAssigment vas in m_valuesAssigments.Values)
             {
+                if (!vas.m_type.SemanticAnalysisFinished())
+                    vas.m_type.DoSemanticAnalysis();
+
                 if (!vas.m_value.IsResolved())
                     vas.m_value = vas.m_type.ResolveVariable(vas.m_value);
             }
         }
-        
+
+
+        internal void EncodeVars(string m_fileName)
+        {
+            foreach (ValueAssigment vas in m_valuesAssigments.Values)
+            {
+                if (vas.m_type.isValueAllowed(vas.m_value))
+                {
+                    System.IO.FileStream wr = new System.IO.FileStream(m_fileName + "-" + m_moduleID + "-" + vas.m_name, System.IO.FileMode.Create);
+                    List<byte> bufer = vas.m_value.Encode2();
+                    wr.Write(bufer.ToArray(), 0, bufer.Count);
+                }
+            }
+        }
     }
 
 
@@ -410,7 +429,17 @@ namespace tinyAsn1
                 return;
             }
             o.P(lev);
-            o.WriteLine(m_name + " " + m_type.Name + " ::= " + m_value.ToString());
+            o.Write(m_name + " ");
+            m_type.PrintAsn1(o, 0);
+            o.WriteLine(" ::= " + m_value.ToString());
+            o.P(lev);
+            o.Write("--PER:");
+            List<byte> PERBuffer = m_value.Encode2();
+            foreach (byte b in PERBuffer)
+                o.Write(b.ToString("X2"));
+            o.WriteLine();
+            o.WriteLine();
+
         }
     }
 

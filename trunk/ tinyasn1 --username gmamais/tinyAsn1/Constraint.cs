@@ -198,7 +198,6 @@ namespace tinyAsn1
 
     }
 
-
     public class RootConstraint : BaseConstraint
     {
         IConstraint m_constr;

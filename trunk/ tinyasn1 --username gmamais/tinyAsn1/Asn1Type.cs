@@ -621,7 +621,7 @@ namespace tinyAsn1
         internal ITree antlrNode;
         //m_module is the module where the variable is declared where it can be different to the module of the type
         public Module m_module;
-        protected Asn1Type m_type = null;
+        internal Asn1Type m_type = null;
 
 
         static public Asn1Value CreateFromAntlrAst(ITree tree)
@@ -686,6 +686,38 @@ namespace tinyAsn1
 
         #endregion
 
+
+        public virtual List<bool> Encode()
+        {
+//            throw new Exception("The method or operation is not implemented.");
+            return new List<bool>();
+        }
+
+        public virtual List<byte> Encode2()
+        {
+            List<bool> bitStream = Encode();
+            while (bitStream.Count % 8 > 0)
+                bitStream.Add(false);
+            List<byte> bufer = new List<byte>();
+
+            LinkedList<bool> bs = new LinkedList<bool>(bitStream);
+
+            while (bs.Count > 0)
+            {
+                byte curByte = 0;
+                byte curMask = 0x80;
+
+                for (int i = 0; i < 8; i++)
+                {
+                    if (bs.First.Value)
+                        curByte |= curMask;
+                    curMask >>= 1;
+                    bs.RemoveFirst();
+                }
+                bufer.Add(curByte);
+            }
+            return bufer;
+        }
     }
 
 

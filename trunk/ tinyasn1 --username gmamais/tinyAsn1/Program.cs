@@ -37,6 +37,7 @@ namespace tinyAsn1
             Asn1CompilerInvokation compInv = Asn1CompilerInvokation.Instance;
 
             bool debug=false;
+            bool encodeVars = false;
             bool genOutput = false;
 
             for (int i=0;i<args.Length;i++)
@@ -45,6 +46,8 @@ namespace tinyAsn1
                 {
                     if (args[i] == "-debug")
                         debug = true;
+                    else if (args[i] == "-encodeVariables")
+                        encodeVars = true;
                     else if (args[i] == "-icd")
                         genOutput = true;
                     else
@@ -107,6 +110,11 @@ namespace tinyAsn1
                 compInv.debug();
             }
 
+            if (encodeVars)
+            {
+                compInv.EncodeVars();
+            }
+
             if (genOutput)
             {
                 for (int i = 0; i < inputFiles.Count; i++)
@@ -123,7 +131,7 @@ namespace tinyAsn1
 
         static int Usage()
         {
-            Console.Error.WriteLine("tinyAsn1 -debug -icd file1, file2, ..., fileN ");
+            Console.Error.WriteLine("tinyAsn1 -debug -encodeVariables -icd file1, file2, ..., fileN ");
             Console.Error.WriteLine("\t -debug \t\tcreates an XML with AST representation");
             Console.Error.WriteLine("\t -icd \t\tGenerate ICD Documents");
             return 4;
