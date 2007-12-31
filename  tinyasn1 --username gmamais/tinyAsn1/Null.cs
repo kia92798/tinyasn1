@@ -104,6 +104,12 @@ namespace tinyAsn1
         {
             return "NULL";
         }
+
+        public override List<bool> Encode()
+        {
+            List<bool> ret = new List<bool>();
+            return ret;
+        }
     }
 
 }

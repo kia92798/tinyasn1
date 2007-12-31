@@ -340,7 +340,11 @@ namespace tinyAsn1
                 if (cn.Extensible)
                 {
                     if (cn.m_extRange != null && cn.m_extRange.isValueWithinRange(Value))
+                    {
                         ret.Add(true);
+                        ret.AddRange(PER.EncodeUnConstraintWholeNumber(Value));
+                        return ret;
+                    }
                     else
                         ret.Add(false);
                 } 

@@ -137,7 +137,48 @@ namespace tinyAsn1
                     m_mantissa = -m_mantissa;
 
             }
+            
+            public SqReal(double d, int newBase)
+            {
+                double maxMantissa = 4503599627370496;
+                if (d == 0.0 || double.IsInfinity(d))
+                    throw new ArgumentOutOfRangeException();
+
+                m_base = newBase;
+                //Let mantissa be 1
+                // then exponent is the logarithm of the input value.
+                //However, since we need the expoent to be stored in an INT we get the Floor 
+                // Floor return the largest integer less than or equal to the specified double-precision floating-point number
+                m_exponent = (Int64)Math.Floor(Math.Log(Math.Abs(d), m_base));
+
+                //Since exponent was 'Floored' mantissa is not 1 anymore but the following value
+                // now mantissa has a value in the range [1..base)
+                double mantissa = d / Math.Pow((double)m_base, (double)m_exponent);
+                if (mantissa >= m_base)
+                    throw new Exception("Mantissa(" + mantissa.ToString() + ") is greater or equal to base");
+
+                m_mantissa = (Int64)mantissa;
+                if (d < 0)
+                    m_mantissa = -m_mantissa;
+                
+                double error = Math.Abs(d - m_mantissa * Math.Pow((double)m_base, (double)m_exponent))/d;
+
+                while (mantissa < maxMantissa && error > Double.Epsilon)
+                {
+                    mantissa *= m_base;
+                    m_exponent--;
+                    m_mantissa = (Int64)mantissa;
+                    if (d < 0)
+                        m_mantissa = -m_mantissa;
+                    error = Math.Abs(d - m_mantissa * Math.Pow((double)m_base, (double)m_exponent)) / d;
+                    if (mantissa - Math.Floor(mantissa) < Double.Epsilon)
+                        break;
+                }
+                
+
+            }
         }
+
         double m_value;
         public virtual double Value
         {
@@ -208,34 +249,6 @@ namespace tinyAsn1
                     throw new Exception("Internal Error");
             }
 
-            /*
-                        double dbValVal;
-                        dbValVal = double.Parse(tree.GetChild(0).Text);
-                        bool negate = false;
-                        Int64 decPart = 0;
-            
-                        if (tree.ChildCount == 2)
-                        {
-                            if (tree.GetChild(1).Text == "-")
-                                negate = true;
-                            else
-                                decPart = Int64.Parse(tree.GetChild(1).Text);
-                        }
-                        else if (tree.ChildCount == 3)
-                        {
-                            negate = tree.GetChild(1).Text == "-";
-                            decPart = Int64.Parse(tree.GetChild(2).Text);
-                        }
-
-                        double tmp = decPart;
-                        for (int i = 0; i < decPart.ToString().Length; i++)
-                            tmp = tmp / 10.0;
-                        m_value = dbValVal + tmp;
-
-                        if (negate)
-                            m_value = -m_value;
-             * */
-
         }
         public RealValue(double v, Module m, ITree antlr, Asn1Type type)
         {
@@ -256,10 +269,6 @@ namespace tinyAsn1
         public override string ToString()
         {
             return Value.ToString(NumberFormatInfo.InvariantInfo);
-            //string ret = Value.ToString().Replace(',','.');
-            //if (!ret.Contains("."))
-            //    ret += ".0";
-            //return ret;
         }
         public override bool Equals(object obj)
         {
@@ -279,6 +288,86 @@ namespace tinyAsn1
             if (oth == null)
                 throw new ArgumentException("obj is not an IntegerValue");
             return Value.CompareTo(oth.Value);
+        }
+
+        public override List<bool> Encode()
+        {
+            List<bool> ret = new List<bool>();
+            if (Value == 0.0)
+            {
+                ret.AddRange(PER.EncodeLength12(0));
+                return ret;
+            }
+            
+            if (Double.IsNegativeInfinity(Value))
+            {
+                ret.AddRange(PER.EncodeLength12(1));
+                ret.AddRange(PER.EncodeConstraintWholeNumber(0x41,0,255));
+                return ret;
+            }
+            
+            if (Double.IsPositiveInfinity(Value))
+            {
+                ret.AddRange(PER.EncodeLength12(1));
+                ret.AddRange(PER.EncodeConstraintWholeNumber(0x40, 0, 255));
+                return ret;
+            }
+
+            /*
+                        Bynary encoding will be used
+                        REAL = M*B^E
+                        where
+                        M = S*N*2^F
+            
+                        ENCODING is done within three parts
+                        part 1 is 1 byte header
+                        part 2 is 1 or more byte for exponent
+                        part 3 is 3 or more byte for mantissa (N)
+            
+                        First byte        
+                        S :0-->+, S:1-->-1
+                        Base will be always be 2 (implied by 7th and 6th bit which are zero)
+                        ab: F  (0..3)
+                        cd:00 --> 1 byte for exponent as 2's complement 
+                        cd:01 --> 2 byte for exponent as 2's complement 
+                        cd:10 --> 3 byte for exponent as 2's complement 
+                        cd:11 --> 1 byte for encoding the length of the exponent, then the expoent 
+
+                         8 7 6 5 4 3 2 1 
+                        +-+-+-+-+-+-+-+-+
+                        |1|S|0|0|a|b|c|d|
+                        +-+-+-+-+-+-+-+-+
+            */
+            Byte Header = 0x80;
+            SqReal tmp = new SqReal(Value, 2);
+            if (Value < 0)
+                Header |= 0x40;
+            int nExpLen = PER.GetLengthInBytesOfSInt(tmp.m_exponent);
+            if (nExpLen == 2)
+                Header |= 1;
+            else if (nExpLen == 3)
+                Header |= 2;
+            else if (nExpLen > 3)
+                throw new Exception("Exponent is two big");
+
+            //encode exponent
+            List<bool> expBits = PER.Encode2ndComplementInteger(tmp.m_exponent);
+            bool signBit = tmp.m_exponent < 0;
+            while (expBits.Count < 8 * nExpLen)
+                expBits.Insert(0, signBit);
+
+            //encode mantissa
+            int nManLen = PER.GetLengthInBytesOfSInt(tmp.m_mantissa);
+            List<bool> manBits = PER.Encode2ndComplementInteger(Math.Abs(tmp.m_mantissa));
+            while (manBits.Count < 8 * nManLen)
+                manBits.Insert(0, false);
+
+            ret.AddRange(PER.EncodeLength12((ulong)(1+nExpLen+nManLen)));
+            ret.AddRange(PER.EncodeConstraintWholeNumber(Header, 0, 255));
+            ret.AddRange(expBits);
+            ret.AddRange(manBits);
+
+            return ret;
         }
 
     }
