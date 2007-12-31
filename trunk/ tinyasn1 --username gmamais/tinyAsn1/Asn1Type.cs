@@ -584,7 +584,7 @@ namespace tinyAsn1
             PEREffectiveConstraint dummy = PEREffectiveConstraint;
         }
         
-        public bool IsPERExtensible()
+        public virtual bool IsPERExtensible()
         {
             if (PEREffectiveConstraint!=null)
                 return PEREffectiveConstraint.Extensible;

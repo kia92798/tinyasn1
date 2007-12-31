@@ -299,6 +299,51 @@ namespace tinyAsn1
 
             return true;
         }
+        public override bool IsPERExtensible()
+        {
+            return m_extMarkPresent;
+        }
+
+
+        public int RootItemsCount
+        {
+            get
+            {
+                int ret=0;
+                foreach(Item it in m_enumValues.Values)
+                {
+                    if (it.m_isExtended)
+                        break;
+                    ret++;
+                }
+                return ret;
+            }
+        }
+        public int ExtendedItemsCount
+        {
+            get
+            {
+                int ret = 0;
+                foreach (Item it in m_enumValues.Values)
+                {
+                    if (!it.m_isExtended)
+                        continue;
+                    ret++;
+                }
+                return ret;
+            }
+        }
+        public bool IsValueWithRootRange(EnumeratedValue val)
+        {
+            foreach (Item it in m_enumValues.Values)
+            {
+                if (it.m_isExtended)
+                    break;
+                if (it.m_value == val.Value)
+                    return true;
+            }
+            return false;
+        }
     }
 
 
@@ -350,6 +395,64 @@ namespace tinyAsn1
         public override int GetHashCode()
         {
             return m_value.GetHashCode();
+        }
+
+        public int Index
+        {
+            get
+            {
+                EnumeratedType myType = Type.GetFinalType() as EnumeratedType;
+                if (myType==null)
+                    throw new Exception("Internal Error");
+                int ret = 0;
+                foreach (EnumeratedType.Item it in myType.m_enumValues.Values)
+                {
+                    if (it.m_isExtended)
+                        break;
+                    if (it.m_value == Value)
+                        return ret;
+                    ret++;
+                }
+                ret = 0;
+                foreach (EnumeratedType.Item it in myType.m_enumValues.Values)
+                {
+                    if (!it.m_isExtended)
+                        continue;
+                    if (it.m_value == Value)
+                        return ret;
+                    ret++;
+                }
+                throw new Exception("Internal Error");
+            }
+        }
+
+        public override List<bool> Encode()
+        {
+            EnumeratedType myType = Type.GetFinalType() as EnumeratedType;
+            if (myType==null)
+                throw new Exception("Internal Error");
+
+            List<bool> ret = new List<bool>();
+
+            if (!myType.IsPERExtensible())
+            {
+                ret = PER.EncodeConstraintWholeNumber(Index, 0, myType.RootItemsCount-1);
+            }
+            else
+            {
+                if (myType.IsValueWithRootRange(this))
+                {
+                    ret.Add(false);
+                    ret.AddRange(PER.EncodeConstraintWholeNumber(Index, 0, myType.RootItemsCount - 1));
+                }
+                else
+                {
+                    ret.Add(true);
+                    ret.AddRange(PER.EncodeNormallySmallNonNegativeNumber((UInt64)Index));
+                }
+            }
+
+            return ret;
         }
     }
 

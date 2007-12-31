@@ -434,9 +434,17 @@ namespace tinyAsn1
             o.WriteLine(" ::= " + m_value.ToString());
             o.P(lev);
             o.Write("--PER:");
-            List<byte> PERBuffer = m_value.Encode2();
-            foreach (byte b in PERBuffer)
-                o.Write(b.ToString("X2"));
+            if (m_type.isValueAllowed(m_value))
+            {
+
+                List<byte> PERBuffer = m_value.Encode2();
+                foreach (byte b in PERBuffer)
+                    o.Write(b.ToString("X2"));
+            }
+            else
+            {
+                o.Write("Invalid!!!");
+            }
             o.WriteLine();
             o.WriteLine();
 

@@ -121,6 +121,13 @@ namespace tinyAsn1
         {
             return m_value.GetHashCode();
         }
+
+        public override List<bool> Encode()
+        {
+            List<bool> ret = new List<bool>();
+            ret.Add(Value);
+            return ret;
+        }
     }
 
 }

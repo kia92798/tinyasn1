@@ -241,6 +241,8 @@ namespace tinyAsn1
             {
                 if (m_perEffectiveConstraint != null)
                     return m_perEffectiveConstraint;
+                if (Type.PEREffectiveConstraint == null)
+                    return null;
                 m_perEffectiveConstraint = Type.PEREffectiveConstraint.Compute(m_constraints, this);
 
                 Asn1Type parType = ParentType;
