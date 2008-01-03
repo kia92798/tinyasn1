@@ -584,6 +584,12 @@ namespace tinyAsn1
                 child.m_type.ComputePEREffectiveConstraints();
             }
         }
+        public override bool IsPERExtensible()
+        {
+            if (m_module.m_extensibilityImplied)
+                return true;
+            return m_extMarkPresent;
+        }
     }
 
     public partial class SequenceOrSetValue : Asn1Value
@@ -761,6 +767,73 @@ namespace tinyAsn1
         public override int GetHashCode()
         {
             return m_children.GetHashCode();
+        }
+
+
+        public override List<bool> Encode()
+        {
+            List<bool> ret = new List<bool>();
+
+            SequenceOrSetType myType = m_type.GetFinalType() as SequenceOrSetType;
+
+            if (myType == null)
+                throw new Exception("Internal Error");
+            if (m_type.IsPERExtensible())
+            {
+                bool bIHaveExtendedChildren = false;
+                foreach (string varName in m_children.Keys)
+                {
+                    if (myType.m_children[varName].m_extended)
+                    {
+                        bIHaveExtendedChildren = true;
+                        throw new Exception("Unimplemented feature: Sequence/Set extensions are not fully supported. Sorry!");
+                    }
+                }
+                ret.Add(bIHaveExtendedChildren);                    
+            }
+
+            //first encode RootComponent Type list items;
+
+            //encode bit-map for optional and defaults
+            List<string> vasToBeIgnored = new List<string>();
+            foreach (string varName in myType.m_children.Keys)
+            {
+                SequenceOrSetType.Child ch = myType.m_children[varName];
+                if (ch.m_extended)
+                    continue;
+                if (ch.m_optional)
+                {
+                    ret.Add(m_children.ContainsKey(varName));
+                }
+                else if (ch.m_defaultValue != null)
+                {
+                    if (m_children.ContainsKey(varName))
+                    {
+                        if (ch.m_defaultValue.Equals(m_children[varName]))
+                        {
+                            ret.Add(false); //18.5 CANONICAL encoding
+                            vasToBeIgnored.Add(varName);
+                        }
+                        else
+                            ret.Add(true);
+                    }
+                    else
+                    {
+                        ret.Add(false); 
+                    }
+                }
+            }
+            //encode non extended children
+            foreach (string varName in myType.m_children.Keys)
+            {
+                SequenceOrSetType.Child ch = myType.m_children[varName];
+                if (ch.m_extended || vasToBeIgnored.Contains(varName))
+                    continue;
+                if (m_children.ContainsKey(varName))
+                    ret.AddRange(m_children[varName].Encode());
+            }
+            
+            return ret;
         }
     }
 

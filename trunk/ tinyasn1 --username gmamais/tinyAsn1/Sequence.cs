@@ -125,5 +125,7 @@ namespace tinyAsn1
                 return false;
             return base.Compatible(other);
         }
+
     }
+
 }

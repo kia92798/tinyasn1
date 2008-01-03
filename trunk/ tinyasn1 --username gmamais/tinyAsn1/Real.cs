@@ -295,21 +295,21 @@ namespace tinyAsn1
             List<bool> ret = new List<bool>();
             if (Value == 0.0)
             {
-                ret.AddRange(PER.EncodeLength12(0));
+                ret.AddRange(PER.EncodeConstraintWholeNumber(0, 0, 0xFF));  //encode length
                 return ret;
             }
             
             if (Double.IsNegativeInfinity(Value))
             {
-                ret.AddRange(PER.EncodeLength12(1));
-                ret.AddRange(PER.EncodeConstraintWholeNumber(0x41,0,255));
+                ret.AddRange(PER.EncodeConstraintWholeNumber(1, 0, 0xFF));  //encode length
+                ret.AddRange(PER.EncodeConstraintWholeNumber(0x41,0,0xFF));
                 return ret;
             }
             
             if (Double.IsPositiveInfinity(Value))
             {
-                ret.AddRange(PER.EncodeLength12(1));
-                ret.AddRange(PER.EncodeConstraintWholeNumber(0x40, 0, 255));
+                ret.AddRange(PER.EncodeConstraintWholeNumber(1, 0, 0xFF)); //encode length
+                ret.AddRange(PER.EncodeConstraintWholeNumber(0x40, 0, 0xFF));
                 return ret;
             }
 
@@ -362,8 +362,8 @@ namespace tinyAsn1
             while (manBits.Count < 8 * nManLen)
                 manBits.Insert(0, false);
 
-            ret.AddRange(PER.EncodeLength12((ulong)(1+nExpLen+nManLen)));
-            ret.AddRange(PER.EncodeConstraintWholeNumber(Header, 0, 255));
+            ret.AddRange(PER.EncodeConstraintWholeNumber(1+nExpLen+nManLen,0,0xFF));//encode length
+            ret.AddRange(PER.EncodeConstraintWholeNumber(Header, 0, 0xFF));
             ret.AddRange(expBits);
             ret.AddRange(manBits);
 

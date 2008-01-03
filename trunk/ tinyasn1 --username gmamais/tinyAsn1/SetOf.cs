@@ -125,7 +125,7 @@ namespace tinyAsn1
             if (v == null)
                 throw new Exception("Internal Error");
 
-            foreach (Asn1Value item in v.m_children)
+            foreach (Asn1Value item in v.Value)
                 if (!m_type.isValueAllowed(item))
                     return false;
 
@@ -156,7 +156,7 @@ namespace tinyAsn1
         }
     }
 
-    public partial class SetOfValue : ArrayValue, ISize
+    public partial class SetOfValue : ArrayValue
     {
         public SetOfType Type2
         {
@@ -300,10 +300,6 @@ namespace tinyAsn1
             return m_children.GetHashCode();
         }
 
-        public long Size
-        {
-            get { return m_children.Count; }
-        }
     }
 
 }

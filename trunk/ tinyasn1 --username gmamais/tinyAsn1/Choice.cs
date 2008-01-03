@@ -405,6 +405,12 @@ namespace tinyAsn1
                 child.m_type.ComputePEREffectiveConstraints();
             }
         }
+        public override bool IsPERExtensible()
+        {
+            if (m_module.m_extensibilityImplied)
+                return true;
+            return m_extMarkPresent;
+        }
     }
 
     public partial class ChoiceChild
@@ -547,6 +553,36 @@ namespace tinyAsn1
         public override int GetHashCode()
         {
             return m_value.GetHashCode();
+        }
+        
+        public override List<bool> Encode()
+        {
+            List<bool> ret = new List<bool>();
+            ChoiceType myType = m_type.GetFinalType() as ChoiceType;
+            if (myType == null)
+                throw new Exception("Internal Error");
+            ChoiceChild myChildType = myType.m_children[AlternativeName];
+
+            if (myChildType.m_extended)
+                throw new Exception("Unimplemented feature: Choice extensions are not fully supported. Sorry!");
+            if (m_type.IsPERExtensible())
+                ret.Add(myChildType.m_extended);
+
+            int choiceIndex = myType.m_children.Keys.IndexOf(AlternativeName);
+            int largestIndex = -1;
+            foreach (string v in myType.m_children.Keys)
+            {
+                if (myType.m_children[v].m_extended)
+                    continue;
+                largestIndex++;
+            }
+            
+            if (largestIndex>0)
+                ret.AddRange(PER.EncodeConstraintWholeNumber(choiceIndex,0,largestIndex));
+            ret.AddRange(Value.Encode());
+            
+
+            return ret;
         }
     }
 
