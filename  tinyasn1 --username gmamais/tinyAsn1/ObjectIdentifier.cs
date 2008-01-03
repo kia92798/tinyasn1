@@ -520,6 +520,66 @@ namespace tinyAsn1
                 }
             }
         }
+
+
+        List<bool> EncodeSubIdentifier(int value)
+        {
+            List<bool> ret = new List<bool>();
+            LinkedList<bool> tmp = new LinkedList<bool>(PER.EncodeNonNegativeInteger((UInt64)Math.Abs(value)));
+
+            while (tmp.Count > 0)
+            {
+                ret.Insert(0, tmp.Last.Value);
+
+                if (ret.Count % 8 == 7)
+                {
+                    if (ret.Count == 7)
+                        ret.Insert(0, false);
+                    else
+                        ret.Insert(0, true);
+                }
+                tmp.RemoveLast();
+            }
+
+            while (ret.Count % 8 > 0)
+                ret.Add(false);
+            if (ret.Count > 8)
+                ret[0] = true;
+
+            return ret;
+        }
+        public override List<bool> Encode()
+        {
+            List<bool> ret = new List<bool>();
+            List<int> subIDs = new List<int>();
+
+            subIDs.Add(m_components[0].no.Value * 40 + m_components[1].no.Value);
+            for (int i = 2; i < m_components.Count - 1; i++)
+                subIDs.Add(m_components[i].no.Value);
+
+            foreach (int subID in subIDs)
+                ret.AddRange(EncodeSubIdentifier(subID));
+            if (ret.Count % 8 != 0)
+                throw new Exception("Internal Error");
+
+            int nBytes = ret.Count / 8;
+
+            if (nBytes <= 0x7F)
+            {
+                ret.InsertRange(0, PER.EncodeConstraintWholeNumber(nBytes, 0, 0xFF));
+            }
+            else if (nBytes <= 0x3FFF)
+            {
+                ret.Insert(0,true);
+                ret.InsertRange(0, PER.EncodeConstraintWholeNumber(nBytes, 0, 0x7FFF));
+            }
+            else
+            {
+                throw new Exception("Internal Error");
+            }
+
+            return ret;
+        }
     }
 
 }

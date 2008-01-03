@@ -383,7 +383,7 @@ namespace tinyAsn1
 
     public class PERSizeEffectiveConstraint : PEREffectiveConstraint
     {
-        PERIntegerEffectiveConstraint m_size = null;
+        public PERIntegerEffectiveConstraint m_size = null;
 
         public PERSizeEffectiveConstraint(PERIntegerEffectiveConstraint size)
         {
@@ -863,7 +863,7 @@ namespace tinyAsn1
             if (nBytes >= 9)
                 throw new Exception("Internal Error");
 
-            ret = EncodeLength12((UInt64)nBytes); //8 bits, first bit is always 0
+            ret = EncodeConstraintWholeNumber(nBytes, 0, 255); //8 bits, first bit is always 0
             List<bool> realContent = EncodeNonNegativeInteger((UInt64)(v - min));
             while (realContent.Count < 8 * nBytes)
                 realContent.Insert(0, false);
@@ -878,7 +878,7 @@ namespace tinyAsn1
             int nBytes = GetLengthInBytesOfSInt(v);
             if (nBytes >= 9)
                 throw new Exception("Internal Error");
-            ret = EncodeLength12((UInt64)nBytes);   //8 bits, first bit is always 0
+            ret = EncodeConstraintWholeNumber(nBytes, 0, 255); //8 bits, first bit is always 0
             List<bool> realContent = Encode2ndComplementInteger(v);
             bool signBit = v < 0;
             while (realContent.Count < 8 * nBytes)
@@ -887,7 +887,7 @@ namespace tinyAsn1
             return ret;
         }
 
-        public static List<bool> EncodeLength12(UInt64 len)
+/*        public static List<bool> EncodeLength12(UInt64 len)
         {
             List<bool> ret = null;
             if (len <= 127)
@@ -904,7 +904,7 @@ namespace tinyAsn1
         public static List<List<bool>> EncodeLength3(UInt64 len)
         {
             return null;
-        }
+        }*/
     }
 
 

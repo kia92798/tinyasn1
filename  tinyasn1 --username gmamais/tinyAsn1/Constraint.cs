@@ -1497,7 +1497,7 @@ namespace tinyAsn1
             ArrayValue arval = val as ArrayValue;
             if (arval == null)
                 throw new Exception("Internal Error");
-            foreach (Asn1Value v in arval.m_children)
+            foreach (Asn1Value v in arval.Value)
                 if (!m_innerTypeConstraint.isValueAllowed(v))
                     return false;
             

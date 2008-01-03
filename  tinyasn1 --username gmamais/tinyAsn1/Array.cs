@@ -65,9 +65,142 @@ namespace tinyAsn1
    }
 
 
-    public partial class ArrayValue : Asn1Value
+    public partial class ArrayValue : Asn1Value, ISize
     {
-        public List<Asn1Value> m_children = new List<Asn1Value>();
+        protected List<Asn1Value> m_children = new List<Asn1Value>();
+        public virtual List<Asn1Value> Value
+        {
+            get { return m_children; }
+        }
+
+        public long Size
+        {
+            get { return m_children.Count; }
+        }
+
+        public List<bool> ContentData
+        {
+            get
+            {
+                List<bool> ret = new List<bool>();
+                foreach (Asn1Value v in Value)
+                    ret.AddRange(v.Encode());
+                return ret;
+            }
+        }
+        public List<bool> EncodeAsUnCostraint()
+        {
+            List<bool> ret = new List<bool>();
+            if (Size <= 0x7F)
+            {
+                ret.AddRange(PER.EncodeConstraintWholeNumber(Size, 0, 0xFF));
+                ret.AddRange(ContentData);
+                return ret;
+            }
+
+            if (Size <= 0x3FFF)
+            {
+                ret.Add(true);
+                ret.AddRange(PER.EncodeConstraintWholeNumber(Size, 0, 0x7FFF));
+                ret.AddRange(ContentData);
+                return ret;
+            }
+            long nCount = Size;
+            int curBlockSize = 0;
+            List<Asn1Value> items = Value;
+            int curItem = 0;
+            while (nCount >= 0x4000)
+            {
+                if (nCount >= 0x10000)
+                {
+                    curBlockSize = 0x10000;
+                    ret.AddRange(PER.EncodeConstraintWholeNumber(0xC4, 0, 0xFF));
+                }
+                else if (nCount >= 0xC000)
+                {
+                    curBlockSize = 0xC000;
+                    ret.AddRange(PER.EncodeConstraintWholeNumber(0xC3, 0, 0xFF));
+                }
+                else if (nCount >= 0x8000)
+                {
+                    curBlockSize = 0x8000;
+                    ret.AddRange(PER.EncodeConstraintWholeNumber(0xC2, 0, 0xFF));
+                }
+                else
+                {
+                    curBlockSize = 0x4000;
+                    ret.AddRange(PER.EncodeConstraintWholeNumber(0xC1, 0, 0xFF));
+                }
+                for (int i = curItem; i < curBlockSize + curItem; i++)
+                {
+                    ret.AddRange(items[i].Encode());
+                }
+                curItem += curBlockSize;
+                nCount -= curBlockSize;
+            }
+
+            if (nCount <= 0x7F)
+            {
+                ret.AddRange(PER.EncodeConstraintWholeNumber(nCount, 0, 0xFF));
+                ret.AddRange(ContentData);
+                return ret;
+            }
+
+            ret.Add(true);
+            ret.AddRange(PER.EncodeConstraintWholeNumber(nCount, 0, 0x7FFF));
+            ret.AddRange(ContentData);
+            return ret;
+        }
+
+        public override List<bool> Encode()
+        {
+            List<bool> ret = new List<bool>();
+            PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)Type.PEREffectiveConstraint;
+
+            if (cn != null)
+            {
+                if (cn.Extensible)
+                {
+                    if (cn.m_size.m_rootRange.isValueWithinRange(Size))
+                    {
+                        ret.Add(false);
+                    }
+                    else
+                    {
+                        ret.Add(true);
+                        ret.AddRange(EncodeAsUnCostraint());
+                        return ret;
+                    }
+                }
+
+                if (!cn.m_size.m_rootRange.m_maxIsInfinite && cn.m_size.m_rootRange.m_max < 0xFFFF)
+                {
+                    if (cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
+                    {
+                        ret.AddRange(ContentData);       //15.9 & 15.10
+                    }
+                    else
+                    {
+                        ret.AddRange(PER.EncodeConstraintWholeNumber(Size, cn.m_size.m_rootRange.m_min, cn.m_size.m_rootRange.m_max));
+                        ret.AddRange(ContentData);
+                    }
+                }
+                else
+                {
+                    ret.AddRange(EncodeAsUnCostraint());
+                }
+
+            }
+            else
+            {
+                ret.AddRange(EncodeAsUnCostraint());
+            }
+
+
+            return ret;
+        }
+
+
     }
 
 }
