@@ -534,8 +534,8 @@ namespace tinyAsn1
             foreach (Char ch in b.m_set)
                 if (!c.m_set.Contains(ch))
                     c.m_set.Add(ch);
-            
 
+            c.m_set.Sort();
             return c;
         }
 
@@ -547,7 +547,7 @@ namespace tinyAsn1
                 if (b.m_set.Contains(ch))
                     c.m_set.Add(ch);
 
-
+            c.m_set.Sort();
             return c;
         }
 
@@ -566,8 +566,8 @@ namespace tinyAsn1
 
     public class PERAlphabetAndSizeEffectiveConstraint : PEREffectiveConstraint
     {
-        PERIntegerEffectiveConstraint m_size = null;
-        CharSet m_from = null;
+        public PERIntegerEffectiveConstraint m_size = null;
+        public CharSet m_from = null;
 
         public PERAlphabetAndSizeEffectiveConstraint()
         {
