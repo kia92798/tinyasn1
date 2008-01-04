@@ -142,13 +142,15 @@ namespace tinyAsn1
             if (nCount <= 0x7F)
             {
                 ret.AddRange(PER.EncodeConstraintWholeNumber(nCount, 0, 0xFF));
-                ret.AddRange(ContentData);
+                for (int i = curItem; i < curItem + nCount; i++)
+                    ret.AddRange(items[i].Encode());
                 return ret;
             }
 
             ret.Add(true);
             ret.AddRange(PER.EncodeConstraintWholeNumber(nCount, 0, 0x7FFF));
-            ret.AddRange(ContentData);
+            for (int i = curItem; i < curItem + nCount; i++)
+                ret.AddRange(items[i].Encode());
             return ret;
         }
 

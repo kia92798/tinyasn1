@@ -226,7 +226,7 @@ namespace tinyAsn1
             return other.GetFinalType() is NumericStringType;
         }
 
-        static Char[] m_allowedCharSet = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ' };
+        static Char[] m_allowedCharSet = { ' ', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
         public override char[] AllowedCharSet
         {
             get { return m_allowedCharSet; }
@@ -310,6 +310,162 @@ namespace tinyAsn1
             m_TypeID = Asn1Value.TypeID.IA5String;
             m_value = str.ToString();
         }
+
+
+        List<bool> ContentData(CharSet perAlphaCon)
+        {
+            List<bool> ret = new List<bool>();
+            foreach(char ch in Value.ToCharArray())
+                ret.AddRange(EncodeSingleChar(ch, perAlphaCon));
+            return ret;
+        }
+
+        
+        protected virtual List<bool> EncodeSingleChar(char p, CharSet perAlphaCon)
+        {
+            List<bool> ret = new List<bool>();
+            IStringType myType = m_type.GetFinalType() as IStringType;
+            if (myType == null)
+                throw new Exception("Internal Error");
+
+            char min;
+            char max;
+
+            if (perAlphaCon == null)
+            {
+                min = myType.AllowedCharSet[0];
+                max = myType.AllowedCharSet[myType.AllowedCharSet.Length - 1];
+            }
+            else
+            {
+                min = perAlphaCon.m_set[0];
+                max = perAlphaCon.m_set[perAlphaCon.m_set.Count - 1];
+            }
+
+            if (min == max)
+                return ret;
+            ret.AddRange(PER.EncodeConstraintWholeNumber(p,min,max));
+
+            return ret;
+        }
+
+
+        public List<bool> EncodeAsUnCostraint(CharSet perAlphaCon)
+        {
+            List<bool> ret = new List<bool>();
+            if (Size <= 0x7F)
+            {
+                ret.AddRange(PER.EncodeConstraintWholeNumber(Size, 0, 0xFF));
+                ret.AddRange(ContentData(perAlphaCon));
+                return ret;
+            }
+
+            if (Size <= 0x3FFF)
+            {
+                ret.Add(true);
+                ret.AddRange(PER.EncodeConstraintWholeNumber(Size, 0, 0x7FFF));
+                ret.AddRange(ContentData(perAlphaCon));
+                return ret;
+            }
+            long nCount = Size;
+            int curBlockSize = 0;
+            List<char> items = new List<char>(Value.ToCharArray());
+            int curItem = 0;
+            while (nCount >= 0x4000)
+            {
+                if (nCount >= 0x10000)
+                {
+                    curBlockSize = 0x10000;
+                    ret.AddRange(PER.EncodeConstraintWholeNumber(0xC4, 0, 0xFF));
+                }
+                else if (nCount >= 0xC000)
+                {
+                    curBlockSize = 0xC000;
+                    ret.AddRange(PER.EncodeConstraintWholeNumber(0xC3, 0, 0xFF));
+                }
+                else if (nCount >= 0x8000)
+                {
+                    curBlockSize = 0x8000;
+                    ret.AddRange(PER.EncodeConstraintWholeNumber(0xC2, 0, 0xFF));
+                }
+                else
+                {
+                    curBlockSize = 0x4000;
+                    ret.AddRange(PER.EncodeConstraintWholeNumber(0xC1, 0, 0xFF));
+                }
+                for (int i = curItem; i < curBlockSize + curItem; i++)
+                {
+                    ret.AddRange(EncodeSingleChar(items[i],perAlphaCon));
+                }
+                curItem += curBlockSize;
+                nCount -= curBlockSize;
+            }
+
+            if (nCount <= 0x7F)
+            {
+                ret.AddRange(PER.EncodeConstraintWholeNumber(nCount, 0, 0xFF));
+                for (int i = curItem; i < curItem + nCount; i++)
+                    ret.AddRange(EncodeSingleChar(items[i], perAlphaCon));
+                return ret;
+            }
+
+            ret.Add(true);
+            ret.AddRange(PER.EncodeConstraintWholeNumber(nCount, 0, 0x7FFF));
+            for (int i = curItem; i < curItem + nCount; i++)
+                ret.AddRange(EncodeSingleChar(items[i], perAlphaCon));
+            return ret;
+        }
+
+
+        public override List<bool> Encode()
+        {
+            List<bool> ret = new List<bool>();
+            PERAlphabetAndSizeEffectiveConstraint cn = (PERAlphabetAndSizeEffectiveConstraint)Type.PEREffectiveConstraint;
+            CharSet perAlphaCon = null;
+            if (cn != null)
+            {
+                perAlphaCon = cn.m_from;
+                if (cn.Extensible)
+                {
+                    if (cn.m_size.m_rootRange.isValueWithinRange(Size))
+                    {
+                        ret.Add(false);
+                    }
+                    else
+                    {
+                        ret.Add(true);
+                        ret.AddRange(EncodeAsUnCostraint((perAlphaCon)));
+                        return ret;
+                    }
+                }
+
+                if (!cn.m_size.m_rootRange.m_maxIsInfinite && cn.m_size.m_rootRange.m_max < 0xFFFF)
+                {
+                    if (cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
+                    {
+                        ret.AddRange(ContentData(perAlphaCon));       //15.9 & 15.10
+                    }
+                    else
+                    {
+                        ret.AddRange(PER.EncodeConstraintWholeNumber(Size, cn.m_size.m_rootRange.m_min, cn.m_size.m_rootRange.m_max));
+                        ret.AddRange(ContentData(perAlphaCon));
+                    }
+                }
+                else
+                {
+                    ret.AddRange(EncodeAsUnCostraint(perAlphaCon));
+                }
+
+            }
+            else
+            {
+                ret.AddRange(EncodeAsUnCostraint(perAlphaCon));
+            }
+
+
+            return ret;
+        }
+
     }
 
     public partial class NumericStringValue : IA5StringValue
@@ -331,6 +487,7 @@ namespace tinyAsn1
         {
             m_TypeID = Asn1Value.TypeID.NumericString;
         }
+
     }
 
 
