@@ -164,7 +164,7 @@ namespace tinyAsn1
 
     public static class Config
     {
-        private static int m_integerSize = 4;
+        private static int m_integerSize = 8;
         public static int IntegerSize { get { return m_integerSize; } }
         public static Int64 MAXINT
         {

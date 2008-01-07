@@ -599,7 +599,7 @@ namespace tinyAsn1
         {
             get
             {
-                return (SequenceOrSetType)Type;
+                return (SequenceOrSetType)Type.GetFinalType();
             }
         }
 

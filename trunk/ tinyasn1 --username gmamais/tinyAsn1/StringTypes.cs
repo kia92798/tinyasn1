@@ -328,23 +328,22 @@ namespace tinyAsn1
             if (myType == null)
                 throw new Exception("Internal Error");
 
-            char min;
-            char max;
+            int min;
+            int max;
+            List<char> tmp = new List<char>(myType.AllowedCharSet);
+            int charIndex = tmp.IndexOf(p);
+            min = 0;
+            max = tmp.Count - 1;
 
-            if (perAlphaCon == null)
+            if (perAlphaCon != null)
             {
-                min = myType.AllowedCharSet[0];
-                max = myType.AllowedCharSet[myType.AllowedCharSet.Length - 1];
-            }
-            else
-            {
-                min = perAlphaCon.m_set[0];
-                max = perAlphaCon.m_set[perAlphaCon.m_set.Count - 1];
+                max = perAlphaCon.m_set.Count - 1;
+                charIndex = perAlphaCon.m_set.IndexOf(p);
             }
 
             if (min == max)
                 return ret;
-            ret.AddRange(PER.EncodeConstraintWholeNumber(p,min,max));
+            ret.AddRange(PER.EncodeConstraintWholeNumber(charIndex, min, max));
 
             return ret;
         }

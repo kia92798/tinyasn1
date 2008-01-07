@@ -243,6 +243,9 @@ namespace tinyAsn1
                 return PERIntegerEffectiveConstraint.Intersection((PERIntegerEffectiveConstraint)a, (PERIntegerEffectiveConstraint)b);
             if (a is PERSizeEffectiveConstraint && b is PERSizeEffectiveConstraint)
                 return PERSizeEffectiveConstraint.Intersection((PERSizeEffectiveConstraint)a, (PERSizeEffectiveConstraint)b);
+            if (a is PERAlphabetAndSizeEffectiveConstraint && b is PERAlphabetAndSizeEffectiveConstraint)
+                return PERAlphabetAndSizeEffectiveConstraint.Intersection((PERAlphabetAndSizeEffectiveConstraint)a,
+                    (PERAlphabetAndSizeEffectiveConstraint)b);
 
             throw new Exception("Internal Error");
         }
