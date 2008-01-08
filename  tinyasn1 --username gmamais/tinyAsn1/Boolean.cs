@@ -70,6 +70,15 @@ namespace tinyAsn1
 
             return true;
         }
+        public override long minBitsInPER(PEREffectiveConstraint cns)
+        {
+            return 1;
+        }
+
+        public override long maxBitsInPER(PEREffectiveConstraint cns)
+        {
+            return 1;
+        }
     }
 
     public partial class BooleanValue : Asn1Value

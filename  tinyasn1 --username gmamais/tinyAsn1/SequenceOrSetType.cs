@@ -22,6 +22,7 @@ namespace tinyAsn1
             public Asn1Value m_defaultValue;
             public bool m_extended = false;
             public int? m_version=null;
+            public List<string> m_comments = new List<string>();
 
             public Child()
             {
@@ -84,6 +85,9 @@ namespace tinyAsn1
                         case asn1Parser.DEFAULT_VALUE:
                             ret.m_defaultValue = Asn1Value.CreateFromAntlrAst(child.GetChild(0));
                             break;
+                        case asn1Parser.SPECIAL_COMMENT:
+                            ret.m_comments.Add(child.Text.Replace("--@", "").Replace("\r", "").Replace("\n", "").Replace("--", ""));
+                            break;
                         default:
                             throw new Exception("Internal Error, unexpected child: " + child.Text + " for node: " + tree.Text);
                     }
@@ -124,6 +128,24 @@ namespace tinyAsn1
                 ret =  m_childVarName == child.m_childVarName && m_optional == child.m_optional &&
                     m_type.Compatible(child.m_type) && ret;
                 return ret;
+            }
+
+            public void PrintHtml(StreamWriterLevel o, int p, int index)
+            {
+                string cssClass = "OddRow";
+                if (index%2==0)
+                    cssClass="EvenRow";
+                o.WriteLine("<tr class=\""+cssClass+"\">");
+                o.WriteLine("<td class=\"no\">{0}</td>",index);
+                o.WriteLine("<td class=\"field\">{0}</td>",m_childVarName);
+                o.WriteLine("<td class=\"comment\">{0}</td>", o.BR(m_comments));
+                o.WriteLine("<td class=\"type\">{0}</td>",m_type.Name);
+                
+                o.WriteLine("<td class=\"constraint\">{0}</td>",m_type.Constraints);
+                o.WriteLine("<td class=\"optional\">{0}</td>",(m_optional?"Yes":"No"));
+                o.WriteLine("<td class=\"min\">{0}</td>",(m_type.MinBitsInPER==-1?"&#8734":m_type.MinBitsInPER.ToString()));
+                o.WriteLine("<td class=\"max\">{0}</td>", (m_type.MaxBitsInPER == -1 ? "&#8734" : m_type.MaxBitsInPER.ToString()));
+                o.WriteLine("</tr>");
             }
         }
         
@@ -590,6 +612,127 @@ namespace tinyAsn1
                 return true;
             return m_extMarkPresent;
         }
+
+        public int PreambleLength
+        {
+            get
+            {
+                int ret = 0;
+                if (IsPERExtensible())
+                    ret++;
+                foreach (Child ch in m_children.Values)
+                {
+                    if (ch.m_extended)
+                        continue;
+                    if (ch.m_optional || ch.m_default)
+                        ret++;
+                }
+
+
+                return ret;
+            }
+        }
+
+        public override long maxBitsInPER(PEREffectiveConstraint cns)
+        {
+            if (IsPERExtensible())
+                return -1;
+
+            long ret = PreambleLength;
+            foreach (Child ch in m_children.Values)
+            {
+                if (ch.m_extended)
+                    continue;
+                long m = ch.m_type.MaxBitsInPER;
+                if (m == -1)
+                    return -1;
+                ret += m;
+            }
+
+            return ret;
+        }
+
+        public override long minBitsInPER(PEREffectiveConstraint cns)
+        {
+            long ret = PreambleLength;
+            if (IsPERExtensible())
+                ret++;
+
+            foreach (Child ch in m_children.Values)
+            {
+                if (ch.m_extended || ch.m_optional || ch.m_default)
+                    continue;
+                long m = ch.m_type.MinBitsInPER;
+                if (m == -1)
+                    return -1;
+                ret += m;
+            }
+            return ret;
+        }
+
+
+        public override void PrintHtml(StreamWriterLevel o, int lev, List<string> comment, string tasName)
+        {
+            o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
+            o.WriteLine("<tbody>");
+            o.WriteLine("<tr  bgcolor=\"#FF8f00\">");
+            o.WriteLine("<td height=\"35\" colspan=\"4\">");
+            o.WriteLine(string.Format("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"4\">{0}(SEQUENCE) </font>",tasName));
+            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\"><a href=\"#sequence2.htm\">ASN.1</a></font>");
+            o.WriteLine("</td>");
+            o.WriteLine("<td height=\"35\" colspan=\"2\"  align=\"center\">");
+            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">min = {0} bytes</font>", (MinBytesInPER == -1 ? "&#8734" : MinBytesInPER.ToString()));
+            o.WriteLine("</td>");
+            o.WriteLine("<td height=\"35\" colspan=\"2\" align=\"center\">");
+            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">max = {0} bytes</font>", (MaxBytesInPER == -1 ? "&#8734" : MaxBytesInPER.ToString()));
+            o.WriteLine("</td>");
+            o.WriteLine("</tr>");
+
+            o.WriteLine("<tr class=\"CommentRow\">");
+            o.WriteLine("<td class=\"comment\" colspan=\"8\">"+o.BR(comment)+"</td>");
+            o.WriteLine("</tr>");
+
+            o.WriteLine("<tr class=\"headerRow\">");
+            o.WriteLine("<td class=\"hrNo\">No</td>");
+            o.WriteLine("<td class=\"hrField\">Field</td>");
+            o.WriteLine("<td class=\"hrComment\">Comment</td>");
+            o.WriteLine("<td class=\"hrType\">Type</td>");
+            o.WriteLine("<td class=\"hrconstraint\">Constraint</td>");
+            o.WriteLine("<td class=\"hrOptional\">Optional</td>");
+            o.WriteLine("<td class=\"hrMin\">Min Length (bits)</td>");
+            o.WriteLine("<td class=\"hrMax\">Max Length (bits)</td>");
+            o.WriteLine("</tr>");
+
+            int index=0;
+            if (PreambleLength > 0)
+            {
+                PrintPreambleHtml(o, lev + 1);
+                index = 1;
+            }
+            foreach (Child ch in m_children.Values)
+            {
+                ch.PrintHtml(o, lev + 1, ++index);
+            }
+
+            o.WriteLine("</tbody>");
+            o.WriteLine("</table>");
+        }
+        public void PrintPreambleHtml(StreamWriterLevel o, int p)
+        {
+            string cssClass = "OddRow";
+            o.WriteLine("<tr class=\"" + cssClass + "\">");
+            o.WriteLine("<td class=\"no\">0</td>");
+            o.WriteLine("<td class=\"field\">Preamble</td>");
+            o.WriteLine("<td class=\"comment\">{0}</td>", "Special field used by PER to indicate the presence of optional and default fields.");
+            o.WriteLine("<td class=\"type\">{0}</td>", "Bit mask");
+
+            o.WriteLine("<td class=\"constraint\">{0}</td>", "-");
+            o.WriteLine("<td class=\"optional\">No</td>" );
+            o.WriteLine("<td class=\"min\">{0}</td>", PreambleLength);
+            o.WriteLine("<td class=\"max\">{0}</td>", PreambleLength);
+            o.WriteLine("</tr>");
+        }
+
     }
 
     public partial class SequenceOrSetValue : Asn1Value

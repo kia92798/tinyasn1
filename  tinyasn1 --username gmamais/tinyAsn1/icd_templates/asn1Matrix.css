@@ -162,4 +162,16 @@
 	width:70pt;
 }
 
+h1
+{
+	font-family: Verdana, Tahoma;
+	color: #033a7a;
+	font-size: 14pt;
+}
 
+h2
+{
+	font-family: Verdana, Tahoma;
+	color: #033a7a;
+	font-size: 12pt;
+}

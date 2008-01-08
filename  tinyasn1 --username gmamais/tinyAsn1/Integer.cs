@@ -239,6 +239,35 @@ namespace tinyAsn1
                 return m_perEffectiveConstraint;
             }
         }
+        public override long maxBitsInPER(PEREffectiveConstraint cns)
+        {
+            PERIntegerEffectiveConstraint cn = (PERIntegerEffectiveConstraint)cns;
+            if (cn == null) //unconstraint integer
+                return (Config.IntegerSize + 1) * 8;
+
+            if (cn.Extensible)
+                return (Config.IntegerSize + 1) * 8;
+
+            if (!cn.m_rootRange.m_minIsInfinite && !cn.m_rootRange.m_maxIsInfinite)
+                return PER.GetNumberOfBitsForNonNegativeInteger((UInt64)(cn.m_rootRange.m_max - cn.m_rootRange.m_min));
+
+
+            return (Config.IntegerSize + 1) * 8;
+        }
+        public override long minBitsInPER(PEREffectiveConstraint cns)
+        {
+            PERIntegerEffectiveConstraint cn = (PERIntegerEffectiveConstraint)cns;
+            if (cn == null) //unconstraint integer
+                return 16;
+            if (cn.Extensible)
+                return 16;
+
+            if (!cn.m_rootRange.m_minIsInfinite && !cn.m_rootRange.m_maxIsInfinite)
+                return PER.GetNumberOfBitsForNonNegativeInteger((UInt64)(cn.m_rootRange.m_max - cn.m_rootRange.m_min));
+
+
+            return 16;
+        }
 
 
     }

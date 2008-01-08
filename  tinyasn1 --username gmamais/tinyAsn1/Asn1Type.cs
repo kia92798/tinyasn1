@@ -561,6 +561,18 @@ namespace tinyAsn1
             }
         }
 
+        public virtual string Constraints
+        {
+            get
+            {
+                string ret = "";
+                foreach (IConstraint con in m_constraints)
+                    ret+=con.ToString(true);
+
+                return ret;
+            }
+        }
+
         public virtual void PrintAsn1(StreamWriterLevel o, int lev)
         {
             if (m_tag != null)
@@ -599,6 +611,75 @@ namespace tinyAsn1
             }
         }
 
+
+        public virtual long minBitsInPER(PEREffectiveConstraint cns)
+        {
+            return 0;
+        }
+
+        public virtual long maxBitsInPER(PEREffectiveConstraint cns)
+        {
+            return -1;
+        }
+
+        /// <summary>
+        /// Return -1 if infinite
+        /// </summary>
+        public long MinBitsInPER
+        {
+            get
+            {
+                return minBitsInPER(PEREffectiveConstraint);
+            }
+        }
+
+        /// <summary>
+        /// Return -1 if infinite
+        /// </summary>
+        public long MaxBitsInPER
+        {
+            get { return maxBitsInPER(PEREffectiveConstraint); }
+        }
+
+        /// <summary>
+        /// Return -1 if infinite
+        /// </summary>
+        public virtual long MinBytesInPER
+        {
+            get {
+                long bits = MinBitsInPER;
+                if (bits == -1)
+                    return -1;
+
+                return (long)Math.Ceiling((double)bits / 8.0); 
+            }
+        }
+
+        /// <summary>
+        /// Return -1 if infinite
+        /// </summary>
+        public virtual long MaxBytesInPER
+        {
+            get
+            {
+                long bits = MaxBitsInPER;
+                if (bits == -1)
+                    return -1;
+
+                return (long)Math.Ceiling((double)bits / 8.0);
+            }
+        }
+
+
+//Backend functions
+        public virtual void PrintHtml(StreamWriterLevel o, int lev, List<string> comment, string tasName)
+        {
+            o.P(lev);o.WriteLine("<div style=\"width: 100%; height: 20pt\">");
+
+
+            o.P(lev); o.WriteLine("</div>");
+
+        }
 
 
     }

@@ -310,7 +310,7 @@ choiceItemsList
 	;
 	
 choiceItem
-	:	identifier type				->  ^(CHOICE_ITEM identifier type)
+	:	SPECIAL_COMMENT* identifier type				->  ^(CHOICE_ITEM identifier type SPECIAL_COMMENT*)
 	;	
 
 choiceListExtension
@@ -356,7 +356,7 @@ componentTypeList
 	;
 	
 componentType
-	:	identifier type (optOrDef=OPTIONAL | optOrDef=DEFAULT value)?	-> ^(SEQUENCE_ITEM identifier type $optOrDef? ^(DEFAULT_VALUE value)?)
+	:	SPECIAL_COMMENT* identifier type (optOrDef=OPTIONAL | optOrDef=DEFAULT value)?	-> ^(SEQUENCE_ITEM identifier type $optOrDef? ^(DEFAULT_VALUE value)? SPECIAL_COMMENT*)
 		| a=COMPONENTS OF type											-> ^(COMPONENTS_OF[$a] type)
 	;	
 	

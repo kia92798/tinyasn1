@@ -244,6 +244,54 @@ namespace tinyAsn1
                 return m_perEffectiveConstraint;
             }
         }
+
+        public override long minBitsInPER(PEREffectiveConstraint cns)
+        {
+            PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
+
+            if (cn == null)
+                return 8;
+
+            if (!cn.m_size.m_rootRange.m_maxIsInfinite && cn.m_size.m_rootRange.m_max < 0xFFFF && cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
+                return cn.m_size.m_rootRange.m_min;
+
+
+            if (cn.m_size.m_rootRange.m_min <= 127)
+                return cn.m_size.m_rootRange.m_min + 8;
+            if (cn.m_size.m_rootRange.m_min <= 0x3FFF)
+                return cn.m_size.m_rootRange.m_min + 16;
+
+
+            return cn.m_size.m_rootRange.m_min + (cn.m_size.m_rootRange.m_min / 0x10000 + 3) * 8;
+        }
+        public override long maxBitsInPER(PEREffectiveConstraint cns)
+        {
+            PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
+
+            if (cn != null)
+            {
+                if (cn.Extensible)
+                    return -1;
+
+                if (!cn.m_size.m_rootRange.m_maxIsInfinite)
+                {
+                    if (cn.m_size.m_rootRange.m_max < 0xFFFF && cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
+                        return cn.m_size.m_rootRange.m_max;
+
+                    if (cn.m_size.m_rootRange.m_max <= 127)
+                        return cn.m_size.m_rootRange.m_max + 8;
+
+                    if (cn.m_size.m_rootRange.m_max <= 0x3FFF)
+                        return cn.m_size.m_rootRange.m_max + 16;
+
+                    return cn.m_size.m_rootRange.m_max + (cn.m_size.m_rootRange.m_max / 0x10000 + 3) * 8;
+                }
+                else
+                    return -1;
+            }
+
+            return -1;
+        }
     }
 
 

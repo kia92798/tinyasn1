@@ -117,14 +117,7 @@ namespace tinyAsn1
 
             if (genOutput)
             {
-                for (int i = 0; i < inputFiles.Count; i++)
-                {
-
-                        System.IO.StreamWriter wr = new System.IO.StreamWriter(inputFiles[i] + ".html");
-//                        ASTs[i].GenerateICD(wr);
-                        wr.Flush();
-                        wr.Close();
-                }
+                compInv.PrintHtml();
             }
             return 0;            
         }
@@ -133,6 +126,7 @@ namespace tinyAsn1
         {
             Console.Error.WriteLine("tinyAsn1 -debug -encodeVariables -icd file1, file2, ..., fileN ");
             Console.Error.WriteLine("\t -debug \t\tcreates an XML with AST representation");
+            Console.Error.WriteLine("\t -encodeVariables \t\tcreates one .dat file with PER encoding for each defined variable");
             Console.Error.WriteLine("\t -icd \t\tGenerate ICD Documents");
             return 4;
         }

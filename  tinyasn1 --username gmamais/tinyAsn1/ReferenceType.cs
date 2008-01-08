@@ -257,6 +257,17 @@ namespace tinyAsn1
                 return m_perEffectiveConstraint;
             }
         }
+
+        public override long minBitsInPER(PEREffectiveConstraint cns)
+        {
+            return Type.minBitsInPER(cns);
+        }
+
+        public override long maxBitsInPER(PEREffectiveConstraint cns)
+        {
+            return Type.maxBitsInPER(cns);
+        }
+
     
     }
 }

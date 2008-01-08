@@ -69,6 +69,15 @@ namespace tinyAsn1
 
             return true;
         }
+
+        public override long minBitsInPER(PEREffectiveConstraint cns)
+        {
+            return 0;
+        }
+        public override long maxBitsInPER(PEREffectiveConstraint cns)
+        {
+            return 0;
+        }
     }
 
 

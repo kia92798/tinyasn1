@@ -96,6 +96,19 @@ namespace tinyAsn1
 
             return true;
         }
+
+        public override long minBitsInPER(PEREffectiveConstraint cns)
+        {
+            // corresponds to 0.0
+            return 8;
+        }
+
+        public override long maxBitsInPER(PEREffectiveConstraint cns)
+        {
+            // one byte header, 3 byte exponent, mantissa as big as harware supports
+            return (1 + 3 + Config.IntegerSize) * 8;
+        }
+
     }
 
     public partial class RealValue : Asn1Value
