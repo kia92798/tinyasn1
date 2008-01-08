@@ -64,6 +64,13 @@ namespace tinyAsn1
             for (int i = 0; i < level; i++)
                 Write("\t");
         }
+        public string BR(List<string> lines)
+        {
+            string ret = "";
+            foreach (string line in lines)
+                ret += line + "<br/>";
+            return ret;
+        }
     }
 
     public class SemanticTreeNode : ITree
@@ -166,6 +173,8 @@ namespace tinyAsn1
     {
         private static int m_integerSize = 8;
         public static int IntegerSize { get { return m_integerSize; } }
+        private static int m_MaxObjectIdentifierSize = 200;
+        public static int MaxObjectIdentifierSize { get { return m_MaxObjectIdentifierSize; } }
         public static Int64 MAXINT
         {
             get

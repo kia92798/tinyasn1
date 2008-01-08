@@ -188,9 +188,6 @@ namespace tinyAsn1
                     foreach (ValueAssigment vas in m.m_valuesAssigments.Values)
                         vas.m_type.ComputePEREffectiveConstraints();
                 }
-
-
-        
         }
 
         private bool Phase1Finished()
@@ -227,6 +224,48 @@ namespace tinyAsn1
             foreach (Asn1File file in m_files)
                 file.PrintAsn1();
 
+        }
+
+        public virtual void PrintHtml()
+        {
+            if (m_files.Count > 0)
+            {
+                string fileName = m_files[0].m_fileName;
+                if (fileName.ToUpper().EndsWith(".ASN1"))
+                    fileName = fileName.Substring(0, fileName.Length - 5) + ".html";
+                else if (fileName.ToUpper().EndsWith(".ASN"))
+                    fileName = fileName.Substring(0, fileName.Length - 4) + ".html";
+                else
+                    fileName += ".html";
+                StreamWriterLevel wr=null;
+                try
+                {
+                    wr = new StreamWriterLevel(fileName);
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine(ex.Message);
+                    return;
+                }
+
+                wr.WriteLine("<html>");
+                wr.WriteLine("<head>");
+                wr.WriteLine("    <title>ASN.1 Test Cases</title>");
+                wr.WriteLine("    <link href=\"asn1Matrix.css\" rel=\"stylesheet\" type=\"text/css\" />");
+                wr.WriteLine("</head>");
+                wr.WriteLine("<body>");
+                
+                
+                foreach (Asn1File file in m_files)
+                    file.PrintHtml(wr, 0);
+
+                wr.WriteLine("</body>");
+                wr.WriteLine("</html>");
+
+                wr.Flush();
+                wr.Close();
+
+            }
         }
 
         internal void EncodeVars()
@@ -286,6 +325,19 @@ namespace tinyAsn1
         }
 
 
+
+        public void PrintHtml(StreamWriterLevel wr, int lev)
+        {
+            wr.WriteLine("    <div style=\"width: 100%; height: 20pt\">");
+            wr.WriteLine(string.Format("    <h1 >File : {0}</h1>", m_fileName));
+
+            foreach (Module m in m_modules)
+                m.PrintHtml(wr, lev);
+
+            wr.WriteLine("    </div>");
+
+            wr.Flush();
+        }
     }
 
 

@@ -87,6 +87,15 @@ namespace tinyAsn1
 
             return true;
         }
+
+        public override long minBitsInPER(PEREffectiveConstraint cns)
+        {
+            return 8;
+        }
+        public override long maxBitsInPER(PEREffectiveConstraint cns)
+        {
+            return Config.MaxObjectIdentifierSize;
+        }
     }
 
     public partial class ObjectIdentifierValue : Asn1Value

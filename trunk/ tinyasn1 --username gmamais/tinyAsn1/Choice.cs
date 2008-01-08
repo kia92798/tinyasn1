@@ -411,6 +411,49 @@ namespace tinyAsn1
                 return true;
             return m_extMarkPresent;
         }
+
+        public override long minBitsInPER(PEREffectiveConstraint cns)
+        {
+            long ret = 0;
+            if (IsPERExtensible())
+                ret++;
+            UInt16 nRootChildren=0;
+            long smallestChild = long.MaxValue;
+            foreach (ChoiceChild ch in m_children.Values)
+            {
+                if (ch.m_extended)
+                    continue;
+                if (ch.m_type.MinBitsInPER < smallestChild)
+                    smallestChild = ch.m_type.MinBitsInPER;
+                nRootChildren++;
+            }
+            ret+=PER.GetNumberOfBitsForNonNegativeInteger(nRootChildren);
+            ret += smallestChild;
+
+            return ret;
+        }
+
+        public override long maxBitsInPER(PEREffectiveConstraint cns)
+        {
+            long ret = 0;
+            if (IsPERExtensible())
+                return -1;
+            UInt16 nRootChildren = 0;
+            long largestChild = 0;
+            foreach (ChoiceChild ch in m_children.Values)
+            {
+                if (ch.m_extended)
+                    continue;
+                if (ch.m_type.MaxBitsInPER > largestChild)
+                    largestChild = ch.m_type.MaxBitsInPER;
+                nRootChildren++;
+            }
+            ret += PER.GetNumberOfBitsForNonNegativeInteger(nRootChildren);
+            ret += largestChild;
+
+
+            return ret;
+        }
     }
 
     public partial class ChoiceChild
@@ -419,6 +462,7 @@ namespace tinyAsn1
         public Asn1Type m_type;
         public bool m_extended = false;
         public int? m_version = null;
+        public List<string> m_comments = new List<string>();
 
         public void PrintAsn1(StreamWriterLevel o, int lev)
         {
@@ -448,6 +492,9 @@ namespace tinyAsn1
                         break;
                     case asn1Parser.TYPE_DEF:
                         ret.m_type = Asn1Type.CreateFromAntlrAst(child);
+                        break;
+                    case asn1Parser.SPECIAL_COMMENT:
+                        ret.m_comments.Add(child.Text.Replace("--@", "").Replace("\r", "").Replace("\n", "").Replace("--", ""));
                         break;
                     default:
                         throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
