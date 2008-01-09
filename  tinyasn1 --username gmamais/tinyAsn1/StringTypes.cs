@@ -181,7 +181,7 @@ namespace tinyAsn1
             return PER.GetNumberOfBitsForNonNegativeInteger((UInt64)(max - min));
         }
 
-        public override long minBitsInPER(PEREffectiveConstraint cns)
+/*        public override long minBitsInPER(PEREffectiveConstraint cns)
         {
             PERAlphabetAndSizeEffectiveConstraint cn = (PERAlphabetAndSizeEffectiveConstraint)cns;
 
@@ -231,7 +231,58 @@ namespace tinyAsn1
             }
 
             return -1;
+        }*/
+        public override long minBitsInPER(PEREffectiveConstraint cns)
+        {
+            PERAlphabetAndSizeEffectiveConstraint cn = (PERAlphabetAndSizeEffectiveConstraint)cns;
+            int extBit = 0;
+            if (cn.Extensible)
+                extBit++;
+
+            if (cn == null)
+                return extBit + 8;
+
+            if (!cn.m_size.m_rootRange.m_maxIsInfinite)
+            {
+                if (cn.m_size.m_rootRange.m_max < 0x10000 &&
+                    cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
+                    return extBit + cn.m_size.m_rootRange.m_min * BitsPerSingleChar(cn.m_from);
+
+                if (cn.m_size.m_rootRange.m_max < 0x10000)
+                    return extBit + cn.m_size.m_rootRange.m_min * BitsPerSingleChar(cn.m_from) + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
+            }
+
+
+            if (cn.m_size.m_rootRange.m_min <= 0x7F)
+                return extBit + cn.m_size.m_rootRange.m_min * BitsPerSingleChar(cn.m_from) + 8;
+            if (cn.m_size.m_rootRange.m_min <= 0x3FFF)
+                return extBit + cn.m_size.m_rootRange.m_min * BitsPerSingleChar(cn.m_from) + 16;
+
+
+            return extBit + cn.m_size.m_rootRange.m_min * BitsPerSingleChar(cn.m_from) + (cn.m_size.m_rootRange.m_min / 0x10000 + 3) * 8;
         }
+
+        public override long maxBitsInPER(PEREffectiveConstraint cns)
+        {
+            PERAlphabetAndSizeEffectiveConstraint cn = (PERAlphabetAndSizeEffectiveConstraint)cns;
+
+            if (cn == null)
+                return -1;
+            if (cn.Extensible)
+                return -1;
+            if (cn.m_size.m_rootRange.m_maxIsInfinite)
+                return -1;
+
+            if (cn.m_size.m_rootRange.m_max < 0x10000 &&
+                cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
+                return cn.m_size.m_rootRange.m_max * BitsPerSingleChar(cn.m_from);
+
+            if (cn.m_size.m_rootRange.m_max < 0x10000)
+                return cn.m_size.m_rootRange.m_max * BitsPerSingleChar(cn.m_from) + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
+
+            return cn.m_size.m_rootRange.m_max * BitsPerSingleChar(cn.m_from) + (cn.m_size.m_rootRange.m_max / 0x10000 + 3) * 8;
+        }
+
     }
 
     public partial class NumericStringType : IA5StringType
@@ -504,7 +555,7 @@ namespace tinyAsn1
                     }
                 }
 
-                if (!cn.m_size.m_rootRange.m_maxIsInfinite && cn.m_size.m_rootRange.m_max < 0xFFFF)
+                if (!cn.m_size.m_rootRange.m_maxIsInfinite && cn.m_size.m_rootRange.m_max < 0x10000)
                 {
                     if (cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
                     {

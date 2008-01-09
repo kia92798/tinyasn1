@@ -226,6 +226,13 @@ namespace tinyAsn1
 
         }
 
+
+        public void Tabularize()
+        {
+            foreach (Asn1File file in m_files)
+                file.Tabularize();
+        }
+
         public virtual void PrintHtml()
         {
             if (m_files.Count > 0)
@@ -328,6 +335,8 @@ namespace tinyAsn1
 
         public void PrintHtml(StreamWriterLevel wr, int lev)
         {
+            Tabularize();
+
             wr.WriteLine("    <div style=\"width: 100%; height: 20pt\">");
             wr.WriteLine(string.Format("    <h1 >File : {0}</h1>", m_fileName));
 
@@ -337,6 +346,12 @@ namespace tinyAsn1
             wr.WriteLine("    </div>");
 
             wr.Flush();
+        }
+
+        public void Tabularize()
+        {
+            foreach (Module m in m_modules)
+                m.Tabularize();
         }
     }
 

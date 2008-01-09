@@ -454,6 +454,89 @@ namespace tinyAsn1
 
             return ret;
         }
+        public override bool Constructed
+        {
+            get { return true; }
+        }
+
+        public override void Tabularize(string tasName)
+        {
+            foreach (ChoiceChild ch in m_children.Values)
+            {
+                ch.m_type.Tabularize(tasName);
+                if (ch.m_type.Constructed)
+                {
+
+                    TypeAssigment newTas = m_module.CreateNewTypeAssigment(ch.m_childVarName, ch.m_type, ch.m_comments);
+                    ch.m_type = ReferenceType.CreateByName(newTas);
+                }
+            }
+        }
+        
+        public override void PrintHtml(StreamWriterLevel o, int lev, List<string> comment, string tasName)
+        {
+            o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
+            o.WriteLine("<tbody>");
+            o.WriteLine("<tr  bgcolor=\"#FF8f00\">");
+            o.WriteLine("<td height=\"35\" colspan=\"3\">");
+            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"4\">{0}({1}) </font>", tasName,Name);
+            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\"><a href=\"#sequence2.htm\">ASN.1</a></font>");
+            o.WriteLine("</td>");
+            o.WriteLine("<td height=\"35\" colspan=\"2\"  align=\"center\">");
+            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">min = {0} bytes</font>", (MinBytesInPER == -1 ? "&#8734" : MinBytesInPER.ToString()));
+            o.WriteLine("</td>");
+            o.WriteLine("<td height=\"35\" colspan=\"2\" align=\"center\">");
+            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">max = {0} bytes</font>", (MaxBytesInPER == -1 ? "&#8734" : MaxBytesInPER.ToString()));
+            o.WriteLine("</td>");
+            o.WriteLine("</tr>");
+
+            o.WriteLine("<tr class=\"CommentRow\">");
+            o.WriteLine("<td class=\"comment\" colspan=\"7\">" + o.BR(comment) + "</td>");
+            o.WriteLine("</tr>");
+
+            o.WriteLine("<tr class=\"headerRow\">");
+            o.WriteLine("<td class=\"hrNo\">No</td>");
+            o.WriteLine("<td class=\"hrField\">Field</td>");
+            o.WriteLine("<td class=\"hrComment\">Comment</td>");
+            o.WriteLine("<td class=\"hrType\">Type</td>");
+            o.WriteLine("<td class=\"hrconstraint\">Constraint</td>");
+            o.WriteLine("<td class=\"hrMin\">Min Length (bits)</td>");
+            o.WriteLine("<td class=\"hrMax\">Max Length (bits)</td>");
+            o.WriteLine("</tr>");
+
+            int index = 0;
+            if (m_children.Count > 1)
+            {
+                PrintChoiceIndexHtml(o, lev + 1);
+                index = 1;
+            }
+            foreach (ChoiceChild ch in m_children.Values)
+            {
+                ch.PrintHtml(o, lev + 1, ++index);
+            }
+
+            o.WriteLine("</tbody>");
+            o.WriteLine("</table>");
+        }
+
+        private void PrintChoiceIndexHtml(StreamWriterLevel o, int p)
+        {
+            string cssClass = "OddRow";
+            int nBits = PER.GetNumberOfBitsForNonNegativeInteger((ulong)m_children.Count);
+            if (IsPERExtensible())
+                nBits++;
+
+            o.WriteLine("<tr class=\"" + cssClass + "\">");
+            o.WriteLine("<td class=\"no\">0</td>");
+            o.WriteLine("<td class=\"field\">ChoiceIndex</td>");
+            o.WriteLine("<td class=\"comment\">{0}</td>", "Special field used by PER to indicate choice alternative is present.");
+            o.WriteLine("<td class=\"type\">{0}</td>", "unsigned int");
+
+            o.WriteLine("<td class=\"constraint\">{0}</td>", "-");
+            o.WriteLine("<td class=\"min\">{0}</td>", nBits);
+            o.WriteLine("<td class=\"max\">{0}</td>", nBits);
+            o.WriteLine("</tr>");
+        }
     }
 
     public partial class ChoiceChild
@@ -519,6 +602,23 @@ namespace tinyAsn1
         internal bool Compatible(ChoiceChild other)
         {
             return m_childVarName==other.m_childVarName && m_type.Compatible(other.m_type);
+        }
+
+        internal void PrintHtml(StreamWriterLevel o, int p, int index)
+        {
+            string cssClass = "OddRow";
+            if (index % 2 == 0)
+                cssClass = "EvenRow";
+            o.WriteLine("<tr class=\"" + cssClass + "\">");
+            o.WriteLine("<td class=\"no\">{0}</td>", index);
+            o.WriteLine("<td class=\"field\">{0}</td>", m_childVarName);
+            o.WriteLine("<td class=\"comment\">{0}</td>", o.BR(m_comments));
+            o.WriteLine("<td class=\"type\">{0}</td>", m_type.Name);
+
+            o.WriteLine("<td class=\"constraint\">{0}</td>", m_type.Constraints);
+            o.WriteLine("<td class=\"min\">{0}</td>", (m_type.MinBitsInPER == -1 ? "&#8734" : m_type.MinBitsInPER.ToString()));
+            o.WriteLine("<td class=\"max\">{0}</td>", (m_type.MaxBitsInPER == -1 ? "&#8734" : m_type.MaxBitsInPER.ToString()));
+            o.WriteLine("</tr>");
         }
     }
 

@@ -677,7 +677,7 @@ namespace tinyAsn1
             o.WriteLine("<tbody>");
             o.WriteLine("<tr  bgcolor=\"#FF8f00\">");
             o.WriteLine("<td height=\"35\" colspan=\"4\">");
-            o.WriteLine(string.Format("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"4\">{0}(SEQUENCE) </font>",tasName));
+            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"4\">{0}({1}) </font>",tasName,Name);
             o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\"><a href=\"#sequence2.htm\">ASN.1</a></font>");
             o.WriteLine("</td>");
             o.WriteLine("<td height=\"35\" colspan=\"2\"  align=\"center\">");
@@ -731,6 +731,25 @@ namespace tinyAsn1
             o.WriteLine("<td class=\"min\">{0}</td>", PreambleLength);
             o.WriteLine("<td class=\"max\">{0}</td>", PreambleLength);
             o.WriteLine("</tr>");
+        }
+
+        public override bool Constructed
+        {
+            get { return true; }
+        }
+
+        public override void Tabularize(string tasName)
+        {
+            foreach(Child ch in m_children.Values) 
+            {
+                ch.m_type.Tabularize(tasName);
+                if (ch.m_type.Constructed)
+                {
+                    TypeAssigment newTas = m_module.CreateNewTypeAssigment(ch.m_childVarName, ch.m_type, ch.m_comments);
+                    ch.m_type = ReferenceType.CreateByName(newTas);
+                }
+
+            }
         }
 
     }

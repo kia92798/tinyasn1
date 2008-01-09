@@ -681,7 +681,20 @@ namespace tinyAsn1
 
         }
 
+        /// <summary>
+        /// Must be overriden in Contstucted types
+        /// </summary>
+        public virtual bool Constructed
+        {
+            get { return false; }
+        }
 
+        /// <summary>
+        /// Must be overriden in Contstucted types
+        /// </summary>
+        public virtual void Tabularize(string tasName)
+        {
+        }
     }
 
 
