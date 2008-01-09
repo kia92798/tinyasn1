@@ -359,6 +359,33 @@ namespace tinyAsn1
                 tas.PrintHtml(wr, p + 1);
             wr.WriteLine("        </div>");
         }
+
+        public void Tabularize()
+        {
+            int cnt = m_typeAssigments.Values.Count;
+            for (int i=0;i < cnt;i++ ) {
+                TypeAssigment tas = m_typeAssigments.Values[i];
+                tas.m_type.Tabularize(tas.m_name);
+            }
+            //foreach (TypeAssigment tas in m_typeAssigments.Values)
+            //    tas.m_type.Tabularize(tas.m_name);
+        }
+
+        public TypeAssigment CreateNewTypeAssigment(string name, Asn1Type asn1Type, List<string> commenst)
+        {
+            string newName = name[0].ToString().ToUpper() + name.Substring(1,name.Length-1);
+            int i=0;
+            while(m_typeAssigments.ContainsKey(newName)) {
+                i++;
+                newName += i.ToString();
+            }
+            TypeAssigment ret = new TypeAssigment();
+            ret.m_name = newName;
+            ret.m_type = asn1Type;
+            ret.m_comments = commenst;
+            m_typeAssigments.Add(newName, ret);
+            return ret;
+        }
     }
 
 

@@ -268,6 +268,15 @@ namespace tinyAsn1
             return Type.maxBitsInPER(cns);
         }
 
-    
+
+
+        public static ReferenceType CreateByName(TypeAssigment newTas)
+        {
+            ReferenceType ret = new ReferenceType();
+            ret.m_referencedTypeName = newTas.m_name;
+            ret.m_module = newTas.m_type.m_module;
+            ret.antlrNode = newTas.m_type.antlrNode;
+            return ret;
+        }
     }
 }

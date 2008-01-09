@@ -7,6 +7,7 @@ using Antlr.Runtime;
 namespace tinyAsn1
 {
 
+
     /// <summary>
     /// Common base class for SEQUENCE OF and SET OF
     /// </summary>
@@ -63,55 +64,68 @@ namespace tinyAsn1
         public override long minBitsInPER(PEREffectiveConstraint cns)
         {
             PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
+            int extBit = 0;
+            if (cn.Extensible)
+                extBit++;
 
             if (cn == null)
-                return 8;
+                return extBit+8;
 
-            if (!cn.m_size.m_rootRange.m_maxIsInfinite &&
-                cn.m_size.m_rootRange.m_max < 0xFFFF &&
-                cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
-                return cn.m_size.m_rootRange.m_min * m_type.MaxBitsInPER;
+            if (!cn.m_size.m_rootRange.m_maxIsInfinite)
+            {
+                if (cn.m_size.m_rootRange.m_max < 0x10000 &&
+                    cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
+                    return extBit + cn.m_size.m_rootRange.m_min * m_type.MaxBitsInPER;
+
+                if (cn.m_size.m_rootRange.m_max < 0x10000)
+                    return extBit + cn.m_size.m_rootRange.m_min * m_type.MaxBitsInPER + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
+            }
 
 
-            if (cn.m_size.m_rootRange.m_min <= 127)
-                return cn.m_size.m_rootRange.m_min * m_type.MaxBitsInPER + 8;
+            if (cn.m_size.m_rootRange.m_min <= 0x7F)
+                return extBit + cn.m_size.m_rootRange.m_min * m_type.MaxBitsInPER + 8;
             if (cn.m_size.m_rootRange.m_min <= 0x3FFF)
-                return cn.m_size.m_rootRange.m_min * m_type.MaxBitsInPER + 16;
+                return extBit + cn.m_size.m_rootRange.m_min * m_type.MaxBitsInPER + 16;
 
 
-            return cn.m_size.m_rootRange.m_min * m_type.MaxBitsInPER + (cn.m_size.m_rootRange.m_min / 0x10000 + 3) * 8;
+            return extBit + cn.m_size.m_rootRange.m_min * m_type.MaxBitsInPER + (cn.m_size.m_rootRange.m_min / 0x10000 + 3) * 8;
         }
 
         public override long maxBitsInPER(PEREffectiveConstraint cns)
         {
             PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
 
-            if (cn != null)
-            {
-                if (cn.Extensible)
-                    return -1;
+            if (cn == null)
+                return -1;
+            if (cn.Extensible)
+                return -1;
+            if (cn.m_size.m_rootRange.m_maxIsInfinite)
+                return -1;
 
-                if (!cn.m_size.m_rootRange.m_maxIsInfinite)
-                {
-                    if (cn.m_size.m_rootRange.m_max < 0xFFFF && 
-                        cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
-                        return cn.m_size.m_rootRange.m_max * m_type.MaxBitsInPER;
+            if (cn.m_size.m_rootRange.m_max < 0x10000 && 
+                cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
+                return cn.m_size.m_rootRange.m_max * m_type.MaxBitsInPER;
 
-                    if (cn.m_size.m_rootRange.m_max <= 127)
-                        return cn.m_size.m_rootRange.m_max * m_type.MaxBitsInPER + 8;
-                    
-                    if (cn.m_size.m_rootRange.m_max <= 0x3FFF)
-                        return cn.m_size.m_rootRange.m_max * m_type.MaxBitsInPER + 16;
+            if (cn.m_size.m_rootRange.m_max < 0x10000)
+                return cn.m_size.m_rootRange.m_max * m_type.MaxBitsInPER + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
 
-                    return cn.m_size.m_rootRange.m_max * m_type.MaxBitsInPER + (cn.m_size.m_rootRange.m_max / 0x10000 + 3) * 8;
-                }
-                else
-                    return -1;
-            }
-
-            return -1;
+            return cn.m_size.m_rootRange.m_max * m_type.MaxBitsInPER + (cn.m_size.m_rootRange.m_max / 0x10000 + 3) * 8;
         }
 
+        public override bool Constructed
+        {
+            get { return true; }
+        }
+
+        public override void Tabularize(string tasName)
+        {
+            m_type.Tabularize(tasName);
+            if (m_type.Constructed)
+            {
+                TypeAssigment newTas = m_module.CreateNewTypeAssigment(tasName, m_type, new List<string>());
+                m_type = ReferenceType.CreateByName(newTas);
+            }
+        }
     
    }
 
@@ -226,7 +240,7 @@ namespace tinyAsn1
                     }
                 }
 
-                if (!cn.m_size.m_rootRange.m_maxIsInfinite && cn.m_size.m_rootRange.m_max < 0xFFFF)
+                if (!cn.m_size.m_rootRange.m_maxIsInfinite && cn.m_size.m_rootRange.m_max < 0x10000)
                 {
                     if (cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
                     {
