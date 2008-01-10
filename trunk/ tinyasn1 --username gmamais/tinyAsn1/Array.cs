@@ -7,11 +7,74 @@ using Antlr.Runtime;
 namespace tinyAsn1
 {
 
+    public abstract class SizeableType : Asn1Type
+    {
+        public override long maxBitsInPER(PEREffectiveConstraint cns)
+        {
+            PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
+
+            if (cn == null)
+                return -1;
+            if (cn.Extensible)
+                return -1;
+            if (cn.m_size.m_rootRange.m_maxIsInfinite)
+                return -1;
+
+            if (cn.m_size.m_rootRange.m_max < 0x10000 &&
+                cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
+                return cn.m_size.m_rootRange.m_max * maxItemBitsInPER(cns);
+
+            if (cn.m_size.m_rootRange.m_max < 0x10000)
+                return cn.m_size.m_rootRange.m_max * maxItemBitsInPER(cns) + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
+
+            return cn.m_size.m_rootRange.m_max * maxItemBitsInPER(cns) + (cn.m_size.m_rootRange.m_max / 0x10000 + 3) * 8;
+        }
+        public override long minBitsInPER(PEREffectiveConstraint cns)
+        {
+            PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
+            int extBit = 0;
+            if (cn.Extensible)
+                extBit++;
+
+            if (cn == null)
+                return extBit + 8;
+
+            if (!cn.m_size.m_rootRange.m_maxIsInfinite)
+            {
+                if (cn.m_size.m_rootRange.m_max < 0x10000 &&
+                    cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
+                    return extBit + cn.m_size.m_rootRange.m_min * minItemBitsInPER(cns);
+
+                if (cn.m_size.m_rootRange.m_max < 0x10000)
+                    return extBit + cn.m_size.m_rootRange.m_min * minItemBitsInPER(cns) + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
+            }
+
+
+            if (cn.m_size.m_rootRange.m_min <= 0x7F)
+                return extBit + cn.m_size.m_rootRange.m_min * minItemBitsInPER(cns) + 8;
+            if (cn.m_size.m_rootRange.m_min <= 0x3FFF)
+                return extBit + cn.m_size.m_rootRange.m_min * minItemBitsInPER(cns) + 16;
+
+
+            return extBit + cn.m_size.m_rootRange.m_min * minItemBitsInPER(cns) + (cn.m_size.m_rootRange.m_min / 0x10000 + 3) * 8;
+        }
+
+        protected virtual long minItemBitsInPER(PEREffectiveConstraint cns)
+        {
+            throw new Exception("Abstract method called");
+        }
+        protected virtual long maxItemBitsInPER(PEREffectiveConstraint cns)
+        {
+            throw new Exception("Abstract method called");
+        }
+
+    }
+
 
     /// <summary>
     /// Common base class for SEQUENCE OF and SET OF
     /// </summary>
-    public partial class ArrayType : Asn1Type
+    public partial class ArrayType : SizeableType
     {
         public string m_xmlVarName;
         public Asn1Type m_type;
@@ -61,7 +124,7 @@ namespace tinyAsn1
                 return m_perEffectiveConstraint;
             }
         }
-        public override long minBitsInPER(PEREffectiveConstraint cns)
+/*        public override long minBitsInPER(PEREffectiveConstraint cns)
         {
             PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
             int extBit = 0;
@@ -110,6 +173,16 @@ namespace tinyAsn1
                 return cn.m_size.m_rootRange.m_max * m_type.MaxBitsInPER + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
 
             return cn.m_size.m_rootRange.m_max * m_type.MaxBitsInPER + (cn.m_size.m_rootRange.m_max / 0x10000 + 3) * 8;
+        }*/
+        
+        protected override long maxItemBitsInPER(PEREffectiveConstraint cns)
+        {
+            return m_type.MaxBitsInPER;
+        }
+
+        protected override long minItemBitsInPER(PEREffectiveConstraint cns)
+        {
+            return m_type.MinBitsInPER;
         }
 
         public override bool Constructed

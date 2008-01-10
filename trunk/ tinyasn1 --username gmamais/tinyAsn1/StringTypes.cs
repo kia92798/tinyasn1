@@ -11,7 +11,7 @@ namespace tinyAsn1
         Char[] AllowedCharSet { get;}
     }
 
-    public partial class IA5StringType : Asn1Type, IStringType
+    public partial class IA5StringType : SizeableType, IStringType
     {
         public override string Name
         {
@@ -181,106 +181,15 @@ namespace tinyAsn1
             return PER.GetNumberOfBitsForNonNegativeInteger((UInt64)(max - min));
         }
 
-/*        public override long minBitsInPER(PEREffectiveConstraint cns)
+
+        protected override long minItemBitsInPER(PEREffectiveConstraint cns)
         {
             PERAlphabetAndSizeEffectiveConstraint cn = (PERAlphabetAndSizeEffectiveConstraint)cns;
-
-            if (cn == null)
-                return 8;
-
-            if (!cn.m_size.m_rootRange.m_maxIsInfinite &&
-                cn.m_size.m_rootRange.m_max < 0xFFFF &&
-                cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
-                return cn.m_size.m_rootRange.m_min * BitsPerSingleChar(cn.m_from);
-
-
-            if (cn.m_size.m_rootRange.m_min <= 127)
-                return cn.m_size.m_rootRange.m_min * BitsPerSingleChar(cn.m_from) + 8;
-            if (cn.m_size.m_rootRange.m_min <= 0x3FFF)
-                return cn.m_size.m_rootRange.m_min * BitsPerSingleChar(cn.m_from) + 16;
-
-
-            return cn.m_size.m_rootRange.m_min * BitsPerSingleChar(cn.m_from) + (cn.m_size.m_rootRange.m_min / 0x10000 + 3) * 8;
+            return BitsPerSingleChar(cn.m_from);
         }
-
-        public override long maxBitsInPER(PEREffectiveConstraint cns)
+        protected override long maxItemBitsInPER(PEREffectiveConstraint cns)
         {
-            PERAlphabetAndSizeEffectiveConstraint cn = (PERAlphabetAndSizeEffectiveConstraint)cns;
-
-            if (cn != null)
-            {
-                if (cn.Extensible)
-                    return -1;
-
-                if (!cn.m_size.m_rootRange.m_maxIsInfinite)
-                {
-                    if (cn.m_size.m_rootRange.m_max < 0xFFFF &&
-                        cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
-                        return cn.m_size.m_rootRange.m_max * BitsPerSingleChar(cn.m_from);
-
-                    if (cn.m_size.m_rootRange.m_max <= 127)
-                        return cn.m_size.m_rootRange.m_max * BitsPerSingleChar(cn.m_from) + 8;
-
-                    if (cn.m_size.m_rootRange.m_max <= 0x3FFF)
-                        return cn.m_size.m_rootRange.m_max * BitsPerSingleChar(cn.m_from) + 16;
-
-                    return cn.m_size.m_rootRange.m_max * BitsPerSingleChar(cn.m_from) + (cn.m_size.m_rootRange.m_max / 0x10000 + 3) * 8;
-                }
-                else
-                    return -1;
-            }
-
-            return -1;
-        }*/
-        public override long minBitsInPER(PEREffectiveConstraint cns)
-        {
-            PERAlphabetAndSizeEffectiveConstraint cn = (PERAlphabetAndSizeEffectiveConstraint)cns;
-            int extBit = 0;
-            if (cn.Extensible)
-                extBit++;
-
-            if (cn == null)
-                return extBit + 8;
-
-            if (!cn.m_size.m_rootRange.m_maxIsInfinite)
-            {
-                if (cn.m_size.m_rootRange.m_max < 0x10000 &&
-                    cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
-                    return extBit + cn.m_size.m_rootRange.m_min * BitsPerSingleChar(cn.m_from);
-
-                if (cn.m_size.m_rootRange.m_max < 0x10000)
-                    return extBit + cn.m_size.m_rootRange.m_min * BitsPerSingleChar(cn.m_from) + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
-            }
-
-
-            if (cn.m_size.m_rootRange.m_min <= 0x7F)
-                return extBit + cn.m_size.m_rootRange.m_min * BitsPerSingleChar(cn.m_from) + 8;
-            if (cn.m_size.m_rootRange.m_min <= 0x3FFF)
-                return extBit + cn.m_size.m_rootRange.m_min * BitsPerSingleChar(cn.m_from) + 16;
-
-
-            return extBit + cn.m_size.m_rootRange.m_min * BitsPerSingleChar(cn.m_from) + (cn.m_size.m_rootRange.m_min / 0x10000 + 3) * 8;
-        }
-
-        public override long maxBitsInPER(PEREffectiveConstraint cns)
-        {
-            PERAlphabetAndSizeEffectiveConstraint cn = (PERAlphabetAndSizeEffectiveConstraint)cns;
-
-            if (cn == null)
-                return -1;
-            if (cn.Extensible)
-                return -1;
-            if (cn.m_size.m_rootRange.m_maxIsInfinite)
-                return -1;
-
-            if (cn.m_size.m_rootRange.m_max < 0x10000 &&
-                cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
-                return cn.m_size.m_rootRange.m_max * BitsPerSingleChar(cn.m_from);
-
-            if (cn.m_size.m_rootRange.m_max < 0x10000)
-                return cn.m_size.m_rootRange.m_max * BitsPerSingleChar(cn.m_from) + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
-
-            return cn.m_size.m_rootRange.m_max * BitsPerSingleChar(cn.m_from) + (cn.m_size.m_rootRange.m_max / 0x10000 + 3) * 8;
+            return minItemBitsInPER(cns);
         }
 
     }

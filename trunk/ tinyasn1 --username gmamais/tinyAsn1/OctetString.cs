@@ -6,7 +6,7 @@ using Antlr.Runtime;
 
 namespace tinyAsn1
 {
-    public partial class OctetStringType : Asn1Type
+    public partial class OctetStringType : SizeableType
     {
         public override string Name
         {
@@ -141,7 +141,7 @@ namespace tinyAsn1
             return -1;
         }
         */
-        public override long minBitsInPER(PEREffectiveConstraint cns)
+/*        public override long minBitsInPER(PEREffectiveConstraint cns)
         {
             PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
             int extBit = 0;
@@ -190,7 +190,17 @@ namespace tinyAsn1
                 return cn.m_size.m_rootRange.m_max * 8 + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
 
             return cn.m_size.m_rootRange.m_max * 8 + (cn.m_size.m_rootRange.m_max / 0x10000 + 3) * 8;
+        }*/
+
+        protected override long minItemBitsInPER(PEREffectiveConstraint cns)
+        {
+            return 8;
         }
+        protected override long maxItemBitsInPER(PEREffectiveConstraint cns)
+        {
+            return 8;
+        }
+
     }
 
 

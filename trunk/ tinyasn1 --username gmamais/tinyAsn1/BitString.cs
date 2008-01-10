@@ -6,7 +6,7 @@ using Antlr.Runtime;
 
 namespace tinyAsn1
 {
-    public partial class BitStringType : Asn1Type
+    public partial class BitStringType : SizeableType
     {
         internal List<NumberedItem> m_namedBitsPriv = new List<NumberedItem>();
         public OrderedDictionary<string, Int64> m_namedBits = new OrderedDictionary<string, Int64>();
@@ -245,7 +245,7 @@ namespace tinyAsn1
             }
         }
 
-        public override long minBitsInPER(PEREffectiveConstraint cns)
+        /*public override long minBitsInPER(PEREffectiveConstraint cns)
         {
             PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
             int extBit = 0;
@@ -294,7 +294,17 @@ namespace tinyAsn1
                 return cn.m_size.m_rootRange.m_max + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
 
             return cn.m_size.m_rootRange.m_max + (cn.m_size.m_rootRange.m_max / 0x10000 + 3) * 8;
+        }*/
+
+        protected override long minItemBitsInPER(PEREffectiveConstraint cns)
+        {
+            return 1;
         }
+        protected override long maxItemBitsInPER(PEREffectiveConstraint cns)
+        {
+            return 1;
+        }
+
     
     
     

@@ -567,9 +567,9 @@ namespace tinyAsn1
     }
 
 
-    public class PERAlphabetAndSizeEffectiveConstraint : PEREffectiveConstraint
+    public class PERAlphabetAndSizeEffectiveConstraint : PERSizeEffectiveConstraint
     {
-        public PERIntegerEffectiveConstraint m_size = null;
+//        public PERIntegerEffectiveConstraint m_size = null;
         public CharSet m_from = null;
 
         public PERAlphabetAndSizeEffectiveConstraint()
@@ -608,7 +608,7 @@ namespace tinyAsn1
             
         }
 
-        public static PERAlphabetAndSizeEffectiveConstraint Full(Asn1Type type)
+        public static new PERAlphabetAndSizeEffectiveConstraint Full(Asn1Type type)
         {
             PERAlphabetAndSizeEffectiveConstraint ret = new PERAlphabetAndSizeEffectiveConstraint();
 
@@ -618,7 +618,7 @@ namespace tinyAsn1
             return ret;
         }
 
-        public static PERAlphabetAndSizeEffectiveConstraint Empty
+        public static new PERAlphabetAndSizeEffectiveConstraint Empty
         {
             get
             {
