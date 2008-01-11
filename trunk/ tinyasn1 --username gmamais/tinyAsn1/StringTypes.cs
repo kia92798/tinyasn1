@@ -191,6 +191,10 @@ namespace tinyAsn1
         {
             return minItemBitsInPER(cns);
         }
+        protected override string TypeName
+        {
+            get { return "ASCII CHARACTER"; }
+        }
 
     }
 
@@ -256,6 +260,10 @@ namespace tinyAsn1
         public override char[] AllowedCharSet
         {
             get { return m_allowedCharSet; }
+        }
+        protected override string TypeName
+        {
+            get { return "NUMERIC CHARACTER"; }
         }
     }
 

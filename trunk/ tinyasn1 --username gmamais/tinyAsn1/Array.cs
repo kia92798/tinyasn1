@@ -68,6 +68,127 @@ namespace tinyAsn1
             throw new Exception("Abstract method called");
         }
 
+        public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, string tasName)
+        {
+            o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
+            o.WriteLine("<tbody>");
+            
+            o.WriteLine("<tr  bgcolor=\"#FF8f00\">");
+                o.WriteLine("<td height=\"35\" colspan=\"2\"  >");
+                o.WriteLine("    <font face=\"Verdana\" color=\"#FFFFFF\" size=\"4\">{0}({1}) </font>", tasName, Name);
+                o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\"><a href=\"#{0}\">ASN.1</a></font>", "ASN1_" + tasName.Replace("-", "_"));
+                o.WriteLine("</td>");
+                
+                o.WriteLine("<td height=\"35\" align=\"center\">");
+                o.WriteLine("    <font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">min = {0} bytes</font>", (MinBytesInPER == -1 ? "&#8734" : MinBytesInPER.ToString()));
+                o.WriteLine("</td>");
+                
+                o.WriteLine("<td height=\"35\" align=\"center\">");
+                o.WriteLine("    <font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">max = {0} bytes</font>", (MaxBytesInPER == -1 ? "&#8734" : MaxBytesInPER.ToString()));
+                o.WriteLine("</td>");
+            o.WriteLine("</tr>");
+
+            o.WriteLine("<tr class=\"CommentRow\">");
+            o.WriteLine("<td class=\"comment2\" colspan=\"4\">" + o.BR(comment) + "</td>");
+            o.WriteLine("</tr>");
+
+            o.WriteLine("<tr class=\"OddRow\">"); 
+            o.WriteLine("    <td class=\"field2\" width=\"30%\" >Length</td>");
+            o.WriteLine("    <td class=\"type2\"  >Unsigned Integer</td>");
+            o.WriteLine("    <td class=\"min2\" width=\"20%\">{0}</td>", (minSizeBitsInPER(cns) == -1 ? "Fragmentation" : minSizeBitsInPER(cns).ToString()));
+            o.WriteLine("    <td class=\"max2\" width=\"20%\">{0}</td>", (maxSizeBitsInPER(cns) == -1 ? "Fragmentation" : maxSizeBitsInPER(cns).ToString()));
+            o.WriteLine("</tr>");
+
+
+            o.WriteLine("<tr class=\"headerRow\">");
+            o.Write("    <td class=\"field2\" colspan=\"4\">");
+            o.Write("{0} to {1} {2} follow", minItems(cns), (maxItems(cns) == -1 ? "&#8734" : maxItems(cns).ToString()), TypeName);
+            o.WriteLine("</td>");
+            o.WriteLine("</tr>");
+
+            long m1 = minItems(cns) * minItemBitsInPER(cns);
+            long m2 = maxItems(cns) * maxItemBitsInPER(cns);
+            o.WriteLine("<tr class=\"OddRow\">");
+            o.WriteLine("    <td class=\"field\" colspan=\"2\">Content</td>");
+            o.WriteLine("    <td class=\"min\" >{0}</td>", (m1 < 0 ? "&#8734" : m1.ToString()));
+            o.WriteLine("    <td class=\"max\" >{0}</td>", (m2 < 0 ? "&#8734" : m2.ToString()));
+            o.WriteLine("</tr>");
+  
+ 
+            o.WriteLine("</tbody>");
+            o.WriteLine("</table>");
+        }
+
+        long minItems(PEREffectiveConstraint cns)
+        {
+            if (cns == null)
+                return 0;
+            PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
+            return cn.m_size.m_rootRange.m_min;
+        }
+        long maxItems(PEREffectiveConstraint cns)
+        {
+            if (cns == null)
+                return -1;
+            PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
+            if (cn.m_size.m_rootRange.m_maxIsInfinite)
+                return -1;
+            return cn.m_size.m_rootRange.m_max;
+        }
+
+        protected virtual string TypeName {
+            get { throw new Exception("Abstract Method Called");}
+        }
+
+        long minSizeBitsInPER(PEREffectiveConstraint cns)
+        {
+            PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
+            int extBit = 0;
+            if (cn.Extensible)
+                extBit++;
+
+            if (cn == null)
+                return extBit + 8;
+
+            if (!cn.m_size.m_rootRange.m_maxIsInfinite)
+            {
+                if (cn.m_size.m_rootRange.m_max < 0x10000 &&
+                    cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
+                    return extBit;
+
+                if (cn.m_size.m_rootRange.m_max < 0x10000)
+                    return extBit + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
+            }
+
+
+            if (cn.m_size.m_rootRange.m_min <= 0x7F)
+                return extBit + 8;
+            if (cn.m_size.m_rootRange.m_min <= 0x3FFF)
+                return extBit + 16;
+
+            return -1;
+        }
+
+        long maxSizeBitsInPER(PEREffectiveConstraint cns)
+        {
+            PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
+
+            if (cn == null)
+                return -1;
+            if (cn.Extensible)
+                return -1;
+            if (cn.m_size.m_rootRange.m_maxIsInfinite)
+                return -1;
+
+            if (cn.m_size.m_rootRange.m_max < 0x10000 &&
+                cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
+                return 0;
+
+            if (cn.m_size.m_rootRange.m_max < 0x10000)
+                return PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
+
+            return -1;
+        }
     }
 
 
@@ -184,6 +305,17 @@ namespace tinyAsn1
         {
             return m_type.MinBitsInPER;
         }
+
+        protected override string TypeName
+        {
+            get {
+                if (m_type is ReferenceType)
+                    return "<a href=\"#ICD_" + m_type.Name.Replace("-", "_") + "\">" + m_type.Name + "</a>";
+                else
+                    return m_type.Name; 
+            }
+        }
+
 
         public override bool Constructed
         {

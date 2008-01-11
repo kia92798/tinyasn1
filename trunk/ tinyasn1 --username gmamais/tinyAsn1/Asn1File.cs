@@ -4,6 +4,7 @@ using System.Text;
 using Antlr.Runtime.Tree;
 using Antlr.Runtime;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace tinyAsn1
 {
@@ -266,6 +267,9 @@ namespace tinyAsn1
                 foreach (Asn1File file in m_files)
                     file.PrintHtml(wr, 0);
 
+                foreach (Asn1File file in m_files)
+                    file.PrintAsn1InHtml(wr, 0);
+
                 wr.WriteLine("</body>");
                 wr.WriteLine("</html>");
 
@@ -346,6 +350,34 @@ namespace tinyAsn1
             wr.WriteLine("    </div>");
 
             wr.Flush();
+
+        }
+
+        public void PrintAsn1InHtml(StreamWriterLevel wr, int lev)
+        {
+            wr.WriteLine("    <div style=\"width: 100%; height: 20pt\">");
+            wr.WriteLine(string.Format("    <h1 >File : {0}</h1>", m_fileName));
+            wr.WriteLine("<pre>");
+            wr.Write(getAsn1InHtml());
+            wr.WriteLine("</pre>");
+            wr.WriteLine("    </div>");
+        }
+
+        string getAsn1InHtml()
+        {
+            string fileData = System.IO.File.ReadAllText(m_fileName);
+            fileData = fileData.Replace("@", "");
+            List<string> tas = new List<string>();
+            foreach (Module m in m_modules)
+                tas.AddRange(m.m_typeAssigments.Keys);
+
+            foreach (string ta in tas)
+            {
+                string regExp = ta + @"( |\t)+::=";
+                string replStr = "<a name=\"ASN1_" + ta.Replace("-","_") + "\">" + ta + "</a> ::=";
+                fileData = Regex.Replace(fileData, regExp, replStr);
+            }
+            return fileData;
         }
 
         public void Tabularize()

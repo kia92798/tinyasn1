@@ -304,6 +304,10 @@ namespace tinyAsn1
         {
             return 1;
         }
+        protected override string TypeName
+        {
+            get { return "BIT"; }
+        }
 
     
     

@@ -353,11 +353,11 @@ namespace tinyAsn1
 
         public void PrintHtml(StreamWriterLevel wr, int p)
         {
-            wr.WriteLine("        <div style=\"width: 100%; height: 20pt\">");
-            wr.WriteLine(string.Format("        <h2 >Module : {0}</h2>", m_moduleID));
+            wr.WriteLine("<div style=\"width: 100%; height: 20pt\">");
+            wr.WriteLine(string.Format("<h2 >Module : {0}</h2>", m_moduleID));
             foreach (TypeAssigment tas in m_typeAssigments.Values)
                 tas.PrintHtml(wr, p + 1);
-            wr.WriteLine("        </div>");
+            wr.WriteLine("</div>");
         }
 
         public void Tabularize()
@@ -522,9 +522,9 @@ namespace tinyAsn1
         public void PrintHtml(StreamWriterLevel wr, int p)
         {
             wr.WriteLine("        <div style=\"width: 100%; height: 20pt\">");
-            m_type.PrintHtml(wr, p, m_comments, m_name);
+            m_type.PrintHtml(m_type.PEREffectiveConstraint, wr, p, m_comments, m_name);
             wr.WriteLine("        </div>");
-            wr.WriteLine("<p/>");
+            wr.WriteLine("&nbsp;<p/>");
         }
     }
 

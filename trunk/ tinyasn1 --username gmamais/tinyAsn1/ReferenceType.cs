@@ -269,7 +269,10 @@ namespace tinyAsn1
         }
 
 
-
+        public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, string tasName)
+        {
+            Type.PrintHtml(cns, o, lev, comment, tasName);
+        }
         public static ReferenceType CreateByName(TypeAssigment newTas)
         {
             ReferenceType ret = new ReferenceType();
@@ -278,5 +281,6 @@ namespace tinyAsn1
             ret.antlrNode = newTas.m_type.antlrNode;
             return ret;
         }
+
     }
 }

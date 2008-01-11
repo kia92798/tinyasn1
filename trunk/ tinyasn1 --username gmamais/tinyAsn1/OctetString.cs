@@ -200,6 +200,10 @@ namespace tinyAsn1
         {
             return 8;
         }
+        protected override string TypeName
+        {
+            get { return "OCTET"; }
+        }
 
     }
 
