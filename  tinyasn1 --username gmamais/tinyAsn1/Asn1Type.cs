@@ -672,7 +672,7 @@ namespace tinyAsn1
 
 
 //Backend functions
-        public virtual void PrintHtml(StreamWriterLevel o, int lev, List<string> comment, string tasName)
+        public virtual void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, string tasName)
         {
             o.P(lev);o.WriteLine("<div style=\"width: 100%; height: 20pt\">");
 

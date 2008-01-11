@@ -139,7 +139,10 @@ namespace tinyAsn1
                 o.WriteLine("<td class=\"no\">{0}</td>",index);
                 o.WriteLine("<td class=\"field\">{0}</td>",m_childVarName);
                 o.WriteLine("<td class=\"comment\">{0}</td>", o.BR(m_comments));
-                o.WriteLine("<td class=\"type\">{0}</td>",m_type.Name);
+                if (m_type is ReferenceType)
+                    o.WriteLine("<td class=\"type\"> <a href=\"#ICD_{0}\">{1}</a></td>",m_type.Name.Replace("-","_"),m_type.Name);
+                else
+                    o.WriteLine("<td class=\"type\">{0}</td>",m_type.Name);
                 
                 o.WriteLine("<td class=\"constraint\">{0}</td>",m_type.Constraints);
                 o.WriteLine("<td class=\"optional\">{0}</td>",(m_optional?"Yes":"No"));
@@ -671,14 +674,15 @@ namespace tinyAsn1
         }
 
 
-        public override void PrintHtml(StreamWriterLevel o, int lev, List<string> comment, string tasName)
+        public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, string tasName)
         {
+            o.WriteLine("<a name=\"{0}\">", "ICD_" + tasName.Replace("-", "_"));
             o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
             o.WriteLine("<tbody>");
             o.WriteLine("<tr  bgcolor=\"#FF8f00\">");
             o.WriteLine("<td height=\"35\" colspan=\"4\">");
             o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"4\">{0}({1}) </font>",tasName,Name);
-            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\"><a href=\"#sequence2.htm\">ASN.1</a></font>");
+            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\"><a href=\"#{0}\">ASN.1</a></font>", "ASN1_" + tasName.Replace("-","_"));
             o.WriteLine("</td>");
             o.WriteLine("<td height=\"35\" colspan=\"2\"  align=\"center\">");
             o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">min = {0} bytes</font>", (MinBytesInPER == -1 ? "&#8734" : MinBytesInPER.ToString()));
@@ -713,9 +717,9 @@ namespace tinyAsn1
             {
                 ch.PrintHtml(o, lev + 1, ++index);
             }
-
             o.WriteLine("</tbody>");
             o.WriteLine("</table>");
+            o.WriteLine("</a>");
         }
         public void PrintPreambleHtml(StreamWriterLevel o, int p)
         {
