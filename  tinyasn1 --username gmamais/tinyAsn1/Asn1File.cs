@@ -20,11 +20,14 @@ namespace tinyAsn1
                 asn1Lexer lexer = new asn1Lexer(input);
                 CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-                //foreach (IToken token in tokens.GetTokens())
-                //{
-                //    if (token.Type!= asn1Lexer.WS)
-                //        Console.WriteLine("{0}\t{1}", token.Type, token.Text);
-                //}
+                List<IToken> tokenslst = new List<IToken>();
+                foreach (IToken token in tokens.GetTokens())
+                {
+                    tokenslst.Add(token);
+                   //if (token.Type!= asn1Lexer.WS)
+                   //     Console.WriteLine("{0}\t{1}", token.Type, token.Text);
+//                    Console.WriteLine("{0}\t{1}\t{2}", token.Type, token.Text, token.Line,token.CharPositionInLine);
+                }
 
 
 
@@ -38,6 +41,7 @@ namespace tinyAsn1
 
                 Asn1File asnFile = Asn1File.CreateFromAntlrAst(tree);
                 asnFile.m_fileName = inFileName;
+                asnFile.m_tokes.AddRange(tokenslst);
                 m_files.Add(asnFile);
             }
             EarlySemanticCheck();
@@ -259,7 +263,8 @@ namespace tinyAsn1
                 wr.WriteLine("<html>");
                 wr.WriteLine("<head>");
                 wr.WriteLine("    <title>ASN.1 Test Cases</title>");
-                wr.WriteLine("    <link href=\"asn1Matrix.css\" rel=\"stylesheet\" type=\"text/css\" />");
+//                wr.WriteLine("    <link href=\"asn1Matrix.css\" rel=\"stylesheet\" type=\"text/css\" />");
+                wr.WriteLine("    <style type=\"text/css\"> {0} </style>", Asn1File.css); 
                 wr.WriteLine("</head>");
                 wr.WriteLine("<body>");
                 
@@ -290,7 +295,7 @@ namespace tinyAsn1
 
     public partial class Asn1File
     {
-
+        public List<IToken> m_tokes = new List<IToken>();
         public string m_fileName = "";
         public List<Module> m_modules = new List<Module>();
 
@@ -341,7 +346,7 @@ namespace tinyAsn1
         {
             Tabularize();
 
-            wr.WriteLine("    <div style=\"width: 100%; height: 20pt\">");
+            wr.WriteLine("    <div style=\"width: 100%\">");
             wr.WriteLine(string.Format("    <h1 >File : {0}</h1>", m_fileName));
 
             foreach (Module m in m_modules)
@@ -355,36 +360,335 @@ namespace tinyAsn1
 
         public void PrintAsn1InHtml(StreamWriterLevel wr, int lev)
         {
-            wr.WriteLine("    <div style=\"width: 100%; height: 20pt\">");
+            wr.WriteLine("    <div style=\"width: 100%\">");
             wr.WriteLine(string.Format("    <h1 >File : {0}</h1>", m_fileName));
             wr.WriteLine("<pre>");
             wr.Write(getAsn1InHtml());
             wr.WriteLine("</pre>");
             wr.WriteLine("    </div>");
         }
+        /*
+         
+         */
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         string getAsn1InHtml()
         {
-            string fileData = System.IO.File.ReadAllText(m_fileName);
-            fileData = fileData.Replace("@", "");
             List<string> tas = new List<string>();
+            Dictionary<int, string> tabulTyps = new Dictionary<int, string>();
             foreach (Module m in m_modules)
-                tas.AddRange(m.m_typeAssigments.Keys);
-
-            foreach (string ta in tas)
+            foreach (TypeAssigment ta in m.m_typeAssigments.Values)
             {
-                string regExp = ta + @"( |\t)+::=";
-                string replStr = "<a name=\"ASN1_" + ta.Replace("-","_") + "\">" + ta + "</a> ::=";
-                fileData = Regex.Replace(fileData, regExp, replStr);
+                if (!ta.m_createdThroughTabulization)
+                    tas.Add(ta.m_name);
+                else
+                    tabulTyps.Add(ta.m_type.antlrNode.TokenStartIndex, ta.m_name);
             }
-            return fileData;
+            List<string> asn1Words = new List<string>(m_asn1Tokens);
+            string ret = "";
+            for (int i = 0; i < m_tokes.Count; i++)
+            {
+                IToken t = m_tokes[i];
+                if (tabulTyps.ContainsKey(i))
+                    ret += "<a name=\"ASN1_" + tabulTyps[i].Replace("-", "_") + "\">" + t.Text + "</a>";
+                else if (asn1Words.Contains(t.Text))
+                    ret += "<font  color=\"#0000FF\" >" + t.Text + "</font>";
+                else if (t.Type == asn1Lexer.StringLiteral || t.Type == asn1Lexer.OctectStringLiteral || t.Type == asn1Lexer.BitStringLiteral)
+                    ret += "<font  color=\"#A31515\" >" + t.Text + "</font>";
+                else if (t.Type == asn1Lexer.UID && tas.Contains(t.Text))
+                {
+                    int j = i + 1;
+                    while (j < m_tokes.Count)
+                        if (m_tokes[j].Type == asn1Lexer.WS || m_tokes[j].Type == asn1Lexer.COMMENT || m_tokes[j].Type == asn1Lexer.COMMENT2)
+                            j++;
+                        else
+                            break;
+                    //<a href="#ASN1_MYSQOF">ASN.1</a>
+                    if (m_tokes[j].Type == asn1Lexer.ASSIG_OP)
+                        ret += "<a name=\"ASN1_" + t.Text.Replace("-", "_") + "\"><a href=\"#ICD_" + t.Text.Replace("-", "_") + "\"><font  color=\"#2B91AF\" >" + t.Text + "</font></a></a>";
+                    else
+                        ret += "<a href=\"#ASN1_" + t.Text.Replace("-", "_") + "\"><font  color=\"#000000\" >" + t.Text + "</font></a>";
+                }
+                else if (t.Type == asn1Lexer.COMMENT || t.Type == asn1Lexer.COMMENT2)
+                    ret += "<font  color=\"#008000\" ><i>" + t.Text + "</i></font>";
+                else if (t.Type == asn1Lexer.SPECIAL_COMMENT)
+                    ret += "<font  color=\"#808080\" >" + t.Text + "</font>";
+                else
+                    ret += t.Text;
+            }
+
+            return ret;
         }
+
 
         public void Tabularize()
         {
             foreach (Module m in m_modules)
                 m.Tabularize();
         }
+
+        static string[] m_asn1Tokens = {
+            "PLUS-INFINITY", "MINUS-INFINITY", "GeneralizedTime", "UTCTime", "mantissa", "base", "exponent", "UNION", "INTERSECTION",
+            "DEFINITIONS", "EXPLICIT", "TAGS", "IMPLICIT", "AUTOMATIC", "EXTENSIBILITY", "IMPLIED", "BEGIN", "END", "EXPORTS", "ALL",
+            "IMPORTS", "FROM", "UNIVERSAL", "APPLICATION", "PRIVATE", "BIT", "STRING", "BOOLEAN", "ENUMERATED", "INTEGER", "REAL",
+            "CHOICE", "SEQUENCE", "OPTIONAL", "SIZE", "OF", "OCTET", "MIN", "MAX", "TRUE", "FALSE", "ABSENT", "PRESENT", "WITH",
+            "COMPONENT", "COMPONENTS", "DEFAULT", "NULL", "PATTERN", "OBJECT", "IDENTIFIER", "RELATIVE-OID", "NumericString",
+            "PrintableString", "VisibleString", "IA5String", "TeletexString", "VideotexString", "GraphicString", "GeneralString",
+            "UniversalString", "BMPString", "UTF8String", "INCLUDES", "EXCEPT", "SET"
+            };
+
+        public static string css = @"
+.headerRow
+{
+	background-color: #BBBBBB;
+}
+
+.hrNo
+{
+	text-align: center;
+	font-family: Verdana;
+	color: white;
+	font-size: 10pt;
+	width: 3%;
+}
+.hrField
+{
+	text-align: center;
+	font-family: Verdana;
+	color: white;
+	font-size: 10pt;
+	width:15%;
+}
+
+.hrComment
+{
+	text-align: center;
+	font-family: Verdana;
+	color: white;
+	font-size: 10pt;
+}
+
+.hrType
+{
+	text-align: center;
+	font-family: Verdana;
+	color: white;
+	font-size: 10pt;
+	width:10%;
+}
+
+.hrconstraint
+{
+	text-align: center;
+	font-family: Verdana;
+	color: white;
+	font-size: 10pt;
+	width:10%;
+}
+
+.hrconstraint2
+{
+	text-align: center;
+	font-family: Verdana;
+	color: white;
+	font-size: 10pt;
+}
+
+.hrOptional
+{
+	text-align: center;
+	font-family: Verdana;
+	color: white;
+	font-size: 10pt;
+	width:10%;
+}
+.hrMin
+{
+	text-align: center;
+	font-family: Verdana;
+	color: white;
+	font-size: 10pt;
+	width:10%;
+}
+.hrMax
+{
+	text-align: center;
+	font-family: Verdana;
+	color: white;
+	font-size: 10pt;
+	width:10%;
+}
+
+.hrMin2
+{
+	text-align: center;
+	font-family: Verdana;
+	color: white;
+	font-size: 10pt;
+	width:20%;
+}
+.hrMax2
+{
+	text-align: center;
+	font-family: Verdana;
+	color: white;
+	font-size: 10pt;
+	width:20%;
+}
+
+.CommentRow
+{
+	background-color: #e9e9e9;
+	height:25px;
+}
+
+.OddRow
+{
+	background-color: #e9e9e9;
+	height:25px;
+}
+
+.EvenRow
+{
+	background-color: #DBDBDB;
+	height:25px;
+}
+
+
+.no
+{
+	text-align:  center;
+	font-family: Verdana;
+	color: black;
+	font-size: 9pt;
+/*	width:30pt;*/
+}
+
+.field
+{
+	text-align: center;
+	font-family: Verdana;
+	color: black;
+	font-size: 9pt;
+/*	width:15%;*/
+}
+
+.field2
+{
+	text-align: center;
+	font-family: Verdana;
+	color: black;
+	font-size: 9pt;
+}
+
+.comment
+{
+	color: black;
+/*	width:25%;*/
+	font-family: Verdana;
+	font-size: 9pt;
+	text-align:left;
+}
+
+.comment2
+{
+	color: black;
+	font-family: Verdana;
+	font-size: 9pt;
+	text-align:left;
+}
+
+.threeDots
+{
+	color: black;
+	font-family: Verdana;
+	font-size: 9pt;
+	text-align:center;
+}
+
+.type
+{
+	text-align: center;
+	font-family: Verdana;
+	color: black;
+	font-size: 9pt;
+/*	width:10%;*/
+}
+
+.type2
+{
+	text-align: center;
+	font-family: Verdana;
+	color: black;
+	font-size: 9pt;
+}
+
+.constraint
+{
+	text-align: center;
+	font-family: Verdana;
+	color: black;
+	font-size: 9pt;
+}
+
+.optional
+{
+	text-align: center;
+	font-family: Verdana;
+	color: black;
+	font-size: 9pt;
+/*	width:10%;*/
+}
+.min
+{
+	text-align: center;
+	font-family: Verdana;
+	color: black;
+	font-size: 9pt;
+/*	width:70pt;*/
+}
+.max
+{
+	text-align: center;
+	font-family: Verdana;
+	color: black;
+	font-size: 9pt;
+/*	width:70pt;*/
+}
+
+.min2
+{
+	text-align: center;
+	font-family: Verdana;
+	color: black;
+	font-size: 9pt;
+}
+.max2
+{
+	text-align: center;
+	font-family: Verdana;
+	color: black;
+	font-size: 9pt;
+}
+
+
+h1
+{
+	font-family: Verdana, Tahoma;
+	color: #033a7a;
+	font-size: 14pt;
+}
+
+h2
+{
+	font-family: Verdana, Tahoma;
+	color: #033a7a;
+	font-size: 12pt;
+}
+";
     }
 
 

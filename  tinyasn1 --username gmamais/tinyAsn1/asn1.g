@@ -138,7 +138,7 @@ moduleDefinition :  	a=modulereference	definitiveIdentifier?
 			|IMPLICIT TAGS
 			| AUTOMATIC TAGS)?
 			(EXTENSIBILITY IMPLIED)?
-			'::=' BEGIN
+			ASSIG_OP BEGIN
 			exports?
 			imports?
 			(
@@ -183,7 +183,7 @@ importFromModule
 	
 	
 valueAssigment	
-	:	valuereference type a='::=' value	 -> ^(VAL_ASSIG[$a] valuereference type value)
+	:	valuereference type a=ASSIG_OP value	 -> ^(VAL_ASSIG[$a] valuereference type value)
 	;		
 
 /*		
@@ -192,7 +192,7 @@ valueSetAssigment
 	;		
 */	
 typeAssigment 
-	:	SPECIAL_COMMENT* typereference a='::=' type -> ^(TYPE_ASSIG[$a] typereference type SPECIAL_COMMENT*)
+	:	SPECIAL_COMMENT* typereference a=ASSIG_OP type -> ^(TYPE_ASSIG[$a] typereference type SPECIAL_COMMENT*)
 	;	
 	
 /* ********************************************************************************************************************* */
@@ -677,6 +677,7 @@ UTF8String	:'UTF8String';
 INCLUDES	:'INCLUDES';
 EXCEPT		:'EXCEPT';
 SET		:'SET';
+ASSIG_OP		: '::=';
 L_BRACKET	:	'{';	
 R_BRACKET	:	'}';	
 L_PAREN		:	'(';

@@ -68,55 +68,93 @@ namespace tinyAsn1
             throw new Exception("Abstract method called");
         }
 
-        public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, string tasName)
+        protected virtual string ItemConstraint(PEREffectiveConstraint cns)
         {
+            throw new Exception("Abstract method called");
+        }
+
+        public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas)
+        {
+            o.WriteLine("<a name=\"{0}\">", "ICD_" + tas.m_name.Replace("-", "_"));
             o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
             o.WriteLine("<tbody>");
-            
-            o.WriteLine("<tr  bgcolor=\"#FF8f00\">");
-                o.WriteLine("<td height=\"35\" colspan=\"2\"  >");
-                o.WriteLine("    <font face=\"Verdana\" color=\"#FFFFFF\" size=\"4\">{0}({1}) </font>", tasName, Name);
-                o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\"><a href=\"#{0}\">ASN.1</a></font>", "ASN1_" + tasName.Replace("-", "_"));
-                o.WriteLine("</td>");
-                
-                o.WriteLine("<td height=\"35\" align=\"center\">");
-                o.WriteLine("    <font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">min = {0} bytes</font>", (MinBytesInPER == -1 ? "&#8734" : MinBytesInPER.ToString()));
-                o.WriteLine("</td>");
-                
-                o.WriteLine("<td height=\"35\" align=\"center\">");
-                o.WriteLine("    <font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">max = {0} bytes</font>", (MaxBytesInPER == -1 ? "&#8734" : MaxBytesInPER.ToString()));
-                o.WriteLine("</td>");
-            o.WriteLine("</tr>");
-
-            o.WriteLine("<tr class=\"CommentRow\">");
-            o.WriteLine("<td class=\"comment2\" colspan=\"4\">" + o.BR(comment) + "</td>");
-            o.WriteLine("</tr>");
-
-            o.WriteLine("<tr class=\"OddRow\">"); 
-            o.WriteLine("    <td class=\"field2\" width=\"30%\" >Length</td>");
-            o.WriteLine("    <td class=\"type2\"  >Unsigned Integer</td>");
-            o.WriteLine("    <td class=\"min2\" width=\"20%\">{0}</td>", (minSizeBitsInPER(cns) == -1 ? "Fragmentation" : minSizeBitsInPER(cns).ToString()));
-            o.WriteLine("    <td class=\"max2\" width=\"20%\">{0}</td>", (maxSizeBitsInPER(cns) == -1 ? "Fragmentation" : maxSizeBitsInPER(cns).ToString()));
-            o.WriteLine("</tr>");
-
-
-            o.WriteLine("<tr class=\"headerRow\">");
-            o.Write("    <td class=\"field2\" colspan=\"4\">");
-            o.Write("{0} to {1} {2} follow", minItems(cns), (maxItems(cns) == -1 ? "&#8734" : maxItems(cns).ToString()), TypeName);
+            o.WriteLine("<tr  bgcolor=\"{0}\">", (tas.m_createdThroughTabulization ? "#379CEE" : "#FF8f00"));
+            o.WriteLine("<td height=\"35\" colspan=\"3\">");
+            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"4\">{0}</font><font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">({1}) </font>", tas.m_name, Name);
+            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\"><a href=\"#{0}\">ASN.1</a></font>", "ASN1_" + tas.m_name.Replace("-", "_"));
+            o.WriteLine("</td>");
+            o.WriteLine("<td height=\"35\" colspan=\"2\"  align=\"center\">");
+            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">min = {0} bytes</font>", (MinBytesInPER == -1 ? "&#8734" : MinBytesInPER.ToString()));
+            o.WriteLine("</td>");
+            o.WriteLine("<td height=\"35\" colspan=\"2\" align=\"center\">");
+            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">max = {0} bytes</font>", (MaxBytesInPER == -1 ? "&#8734" : MaxBytesInPER.ToString()));
             o.WriteLine("</td>");
             o.WriteLine("</tr>");
 
-            long m1 = minItems(cns) * minItemBitsInPER(cns);
-            long m2 = maxItems(cns) * maxItemBitsInPER(cns);
-            o.WriteLine("<tr class=\"OddRow\">");
-            o.WriteLine("    <td class=\"field\" colspan=\"2\">Content</td>");
-            o.WriteLine("    <td class=\"min\" >{0}</td>", (m1 < 0 ? "&#8734" : m1.ToString()));
-            o.WriteLine("    <td class=\"max\" >{0}</td>", (m2 < 0 ? "&#8734" : m2.ToString()));
+            o.WriteLine("<tr class=\"CommentRow\">");
+            o.WriteLine("<td class=\"comment\" colspan=\"7\">" + o.BR(comment) + "</td>");
             o.WriteLine("</tr>");
-  
- 
+
+            o.WriteLine("<tr class=\"headerRow\">");
+            o.WriteLine("<td class=\"hrNo\">No</td>");
+            o.WriteLine("<td class=\"hrField\">Field</td>");
+            o.WriteLine("<td class=\"hrComment\">Comment</td>");
+            o.WriteLine("<td class=\"hrType\">Type</td>");
+            o.WriteLine("<td class=\"hrconstraint\">Constraint</td>");
+            o.WriteLine("<td class=\"hrMin\">Min Length (bits)</td>");
+            o.WriteLine("<td class=\"hrMax\">Max Length (bits)</td>");
+            o.WriteLine("</tr>");
+
+
+            PrintSizeLengthHtml(cns, o, lev + 1);
+            PrintItemHtml(cns, o, lev + 1, 1);
+            o.WriteLine("<tr class=\"CommentRow\">");
+            o.WriteLine("<td class=\"threeDots\" colspan=\"7\"> <p>. . .</p> </td>");
+            o.WriteLine("</tr>");
+            PrintItemHtml(cns, o, lev + 1, maxItems(cns));
+
             o.WriteLine("</tbody>");
             o.WriteLine("</table>");
+            o.WriteLine("</a>");
+
+ 
+        }
+
+        private void PrintSizeLengthHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int p)
+        {
+            string cssClass = "OddRow";
+            long mnItems = minItems(cns);
+            long mxItems = maxItems(cns);
+
+            o.WriteLine("<tr class=\"" + cssClass + "\">");
+            o.WriteLine("<td class=\"no\">1</td>");
+            o.WriteLine("<td class=\"field\">Lenth</td>");
+            if (mnItems!=mxItems)
+                o.WriteLine("<td class=\"comment\">Special field used by PER to indicate the number of items present in the array.</td>");
+            else
+                o.WriteLine("<td class=\"comment\">Special field used by PER to indicate the number of items present in the array.In this case however, the length field requires zero bits because its value is known in advnace ({0})</td>", mxItems);
+
+            o.WriteLine("<td class=\"type\">{0}</td>", "unsigned int");
+
+            o.WriteLine("<td class=\"constraint\">{0}</td>", cns.ToString());
+            o.WriteLine("<td class=\"min\">{0}</td>", minSizeBitsInPER(cns));
+            o.WriteLine("<td class=\"max\">{0}</td>", maxSizeBitsInPER(cns));
+            o.WriteLine("</tr>");
+        }
+
+        private void PrintItemHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int p, long itemNo)
+        {
+            string cssClass = "EvenRow";
+            o.WriteLine("<tr class=\"" + cssClass + "\">");
+            o.WriteLine("<td class=\"no\">{0}</td>", (itemNo) == -1 ? "&#8734" : (itemNo+1).ToString());
+            o.WriteLine("<td class=\"field\">Item #{0}</td>", (itemNo) == -1 ? "&#8734" : itemNo.ToString());
+            o.WriteLine("<td class=\"comment\">{0}</td>", "");
+            o.WriteLine("<td class=\"type\">{0}</td>", TypeName);
+
+            o.WriteLine("<td class=\"constraint\">{0}</td>", ItemConstraint(cns));
+            o.WriteLine("<td class=\"min\">{0}</td>", (minItemBitsInPER(cns) == -1 ? "&#8734" : minItemBitsInPER(cns).ToString()));
+            o.WriteLine("<td class=\"max\">{0}</td>", (maxItemBitsInPER(cns) == -1 ? "&#8734" : maxItemBitsInPER(cns).ToString()));
+            o.WriteLine("</tr>");
         }
 
         long minItems(PEREffectiveConstraint cns)
@@ -330,6 +368,10 @@ namespace tinyAsn1
                 TypeAssigment newTas = m_module.CreateNewTypeAssigment(tasName, m_type, new List<string>());
                 m_type = ReferenceType.CreateByName(newTas);
             }
+        }
+        protected override string ItemConstraint(PEREffectiveConstraint cns)
+        {
+            return m_type.Constraints;
         }
     
    }
