@@ -195,6 +195,11 @@ namespace tinyAsn1
         {
             get { return "ASCII CHARACTER"; }
         }
+        protected override string ItemConstraint(PEREffectiveConstraint cns)
+        {
+            PERAlphabetAndSizeEffectiveConstraint cn = (PERAlphabetAndSizeEffectiveConstraint)cns;
+            return cn.m_from.ToString();
+        }
 
     }
 

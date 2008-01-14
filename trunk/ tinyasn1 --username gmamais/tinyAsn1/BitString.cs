@@ -308,6 +308,10 @@ namespace tinyAsn1
         {
             get { return "BIT"; }
         }
+        protected override string ItemConstraint(PEREffectiveConstraint cns)
+        {
+            return "";
+        }
 
     
     

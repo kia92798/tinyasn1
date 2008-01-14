@@ -672,12 +672,49 @@ namespace tinyAsn1
 
 
 //Backend functions
-        public virtual void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, string tasName)
+        public virtual void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas)
         {
-            o.P(lev);o.WriteLine("<div style=\"width: 100%; height: 20pt\">");
+            o.WriteLine("<a name=\"{0}\">", "ICD_" + tas.m_name.Replace("-", "_"));
+            o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
+            o.WriteLine("<tbody>");
+
+            o.WriteLine("<tr  bgcolor=\"{0}\">", (tas.m_createdThroughTabulization ? "#379CEE" : "#FF8f00"));
+            o.WriteLine("<td height=\"35\" colspan=\"2\"  >");
+            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"4\">{0}</font><font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">({1}) </font>", tas.m_name, Name);
+            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\"><a href=\"#{0}\">ASN.1</a></font>", "ASN1_" + tas.m_name.Replace("-", "_"));
+            o.WriteLine("</td>");
+
+            o.WriteLine("<td height=\"35\" align=\"center\">");
+            o.WriteLine("    <font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">min = {0} bytes</font>", (MinBytesInPER == -1 ? "&#8734" : MinBytesInPER.ToString()));
+            o.WriteLine("</td>");
+
+            o.WriteLine("<td height=\"35\" align=\"center\">");
+            o.WriteLine("    <font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">max = {0} bytes</font>", (MaxBytesInPER == -1 ? "&#8734" : MaxBytesInPER.ToString()));
+            o.WriteLine("</td>");
+            o.WriteLine("</tr>");
+
+            o.WriteLine("<tr class=\"CommentRow\">");
+            o.WriteLine("<td class=\"comment2\" colspan=\"4\">" + o.BR(comment) + "</td>");
+            o.WriteLine("</tr>");
+
+            o.WriteLine("<tr class=\"headerRow\">");
+            o.WriteLine("<td class=\"hrconstraint2\" colspan=\"2\">Constraints</td>");
+            o.WriteLine("<td class=\"hrMin2\">Min Length (bits)</td>");
+            o.WriteLine("<td class=\"hrMax2\">Max Length (bits)</td>");
+            o.WriteLine("</tr>");
 
 
-            o.P(lev); o.WriteLine("</div>");
+
+            o.WriteLine("<tr class=\"OddRow\">");
+            o.WriteLine("    <td class=\"constraint\" colspan=\"2\">{0}</td>", Constraints);
+            o.WriteLine("    <td class=\"min\" >{0}</td>", MinBitsInPER);
+            o.WriteLine("    <td class=\"max\" >{0}</td>", MaxBitsInPER);
+            o.WriteLine("</tr>");
+
+
+            o.WriteLine("</tbody>");
+            o.WriteLine("</table>");
+            o.WriteLine("</a>");
 
         }
 

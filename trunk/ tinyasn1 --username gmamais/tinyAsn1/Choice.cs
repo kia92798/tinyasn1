@@ -473,14 +473,15 @@ namespace tinyAsn1
             }
         }
 
-        public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, string tasName)
+        public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas)
         {
+            o.WriteLine("<a name=\"{0}\">", "ICD_" + tas.m_name.Replace("-", "_"));
             o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
             o.WriteLine("<tbody>");
-            o.WriteLine("<tr  bgcolor=\"#FF8f00\">");
+            o.WriteLine("<tr  bgcolor=\"{0}\">", (tas.m_createdThroughTabulization ? "#379CEE" : "#FF8f00"));
             o.WriteLine("<td height=\"35\" colspan=\"3\">");
-            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"4\">{0}({1}) </font>", tasName,Name);
-            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\"><a href=\"#{0}\">ASN.1</a></font>", "ASN1_" + tasName.Replace("-", "_"));
+            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"4\">{0}</font><font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">({1}) </font>", tas.m_name, Name);
+            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\"><a href=\"#{0}\">ASN.1</a></font>", "ASN1_" + tas.m_name.Replace("-", "_"));
             o.WriteLine("</td>");
             o.WriteLine("<td height=\"35\" colspan=\"2\"  align=\"center\">");
             o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">min = {0} bytes</font>", (MinBytesInPER == -1 ? "&#8734" : MinBytesInPER.ToString()));
@@ -517,6 +518,7 @@ namespace tinyAsn1
 
             o.WriteLine("</tbody>");
             o.WriteLine("</table>");
+            o.WriteLine("</a>");
         }
 
         private void PrintChoiceIndexHtml(StreamWriterLevel o, int p)

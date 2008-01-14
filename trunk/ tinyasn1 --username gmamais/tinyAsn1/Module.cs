@@ -353,7 +353,7 @@ namespace tinyAsn1
 
         public void PrintHtml(StreamWriterLevel wr, int p)
         {
-            wr.WriteLine("<div style=\"width: 100%; height: 20pt\">");
+            wr.WriteLine("<div style=\"width: 100%\">");
             wr.WriteLine(string.Format("<h2 >Module : {0}</h2>", m_moduleID));
             foreach (TypeAssigment tas in m_typeAssigments.Values)
                 tas.PrintHtml(wr, p + 1);
@@ -384,6 +384,7 @@ namespace tinyAsn1
             ret.m_type = asn1Type;
             ret.m_comments = commenst;
             m_typeAssigments.Add(newName, ret);
+            ret.m_createdThroughTabulization = true;
             return ret;
         }
     }
@@ -492,6 +493,7 @@ namespace tinyAsn1
         public List<string> m_comments = new List<string>();
         public string m_name;
         public Asn1Type m_type;
+        public bool m_createdThroughTabulization = false;
 
         //^(TYPE_ASSIG typereference type)
         static public TypeAssigment CreateFromAntlrAst(ITree tree)
@@ -521,8 +523,8 @@ namespace tinyAsn1
 
         public void PrintHtml(StreamWriterLevel wr, int p)
         {
-            wr.WriteLine("        <div style=\"width: 100%; height: 20pt\">");
-            m_type.PrintHtml(m_type.PEREffectiveConstraint, wr, p, m_comments, m_name);
+            wr.WriteLine("        <div style=\"width: 100%\">");
+            m_type.PrintHtml(m_type.PEREffectiveConstraint, wr, p, m_comments, this);
             wr.WriteLine("        </div>");
             wr.WriteLine("&nbsp;<p/>");
         }
