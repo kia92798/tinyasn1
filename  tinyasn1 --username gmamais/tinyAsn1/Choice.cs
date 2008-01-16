@@ -524,14 +524,14 @@ namespace tinyAsn1
         private void PrintChoiceIndexHtml(StreamWriterLevel o, int p)
         {
             string cssClass = "OddRow";
-            int nBits = PER.GetNumberOfBitsForNonNegativeInteger((ulong)m_children.Count);
+            int nBits = PER.GetNumberOfBitsForNonNegativeInteger((ulong)(m_children.Count-1));
             if (IsPERExtensible())
                 nBits++;
 
             o.WriteLine("<tr class=\"" + cssClass + "\">");
             o.WriteLine("<td class=\"no\">0</td>");
             o.WriteLine("<td class=\"field\">ChoiceIndex</td>");
-            o.WriteLine("<td class=\"comment\">{0}</td>", "Special field used by PER to indicate choice alternative is present.");
+            o.WriteLine("<td class=\"comment\">{0}</td>", "Special field used by PER to indicate which choice alternative is present.");
             o.WriteLine("<td class=\"type\">{0}</td>", "unsigned int");
 
             o.WriteLine("<td class=\"constraint\">{0}</td>", "-");

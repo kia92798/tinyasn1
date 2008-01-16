@@ -132,7 +132,7 @@ namespace tinyAsn1
             if (mnItems!=mxItems)
                 o.WriteLine("<td class=\"comment\">Special field used by PER to indicate the number of items present in the array.</td>");
             else
-                o.WriteLine("<td class=\"comment\">Special field used by PER to indicate the number of items present in the array.In this case however, the length field requires zero bits because its value is known in advnace ({0})</td>", mxItems);
+                o.WriteLine("<td class=\"comment\">Special field used by PER to indicate the number of items present in the array.In this case however, the length field requires zero bits because its value ({0}) is known in advanced by its size constraint.</td>", mxItems);
 
             o.WriteLine("<td class=\"type\">{0}</td>", "unsigned int");
 

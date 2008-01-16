@@ -145,7 +145,13 @@ namespace tinyAsn1
                     o.WriteLine("<td class=\"type\">{0}</td>",m_type.Name);
                 
                 o.WriteLine("<td class=\"constraint\">{0}</td>",m_type.Constraints);
-                o.WriteLine("<td class=\"optional\">{0}</td>",(m_optional?"Yes":"No"));
+                if (m_optional)
+                    o.WriteLine("<td class=\"optional\">Yes</td>");
+                else if (m_default)
+                    o.WriteLine("<td class=\"optional\">Def</td>");
+                else
+                    o.WriteLine("<td class=\"optional\">No</td>");
+                
                 o.WriteLine("<td class=\"min\">{0}</td>",(m_type.MinBitsInPER==-1?"&#8734":m_type.MinBitsInPER.ToString()));
                 o.WriteLine("<td class=\"max\">{0}</td>", (m_type.MaxBitsInPER == -1 ? "&#8734" : m_type.MaxBitsInPER.ToString()));
                 o.WriteLine("</tr>");
