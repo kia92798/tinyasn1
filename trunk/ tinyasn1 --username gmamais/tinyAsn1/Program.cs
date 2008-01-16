@@ -46,7 +46,7 @@ namespace tinyAsn1
                 {
                     if (args[i] == "-debug")
                         debug = true;
-                    else if (args[i] == "-encodeVariables")
+                    else if (args[i] == "-enc")
                         encodeVars = true;
                     else if (args[i] == "-icd")
                         genOutput = true;
@@ -124,10 +124,15 @@ namespace tinyAsn1
 
         static int Usage()
         {
-            Console.Error.WriteLine("tinyAsn1 -debug -encodeVariables -icd file1, file2, ..., fileN ");
-            Console.Error.WriteLine("\t -debug \t\tcreates an XML with AST representation");
-            Console.Error.WriteLine("\t -encodeVariables \t\tcreates one .dat file with PER encoding for each defined variable");
-            Console.Error.WriteLine("\t -icd \t\tGenerate ICD Documents");
+            Console.Error.WriteLine("Automatic ICD Generator");
+            Console.Error.WriteLine("Current Version is: 0.90");
+            Console.Error.WriteLine("Usage:");
+            Console.Error.WriteLine("autoICD -debug -encodeVariables -icd file1, file2, ..., fileN ");
+            Console.Error.WriteLine("\t -debug\tre-prints the AST using ASN.1. Usefull only for debug purposes.");
+            Console.Error.WriteLine("\t -enc\tcreates one .dat file with PER encoding for each variable");
+            Console.Error.WriteLine("\t -icd\tgenerates ICD Documents");
+            Console.Error.WriteLine("Example:");
+            Console.Error.WriteLine("\tautoICD -icd MyFile.asn1");
             return 4;
         }
     }
