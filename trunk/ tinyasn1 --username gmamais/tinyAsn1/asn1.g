@@ -111,6 +111,10 @@ public override IToken NextToken() {
         tokens.Remove(ret);
         return ret;
 }
+public override void ReportError(RecognitionException e) {
+	base.ReportError(e);
+        throw e;
+}
 }
 
 /* ********************************************************************************************************************* */

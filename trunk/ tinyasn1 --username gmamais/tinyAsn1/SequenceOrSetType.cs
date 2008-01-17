@@ -682,7 +682,7 @@ namespace tinyAsn1
 
         public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas)
         {
-            o.WriteLine("<a name=\"{0}\">", "ICD_" + tas.m_name.Replace("-", "_"));
+            o.WriteLine("<a name=\"{0}\"></a>", "ICD_" + tas.m_name.Replace("-", "_"));
             o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
             o.WriteLine("<tbody>");
             o.WriteLine("<tr  bgcolor=\"{0}\">", (tas.m_createdThroughTabulization ? "#379CEE" : "#FF8f00"));
@@ -698,9 +698,12 @@ namespace tinyAsn1
             o.WriteLine("</td>");
             o.WriteLine("</tr>");
 
-            o.WriteLine("<tr class=\"CommentRow\">");
-            o.WriteLine("<td class=\"comment\" colspan=\"8\">"+o.BR(comment)+"</td>");
-            o.WriteLine("</tr>");
+            if (comment.Count > 0)
+            {
+                o.WriteLine("<tr class=\"CommentRow\">");
+                o.WriteLine("<td class=\"comment\" colspan=\"8\">" + o.BR(comment) + "</td>");
+                o.WriteLine("</tr>");
+            }
 
             o.WriteLine("<tr class=\"headerRow\">");
             o.WriteLine("<td class=\"hrNo\">No</td>");
@@ -725,7 +728,7 @@ namespace tinyAsn1
             }
             o.WriteLine("</tbody>");
             o.WriteLine("</table>");
-            o.WriteLine("</a>");
+//            o.WriteLine("</a>");
         }
         public void PrintPreambleHtml(StreamWriterLevel o, int p)
         {

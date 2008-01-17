@@ -674,7 +674,7 @@ namespace tinyAsn1
 //Backend functions
         public virtual void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas)
         {
-            o.WriteLine("<a name=\"{0}\">", "ICD_" + tas.m_name.Replace("-", "_"));
+            o.WriteLine("<a name=\"{0}\"></a>", "ICD_" + tas.m_name.Replace("-", "_"));
             o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
             o.WriteLine("<tbody>");
 
@@ -693,9 +693,12 @@ namespace tinyAsn1
             o.WriteLine("</td>");
             o.WriteLine("</tr>");
 
-            o.WriteLine("<tr class=\"CommentRow\">");
-            o.WriteLine("<td class=\"comment2\" colspan=\"4\">" + o.BR(comment) + "</td>");
-            o.WriteLine("</tr>");
+            if (comment.Count > 0)
+            {
+                o.WriteLine("<tr class=\"CommentRow\">");
+                o.WriteLine("<td class=\"comment2\" colspan=\"4\">" + o.BR(comment) + "</td>");
+                o.WriteLine("</tr>");
+            }
 
             o.WriteLine("<tr class=\"headerRow\">");
             o.WriteLine("<td class=\"hrconstraint2\" colspan=\"2\">Constraints</td>");
@@ -714,7 +717,7 @@ namespace tinyAsn1
 
             o.WriteLine("</tbody>");
             o.WriteLine("</table>");
-            o.WriteLine("</a>");
+//            o.WriteLine("</a>");
 
         }
 

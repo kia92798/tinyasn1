@@ -39,6 +39,7 @@ namespace tinyAsn1
             bool debug=false;
             bool encodeVars = false;
             bool genOutput = false;
+            string outFileName = null;
 
             for (int i=0;i<args.Length;i++)
             {
@@ -50,6 +51,23 @@ namespace tinyAsn1
                         encodeVars = true;
                     else if (args[i] == "-icd")
                         genOutput = true;
+                    else if (args[i] == "-o")
+                    {
+                        try
+                        {
+                            i++;
+                            outFileName = args[i];
+                            System.IO.StreamWriter d= System.IO.File.CreateText(outFileName);
+                            d.Close();
+                            System.IO.File.Delete(outFileName);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.Error.WriteLine("-o argument specified, but filename specified is not valid. Error is");
+                            Console.Error.WriteLine(ex.Message);
+                            return Usage();
+                        }
+                    }
                     else
                     {
                         Console.Error.WriteLine("Unrecognized option: " + args[i]);
@@ -117,7 +135,7 @@ namespace tinyAsn1
 
             if (genOutput)
             {
-                compInv.PrintHtml();
+                compInv.PrintHtml(outFileName);
             }
             return 0;            
         }
@@ -125,12 +143,13 @@ namespace tinyAsn1
         static int Usage()
         {
             Console.Error.WriteLine("Automatic ICD Generator");
-            Console.Error.WriteLine("Current Version is: 0.90");
+            Console.Error.WriteLine("Current Version is: 0.91");
             Console.Error.WriteLine("Usage:");
-            Console.Error.WriteLine("autoICD -debug -encodeVariables -icd file1, file2, ..., fileN ");
+            Console.Error.WriteLine("autoICD -o outputFileName.html -debug -encodeVariables -icd file1, file2, ..., fileN ");
             Console.Error.WriteLine("\t -debug\tre-prints the AST using ASN.1. Usefull only for debug purposes.");
             Console.Error.WriteLine("\t -enc\tcreates one .dat file with PER encoding for each variable");
             Console.Error.WriteLine("\t -icd\tgenerates ICD Documents");
+            Console.Error.WriteLine("\t -o outputFileName.html\tthe generated ICD file name.");
             Console.Error.WriteLine("Example:");
             Console.Error.WriteLine("\tautoICD -icd MyFile.asn1");
             return 4;
