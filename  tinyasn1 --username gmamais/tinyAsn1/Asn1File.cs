@@ -238,17 +238,25 @@ namespace tinyAsn1
                 file.Tabularize();
         }
 
-        public virtual void PrintHtml()
+        public virtual void PrintHtml(string f)
         {
             if (m_files.Count > 0)
             {
-                string fileName = m_files[0].m_fileName;
-                if (fileName.ToUpper().EndsWith(".ASN1"))
-                    fileName = fileName.Substring(0, fileName.Length - 5) + ".html";
-                else if (fileName.ToUpper().EndsWith(".ASN"))
-                    fileName = fileName.Substring(0, fileName.Length - 4) + ".html";
+                string fileName = null;
+                if (f == null)
+                {
+                    fileName = m_files[0].m_fileName;
+
+                    if (fileName.ToUpper().EndsWith(".ASN1"))
+                        fileName = fileName.Substring(0, fileName.Length - 5) + ".html";
+                    else if (fileName.ToUpper().EndsWith(".ASN"))
+                        fileName = fileName.Substring(0, fileName.Length - 4) + ".html";
+                    else
+                        fileName += ".html";
+                }
                 else
-                    fileName += ".html";
+                    fileName = f;
+
                 StreamWriterLevel wr=null;
                 try
                 {
@@ -259,8 +267,10 @@ namespace tinyAsn1
                     Console.Error.WriteLine(ex.Message);
                     return;
                 }
+                wr.WriteLine("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"");
+                wr.WriteLine("        \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
 
-                wr.WriteLine("<html>");
+                wr.WriteLine("<html xmlns=\"http://www.w3.org/1999/xhtml\" >");
                 wr.WriteLine("<head>");
                 wr.WriteLine("    <title>ASN.1 Test Cases</title>");
 //                wr.WriteLine("    <link href=\"asn1Matrix.css\" rel=\"stylesheet\" type=\"text/css\" />");
@@ -347,7 +357,7 @@ namespace tinyAsn1
             Tabularize();
 
             wr.WriteLine("    <div style=\"width: 100%\">");
-            wr.WriteLine(string.Format("    <h1 >File : {0}</h1>", m_fileName));
+            wr.WriteLine(string.Format("    <h1 >File : {0}</h1>", System.IO.Path.GetFileName(m_fileName)));
 
             foreach (Module m in m_modules)
                 m.PrintHtml(wr, lev);
@@ -360,11 +370,13 @@ namespace tinyAsn1
 
         public void PrintAsn1InHtml(StreamWriterLevel wr, int lev)
         {
+            //string fname = m_fileName.Substring(m_fileName.LastIndexOf( 
+            
             wr.WriteLine("    <div style=\"width: 100%\">");
-            wr.WriteLine(string.Format("    <h1 >File : {0}</h1>", m_fileName));
-            wr.WriteLine("<pre>");
+            wr.WriteLine("    <h1 >File : {0}</h1>", System.IO.Path.GetFileName(m_fileName));
+            wr.WriteLine("<div style=\"width: 100%; white-space:pre; font-family:Courier New; font-size:small\">");
             wr.Write(getAsn1InHtml());
-            wr.WriteLine("</pre>");
+            wr.WriteLine("</div>");
             wr.WriteLine("    </div>");
         }
         /*
@@ -395,7 +407,7 @@ namespace tinyAsn1
                 if (tabulTyps.ContainsKey(i))
                     ret += "<a name=\"ASN1_" + tabulTyps[i].Replace("-", "_") + "\">" + t.Text + "</a>";
                 else if (asn1Words.Contains(t.Text))
-                    ret += "<font  color=\"#0000FF\" >" + t.Text + "</font>";
+                    ret += "<b><font  color=\"#5F9EA0\" >" + t.Text + "</font></b>";
                 else if (t.Type == asn1Lexer.StringLiteral || t.Type == asn1Lexer.OctectStringLiteral || t.Type == asn1Lexer.BitStringLiteral)
                     ret += "<font  color=\"#A31515\" >" + t.Text + "</font>";
                 else if (t.Type == asn1Lexer.UID && tas.Contains(t.Text))
@@ -408,7 +420,8 @@ namespace tinyAsn1
                             break;
                     //<a href="#ASN1_MYSQOF">ASN.1</a>
                     if (m_tokes[j].Type == asn1Lexer.ASSIG_OP)
-                        ret += "<a name=\"ASN1_" + t.Text.Replace("-", "_") + "\"><a href=\"#ICD_" + t.Text.Replace("-", "_") + "\"><font  color=\"#2B91AF\" >" + t.Text + "</font></a></a>";
+//                        ret += "<a name=\"ASN1_" + t.Text.Replace("-", "_") + "\"><a href=\"#ICD_" + t.Text.Replace("-", "_") + "\"><font  color=\"#2B91AF\" >" + t.Text + "</font></a></a>";
+                        ret += "<a name=\"ASN1_" + t.Text.Replace("-", "_") + "\"></a><a href=\"#ICD_" + t.Text.Replace("-", "_") + "\"><font  color=\"#B8860B\" ><b>" + t.Text + "</b></font></a>";
                     else
                         ret += "<a href=\"#ASN1_" + t.Text.Replace("-", "_") + "\"><font  color=\"#000000\" >" + t.Text + "</font></a>";
                 }
@@ -434,11 +447,12 @@ namespace tinyAsn1
             "PLUS-INFINITY", "MINUS-INFINITY", "GeneralizedTime", "UTCTime", "mantissa", "base", "exponent", "UNION", "INTERSECTION",
             "DEFINITIONS", "EXPLICIT", "TAGS", "IMPLICIT", "AUTOMATIC", "EXTENSIBILITY", "IMPLIED", "BEGIN", "END", "EXPORTS", "ALL",
             "IMPORTS", "FROM", "UNIVERSAL", "APPLICATION", "PRIVATE", "BIT", "STRING", "BOOLEAN", "ENUMERATED", "INTEGER", "REAL",
-            "CHOICE", "SEQUENCE", "OPTIONAL", "SIZE", "OF", "OCTET", "MIN", "MAX", "TRUE", "FALSE", "ABSENT", "PRESENT", "WITH",
-            "COMPONENT", "COMPONENTS", "DEFAULT", "NULL", "PATTERN", "OBJECT", "IDENTIFIER", "RELATIVE-OID", "NumericString",
+            "OPTIONAL", "SIZE", "OCTET", "MIN", "MAX", "TRUE", "FALSE", "ABSENT", "PRESENT", "WITH",
+            "COMPONENT", "DEFAULT", "NULL", "PATTERN", "OBJECT", "IDENTIFIER", "RELATIVE-OID", "NumericString",
             "PrintableString", "VisibleString", "IA5String", "TeletexString", "VideotexString", "GraphicString", "GeneralString",
-            "UniversalString", "BMPString", "UTF8String", "INCLUDES", "EXCEPT", "SET"
+            "UniversalString", "BMPString", "UTF8String", "INCLUDES", "EXCEPT", "SET", "SEQUENCE","CHOICE","OF","COMPONENTS"
             };
+        
 
         public static string css = @"
 .headerRow
