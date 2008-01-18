@@ -273,11 +273,11 @@ namespace tinyAsn1
                 wr.WriteLine("<html xmlns=\"http://www.w3.org/1999/xhtml\" >");
                 wr.WriteLine("<head>");
                 wr.WriteLine("    <title>ASN.1 Test Cases</title>");
-//                wr.WriteLine("    <link href=\"asn1Matrix.css\" rel=\"stylesheet\" type=\"text/css\" />");
                 wr.WriteLine("    <style type=\"text/css\"> {0} </style>", Asn1File.css); 
                 wr.WriteLine("</head>");
                 wr.WriteLine("<body>");
-                
+                wr.WriteLine("<i>This page was created by the");
+                wr.WriteLine("<a href=\"http://www.semantix.gr/DataModelling/OnlineDemo/icdDemo.htm\">Automatic ICD Generator tool</a></i><br/><br/>");
                 
                 foreach (Asn1File file in m_files)
                     file.PrintHtml(wr, 0);
