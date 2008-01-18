@@ -110,11 +110,11 @@ namespace tinyAsn1
 
 
             PrintSizeLengthHtml(cns, o, lev + 1);
-            PrintItemHtml(cns, o, lev + 1, 1);
+            PrintItemHtml(cns, o, 1);
             o.WriteLine("<tr class=\"CommentRow\">");
             o.WriteLine("<td class=\"threeDots\" colspan=\"7\"> <p>. . .</p> </td>");
             o.WriteLine("</tr>");
-            PrintItemHtml(cns, o, lev + 1, maxItems(cns));
+            PrintItemHtml(cns, o, maxItems(cns));
 
             o.WriteLine("</tbody>");
             o.WriteLine("</table>");
@@ -128,14 +128,17 @@ namespace tinyAsn1
             string cssClass = "OddRow";
             long mnItems = minItems(cns);
             long mxItems = maxItems(cns);
+            if (mnItems == mxItems)
+                return;
+
 
             o.WriteLine("<tr class=\"" + cssClass + "\">");
             o.WriteLine("<td class=\"no\">1</td>");
             o.WriteLine("<td class=\"field\">Length</td>");
-            if (mnItems!=mxItems)
+//            if (mnItems!=mxItems)
                 o.WriteLine("<td class=\"comment\">Special field used by PER to indicate the number of items present in the array.</td>");
-            else
-                o.WriteLine("<td class=\"comment\">Special field used by PER to indicate the number of items present in the array.In this case however, the length field requires zero bits because its value ({0}) is known in advanced by its size constraint.</td>", mxItems);
+//            else
+//                o.WriteLine("<td class=\"comment\">Special field used by PER to indicate the number of items present in the array.In this case however, the length field requires zero bits because its value ({0}) is known in advanced by its size constraint.</td>", mxItems);
 
             o.WriteLine("<td class=\"type\">{0}</td>", "unsigned int");
 
@@ -145,11 +148,12 @@ namespace tinyAsn1
             o.WriteLine("</tr>");
         }
 
-        private void PrintItemHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int p, long itemNo)
+        private void PrintItemHtml(PEREffectiveConstraint cns, StreamWriterLevel o, long itemNo)
         {
+            int inc = ((minItems(cns) == maxItems(cns) ? 0 : 1));
             string cssClass = "EvenRow";
             o.WriteLine("<tr class=\"" + cssClass + "\">");
-            o.WriteLine("<td class=\"no\">{0}</td>", (itemNo) == -1 ? "&#8734" : (itemNo+1).ToString());
+            o.WriteLine("<td class=\"no\">{0}</td>", (itemNo) == -1 ? "&#8734" : (itemNo + inc).ToString());
             o.WriteLine("<td class=\"field\">Item #{0}</td>", (itemNo) == -1 ? "&#8734" : itemNo.ToString());
             o.WriteLine("<td class=\"comment\">{0}</td>", "");
             o.WriteLine("<td class=\"type\">{0}</td>", TypeName);
