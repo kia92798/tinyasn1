@@ -367,10 +367,16 @@ namespace tinyAsn1
         internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
             h.WriteLine("enum {0} {{", typeName);
+            int i = 0;
             foreach (Item it in m_enumValues.Values)
             {
                 h.P(lev + 1);
-                h.WriteLine("{0} = {1},", it.m_id, it.m_value);
+                h.Write("{0} = {1}", it.m_id, it.m_value);
+                if (i < m_enumValues.Values.Count - 1)
+                    h.WriteLine(",");
+                else
+                    h.WriteLine();
+                i++;
             }
 
             h.P(lev);
