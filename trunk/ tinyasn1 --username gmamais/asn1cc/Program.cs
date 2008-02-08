@@ -1,4 +1,3 @@
-#if UNDEFINED
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,8 +9,9 @@ using Antlr.StringTemplate.Language;
 using Antlr.Utility.Tree;
 using Antlr.Runtime.Tree;
 using System.IO;
+using tinyAsn1;
 
-namespace tinyAsn1
+namespace asn1cc
 {
     class Program
     {
@@ -31,44 +31,20 @@ namespace tinyAsn1
                 return 3;
             }
         }
-        
+
         static int Main2(string[] args)
         {
             List<string> inputFiles = new List<string>();
             Asn1CompilerInvokation compInv = Asn1CompilerInvokation.Instance;
 
-            bool debug=false;
-            bool encodeVars = false;
-            bool genOutput = false;
-            string outFileName = null;
+            bool debug = false;
 
-            for (int i=0;i<args.Length;i++)
+            for (int i = 0; i < args.Length; i++)
             {
                 if (args[i].StartsWith("-"))
                 {
                     if (args[i] == "-debug")
                         debug = true;
-                    else if (args[i] == "-enc")
-                        encodeVars = true;
-                    else if (args[i] == "-icd")
-                        genOutput = true;
-                    else if (args[i] == "-o")
-                    {
-                        try
-                        {
-                            i++;
-                            outFileName = args[i];
-                            System.IO.StreamWriter d= System.IO.File.CreateText(outFileName);
-                            d.Close();
-                            System.IO.File.Delete(outFileName);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.Error.WriteLine("-o argument specified, but filename specified is not valid. Error is");
-                            Console.Error.WriteLine(ex.Message);
-                            return Usage();
-                        }
-                    }
                     else
                     {
                         Console.Error.WriteLine("Unrecognized option: " + args[i]);
@@ -96,7 +72,7 @@ namespace tinyAsn1
                 }
             }
 
-//Create Syntax Tree
+            //Create Syntax Tree
             try
             {
                 compInv.CreateASTs(inputFiles);
@@ -111,7 +87,7 @@ namespace tinyAsn1
                 return 2;
             }
 
-// Modify Syntax Tree and make Semantic checks
+            // Modify Syntax Tree and make Semantic checks
 
             try
             {
@@ -122,39 +98,27 @@ namespace tinyAsn1
                 Console.Error.WriteLine(ex.Message);
                 return 2;
             }
-            
+
 
             if (debug)
             {
                 compInv.debug();
             }
+            compInv.printC();
 
-            if (encodeVars)
-            {
-                compInv.EncodeVars();
-            }
-
-            if (genOutput)
-            {
-                compInv.PrintHtml(outFileName);
-            }
-            return 0;            
+            return 0;
         }
 
         static int Usage()
         {
-            Console.Error.WriteLine("Automatic ICD Generator");
+            Console.Error.WriteLine("ASN.1 Certified compiler");
             Console.Error.WriteLine("Current Version is: 0.92");
             Console.Error.WriteLine("Usage:");
-            Console.Error.WriteLine("autoICD -o outputFileName.html -debug -encodeVariables -icd file1, file2, ..., fileN ");
+            Console.Error.WriteLine("asn1cc -debug file1, file2, ..., fileN ");
             Console.Error.WriteLine("\t -debug\tre-prints the AST using ASN.1. Usefull only for debug purposes.");
-            Console.Error.WriteLine("\t -enc\tcreates one .dat file with PER encoding for each variable");
-            Console.Error.WriteLine("\t -icd\tgenerates ICD Documents");
-            Console.Error.WriteLine("\t -o outputFileName.html\tthe generated ICD file name.");
             Console.Error.WriteLine("Example:");
-            Console.Error.WriteLine("\tautoICD -icd MyFile.asn1");
+            Console.Error.WriteLine("\tasn1cc MyFile.asn1");
             return 4;
         }
     }
 }
-#endif

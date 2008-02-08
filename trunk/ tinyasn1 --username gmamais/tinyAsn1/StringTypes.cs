@@ -200,7 +200,18 @@ namespace tinyAsn1
             PERAlphabetAndSizeEffectiveConstraint cn = (PERAlphabetAndSizeEffectiveConstraint)cns;
             return cn.m_from.ToString();
         }
-
+        internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        {
+            if (varName=="")
+                h.WriteLine("char {0}[{1}];", typeName, maxItems(cns) + 1);
+            else
+                h.WriteLine("char {0}[{1}];", varName, maxItems(cns) + 1);
+        }
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        {
+            h.P(lev);
+            h.WriteLine("{0}[0] = 0x0;", varName);
+        }
     }
 
     public partial class NumericStringType : IA5StringType

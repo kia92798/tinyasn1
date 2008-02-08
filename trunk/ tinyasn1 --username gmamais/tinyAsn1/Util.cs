@@ -62,7 +62,7 @@ namespace tinyAsn1
         public void P(int level)
         {
             for (int i = 0; i < level; i++)
-                Write("\t");
+                Write("    ");
         }
         public string BR(List<string> lines)
         {
@@ -260,6 +260,15 @@ namespace tinyAsn1
             for (int i = 0; i < root.ChildCount; i++)
                 visitIfNot(root.GetChild(i), tokenIDs, callBack, StopList);
         }
+    }
+
+    static class C
+    {
+        public static string ID(string str)
+        {
+            return str.Replace('_', '-').Replace('.', '_');
+        }
+
     }
 
 }

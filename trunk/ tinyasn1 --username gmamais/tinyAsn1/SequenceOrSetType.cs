@@ -764,7 +764,67 @@ namespace tinyAsn1
 
             }
         }
+        internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        {
+            h.WriteLine("struct {0} {{", typeName);
+            foreach (Child ch in m_children.Values)
+            {
+                h.P(lev + 1);
+                ch.m_type.PrintHTypeDeclaration(ch.m_type.PEREffectiveConstraint, h, "", C.ID(ch.m_childVarName), lev + 1);
+                if (!(ch.m_type is IA5StringType))
+                    h.WriteLine(" {0};", C.ID(ch.m_childVarName));
+            }
+            if (GetNumberOfOptionalOrDefaultFields() != 0)
+            {
+                h.P(lev + 1);
+                h.WriteLine("struct {");
+                foreach (Child ch in m_children.Values)
+                {
+                    if (ch.m_optional || ch.m_defaultValue!=null)
+                    {
+                        h.P(lev + 2);
+                        h.WriteLine("unsigned int {0}:1;", C.ID(ch.m_childVarName));
+                    }
+                }
+                h.P(lev + 1);
+                h.WriteLine("} exist;");
+                
+            }
+            h.P(lev);
+            h.Write("}");
+        }
 
+        internal override bool DependsOnlyOn(List<TypeAssigment> values)
+        {
+            foreach (Child ch in m_children.Values)
+                if (!ch.m_type.DependsOnlyOn(values))
+                    return false;
+            return true;
+        }
+
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, StreamWriterLevel c, string typeName, string varName, int lev)
+        {
+            bool topLevel = !varName.Contains("->");
+            string prefix = "";
+            if (topLevel)
+                prefix = varName + "->";
+            else
+                prefix = varName + ".";
+
+            foreach (Child ch in m_children.Values)
+            {
+                ch.m_type.PrintCInitialize(ch.m_type.PEREffectiveConstraint, c, "", prefix+C.ID(ch.m_childVarName), lev);
+            }
+        }
+
+        internal override void PrintHConstraintConstant(StreamWriterLevel h, string name)
+        {
+            base.PrintHConstraintConstant(h, name);
+            foreach (Child ch in m_children.Values)
+            {
+                ch.m_type.PrintHConstraintConstant(h, name + "_" + ch.m_childVarName);
+            }
+        }
     }
 
     public partial class SequenceOrSetValue : Asn1Value

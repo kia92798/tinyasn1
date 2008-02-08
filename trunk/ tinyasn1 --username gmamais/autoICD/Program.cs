@@ -1,4 +1,3 @@
-#if UNDEFINED
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,8 +9,9 @@ using Antlr.StringTemplate.Language;
 using Antlr.Utility.Tree;
 using Antlr.Runtime.Tree;
 using System.IO;
+using tinyAsn1;
 
-namespace tinyAsn1
+namespace autoICD
 {
     class Program
     {
@@ -31,18 +31,18 @@ namespace tinyAsn1
                 return 3;
             }
         }
-        
+
         static int Main2(string[] args)
         {
             List<string> inputFiles = new List<string>();
             Asn1CompilerInvokation compInv = Asn1CompilerInvokation.Instance;
 
-            bool debug=false;
+            bool debug = false;
             bool encodeVars = false;
             bool genOutput = false;
             string outFileName = null;
 
-            for (int i=0;i<args.Length;i++)
+            for (int i = 0; i < args.Length; i++)
             {
                 if (args[i].StartsWith("-"))
                 {
@@ -58,7 +58,7 @@ namespace tinyAsn1
                         {
                             i++;
                             outFileName = args[i];
-                            System.IO.StreamWriter d= System.IO.File.CreateText(outFileName);
+                            System.IO.StreamWriter d = System.IO.File.CreateText(outFileName);
                             d.Close();
                             System.IO.File.Delete(outFileName);
                         }
@@ -96,7 +96,7 @@ namespace tinyAsn1
                 }
             }
 
-//Create Syntax Tree
+            //Create Syntax Tree
             try
             {
                 compInv.CreateASTs(inputFiles);
@@ -111,7 +111,7 @@ namespace tinyAsn1
                 return 2;
             }
 
-// Modify Syntax Tree and make Semantic checks
+            // Modify Syntax Tree and make Semantic checks
 
             try
             {
@@ -122,7 +122,7 @@ namespace tinyAsn1
                 Console.Error.WriteLine(ex.Message);
                 return 2;
             }
-            
+
 
             if (debug)
             {
@@ -138,7 +138,7 @@ namespace tinyAsn1
             {
                 compInv.PrintHtml(outFileName);
             }
-            return 0;            
+            return 0;
         }
 
         static int Usage()
@@ -157,4 +157,3 @@ namespace tinyAsn1
         }
     }
 }
-#endif

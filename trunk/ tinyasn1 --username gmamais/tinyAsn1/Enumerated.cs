@@ -363,6 +363,30 @@ namespace tinyAsn1
             ret += PER.GetNumberOfBitsForNonNegativeInteger((UInt64)(RootItemsCount - 1));
             return ret;
         }
+
+        internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        {
+            h.WriteLine("enum {0} {{", typeName);
+            foreach (Item it in m_enumValues.Values)
+            {
+                h.P(lev + 1);
+                h.WriteLine("{0} = {1},", it.m_id, it.m_value);
+            }
+
+            h.P(lev);
+            h.Write("}");
+        }
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        {
+            bool topLevel = !varName.Contains("->"); 
+            
+            h.P(lev);
+            if (topLevel)
+                h.WriteLine("*{0} = {1};", varName, m_enumValues.Values[0].m_id);
+            else
+                h.WriteLine("{0} = {1};", varName, m_enumValues.Values[0].m_id);
+
+        }
     }
 
 

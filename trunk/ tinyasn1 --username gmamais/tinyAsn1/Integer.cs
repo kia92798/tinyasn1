@@ -269,7 +269,21 @@ namespace tinyAsn1
             return 16;
         }
 
+        internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        {
+            h.Write("sint ");
+        }
 
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        {
+            bool topLevel = !varName.Contains("->");
+
+            h.P(lev);
+            if (topLevel)
+                h.WriteLine("*{0} = 0;", varName);
+            else
+                h.WriteLine("{0} = 0;", varName);
+        }
     }
 
 

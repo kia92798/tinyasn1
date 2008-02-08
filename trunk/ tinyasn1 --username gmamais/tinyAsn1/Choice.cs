@@ -542,6 +542,67 @@ namespace tinyAsn1
             o.WriteLine("<td class=\"max\">{0}</td>", nBits);
             o.WriteLine("</tr>");
         }
+        internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        {
+            h.WriteLine("struct {0} {{", typeName);
+            h.P(lev + 1);
+            h.WriteLine("enum {0}_PR {{", typeName);
+            h.P(lev + 2);
+            h.WriteLine("{0}_NONE,	/* No components present */",typeName);
+            foreach (ChoiceChild ch in m_children.Values)
+            {
+                h.P(lev + 2);
+                h.WriteLine("{0}_{1},", typeName, ch.m_childVarName);
+            }
+            h.P(lev + 1);
+            h.WriteLine("} kind;");
+
+
+            h.P(lev + 1);
+            h.WriteLine("union {0}_data {{", typeName);
+            foreach (ChoiceChild ch in m_children.Values)
+            {
+
+
+                h.P(lev + 2);
+                ch.m_type.PrintHTypeDeclaration(ch.m_type.PEREffectiveConstraint, h, "", C.ID(ch.m_childVarName), lev + 1);
+                if (!(ch.m_type is IA5StringType))
+                    h.WriteLine(" {0};", C.ID(ch.m_childVarName));
+            }
+            h.P(lev + 1);
+            h.WriteLine("} u;");
+
+
+            h.P(lev);
+            h.Write("}");
+        }
+        internal override bool DependsOnlyOn(List<TypeAssigment> values)
+        {
+            foreach (ChoiceChild ch in m_children.Values)
+                if (!ch.m_type.DependsOnlyOn(values))
+                    return false;
+            return true;
+        }
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, StreamWriterLevel c, string typeName, string varName, int lev)
+        {
+            bool topLevel = !varName.Contains("->");
+            string prefix = "";
+            if (topLevel)
+                prefix = varName + "->";
+            else
+                prefix = varName + ".";
+
+            c.P(lev); c.WriteLine("{0}kind = {1}_NONE;", prefix, typeName);
+        }
+
+        internal override void PrintHConstraintConstant(StreamWriterLevel h, string name)
+        {
+            base.PrintHConstraintConstant(h, name);
+            foreach (ChoiceChild ch in m_children.Values)
+            {
+                ch.m_type.PrintHConstraintConstant(h, name + "_" + ch.m_childVarName);
+            }
+        }
     }
 
     public partial class ChoiceChild
