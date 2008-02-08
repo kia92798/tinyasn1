@@ -164,14 +164,14 @@ namespace tinyAsn1
             o.WriteLine("</tr>");
         }
 
-        long minItems(PEREffectiveConstraint cns)
+        protected long minItems(PEREffectiveConstraint cns)
         {
             if (cns == null)
                 return 0;
             PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
             return cn.m_size.m_rootRange.m_min;
         }
-        long maxItems(PEREffectiveConstraint cns)
+        protected long maxItems(PEREffectiveConstraint cns)
         {
             if (cns == null)
                 return -1;
@@ -380,8 +380,68 @@ namespace tinyAsn1
         {
             return m_type.Constraints;
         }
-    
-   }
+
+        internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        {
+            long min = minItems(cns);
+            long max = maxItems(cns);
+            h.WriteLine("struct {0} {{", typeName);
+            if (min != max)
+            {
+                h.P(lev + 1);
+                h.WriteLine("long nCount;");
+            }
+            h.P(lev + 1); m_type.PrintHTypeDeclaration(m_type.PEREffectiveConstraint, h, "", "", lev + 1);
+            h.WriteLine(" arr[{0}];", max);
+            h.P(lev);
+            h.Write("}");
+        }
+        
+        internal override bool DependsOnlyOn(List<TypeAssigment> values)
+        {
+            return m_type.DependsOnlyOn(values);
+        }
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, StreamWriterLevel c, string typeName, string varName, int lev)
+        {
+            long min = minItems(cns);
+            long max = maxItems(cns);
+            string i = "i" + lev.ToString();
+            string prefix = "";
+            bool topLevel = !varName.Contains("->");
+            if (topLevel)
+                prefix = varName + "->";
+            else
+            {
+                prefix = varName + ".";
+                c.WriteLine();
+                c.P(lev);c.WriteLine("{");
+                lev++;
+            }
+
+            c.P(lev); c.WriteLine("int {0};", i);
+            if (min != max)
+            {
+                c.P(lev); 
+                c.WriteLine("{0}nCount = 0;", prefix);
+            }
+            
+            c.P(lev); c.WriteLine("for({0}=0;{0}<{1};{0}++)", i, maxItems(cns));
+            c.P(lev); c.WriteLine("{");
+            m_type.PrintCInitialize(m_type.PEREffectiveConstraint, c, "", prefix + "arr["+i+"]", lev + 1);
+            c.P(lev); c.WriteLine("}");
+            if (!topLevel)
+            {
+                lev--;
+                c.P(lev); c.WriteLine("}");
+                c.WriteLine();
+            }
+        }
+        internal override void PrintHConstraintConstant(StreamWriterLevel h, string name)
+        {
+            base.PrintHConstraintConstant(h, name);
+            m_type.PrintHConstraintConstant(h, name + "_elem");
+        }
+    }
 
 
     public partial class ArrayValue : Asn1Value, ISize

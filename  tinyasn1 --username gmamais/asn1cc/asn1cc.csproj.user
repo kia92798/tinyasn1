@@ -1,0 +1,5 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <StartArguments>C:\prj\DataModeling\tinyAsn1\asn1cc\tests\sample2.asn1</StartArguments>
+  </PropertyGroup>
+</Project>

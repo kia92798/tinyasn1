@@ -4,13 +4,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{AA87CFEC-3291-4F26-8ACC-3FDD380805D5}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{8E158748-B327-45FA-A0F0-60024667118D}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>tinyAsn1</RootNamespace>
-    <AssemblyName>tinyAsn1</AssemblyName>
-    <StartupObject>
-    </StartupObject>
+    <RootNamespace>autoICD</RootNamespace>
+    <AssemblyName>autoICD</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,38 +49,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Array.cs" />
-    <Compile Include="Asn1File.cs" />
-    <Compile Include="asn1Lexer.cs" />
-    <Compile Include="asn1Parser.cs" />
-    <Compile Include="Asn1Type.cs" />
-    <Compile Include="BitString.cs" />
-    <Compile Include="Boolean.cs" />
-    <Compile Include="Choice.cs" />
-    <Compile Include="Constraint.cs" />
-    <Compile Include="Enumerated.cs" />
-    <Compile Include="Integer.cs" />
-    <Compile Include="Module.cs" />
-    <Compile Include="Null.cs" />
-    <Compile Include="NumberedItem.cs" />
-    <Compile Include="ObjectIdentifier.cs" />
-    <Compile Include="OctetString.cs" />
-    <Compile Include="PER.cs" />
-    <Compile Include="Real.cs" />
-    <Compile Include="ReferenceType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sequence.cs" />
-    <Compile Include="SequenceOf.cs" />
-    <Compile Include="SequenceOrSetType.cs" />
-    <Compile Include="Set.cs" />
-    <Compile Include="SetOf.cs" />
-    <Compile Include="StringTypes.cs" />
-    <Compile Include="TimeTypes.cs" />
-    <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="StepsToPublishANewVersion.txt" />
+    <ProjectReference Include="..\tinyAsn1\tinyAsn1.csproj">
+      <Project>{AA87CFEC-3291-4F26-8ACC-3FDD380805D5}</Project>
+      <Name>tinyAsn1</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

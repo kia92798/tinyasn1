@@ -589,6 +589,7 @@ namespace tinyAsn1
 // PER related methods
 
         /// <summary>
+        /// This method is called by SemanticParse() of the Asn1CompilerInvokation.
         /// This method must be overriden in types that include other types (i.e. SEQUENCE etc)
         /// </summary>
         public virtual void ComputePEREffectiveConstraints()
@@ -603,6 +604,10 @@ namespace tinyAsn1
             return false;
         }
 
+        /// <summary>
+        /// Returns the PER effective constraint for the given type
+        /// If there is no effective constraint returns null
+        /// </summary>
         public virtual PEREffectiveConstraint PEREffectiveConstraint
         {
             get
@@ -611,12 +616,23 @@ namespace tinyAsn1
             }
         }
 
-
+        /// <summary>
+        /// This function should never be called directly.
+        /// Instead call the property MinBitsInPER
+        /// </summary>
+        /// <param name="cns"></param>
+        /// <returns></returns>
         public virtual long minBitsInPER(PEREffectiveConstraint cns)
         {
             return 0;
         }
 
+        /// <summary>
+        /// This function should never be called directly.
+        /// Instead call the property MaxBitsInPER
+        /// </summary>
+        /// <param name="cns"></param>
+        /// <returns></returns>
         public virtual long maxBitsInPER(PEREffectiveConstraint cns)
         {
             return -1;
@@ -734,6 +750,27 @@ namespace tinyAsn1
         /// </summary>
         public virtual void Tabularize(string tasName)
         {
+        }
+
+        internal virtual void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        {
+            throw new Exception("Abstract method called");
+        }
+
+        internal virtual bool DependsOnlyOn(List<TypeAssigment> values)
+        {
+            return true;
+        }
+
+        internal virtual void PrintCInitialize(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        {
+            throw new Exception("Abstract method called");
+        }
+
+        internal virtual void PrintHConstraintConstant(StreamWriterLevel h, string name)
+        {
+            if (m_constraints.Count>0)
+                h.WriteLine("#define ERR_{0}_CONSTRAINT_FAILED\t\t{1} /* {2} */", name, Asn1CompilerInvokation.Instance.ConstraintErrorID++, Constraints);
         }
     }
 

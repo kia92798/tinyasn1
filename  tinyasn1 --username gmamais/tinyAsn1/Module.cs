@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Antlr.Runtime.Tree;
 using Antlr.Runtime;
+using System.IO;
 
 namespace tinyAsn1
 {
@@ -387,6 +388,8 @@ namespace tinyAsn1
             ret.m_createdThroughTabulization = true;
             return ret;
         }
+
+
     }
 
 
@@ -527,6 +530,52 @@ namespace tinyAsn1
             m_type.PrintHtml(m_type.PEREffectiveConstraint, wr, p, m_comments, this);
             wr.WriteLine("        </div>");
             wr.WriteLine("&nbsp;<br/>");
+        }
+
+        internal void PrintH(StreamWriterLevel h, string uniqueID)
+        {
+            //print type declaration
+            h.WriteLine("/*");
+            h.WriteLine("Definition of :{0}", m_name);
+            h.WriteLine("*/");
+            h.Write("typedef ");
+            m_type.PrintHTypeDeclaration(m_type.PEREffectiveConstraint, h, uniqueID, "", 0);
+            if (!(m_type is IA5StringType))
+                h.WriteLine(" {0};", uniqueID);
+            h.WriteLine();
+
+            //print 
+            h.WriteLine("#define {0}_REQUIRED_BYTES_FOR_ENCODING		{1}",uniqueID, m_type.MaxBytesInPER);
+            h.WriteLine();
+            m_type.PrintHConstraintConstant(h, uniqueID);
+            h.WriteLine();
+            string star = "";
+            if (!(m_type is IA5StringType))
+                star = "*";
+            h.WriteLine("void {0}_Initialize({0}{1} pVal);", uniqueID,star);
+            h.WriteLine("flag {0}_IsConstraintValid({0}{1} val, int* pErrCode);", uniqueID,star);
+            h.WriteLine("flag {0}_Encode({0}{1} val, BitStream* pBitStrm, int* pErrCode);",uniqueID, star);
+            h.WriteLine("flag {0}_Decode({0}{1} val, BitStream* pBitStrm, int* pErrCode);",uniqueID, star);
+            h.WriteLine();
+            h.WriteLine();
+        }
+
+        internal bool DependsOnlyOn(List<TypeAssigment> values)
+        {
+            return m_type.DependsOnlyOn(values);
+        }
+
+        internal void PrintC(StreamWriterLevel c, string uniqueID)
+        {
+            string star = "";
+            if (!(m_type is IA5StringType))
+                star = "*";
+            c.WriteLine();
+            c.WriteLine("void {0}_Initialize({0}{1} pVal)", uniqueID,star);
+            c.WriteLine("{");
+            m_type.PrintCInitialize(m_type.PEREffectiveConstraint, c, uniqueID, "pVal", 1);
+            c.WriteLine("}");
+            c.WriteLine();
         }
     }
 

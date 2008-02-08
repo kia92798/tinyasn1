@@ -282,5 +282,42 @@ namespace tinyAsn1
             return ret;
         }
 
+        internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        {
+            h.Write(m_referencedTypeName);
+        }
+
+        internal override bool DependsOnlyOn(List<TypeAssigment> values)
+        {
+            foreach (TypeAssigment t in values)
+            {
+                if (m_referencedTypeName == t.m_name)
+                    return true;
+            }
+            return false;
+        }
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        {
+            h.P(lev);
+            if (!(Type is IA5StringType))
+                h.WriteLine("{0}_Initialize(&{1});", m_referencedTypeName, varName);
+            else
+                h.WriteLine("{0}_Initialize({1});", m_referencedTypeName, varName);
+
+        }
+        internal override void PrintHConstraintConstant(StreamWriterLevel h, string name)
+        {
+            Asn1Type cur = this;
+            int nCount = 0;
+            string conConstraints = "";
+            while (cur != null)
+            {
+                nCount = cur.m_constraints.Count;
+                conConstraints += cur.Constraints;
+                cur = cur.ParentType;
+            }
+            if (nCount>0)
+                h.WriteLine("#define ERR_{0}_CONSTRAINT_FAILED\t\t{1} /* {2} */", name, Asn1CompilerInvokation.Instance.ConstraintErrorID++, conConstraints);
+        }
     }
 }
