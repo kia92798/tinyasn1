@@ -549,10 +549,16 @@ namespace tinyAsn1
             h.WriteLine("enum {0}_PR {{", typeName);
             h.P(lev + 2);
             h.WriteLine("{0}_NONE,	/* No components present */",typeName);
+            int i = 0;
             foreach (ChoiceChild ch in m_children.Values)
             {
                 h.P(lev + 2);
-                h.WriteLine("{0}_{1},", typeName, ch.m_childVarName);
+                h.Write("{0}_{1}", typeName, ch.m_childVarName);
+                if (i < m_children.Values.Count - 1)
+                    h.WriteLine(",");
+                else
+                    h.WriteLine();
+                i++;
             }
             h.P(lev + 1);
             h.WriteLine("} kind;");
