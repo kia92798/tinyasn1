@@ -1,0 +1,117 @@
+CAR-PARTS DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+/* 
+this is a multiline comment which doesn't appeard in the ICD tables. 
+Of course the comment the comment will appear along with the rest of
+the ASN.1 grammar at the the end of the ICD file.
+*/
+
+--This a single comment which also doesn't appear in any table.
+
+
+	MyInt ::= INTEGER(1|2|3)
+
+	MyInt2 ::= INTEGER(10..100)
+
+	MyInt2b ::= INTEGER(10..100 | 200..<500)
+
+	MyInt3 ::= INTEGER(MIN..100)
+	
+	MyInt4 ::= INTEGER(20..MAX)
+
+	MyReal	::= REAL
+	
+	MyEnum ::= ENUMERATED {
+		alpha, beta, gamma
+	}
+	
+	MyString ::= IA5String(SIZE(1..10))
+	
+
+	
+	--@This a special comment which appears in the ICD table
+	--@It should appear in front of type assigments 
+	--@CAR DEFINITION
+	Vehicle ::= SEQUENCE {
+		myStr	MyString,
+	
+		--@Provides information about the engine's power, fuel consumption etc 
+		engine	Engine,
+		
+		--@Cars have 4 wheels while motorbikes have 2 or 3
+		wheels	SEQUENCE (SIZE (2..4)) OF Wheel,
+		
+		--@Car's color. Default value is red
+		color	ENUMERATED {
+					red, green, blue, black
+					}(red|blue)	DEFAULT	red ,
+		--@Car's unique serial number					
+		serialNumber	IA5String(SIZE(1..10))	DEFAULT "0000000000",
+		--@Extra equipment
+		extraEquipment	ExtraEquipment OPTIONAL,
+		
+		internal1 SEQUENCE {
+			radius	INTEGER(5..40) OPTIONAL,
+			tread	INTEGER(2..25),
+			internal2 SEQUENCE {
+				radius	INTEGER(5..40) OPTIONAL,
+				tread	INTEGER(2..25),
+				intArray SEQUENCE (SIZE(10)) OF INTEGER(1..5),
+				intDoubleArray SEQUENCE (SIZE(10)) OF SEQUENCE (SIZE(100)) OF INTEGER(1..5),
+				intArryStruct SEQUENCE (SIZE(10)) OF SEQUENCE (SIZE(100)) OF  SEQUENCE {
+																				alpha	INTEGER(5..40) OPTIONAL,
+																				beta	INTEGER(2..25)
+																			}
+			}  OPTIONAL
+			
+		},
+		
+		internalChoice 	CHOICE {
+			sport	SportEquipment,
+			classic ClassicEquipment
+		}
+
+
+	}
+	
+	--@Defines car's engine
+	Engine ::= SEQUENCE {
+		--Upper limit goes for Bugatti Veyron
+		horsePower	INTEGER(0..1001),
+		--@Fuel consumption is given in litres per 100Km
+		fuelConsumption	REAL,
+		--@Unit's are gr/Km
+		co2Emissions	INTEGER(0..300)
+	}
+	
+	--@Wheel definition
+	Wheel ::= SEQUENCE {
+		--@Units are centimeters
+		radius	INTEGER(5..40),
+		--@Units are centimeters
+		tread	INTEGER(2..25)
+		
+	}
+	--@Car's extra equipment
+	ExtraEquipment ::= CHOICE {
+		sport	SportEquipment,
+		classic ClassicEquipment
+	}
+	
+	--@Sport Equipment
+	SportEquipment ::= SEQUENCE {
+		aircondition	BOOLEAN,
+		leatherSofas	BOOLEAN,
+		xenonLights		BOOLEAN
+	}
+
+	--@Classic Equipment
+	ClassicEquipment ::= SEQUENCE {
+		aircondition	BOOLEAN,
+		leatherSofas	BOOLEAN
+	}
+	
+	DayProduction ::= SEQUENCE (SIZE(500)) OF Vehicle
+	
+	
+END
