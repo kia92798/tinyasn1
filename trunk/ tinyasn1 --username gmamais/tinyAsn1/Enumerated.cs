@@ -430,7 +430,8 @@ namespace tinyAsn1
         }
         public override string ToString()
         {
-            return ID + "(" + Value.ToString() + ")";
+            return ID ;
+//            return ID + "(" + Value.ToString() + ")";
         }
 
         public override bool Equals(object obj)

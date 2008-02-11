@@ -319,5 +319,20 @@ namespace tinyAsn1
             if (nCount>0)
                 h.WriteLine("#define ERR_{0}_CONSTRAINT_FAILED\t\t{1} /* {2} */", name, Asn1CompilerInvokation.Instance.ConstraintErrorID++, conConstraints);
         }
+
+        internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            c.P(lev); c.Write("ret =");
+            if (!(Type is IA5StringType))
+                c.WriteLine("{0}_IsConstraintValid(&{1}, pErrCode);", m_referencedTypeName, varName);
+            else
+                c.WriteLine("{0}_IsConstraintValid({1}, pErrCode);", m_referencedTypeName, varName);
+
+            c.P(lev);
+            c.WriteLine("if (!ret)");
+            c.P(lev + 1);
+            c.WriteLine("return FALSE;");
+            
+        }
     }
 }

@@ -284,6 +284,7 @@ namespace tinyAsn1
             else
                 h.WriteLine("{0} = 0;", varName);
         }
+
     }
 
 
