@@ -386,7 +386,7 @@ namespace tinyAsn1
             long min = minItems(cns);
             long max = maxItems(cns);
             h.WriteLine("struct {0} {{", typeName);
-            if (min != max)
+//            if (min != max)
             {
                 h.P(lev + 1);
                 h.WriteLine("long nCount;");
@@ -419,7 +419,7 @@ namespace tinyAsn1
             }
 
             c.P(lev); c.WriteLine("int {0};", i);
-            if (min != max)
+  //          if (min != max)
             {
                 c.P(lev); 
                 c.WriteLine("{0}nCount = 0;", prefix);
@@ -440,6 +440,48 @@ namespace tinyAsn1
         {
             base.PrintHConstraintConstant(h, name);
             m_type.PrintHConstraintConstant(h, name + "_elem");
+        }
+
+        internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            long min = minItems(cns);
+            long max = maxItems(cns);
+            string i = "i" + lev.ToString();
+            string prefix = "";
+            bool topLevel = !varName.Contains("->");
+            if (topLevel)
+            {
+                c.P(lev); c.WriteLine("int {0};", i);
+            }
+
+            base.PrintCIsConstraintValid(cns, c, errorCode, varName, lev);
+            
+            c.WriteLine();
+            if (topLevel)
+                prefix = varName + "->";
+            else
+            {
+                prefix = varName + ".";
+                c.WriteLine();
+                c.P(lev); c.WriteLine("{");
+                lev++;
+            }
+            if (!topLevel)
+            {
+                c.P(lev); c.WriteLine("int {0};", i);
+            }
+            c.P(lev); c.WriteLine("for({0}=0;{0}<{1};{0}++)", i, maxItems(cns));
+            c.P(lev); c.WriteLine("{");
+            m_type.PrintCIsConstraintValid(m_type.PEREffectiveConstraint, c, errorCode + "_elem", prefix + "arr[" + i + "]", lev + 1);
+            c.P(lev); c.WriteLine("}");
+            if (!topLevel)
+            {
+                lev--;
+                c.P(lev); c.WriteLine("}");
+                c.WriteLine();
+            }
+        
+        
         }
     }
 

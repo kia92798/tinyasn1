@@ -609,6 +609,11 @@ namespace tinyAsn1
                 ch.m_type.PrintHConstraintConstant(h, name + "_" + ch.m_childVarName);
             }
         }
+
+        internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            
+        }
     }
 
     public partial class ChoiceChild

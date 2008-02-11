@@ -76,6 +76,8 @@ namespace tinyAsn1
         PERIntegerEffectiveConstraint PEREffectiveIntegerRange { get;}
         PERSizeEffectiveConstraint PEREffectiveSizeConstraint { get;}
         PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint { get;}
+
+        string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev);
     }
 
     public class BaseConstraint : IConstraint
@@ -195,7 +197,10 @@ namespace tinyAsn1
         {
             get { throw new Exception("The method or operation is not implemented."); }
         }
-
+        public virtual string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
     }
 
     public class RootConstraint : BaseConstraint
@@ -331,6 +336,12 @@ namespace tinyAsn1
                 return ret;
             }
         }
+        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
+        {
+            if (m_extConstr == null)
+                return m_constr.PrintCIsConstraintValid(c, varName, lev);
+            return "(" + m_constr.PrintCIsConstraintValid(c, varName, lev) + "||" + m_extConstr.PrintCIsConstraintValid(c, varName, lev) + ")";
+        }
     }
     
     // Union, I
@@ -460,7 +471,21 @@ namespace tinyAsn1
                 return ret;
             }
         }
-
+        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
+        {
+            string ret;
+            if (m_items.Count == 1)
+                return m_items[0].PrintCIsConstraintValid(c, varName, lev);
+            ret = "(";
+            for (int i = 0; i < m_items.Count; i++)
+            {
+                ret += m_items[i].PrintCIsConstraintValid(c, varName, lev);
+                if (i != m_items.Count - 1)
+                    ret += " || ";
+            }
+            ret += ")";
+            return ret;
+        }
     }
 
     // Intersection, ^
@@ -583,6 +608,21 @@ namespace tinyAsn1
                 return ret;
             }
         }
+        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
+        {
+            string ret;
+            if (m_items.Count == 1)
+                return m_items[0].PrintCIsConstraintValid(c, varName, lev);
+            ret = "(";
+            for (int i = 0; i < m_items.Count; i++)
+            {
+                ret += m_items[i].PrintCIsConstraintValid(c, varName, lev);
+                if (i != m_items.Count - 1)
+                    ret += " && ";
+            }
+            ret += ")";
+            return ret;
+        }
     }
 
     public class ExceptConstraint : BaseConstraint
@@ -673,6 +713,11 @@ namespace tinyAsn1
                 return m_c1.PEREffectiveAlphabetAndSizeConstraint;
             }
         }
+
+        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
+        {
+            return "(" + m_c1.PrintCIsConstraintValid(c, varName, lev) + " && !" + m_c2.PrintCIsConstraintValid(c, varName, lev) + ")";
+        }
     }
 
     // m_c1 is the Parent constraint
@@ -745,6 +790,10 @@ namespace tinyAsn1
             {
                 return PERAlphabetAndSizeEffectiveConstraint.Full(m_type);
             }
+        }
+        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
+        {
+            return "!" + m_c.PrintCIsConstraintValid(c, varName, lev);
         }
     }
 
@@ -834,6 +883,11 @@ namespace tinyAsn1
             {
                 return null;
             }
+        }
+
+        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
+        {
+            return "(" + varName + " == " + m_val.ToString() + ")";
         }
 
     }
@@ -1016,25 +1070,6 @@ namespace tinyAsn1
             return this;
         }
 
-        public override string ToString()
-        {
-            string ret = "";
-            if (m_min==null)
-                ret="MIN";
-            else
-                ret = m_min.ToString();
-
-            if (!m_minValIsInluded)
-                ret += "<";
-            ret += "..";
-            if (!m_maxValIsInluded)
-                ret += "<";
-            if (m_max == null)
-                ret += "MAX";
-            else
-                ret += m_max.ToString();
-            return ret;
-        }
 
         public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
         {
@@ -1074,6 +1109,55 @@ namespace tinyAsn1
             {
                 return null;
             }
+        }
+
+        public override string ToString()
+        {
+            string ret = "";
+            if (m_min == null)
+                ret = "MIN";
+            else
+                ret = m_min.ToString();
+
+            if (!m_minValIsInluded)
+                ret += "<";
+            ret += "..";
+            if (!m_maxValIsInluded)
+                ret += "<";
+            if (m_max == null)
+                ret += "MAX";
+            else
+                ret += m_max.ToString();
+            return ret;
+        }
+        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
+        {
+            string ret="";
+            if (m_max!=null && m_min!=null)
+                ret = "(";
+            if (m_min != null)
+            {
+                ret += "(" + varName +">";
+                if (m_minValIsInluded)
+                    ret += "=";
+                ret += m_min.ToString() + ")";
+
+            }
+            if (m_max != null && m_min != null)
+                ret += " && ";
+
+            if (m_max != null)
+            {
+                ret += "(" + varName + "<";
+                if (m_maxValIsInluded)
+                    ret += "=";
+                ret += m_max.ToString() + ")";
+            }
+
+
+            if (m_max != null && m_min != null)
+                ret += ")";
+            return ret;
         }
 
     }
@@ -1205,6 +1289,7 @@ namespace tinyAsn1
                 ret += ")";
                 return ret;
             }
+
         }
 
         DummyReferenceType sizeCon;
@@ -1273,6 +1358,30 @@ namespace tinyAsn1
             {
                 return new PERAlphabetAndSizeEffectiveConstraint(sizeCon.PEREffectiveConstraint as PERIntegerEffectiveConstraint);
             }
+        }
+
+        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
+        {
+            string varName2="";
+            if (m_type is IA5StringType)
+                varName2 = "strlen(" + varName + ")";
+            else
+            {
+                if (varName.Contains("->"))
+                    varName2 = varName + ".nCount";
+                else
+                    varName2 = varName.Replace("*","") + "->nCount";
+                
+            }
+
+            string ret = "";
+            for (int i = 0; i < sizeCon.m_constraints.Count; i++)
+            {
+                ret += sizeCon.m_constraints[i].PrintCIsConstraintValid(c, varName2, lev);
+                if (i != sizeCon.m_constraints.Count-1)
+                    ret += " && ";
+            }
+            return ret;
         }
 
     }

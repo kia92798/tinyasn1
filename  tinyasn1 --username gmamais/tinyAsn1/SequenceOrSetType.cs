@@ -825,6 +825,21 @@ namespace tinyAsn1
                 ch.m_type.PrintHConstraintConstant(h, name + "_" + ch.m_childVarName);
             }
         }
+
+        internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            string varName2 = varName;
+            if (!varName.Contains("->"))
+                varName2 += "->";
+            else
+                varName2 += ".";
+
+            foreach (Child ch in m_children.Values)
+            {
+                ch.m_type.PrintCIsConstraintValid(ch.m_type.PEREffectiveConstraint, c, errorCode + "_" + ch.m_childVarName, varName2 + C.ID(ch.m_childVarName), lev);
+                c.WriteLine();
+            }
+        }
     }
 
     public partial class SequenceOrSetValue : Asn1Value

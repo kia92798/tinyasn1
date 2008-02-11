@@ -772,6 +772,35 @@ namespace tinyAsn1
             if (m_constraints.Count>0)
                 h.WriteLine("#define ERR_{0}_CONSTRAINT_FAILED\t\t{1} /* {2} */", name, Asn1CompilerInvokation.Instance.ConstraintErrorID++, Constraints);
         }
+
+        internal virtual void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            string varName2 = varName;
+            if (!varName.Contains("->"))
+                varName2 = "*" + varName;
+
+            if (m_AntlrConstraints.Count > 0)
+            {
+                c.P(lev); c.Write("ret =");
+                for (int i = 0; i < m_constraints.Count; i++)
+                {
+                    string ret = m_constraints[i].PrintCIsConstraintValid(c, varName2, lev);
+                    c.Write(ret);
+                    if (i != m_constraints.Count - 1)
+                        c.Write(" && ");
+                }
+                c.WriteLine(";");
+                c.P(lev);
+                c.WriteLine("if (!ret) {");
+                c.P(lev + 1);
+                c.WriteLine("*pErrCode = ERR_{0}_CONSTRAINT_FAILED;", errorCode);
+                c.P(lev + 1);
+                c.WriteLine("return FALSE;");
+                c.P(lev);
+                c.WriteLine("}");
+            }
+
+        }
     }
 
 

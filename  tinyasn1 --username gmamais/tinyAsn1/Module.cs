@@ -576,6 +576,16 @@ namespace tinyAsn1
             m_type.PrintCInitialize(m_type.PEREffectiveConstraint, c, uniqueID, "pVal", 1);
             c.WriteLine("}");
             c.WriteLine();
+
+            c.WriteLine();
+            c.WriteLine("flag {0}_IsConstraintValid({0}{1} pVal, int* pErrCode)", uniqueID, star);
+            c.WriteLine("{");
+            c.P(1); c.WriteLine("flag ret;");
+            m_type.PrintCIsConstraintValid(m_type.PEREffectiveConstraint, c, uniqueID, "pVal", 1);
+            c.P(1); c.WriteLine("return TRUE;");
+            c.WriteLine("}");
+            c.WriteLine();
+        
         }
     }
 
