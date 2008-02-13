@@ -770,7 +770,8 @@ namespace tinyAsn1
             foreach (Child ch in m_children.Values)
             {
                 h.P(lev + 1);
-                ch.m_type.PrintHTypeDeclaration(ch.m_type.PEREffectiveConstraint, h, "", C.ID(ch.m_childVarName), lev + 1);
+                ch.m_type.PrintHTypeDeclaration(ch.m_type.PEREffectiveConstraint, h, 
+                    typeName + "_" + C.ID(ch.m_childVarName), C.ID(ch.m_childVarName), lev + 1);
                 if (!(ch.m_type is IA5StringType))
                     h.WriteLine(" {0};", C.ID(ch.m_childVarName));
             }
@@ -802,7 +803,7 @@ namespace tinyAsn1
             return true;
         }
 
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, StreamWriterLevel c, string typeName, string varName, int lev)
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel c, string typeName, string varName, int lev)
         {
             bool topLevel = !varName.Contains("->");
             string prefix = "";
@@ -813,7 +814,8 @@ namespace tinyAsn1
 
             foreach (Child ch in m_children.Values)
             {
-                ch.m_type.PrintCInitialize(ch.m_type.PEREffectiveConstraint, c, "", prefix+C.ID(ch.m_childVarName), lev);
+                ch.m_type.PrintCInitialize(ch.m_type.PEREffectiveConstraint, ch.m_defaultValue, c, 
+                    typeName + "_" + C.ID(ch.m_childVarName), prefix + C.ID(ch.m_childVarName), lev);
             }
         }
 
@@ -826,7 +828,7 @@ namespace tinyAsn1
             }
         }
 
-        internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev)
         {
             string varName2 = varName;
             if (!varName.Contains("->"))
@@ -836,9 +838,17 @@ namespace tinyAsn1
 
             foreach (Child ch in m_children.Values)
             {
-                ch.m_type.PrintCIsConstraintValid(ch.m_type.PEREffectiveConstraint, c, errorCode + "_" + ch.m_childVarName, varName2 + C.ID(ch.m_childVarName), lev);
+                ch.m_type.PrintCIsConstraintValid(ch.m_type.PEREffectiveConstraint, c, errorCode + "_" + ch.m_childVarName, 
+                    typeName + "_" + C.ID(ch.m_childVarName), varName2 + C.ID(ch.m_childVarName), lev);
                 c.WriteLine();
             }
+        }
+        
+        internal override void PrintCIsConstraintValidAux(StreamWriterLevel c)
+        {
+            base.PrintCIsConstraintValidAux(c);
+            foreach (Child ch in m_children.Values)
+                ch.m_type.PrintCIsConstraintValidAux(c);
         }
     }
 
@@ -1084,6 +1094,23 @@ namespace tinyAsn1
             }
             
             return ret;
+        }
+
+        internal override void PrintC(StreamWriterLevel c, int lev)
+        {
+            c.WriteLine("{");
+            int cnt = m_children.Count;
+            for (int i = 0; i < cnt; i++)
+            {
+                c.P(lev+1);
+                m_children.Values[i].PrintC(c, lev + 1);
+                if (i != cnt - 1)
+                    c.WriteLine(",");
+                else
+                    c.WriteLine();
+            }
+            c.P(lev);
+            c.Write("}");
         }
     }
 

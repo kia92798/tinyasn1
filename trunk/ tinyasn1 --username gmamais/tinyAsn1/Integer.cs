@@ -274,15 +274,20 @@ namespace tinyAsn1
             h.Write("sint ");
         }
 
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defaultVal, StreamWriterLevel h, string typeName, string varName, int lev)
         {
             bool topLevel = !varName.Contains("->");
+            long defValue = 0;
+
+            PERIntegerEffectiveConstraint intCns = cns as PERIntegerEffectiveConstraint;
+            if (defaultVal != null)
+                defValue = ((IntegerValue)defaultVal).Value;
 
             h.P(lev);
             if (topLevel)
-                h.WriteLine("*{0} = 0;", varName);
+                h.WriteLine("*{0} = {1};", varName,defValue);
             else
-                h.WriteLine("{0} = 0;", varName);
+                h.WriteLine("{0} = {1};", varName, defValue);
         }
 
     }

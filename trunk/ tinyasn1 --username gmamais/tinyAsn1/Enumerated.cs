@@ -382,15 +382,18 @@ namespace tinyAsn1
             h.P(lev);
             h.Write("}");
         }
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev)
         {
-            bool topLevel = !varName.Contains("->"); 
-            
+            bool topLevel = !varName.Contains("->");
+            EnumeratedValue v = defauleVal as EnumeratedValue;
+            string defVal = m_enumValues.Values[0].m_id;
+            if (v != null)
+                defVal = v.ID;
             h.P(lev);
             if (topLevel)
-                h.WriteLine("*{0} = {1};", varName, m_enumValues.Values[0].m_id);
+                h.WriteLine("*{0} = {1};", varName, defVal);
             else
-                h.WriteLine("{0} = {1};", varName, m_enumValues.Values[0].m_id);
+                h.WriteLine("{0} = {1};", varName, defVal);
 
         }
     }

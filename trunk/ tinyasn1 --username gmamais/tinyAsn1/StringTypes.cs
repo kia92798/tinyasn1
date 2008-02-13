@@ -207,10 +207,13 @@ namespace tinyAsn1
             else
                 h.WriteLine("char {0}[{1}];", varName, maxItems(cns) + 1);
         }
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defaultVal, StreamWriterLevel h, string typeName, string varName, int lev)
         {
             h.P(lev);
-            h.WriteLine("{0}[0] = 0x0;", varName);
+            if (defaultVal!=null)
+                h.WriteLine("strcpy({0}, {1});", varName, defaultVal.ToString());
+            else
+                h.WriteLine("memset({0}, 0x0, {1});", varName, maxItems(cns) + 1);
         }
     }
 

@@ -489,6 +489,12 @@ namespace tinyAsn1
             o.WriteLine();
 
         }
+        internal void PrintC(StreamWriterLevel c)
+        {
+            c.Write("{0} {1} = ", C.ID(m_type.Name), C.ID(m_name));
+            m_value.PrintC(c, 0);
+            c.WriteLine(";");
+        }
     }
 
     public partial class TypeAssigment
@@ -573,19 +579,21 @@ namespace tinyAsn1
             c.WriteLine();
             c.WriteLine("void {0}_Initialize({0}{1} pVal)", uniqueID,star);
             c.WriteLine("{");
-            m_type.PrintCInitialize(m_type.PEREffectiveConstraint, c, uniqueID, "pVal", 1);
+            m_type.PrintCInitialize(m_type.PEREffectiveConstraint, null, c, uniqueID, "pVal", 1);
             c.WriteLine("}");
             c.WriteLine();
+
+            m_type.PrintCIsConstraintValidAux(c);
 
             c.WriteLine();
             c.WriteLine("flag {0}_IsConstraintValid({0}{1} pVal, int* pErrCode)", uniqueID, star);
             c.WriteLine("{");
             c.P(1); c.WriteLine("flag ret;");
-            m_type.PrintCIsConstraintValid(m_type.PEREffectiveConstraint, c, uniqueID, "pVal", 1);
+            m_type.PrintCIsConstraintValid(m_type.PEREffectiveConstraint, c, uniqueID, uniqueID, "pVal", 1);
             c.P(1); c.WriteLine("return TRUE;");
             c.WriteLine("}");
             c.WriteLine();
-        
+
         }
     }
 
