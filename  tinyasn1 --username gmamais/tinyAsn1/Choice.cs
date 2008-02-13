@@ -571,7 +571,9 @@ namespace tinyAsn1
 
 
                 h.P(lev + 2);
-                ch.m_type.PrintHTypeDeclaration(ch.m_type.PEREffectiveConstraint, h, "", C.ID(ch.m_childVarName), lev + 1);
+                ch.m_type.PrintHTypeDeclaration(ch.m_type.PEREffectiveConstraint, h, 
+                    typeName + "_" + C.ID(ch.m_childVarName), 
+                    C.ID(ch.m_childVarName), lev + 1);
                 if (!(ch.m_type is IA5StringType))
                     h.WriteLine(" {0};", C.ID(ch.m_childVarName));
             }
@@ -589,7 +591,7 @@ namespace tinyAsn1
                     return false;
             return true;
         }
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, StreamWriterLevel c, string typeName, string varName, int lev)
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel c, string typeName, string varName, int lev)
         {
             bool topLevel = !varName.Contains("->");
             string prefix = "";
@@ -603,16 +605,47 @@ namespace tinyAsn1
 
         internal override void PrintHConstraintConstant(StreamWriterLevel h, string name)
         {
-            base.PrintHConstraintConstant(h, name);
+            h.WriteLine("#define ERR_{0}_CONSTRAINT_FAILED\t\t{1} /* {2} */", name, Asn1CompilerInvokation.Instance.ConstraintErrorID++, Constraints);
+//            base.PrintHConstraintConstant(h, name);
             foreach (ChoiceChild ch in m_children.Values)
             {
                 ch.m_type.PrintHConstraintConstant(h, name + "_" + ch.m_childVarName);
             }
         }
 
-        internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev)
         {
-            
+            string varName2 = varName;
+            if (!varName.Contains("->"))
+                varName2 += "->";
+            else
+                varName2 += ".";
+
+            c.P(lev);
+            c.WriteLine("switch({0}kind)", varName2);
+            c.P(lev); c.WriteLine("{");
+            foreach (ChoiceChild ch in m_children.Values)
+            {
+                c.P(lev); c.WriteLine("case {0}_{1}:", typeName, ch.m_childVarName);
+                ch.m_type.PrintCIsConstraintValid(ch.m_type.PEREffectiveConstraint, c, errorCode + "_" + ch.m_childVarName,
+                    typeName + "_" + C.ID(ch.m_childVarName), varName2 + "u." + C.ID(ch.m_childVarName), lev + 1);
+                c.P(lev + 1);
+                c.WriteLine("break;");
+            }
+            c.P(lev);
+            c.WriteLine("default:");
+            c.P(lev+1);
+            c.WriteLine("*pErrCode = ERR_{0}_CONSTRAINT_FAILED;", errorCode);
+            c.P(lev + 1);
+            c.WriteLine("return FALSE;");
+            c.P(lev); c.WriteLine("}");
+                        
+        }
+        internal override void PrintCIsConstraintValidAux(StreamWriterLevel c)
+        {
+            base.PrintCIsConstraintValidAux(c);
+            foreach (ChoiceChild ch in m_children.Values)
+                ch.m_type.PrintCIsConstraintValidAux(c);
         }
     }
 
@@ -707,7 +740,7 @@ namespace tinyAsn1
     {
         public ChoiceType ChoiceType
         {
-            get { return (ChoiceType)m_type; }
+            get { return (ChoiceType)m_type.GetFinalType(); }
         }
         Asn1Value m_value;
         public virtual Asn1Value Value
@@ -810,6 +843,17 @@ namespace tinyAsn1
             
 
             return ret;
+        }
+        internal override void PrintC(StreamWriterLevel c, int lev)
+        {
+            c.WriteLine("{");
+            c.P(lev + 1);
+            c.WriteLine("{0},", ChoiceType.m_children.Keys.IndexOf(m_alternativeName)+1);
+            c.P(lev + 1);
+            m_value.PrintC(c, lev + 1);
+            c.WriteLine();
+            c.P(lev);
+            c.Write("}");
         }
     }
 

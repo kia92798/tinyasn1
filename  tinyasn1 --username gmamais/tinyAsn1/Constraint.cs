@@ -78,6 +78,7 @@ namespace tinyAsn1
         PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint { get;}
 
         string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev);
+        void PrintCIsConstraintValidAux(StreamWriterLevel c);
     }
 
     public class BaseConstraint : IConstraint
@@ -200,6 +201,9 @@ namespace tinyAsn1
         public virtual string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
         {
             throw new Exception("The method or operation is not implemented.");
+        }
+        public virtual void PrintCIsConstraintValidAux(StreamWriterLevel c)
+        {
         }
     }
 
@@ -912,6 +916,15 @@ namespace tinyAsn1
                 return false;
             return true;
         }
+
+        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
+        {
+            ICharacterString set = m_val as ICharacterString;
+            if (set == null)
+                throw new Exception("Internal Error");
+
+            return "strchr(\"" + set.Value + "\", " + varName + ")";
+        }
         public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
         {
             get
@@ -1241,6 +1254,45 @@ namespace tinyAsn1
             return true;
         }
 
+        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
+        {
+            if (m_min != null && Lo.Value.Length != 1)
+                return ""; // ignore constraint
+            if (m_max != null && Hi.Value.Length != 1)
+                return ""; // ignore constraint
+            if (m_min == null && m_max == null)  //(MIN..MAX)
+                return "";
+            string ret = "";
+            if (m_max != null && m_min != null)
+                ret = "(";
+
+            if (m_min != null)
+            {
+                ret += "(" + varName +">";
+                if (m_minValIsInluded)
+                    ret += "=";
+                ret += "'" + m_min.ToString().Replace("\"","") + "')";
+
+            }
+            if (m_max != null && m_min != null)
+                ret += " && ";
+
+            if (m_max != null)
+            {
+                ret += "(" + varName + "<";
+                if (m_maxValIsInluded)
+                    ret += "=";
+                ret += "'" + m_max.ToString().Replace("\"", "") + "')";
+            }
+
+
+            if (m_max != null && m_min != null)
+                ret += ")";
+            return ret;
+
+        
+        }
+
         public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
         {
             get
@@ -1363,8 +1415,8 @@ namespace tinyAsn1
         public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
         {
             string varName2="";
-            if (m_type is IA5StringType)
-                varName2 = "strlen(" + varName + ")";
+            if (m_type.GetFinalType() is IA5StringType)
+                varName2 = "strlen(" + varName.Replace("*", "") + ")";
             else
             {
                 if (varName.Contains("->"))
@@ -1470,6 +1522,43 @@ namespace tinyAsn1
                 ret = (PERAlphabetAndSizeEffectiveConstraint)ret.Compute(allowed_char_set.m_constraints, allowed_char_set);
                 return ret;
             }
+        }
+
+        static int nCount=0;
+        int AuxFunctionID;
+        public override void PrintCIsConstraintValidAux(StreamWriterLevel c)
+        {
+            nCount++;
+            AuxFunctionID = nCount;
+
+            c.WriteLine("flag CheckString{0}(const char* str)", AuxFunctionID);
+            c.WriteLine("{");
+            c.P(1); c.WriteLine("int i;");
+            c.P(1); c.WriteLine("int n = strlen(str);");
+            c.P(1);
+            c.WriteLine("for(i=0;i<n;i++)");
+            c.P(1); c.WriteLine("{");
+
+            c.P(2);
+            c.Write("if (!");
+            for (int i = 0; i < allowed_char_set.m_constraints.Count; i++)
+            {
+                c.Write(allowed_char_set.m_constraints[i].PrintCIsConstraintValid(c, "str[i]", 0));
+                if (i != allowed_char_set.m_constraints.Count - 1)
+                    c.Write(" && ");
+            }
+            c.WriteLine(")");
+            c.P(3);
+            c.WriteLine("return FALSE;");
+            c.P(1); c.WriteLine("}");
+
+            c.P(1); c.WriteLine("return TRUE;");
+            c.WriteLine("}");
+        }
+
+        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
+        {
+            return "CheckString" + AuxFunctionID.ToString()+"("+varName.Replace("*","")+")";
         }
     }
 

@@ -391,7 +391,7 @@ namespace tinyAsn1
                 h.P(lev + 1);
                 h.WriteLine("long nCount;");
             }
-            h.P(lev + 1); m_type.PrintHTypeDeclaration(m_type.PEREffectiveConstraint, h, "", "", lev + 1);
+            h.P(lev + 1); m_type.PrintHTypeDeclaration(m_type.PEREffectiveConstraint, h, typeName+"_arr"/*+varName*/, "arr", lev + 1);
             h.WriteLine(" arr[{0}];", max);
             h.P(lev);
             h.Write("}");
@@ -401,7 +401,7 @@ namespace tinyAsn1
         {
             return m_type.DependsOnlyOn(values);
         }
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, StreamWriterLevel c, string typeName, string varName, int lev)
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel c, string typeName, string varName, int lev)
         {
             long min = minItems(cns);
             long max = maxItems(cns);
@@ -427,7 +427,8 @@ namespace tinyAsn1
             
             c.P(lev); c.WriteLine("for({0}=0;{0}<{1};{0}++)", i, maxItems(cns));
             c.P(lev); c.WriteLine("{");
-            m_type.PrintCInitialize(m_type.PEREffectiveConstraint, c, "", prefix + "arr["+i+"]", lev + 1);
+            m_type.PrintCInitialize(m_type.PEREffectiveConstraint, null, c, 
+                typeName+"_arr", prefix + "arr[" + i + "]", lev + 1);
             c.P(lev); c.WriteLine("}");
             if (!topLevel)
             {
@@ -442,7 +443,12 @@ namespace tinyAsn1
             m_type.PrintHConstraintConstant(h, name + "_elem");
         }
 
-        internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        internal override void PrintCIsConstraintValidAux(StreamWriterLevel c)
+        {
+            base.PrintCIsConstraintValidAux(c);
+            m_type.PrintCIsConstraintValidAux(c);
+        }
+        internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev)
         {
             long min = minItems(cns);
             long max = maxItems(cns);
@@ -454,7 +460,7 @@ namespace tinyAsn1
                 c.P(lev); c.WriteLine("int {0};", i);
             }
 
-            base.PrintCIsConstraintValid(cns, c, errorCode, varName, lev);
+            base.PrintCIsConstraintValid(cns, c, errorCode,typeName, varName, lev);
             
             c.WriteLine();
             if (topLevel)
@@ -472,7 +478,8 @@ namespace tinyAsn1
             }
             c.P(lev); c.WriteLine("for({0}=0;{0}<{1};{0}++)", i, maxItems(cns));
             c.P(lev); c.WriteLine("{");
-            m_type.PrintCIsConstraintValid(m_type.PEREffectiveConstraint, c, errorCode + "_elem", prefix + "arr[" + i + "]", lev + 1);
+            m_type.PrintCIsConstraintValid(m_type.PEREffectiveConstraint, c, errorCode + "_elem",
+                typeName + "_arr", prefix + "arr[" + i + "]", lev + 1);
             c.P(lev); c.WriteLine("}");
             if (!topLevel)
             {

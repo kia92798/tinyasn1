@@ -762,7 +762,17 @@ namespace tinyAsn1
             return true;
         }
 
-        internal virtual void PrintCInitialize(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+
+        /// <summary>
+        /// Initialize type. If there is a default value (i.e. as child of a sequence, or set), this value is used for 
+        /// initialization. Otherwise set to 0, or 0.0 or memset(0x0)
+        /// </summary>
+        /// <param name="cns"></param>
+        /// <param name="h"></param>
+        /// <param name="typeName"></param>
+        /// <param name="varName"></param>
+        /// <param name="lev"></param>
+        internal virtual void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev)
         {
             throw new Exception("Abstract method called");
         }
@@ -773,13 +783,24 @@ namespace tinyAsn1
                 h.WriteLine("#define ERR_{0}_CONSTRAINT_FAILED\t\t{1} /* {2} */", name, Asn1CompilerInvokation.Instance.ConstraintErrorID++, Constraints);
         }
 
-        internal virtual void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        internal virtual void PrintCIsConstraintValidAux(StreamWriterLevel c)
+        {
+            if (m_constraints.Count > 0)
+            {
+                for (int i = 0; i < m_constraints.Count; i++)
+                {
+                    m_constraints[i].PrintCIsConstraintValidAux(c);
+                }
+            }
+        }
+
+        internal virtual void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev)
         {
             string varName2 = varName;
             if (!varName.Contains("->"))
                 varName2 = "*" + varName;
 
-            if (m_AntlrConstraints.Count > 0)
+            if (m_constraints.Count > 0)
             {
                 c.P(lev); c.Write("ret =");
                 for (int i = 0; i < m_constraints.Count; i++)
@@ -917,6 +938,11 @@ namespace tinyAsn1
                 bufer.Add(curByte);
             }
             return bufer;
+        }
+
+        internal virtual void PrintC(StreamWriterLevel c, int lev)
+        {
+            c.Write(ToString());
         }
     }
 

@@ -10,6 +10,8 @@ the ASN.1 grammar at the the end of the ICD file.
 
 
 	MyInt ::= INTEGER(1|2|3)
+	
+	a MyInt ::= 1
 
 	MyInt2 ::= INTEGER(10..100)
 
@@ -21,19 +23,50 @@ the ASN.1 grammar at the the end of the ICD file.
 
 	MyReal	::= REAL
 	
+	ar MyReal ::= 3.14
+	
 	MyEnum ::= ENUMERATED {
 		alpha, beta, gamma
 	}
 	
-	MyString ::= IA5String(SIZE(1..10))
+	myEnum MyEnum ::= alpha
 	
+	MyString ::= IA5String(SIZE(1..10))(FROM("A".."Z"|"abcde"))
+	
+	str MyString ::= "ABCDE"
+	
+	MyBool ::= BOOLEAN
+	myBool MyBool ::=TRUE
 
+
+
+	MyStruct ::= SEQUENCE {
+		a1 INTEGER (1..10),
+		b1 REAL,
+		c MyEnum
+	}
+	
+	MyStruct2 ::= SEQUENCE {
+		a2 INTEGER (1..10),
+		b2 REAL,
+		c2 MyEnum
+	}
+	
+	myStruct MyStruct ::= { a1 4, b1 3.14, c alpha}
+	
+	MyChoice ::= CHOICE {
+		alpha MyStruct,
+		beta MyStruct2
+	}
+	myCh MyChoice ::= beta : { a2 9, b2 2.7, c2 gamma}
+	
+	
 	
 	--@This a special comment which appears in the ICD table
 	--@It should appear in front of type assigments 
 	--@CAR DEFINITION
 	Vehicle ::= SEQUENCE {
-		myStr	MyString,
+		myStr	MyString (SIZE(2..6))(FROM("ABC")),
 	
 		--@Provides information about the engine's power, fuel consumption etc 
 		engine	Engine,
@@ -57,18 +90,22 @@ the ASN.1 grammar at the the end of the ICD file.
 				radius	INTEGER(5..40) OPTIONAL,
 				tread	INTEGER(2..25),
 				intArray SEQUENCE (SIZE(10)) OF INTEGER(1..5),
-				intDoubleArray SEQUENCE (SIZE(10)) OF SEQUENCE (SIZE(100)) OF INTEGER(1..5),
+				intDoubleArray SEQUENCE (SIZE(10)) OF SEQUENCE (SIZE(100)) OF REAL(1..5),
 				intArryStruct SEQUENCE (SIZE(10)) OF SEQUENCE (SIZE(100)) OF  SEQUENCE {
-																				alpha	INTEGER(5..40) OPTIONAL,
-																				beta	INTEGER(2..25)
-																			}
+					alpha	INTEGER(5..40) OPTIONAL,
+					beta	INTEGER(2..25)
+				}
 			}  OPTIONAL
 			
 		},
 		
-		internalChoice 	CHOICE {
+		internalChoiceA 	SEQUENCE (SIZE(20)) OF SEQUENCE (SIZE(9)) OF CHOICE {
 			sport	SportEquipment,
-			classic ClassicEquipment
+			classic ClassicEquipment,
+			internalChoiceB 	SEQUENCE (SIZE(20)) OF SEQUENCE (SIZE(9)) OF CHOICE {
+				sport	SportEquipment,
+				classic ClassicEquipment
+			}
 		}
 
 

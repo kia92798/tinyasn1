@@ -296,7 +296,7 @@ namespace tinyAsn1
             }
             return false;
         }
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev)
         {
             h.P(lev);
             if (!(Type is IA5StringType))
@@ -320,7 +320,7 @@ namespace tinyAsn1
                 h.WriteLine("#define ERR_{0}_CONSTRAINT_FAILED\t\t{1} /* {2} */", name, Asn1CompilerInvokation.Instance.ConstraintErrorID++, conConstraints);
         }
 
-        internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev)
         {
             c.P(lev); c.Write("ret =");
             if (!(Type is IA5StringType))
@@ -332,6 +332,8 @@ namespace tinyAsn1
             c.WriteLine("if (!ret)");
             c.P(lev + 1);
             c.WriteLine("return FALSE;");
+
+            base.PrintCIsConstraintValid(cns, c, errorCode, typeName, varName, lev);
             
         }
     }

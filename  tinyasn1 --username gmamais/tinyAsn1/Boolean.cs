@@ -83,15 +83,18 @@ namespace tinyAsn1
         {
             h.Write("flag ");
         }
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defaultVal, StreamWriterLevel h, string typeName, string varName, int lev)
         {
             bool topLevel = !varName.Contains("->");
-
+            BooleanValue b = defaultVal as BooleanValue;
+            string defVal = "FALSE";
+            if (b != null && b.Value)
+                defVal = "TRUE";
             h.P(lev);
             if (topLevel)
-                h.WriteLine("*{0} = FALSE;", varName);
+                h.WriteLine("*{0} = {1};", varName, defVal);
             else
-                h.WriteLine("{0} = FALSE;", varName);
+                h.WriteLine("{0} = {1};", varName, defVal);
 
         }
     }
