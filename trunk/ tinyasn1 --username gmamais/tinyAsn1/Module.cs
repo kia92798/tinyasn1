@@ -339,6 +339,21 @@ namespace tinyAsn1
         }
 
 
+        public IEnumerable<T> GetTypes<T>() where T : Asn1Type
+        {
+            foreach (TypeAssigment tas in m_typeAssigments.Values)
+                foreach (T t in tas.m_type.GetMySelfAndAnyChildren<T>())
+                    yield return t;
+        }
+
+        public IEnumerable<KeyValuePair<string,T>> GetTypesWithPath<T>() where T : Asn1Type
+        {
+            foreach (TypeAssigment tas in m_typeAssigments.Values)
+                foreach (KeyValuePair<string, T> t in tas.m_type.GetMySelfAndAnyChildrenWithPath<T>(m_moduleID + "/" + tas.m_name))
+                    yield return t;
+        }
+
+
         internal void EncodeVars(string m_fileName)
         {
             foreach (ValueAssigment vas in m_valuesAssigments.Values)

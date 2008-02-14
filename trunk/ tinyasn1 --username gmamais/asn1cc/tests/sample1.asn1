@@ -61,6 +61,9 @@ the ASN.1 grammar at the the end of the ICD file.
 	myCh MyChoice ::= beta : { a2 9, b2 2.7, c2 gamma}
 	
 	
+	MyArr ::= SEQUENCE (SIZE(1..10)) OF MyChoice
+	
+	myArr MyArr ::= { beta : { a2 9, b2 2.7, c2 gamma}, alpha : { a1 8, b1 4.32, c gamma}}
 	
 	--@This a special comment which appears in the ICD table
 	--@It should appear in front of type assigments 
@@ -78,6 +81,11 @@ the ASN.1 grammar at the the end of the ICD file.
 		color	ENUMERATED {
 					red, green, blue, black
 					}(red|blue)	DEFAULT	red ,
+
+		color2	ENUMERATED {
+					red, green, blue, black
+					}(red|blue)	DEFAULT	red ,
+
 		--@Car's unique serial number					
 		serialNumber	IA5String(SIZE(1..10))	DEFAULT "0000000000",
 		--@Extra equipment
@@ -93,7 +101,10 @@ the ASN.1 grammar at the the end of the ICD file.
 				intDoubleArray SEQUENCE (SIZE(10)) OF SEQUENCE (SIZE(100)) OF REAL(1..5),
 				intArryStruct SEQUENCE (SIZE(10)) OF SEQUENCE (SIZE(100)) OF  SEQUENCE {
 					alpha	INTEGER(5..40) OPTIONAL,
-					beta	INTEGER(2..25)
+					beta	INTEGER(2..25),
+					color2	ENUMERATED {
+						orange, brown, blue, black
+						}(orange|blue)	DEFAULT	orange
 				}
 			}  OPTIONAL
 			

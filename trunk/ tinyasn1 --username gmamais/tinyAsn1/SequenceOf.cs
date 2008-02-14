@@ -169,7 +169,7 @@ namespace tinyAsn1
         {
             get
             {
-                return (SequenceOfType)Type;
+                return (SequenceOfType)Type.GetFinalType();
             }
         }
 

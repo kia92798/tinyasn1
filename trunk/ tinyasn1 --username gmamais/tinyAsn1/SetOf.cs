@@ -162,7 +162,7 @@ namespace tinyAsn1
         {
             get
             {
-                return (SetOfType)Type;
+                return (SetOfType)Type.GetFinalType();
             }
         }
 

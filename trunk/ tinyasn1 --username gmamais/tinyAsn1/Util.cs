@@ -266,7 +266,7 @@ namespace tinyAsn1
     {
         public static string ID(string str)
         {
-            return str.Replace('_', '-').Replace('.', '_');
+            return str.Replace('-', '_').Replace('.', '_').Replace('/', '_');
         }
 
     }

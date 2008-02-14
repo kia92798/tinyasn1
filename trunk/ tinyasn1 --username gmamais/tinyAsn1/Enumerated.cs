@@ -22,6 +22,21 @@ namespace tinyAsn1
             public Int64 m_value;
             public bool m_isExtended = false;
             internal bool m_valCalculated = false;
+
+            string _cid = null;
+            public string CID
+            {
+                get
+                {
+                    if (_cid == null)
+                        return C.ID(m_id);
+                    return _cid;
+                }
+                set
+                {
+                    _cid = C.ID(value);
+                }
+            }
         }
 
 
@@ -366,12 +381,13 @@ namespace tinyAsn1
 
         internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
-            h.WriteLine("enum {0} {{", typeName);
+            h.WriteLine("enum {");
+//            h.WriteLine("enum {0} {{", typeName);
             int i = 0;
             foreach (Item it in m_enumValues.Values)
             {
                 h.P(lev + 1);
-                h.Write("{0} = {1}", it.m_id, it.m_value);
+                h.Write("{0} = {1}", it.CID, it.m_value);
                 if (i < m_enumValues.Values.Count - 1)
                     h.WriteLine(",");
                 else
@@ -386,9 +402,9 @@ namespace tinyAsn1
         {
             bool topLevel = !varName.Contains("->");
             EnumeratedValue v = defauleVal as EnumeratedValue;
-            string defVal = m_enumValues.Values[0].m_id;
+            string defVal = m_enumValues.Values[0].CID;
             if (v != null)
-                defVal = v.ID;
+                defVal = m_enumValues[v.ID].CID;
             h.P(lev);
             if (topLevel)
                 h.WriteLine("*{0} = {1};", varName, defVal);
@@ -433,8 +449,7 @@ namespace tinyAsn1
         }
         public override string ToString()
         {
-            return ID ;
-//            return ID + "(" + Value.ToString() + ")";
+            return ID + "(" + Value.ToString() + ")";
         }
 
         public override bool Equals(object obj)
@@ -506,6 +521,16 @@ namespace tinyAsn1
             }
 
             return ret;
+        }
+
+        public override string ToStringC()
+        {
+            EnumeratedType type = m_type.GetFinalType() as EnumeratedType;
+            if (type == null)
+                throw new Exception("Internal Error");
+
+            return type.m_enumValues[ID].CID;
+            
         }
     }
 
