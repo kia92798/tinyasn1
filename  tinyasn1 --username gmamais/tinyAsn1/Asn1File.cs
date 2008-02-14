@@ -12,6 +12,20 @@ namespace tinyAsn1
     {
         public List<Asn1File> m_files = new List<Asn1File>();
 
+        public IEnumerable<T> GetTypes<T>() where T : Asn1Type
+        {
+            foreach (Asn1File f in m_files)
+                foreach (T t in f.GetTypes<T>())
+                    yield return t;
+        }
+
+        public IEnumerable<KeyValuePair<string, T>> GetTypesWithPath<T>() where T : Asn1Type
+        {
+            foreach (Asn1File f in m_files)
+                foreach (KeyValuePair<string, T> t in f.GetTypesWithPath<T>())
+                    yield return t;
+        }
+
         public void CreateASTs(List<string> inputFiles)
         {
             foreach (string inFileName in inputFiles)
@@ -196,6 +210,11 @@ namespace tinyAsn1
                     foreach (ValueAssigment vas in m.m_valuesAssigments.Values)
                         vas.m_type.ComputePEREffectiveConstraints();
                 }
+
+            foreach (KeyValuePair<string, Asn1Type> v in GetTypesWithPath<Asn1Type>())
+                v.Value.UniquePath = v.Key;
+
+
         }
 
         private bool Phase1Finished()
@@ -297,8 +316,69 @@ namespace tinyAsn1
             }
         }
 
+
+        private void EnsureUniqueEnumerated()
+        {
+            List<string> enumKeys = new List<string>();
+            List<string> doubleKeys = new List<string>();
+            while (true)
+            {
+                enumKeys.Clear();
+                foreach (EnumeratedType en in GetTypes<EnumeratedType>())
+                {
+                    List<string> path = new List<string>(en.UniquePath.Split('/'));
+                    foreach (EnumeratedType.Item item in en.m_enumValues.Values)
+                    {
+                        if (doubleKeys.Contains(item.CID))
+                        {
+                            for (int i = path.Count - 1; i >= 0; i--)
+                                if (!item.CID.Contains(path[i]))
+                                {
+                                    item.CID = path[i] + "_" + item.CID;
+                                    break;
+                                }
+                        }
+                        enumKeys.Add(item.CID);
+                    }
+                }
+
+                foreach (ChoiceType ch in GetTypes<ChoiceType>())
+                {
+                    List<string> path = new List<string>(ch.UniquePath.Split('/'));
+                    foreach (ChoiceChild item in ch.m_children.Values)
+                    {
+                        if (doubleKeys.Contains(item.CID))
+                        {
+                            for (int i = path.Count - 1; i >= 0; i--)
+                                if (!item.CID.Contains(path[i]))
+                                {
+                                    item.CID = path[i] + "_" + item.CID;
+                                    break;
+                                }
+                        }
+                        enumKeys.Add(item.CID);
+                    }
+                }
+
+
+                doubleKeys.Clear();
+                for (int i = 0; i < enumKeys.Count; i++)
+                {
+                    for (int j = i + 1; j < enumKeys.Count; j++)
+                    {
+                        if (enumKeys[i] == enumKeys[j] && !doubleKeys.Contains(enumKeys[i]))
+                            doubleKeys.Add(enumKeys[i]);
+                    }
+                }
+                if (doubleKeys.Count == 0)
+                    break;
+            }
+        }
+
         public void printC()
         {
+
+            EnsureUniqueEnumerated();
             foreach (Asn1File file in m_files)
                 file.printC();
         }
@@ -325,6 +405,19 @@ namespace tinyAsn1
         public List<IToken> m_tokes = new List<IToken>();
         public string m_fileName = "";
         public List<Module> m_modules = new List<Module>();
+
+        public IEnumerable<T> GetTypes<T>() where T : Asn1Type
+        {
+            foreach (Module m in m_modules)
+                foreach (T t in m.GetTypes<T>())
+                    yield return t;
+        }
+        public IEnumerable<KeyValuePair<string, T>> GetTypesWithPath<T>() where T : Asn1Type
+        {
+            foreach (Module m in m_modules)
+                foreach (KeyValuePair<string, T> t in m.GetTypesWithPath<T>())
+                    yield return t;
+        }
 
         public virtual void PrintAsn1()
         {

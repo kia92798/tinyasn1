@@ -13,6 +13,30 @@ namespace tinyAsn1
         public ExceptionSpec m_exceptionSpec;
         public bool m_extMarkPresent2 = false;
 
+        public override IEnumerable<T> GetMySelfAndAnyChildren<T>()
+        {
+            if (this is T)
+                yield return this as T;
+            foreach (Child ch in m_children.Values)
+            {
+                foreach (T grCh in ch.m_type.GetMySelfAndAnyChildren<T>())
+                    yield return grCh;
+            }
+        }
+
+        public override IEnumerable<KeyValuePair<string, T>> GetMySelfAndAnyChildrenWithPath<T>(string pathUpToHere)
+        {
+            if (this is T)
+                yield return new KeyValuePair<string, T>(pathUpToHere, this as T);
+            
+            foreach (Child ch in m_children.Values)
+            {
+                foreach (KeyValuePair<string, T> grCh in ch.m_type.GetMySelfAndAnyChildrenWithPath<T>(pathUpToHere + "/" + ch.m_childVarName))
+                    yield return grCh;
+            }
+        }
+
+
         public partial class Child 
         {
             public string m_childVarName;
@@ -766,7 +790,8 @@ namespace tinyAsn1
         }
         internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
-            h.WriteLine("struct {0} {{", typeName);
+            h.WriteLine("struct {");
+//            h.WriteLine("struct {0} {{", typeName);
             foreach (Child ch in m_children.Values)
             {
                 h.P(lev + 1);

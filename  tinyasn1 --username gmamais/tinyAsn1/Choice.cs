@@ -19,6 +19,28 @@ namespace tinyAsn1
         //Choices do not have default tag!
         public override Asn1Type.Tag UniversalTag        { get { return null; } }
 
+        public override IEnumerable<T> GetMySelfAndAnyChildren<T>()
+        {
+            if (this is T)
+                yield return this as T;
+            foreach (ChoiceChild ch in m_children.Values)
+            {
+                foreach (T grCh in ch.m_type.GetMySelfAndAnyChildren<T>())
+                    yield return grCh;
+            }
+        }
+
+        public override IEnumerable<KeyValuePair<string, T>> GetMySelfAndAnyChildrenWithPath<T>(string pathUpToHere)
+        {
+            if (this is T)
+                yield return new KeyValuePair<string, T>(pathUpToHere, this as T);
+
+            foreach (ChoiceChild ch in m_children.Values)
+            {
+                foreach (KeyValuePair<string, T> grCh in ch.m_type.GetMySelfAndAnyChildrenWithPath<T>(pathUpToHere + "/" + ch.m_childVarName))
+                    yield return grCh;
+            }
+        }
 
         //	^(CHOICE_TYPE choiceItemsList choiceExtensionBody?)
         static public new ChoiceType CreateFromAntlrAst(ITree tree)
@@ -544,16 +566,19 @@ namespace tinyAsn1
         }
         internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
-            h.WriteLine("struct {0} {{", typeName);
+//            h.WriteLine("struct {0} {{", typeName);
+            h.WriteLine("struct {");
             h.P(lev + 1);
-            h.WriteLine("enum {0}_PR {{", typeName);
+            h.WriteLine("enum {");
+//            h.WriteLine("enum {0}_PR {{", typeName);
             h.P(lev + 2);
             h.WriteLine("{0}_NONE,	/* No components present */",typeName);
             int i = 0;
             foreach (ChoiceChild ch in m_children.Values)
             {
                 h.P(lev + 2);
-                h.Write("{0}_{1}", typeName, ch.m_childVarName);
+//                h.Write("{0}_{1}", typeName, ch.m_childVarName);
+                h.Write("{0}", ch.CID);
                 if (i < m_children.Values.Count - 1)
                     h.WriteLine(",");
                 else
@@ -565,11 +590,10 @@ namespace tinyAsn1
 
 
             h.P(lev + 1);
-            h.WriteLine("union {0}_data {{", typeName);
+            h.WriteLine("union {");
+//            h.WriteLine("union {0}_data {{", typeName);
             foreach (ChoiceChild ch in m_children.Values)
             {
-
-
                 h.P(lev + 2);
                 ch.m_type.PrintHTypeDeclaration(ch.m_type.PEREffectiveConstraint, h, 
                     typeName + "_" + C.ID(ch.m_childVarName), 
@@ -626,7 +650,8 @@ namespace tinyAsn1
             c.P(lev); c.WriteLine("{");
             foreach (ChoiceChild ch in m_children.Values)
             {
-                c.P(lev); c.WriteLine("case {0}_{1}:", typeName, ch.m_childVarName);
+//                c.P(lev); c.WriteLine("case {0}_{1}:", typeName, ch.m_childVarName);
+                c.P(lev); c.WriteLine("case {0}:", ch.CID);
                 ch.m_type.PrintCIsConstraintValid(ch.m_type.PEREffectiveConstraint, c, errorCode + "_" + ch.m_childVarName,
                     typeName + "_" + C.ID(ch.m_childVarName), varName2 + "u." + C.ID(ch.m_childVarName), lev + 1);
                 c.P(lev + 1);
@@ -656,6 +681,22 @@ namespace tinyAsn1
         public bool m_extended = false;
         public int? m_version = null;
         public List<string> m_comments = new List<string>();
+
+        string _cid = null;
+        public string CID
+        {
+            get
+            {
+                if (_cid == null)
+                    return C.ID(m_childVarName);
+                return _cid;
+            }
+            set
+            {
+                _cid = C.ID(value);
+            }
+        }
+
 
         public void PrintAsn1(StreamWriterLevel o, int lev)
         {
@@ -848,7 +889,7 @@ namespace tinyAsn1
         {
             c.WriteLine("{");
             c.P(lev + 1);
-            c.WriteLine("{0},", ChoiceType.m_children.Keys.IndexOf(m_alternativeName)+1);
+            c.WriteLine("{0},", ChoiceType.m_children[m_alternativeName].CID);
             c.P(lev + 1);
             m_value.PrintC(c, lev + 1);
             c.WriteLine();

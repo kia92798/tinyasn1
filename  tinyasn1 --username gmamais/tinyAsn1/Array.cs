@@ -245,6 +245,24 @@ namespace tinyAsn1
         public string m_xmlVarName;
         public Asn1Type m_type;
 
+        public override IEnumerable<T> GetMySelfAndAnyChildren<T>()
+        {
+            if (this is T)
+                yield return this as T;
+            foreach (T grCh in m_type.GetMySelfAndAnyChildren<T>())
+                yield return grCh;
+        }
+
+        public override IEnumerable<KeyValuePair<string, T>> GetMySelfAndAnyChildrenWithPath<T>(string pathUpToHere)
+        {
+            if (this is T)
+                yield return new KeyValuePair<string, T>(pathUpToHere, this as T);
+
+            foreach (KeyValuePair<string, T> grCh in m_type.GetMySelfAndAnyChildrenWithPath<T>(pathUpToHere + "/arr"))
+                yield return grCh;
+        }
+
+
         static List<int> m_allowedTokens = new List<int>(new int[]{ asn1Parser.CONSTRAINT, asn1Parser.EXCEPTION_SPEC, asn1Parser.EXT_MARK, 
                 asn1Parser.UNION_SET, asn1Parser.UNION_SET_ALL_EXCEPT, asn1Parser.INTERSECTION_SET,
                 asn1Parser.INTERSECTION_ELEMENT, asn1Parser.VALUE_RANGE_EXPR, asn1Parser.SUBTYPE_EXPR, 
@@ -385,7 +403,8 @@ namespace tinyAsn1
         {
             long min = minItems(cns);
             long max = maxItems(cns);
-            h.WriteLine("struct {0} {{", typeName);
+            h.WriteLine("struct {");
+//            h.WriteLine("struct {0} {{", typeName);
 //            if (min != max)
             {
                 h.P(lev + 1);
@@ -631,6 +650,31 @@ namespace tinyAsn1
         }
 
 
+        internal override void PrintC(StreamWriterLevel c, int lev)
+        {
+            c.WriteLine("{");
+            lev++;
+
+            int cnt = m_children.Count;
+
+            c.P(lev); c.WriteLine("{0},",cnt);
+
+            c.P(lev); c.WriteLine("{");
+            for (int i = 0; i < cnt; i++)
+            {
+                c.P(lev + 1);
+                m_children[i].PrintC(c, lev + 1);
+                if (i != cnt - 1)
+                    c.WriteLine(",");
+                else
+                    c.WriteLine();
+            }
+            c.P(lev); c.WriteLine("}");
+
+            lev--;
+            c.P(lev);
+            c.Write("}");
+        }
     }
 
 }

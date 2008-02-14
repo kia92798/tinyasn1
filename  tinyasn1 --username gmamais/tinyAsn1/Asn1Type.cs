@@ -14,6 +14,30 @@ namespace tinyAsn1
         public Tag m_tag;
         public List<ITree> m_AntlrConstraints = new List<ITree>();
         public List<IConstraint> m_constraints = new List<IConstraint>();
+
+
+        public virtual IEnumerable<T> GetMySelfAndAnyChildren<T>() where T : Asn1Type 
+        {
+         
+            if (this is T)
+                yield return this as T;
+            yield break;
+        }
+
+        public virtual IEnumerable<KeyValuePair<string,T>> GetMySelfAndAnyChildrenWithPath<T>(string pathUpToHere) where T : Asn1Type
+        {
+            if (this is T)
+                yield return new KeyValuePair<string,T>(pathUpToHere, this as T);
+            yield break;
+        }
+
+        string _uniquePath = "";
+
+        public string UniquePath
+        {
+            get { return _uniquePath; }
+            set { _uniquePath = value; }
+        }
         
 
         public partial class Tag
@@ -793,6 +817,10 @@ namespace tinyAsn1
                 }
             }
         }
+        
+ 
+        
+
 
         internal virtual void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev)
         {
@@ -942,7 +970,12 @@ namespace tinyAsn1
 
         internal virtual void PrintC(StreamWriterLevel c, int lev)
         {
-            c.Write(ToString());
+            c.Write(ToStringC());
+        }
+
+        public virtual string ToStringC()
+        {
+            return ToString();
         }
     }
 

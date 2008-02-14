@@ -891,7 +891,7 @@ namespace tinyAsn1
 
         public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
         {
-            return "(" + varName + " == " + m_val.ToString() + ")";
+            return "(" + varName + " == " + m_val.ToStringC() + ")";
         }
 
     }
