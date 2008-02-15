@@ -458,8 +458,8 @@ namespace tinyAsn1
         }
         internal override void PrintHConstraintConstant(StreamWriterLevel h, string name)
         {
-            base.PrintHConstraintConstant(h, name);
-            m_type.PrintHConstraintConstant(h, name + "_elem");
+            base.PrintHConstraintConstant(h, C.ID(name));
+            m_type.PrintHConstraintConstant(h, C.ID(name) + "_elem");
         }
 
         internal override void PrintCIsConstraintValidAux(StreamWriterLevel c)

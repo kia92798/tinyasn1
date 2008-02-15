@@ -290,6 +290,57 @@ namespace tinyAsn1
                 h.WriteLine("{0} = {1};", varName, defValue);
         }
 
+        internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            string var = varName;
+            if (!varName.Contains("->"))
+                var = "*" + var;
+
+            PERIntegerEffectiveConstraint cn = cns as PERIntegerEffectiveConstraint;
+            if (cn == null) //unconstraint integer
+            {
+                c.P(lev);
+                c.WriteLine("BitStream_Encode2ndComplementInteger(pBitStrm, {0});", var);
+            }
+            else
+            {
+/*                if (cn.Extensible)
+                {
+                    if (cn.m_extRange != null && cn.m_extRange.isValueWithinRange(Value))
+                    {
+                        ret.Add(true);
+
+                        ret.AddRange(PER.EncodeUnConstraintWholeNumber(Value));
+                        return ret;
+                    }
+                    else
+                        ret.Add(false);
+                }
+*/
+
+                if (!cn.m_rootRange.m_minIsInfinite && !cn.m_rootRange.m_maxIsInfinite)
+                {
+                    //ret.AddRange(PER.EncodeConstraintWholeNumber(Value, cn.m_rootRange.m_min, cn.m_rootRange.m_max));
+                    c.P(lev);
+                    c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, {0}, {1}, {2});", var, cn.m_rootRange.m_min, cn.m_rootRange.m_max);
+                }
+                else if (!cn.m_rootRange.m_minIsInfinite && cn.m_rootRange.m_maxIsInfinite)
+                {
+//                    ret.AddRange(PER.EncodeSemiConstraintWholeNumber(Value, cn.m_rootRange.m_min));
+                    c.P(lev);
+                    c.WriteLine("BitStream_EncodeNonNegativeInteger(pBitStrm, {0}-{1});", var, cn.m_rootRange.m_min);
+                }
+                else
+                {
+                    //                    ret.AddRange(PER.EncodeUnConstraintWholeNumber(Value));
+                    c.P(lev);
+                    c.WriteLine("BitStream_Encode2ndComplementInteger(pBitStrm, {0});", var);
+                }
+
+            }
+
+        }
+
     }
 
 

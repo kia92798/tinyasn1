@@ -804,7 +804,7 @@ namespace tinyAsn1
         internal virtual void PrintHConstraintConstant(StreamWriterLevel h, string name)
         {
             if (m_constraints.Count>0)
-                h.WriteLine("#define ERR_{0}_CONSTRAINT_FAILED\t\t{1} /* {2} */", name, Asn1CompilerInvokation.Instance.ConstraintErrorID++, Constraints);
+                h.WriteLine("#define ERR_{0}_CONSTRAINT_FAILED\t\t{1} /* {2} */", C.ID(name), Asn1CompilerInvokation.Instance.ConstraintErrorID++, Constraints);
         }
 
         internal virtual void PrintCIsConstraintValidAux(StreamWriterLevel c)
@@ -842,13 +842,27 @@ namespace tinyAsn1
                 c.P(lev);
                 c.WriteLine("if (!ret) {");
                 c.P(lev + 1);
-                c.WriteLine("*pErrCode = ERR_{0}_CONSTRAINT_FAILED;", errorCode);
+                c.WriteLine("*pErrCode = ERR_{0}_CONSTRAINT_FAILED;", C.ID(errorCode));
                 c.P(lev + 1);
                 c.WriteLine("return FALSE;");
                 c.P(lev);
                 c.WriteLine("}");
             }
 
+        }
+
+        internal virtual void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+//            throw new Exception("Abstract method called");
+            c.P(lev);
+            c.WriteLine("assert(0);");
+        }
+        
+        internal virtual void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            //            throw new Exception("Abstract method called");
+            c.P(lev);
+            c.WriteLine("assert(0);");
         }
     }
 

@@ -9,6 +9,23 @@ the ASN.1 grammar at the the end of the ICD file.
 --This a single comment which also doesn't appear in any table.
 
 
+	OnOff ::= CHOICE {
+		on INTEGER(1..2),
+		off IA5String (SIZE(3)),
+		bitStr BIT STRING (SIZE(6))
+	} 
+	
+	off OnOff ::= bitStr : '100101'B
+
+	MyOct ::= OCTET STRING (SIZE(4))
+
+	mOct MyOct ::= 'ABCDEF01'H
+	
+
+	MyBit ::= BIT STRING (SIZE(20))
+
+	MyNull ::= NULL
+
 	MyInt ::= INTEGER(1|2|3)
 	
 	a MyInt ::= 1
@@ -44,6 +61,7 @@ the ASN.1 grammar at the the end of the ICD file.
 		a1 INTEGER (1..10),
 		b1 REAL,
 		c MyEnum
+		
 	}
 	
 	MyStruct2 ::= SEQUENCE {
@@ -56,14 +74,15 @@ the ASN.1 grammar at the the end of the ICD file.
 	
 	MyChoice ::= CHOICE {
 		alpha MyStruct,
-		beta MyStruct2
+		beta MyStruct2,
+		octStr OCTET STRING (SIZE(4))
 	}
 	myCh MyChoice ::= beta : { a2 9, b2 2.7, c2 gamma}
 	
 	
 	MyArr ::= SEQUENCE (SIZE(1..10)) OF MyChoice
 	
-	myArr MyArr ::= { beta : { a2 9, b2 2.7, c2 gamma}, alpha : { a1 8, b1 4.32, c gamma}}
+	myArr MyArr ::= { beta : { a2 9, b2 2.7, c2 gamma}, alpha : { a1 8, b1 4.32, c gamma}, octStr : 'AABBCCDD'H }
 	
 	--@This a special comment which appears in the ICD table
 	--@It should appear in front of type assigments 
@@ -104,7 +123,9 @@ the ASN.1 grammar at the the end of the ICD file.
 					beta	INTEGER(2..25),
 					color2	ENUMERATED {
 						orange, brown, blue, black
-						}(orange|blue)	DEFAULT	orange
+						}(orange|blue)	DEFAULT	orange,
+					octstr OCTET STRING (SIZE(1..20|50)),
+					bitstr BIT STRING (SIZE(5..20))
 				}
 			}  OPTIONAL
 			
@@ -115,7 +136,8 @@ the ASN.1 grammar at the the end of the ICD file.
 			classic ClassicEquipment,
 			internalChoiceB 	SEQUENCE (SIZE(20)) OF SEQUENCE (SIZE(9)) OF CHOICE {
 				sport	SportEquipment,
-				classic ClassicEquipment
+				classic ClassicEquipment,
+				octstr OCTET STRING (SIZE(1..20|50))
 			}
 		}
 

@@ -294,7 +294,7 @@ namespace tinyAsn1
 
                 wr.WriteLine("<html xmlns=\"http://www.w3.org/1999/xhtml\" >");
                 wr.WriteLine("<head>");
-                wr.WriteLine("    <title>ASN.1 Test Cases</title>");
+                wr.WriteLine("    <title>ICD</title>");
                 wr.WriteLine("    <style type=\"text/css\"> {0} </style>", Asn1File.css); 
                 wr.WriteLine("</head>");
                 wr.WriteLine("<body>");
@@ -345,6 +345,16 @@ namespace tinyAsn1
                 foreach (ChoiceType ch in GetTypes<ChoiceType>())
                 {
                     List<string> path = new List<string>(ch.UniquePath.Split('/'));
+                    if (doubleKeys.Contains(ch.CID_NONE))
+                    {
+                        for (int i = path.Count - 1; i >= 0; i--)
+                            if (!ch.CID_NONE.Contains(path[i]))
+                            {
+                                ch.CID_NONE = path[i] + "_" + ch.CID_NONE;
+                                break;
+                            }
+                    }
+                    enumKeys.Add(ch.CID_NONE);
                     foreach (ChoiceChild item in ch.m_children.Values)
                     {
                         if (doubleKeys.Contains(item.CID))
@@ -873,7 +883,7 @@ h2
 
                 foreach (TypeAssigment t in tmp)
                 {
-                    string uniqueID = Asn1CompilerInvokation.Instance.GetUniqueID(t.m_name);
+                    string uniqueID = Asn1CompilerInvokation.Instance.GetUniqueID(C.ID(t.m_name));
                     t.PrintH(h, uniqueID);
                 }
 
@@ -896,7 +906,7 @@ h2
                 c.WriteLine("#include \"{0}\"", fileName + ".h");
                 foreach (TypeAssigment t in tmp)
                 {
-                    string uniqueID = Asn1CompilerInvokation.Instance.GetUniqueID(t.m_name);
+                    string uniqueID = Asn1CompilerInvokation.Instance.GetUniqueID(C.ID(t.m_name));
                     t.PrintC(c, uniqueID);
                 }
 

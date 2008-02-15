@@ -575,7 +575,7 @@ namespace tinyAsn1
                 star = "*";
             h.WriteLine("void {0}_Initialize({0}{1} pVal);", uniqueID,star);
             h.WriteLine("flag {0}_IsConstraintValid({0}{1} val, int* pErrCode);", uniqueID,star);
-            h.WriteLine("flag {0}_Encode({0}{1} val, BitStream* pBitStrm, int* pErrCode);",uniqueID, star);
+            h.WriteLine("flag {0}_Encode({0}{1} val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);", uniqueID, star);
             h.WriteLine("flag {0}_Decode({0}{1} val, BitStream* pBitStrm, int* pErrCode);",uniqueID, star);
             h.WriteLine();
             h.WriteLine();
@@ -609,6 +609,24 @@ namespace tinyAsn1
             c.WriteLine("}");
             c.WriteLine();
 
+            c.WriteLine("flag {0}_Encode({0}{1} pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints)", uniqueID, star);
+            c.WriteLine("{");
+            c.P(1); c.WriteLine("if (bCheckConstraints && !{0}_IsConstraintValid(pVal, pErrCode))", uniqueID);
+            c.P(2); c.WriteLine("return FALSE;");
+            
+
+            m_type.PrintCEncode(m_type.PEREffectiveConstraint, c, uniqueID, "pVal", 1);
+            c.P(1); c.WriteLine("return TRUE;");
+            c.WriteLine("}");
+            c.WriteLine();
+
+            c.WriteLine("flag {0}_Decode({0}{1} pVal, BitStream* pBitStrm, int* pErrCode)", uniqueID, star);
+            c.WriteLine("{");
+            c.P(1); c.WriteLine("flag ret;");
+            m_type.PrintCDecode(m_type.PEREffectiveConstraint, c, uniqueID, "pVal", 1);
+            c.P(1); c.WriteLine("return TRUE;");
+            c.WriteLine("}");
+            c.WriteLine();
         }
     }
 
