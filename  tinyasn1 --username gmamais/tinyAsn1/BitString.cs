@@ -313,6 +313,34 @@ namespace tinyAsn1
             return "";
         }
 
+        /* Print C backend */
+
+        internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        {
+            lev++;
+            long max = (long)Math.Ceiling((double)maxItems(cns) / 8.0);
+            h.WriteLine("struct {");
+            h.P(lev + 1);
+            h.WriteLine("long nCount; /*Number of bits in the array. Max value is : {0} */", maxItems(cns));
+            h.P(lev + 1); h.WriteLine("byte arr[{0}];", max);
+            h.P(lev);
+            h.Write("}");
+        }
+
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel c, string typeName, string varName, int lev)
+        {
+            long max = (long)Math.Ceiling((double)maxItems(cns) / 8.0);
+            string i = "i" + lev.ToString();
+            string prefix = "";
+            bool topLevel = !varName.Contains("->");
+            if (topLevel)
+                prefix = varName + "->";
+            else
+                prefix = varName + ".";
+
+            c.P(lev); c.WriteLine("{0}nCount = 0;", prefix);
+            c.P(lev); c.WriteLine("memset({0}arr,0x0,{1});", prefix, max);
+        }
     
     
     
@@ -550,6 +578,34 @@ namespace tinyAsn1
 
 
             return ret;
+        }
+
+        internal override void PrintC(StreamWriterLevel c, int lev)
+        {
+            c.WriteLine("{");
+            lev++;
+
+            List<byte> val = OctectStringValue.ConvertToOctetArray(this);
+
+            int cnt = val.Count;
+
+            c.P(lev); c.WriteLine("{0},", cnt);
+
+            c.P(lev); c.WriteLine("{");
+            for (int i = 0; i < cnt; i++)
+            {
+                c.P(lev + 1);
+                c.Write("0x{0:X2}", val[i]);
+                if (i != cnt - 1)
+                    c.WriteLine(",");
+                else
+                    c.WriteLine();
+            }
+            c.P(lev); c.WriteLine("}");
+
+            lev--;
+            c.P(lev);
+            c.Write("}");
         }
 
     }

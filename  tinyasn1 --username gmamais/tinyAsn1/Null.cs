@@ -78,6 +78,21 @@ namespace tinyAsn1
         {
             return 0;
         }
+        internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        {
+            h.Write("NullType ");
+        }
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defaultVal, StreamWriterLevel h, string typeName, string varName, int lev)
+        {
+            bool topLevel = !varName.Contains("->");
+            h.P(lev);
+            if (topLevel)
+                h.WriteLine("*{0} = 0;", varName);
+            else
+                h.WriteLine("{0} = 0;", varName);
+
+        }
+
     }
 
 
@@ -119,6 +134,12 @@ namespace tinyAsn1
             List<bool> ret = new List<bool>();
             return ret;
         }
+
+        public override string ToStringC()
+        {
+            return "0";
+        }
+
     }
 
 }

@@ -284,7 +284,7 @@ namespace tinyAsn1
 
         internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
-            h.Write(m_referencedTypeName);
+            h.Write(C.ID(m_referencedTypeName));
         }
 
         internal override bool DependsOnlyOn(List<TypeAssigment> values)
@@ -299,10 +299,10 @@ namespace tinyAsn1
         internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev)
         {
             h.P(lev);
-            if (!(Type is IA5StringType))
-                h.WriteLine("{0}_Initialize(&{1});", m_referencedTypeName, varName);
+            if ((Type is IA5StringType) || !varName.Contains("->"))
+                h.WriteLine("{0}_Initialize({1});", C.ID(m_referencedTypeName), varName);
             else
-                h.WriteLine("{0}_Initialize({1});", m_referencedTypeName, varName);
+                h.WriteLine("{0}_Initialize(&{1});", C.ID(m_referencedTypeName), varName);
 
         }
         internal override void PrintHConstraintConstant(StreamWriterLevel h, string name)
@@ -317,16 +317,16 @@ namespace tinyAsn1
                 cur = cur.ParentType;
             }
             if (nCount>0)
-                h.WriteLine("#define ERR_{0}_CONSTRAINT_FAILED\t\t{1} /* {2} */", name, Asn1CompilerInvokation.Instance.ConstraintErrorID++, conConstraints);
+                h.WriteLine("#define ERR_{0}_CONSTRAINT_FAILED\t\t{1} /* {2} */", C.ID(name), Asn1CompilerInvokation.Instance.ConstraintErrorID++, conConstraints);
         }
 
         internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev)
         {
             c.P(lev); c.Write("ret =");
-            if (!(Type is IA5StringType))
-                c.WriteLine("{0}_IsConstraintValid(&{1}, pErrCode);", m_referencedTypeName, varName);
+            if ((Type is IA5StringType) || !varName.Contains("->"))
+                c.WriteLine("{0}_IsConstraintValid({1}, pErrCode);", C.ID(m_referencedTypeName), varName);
             else
-                c.WriteLine("{0}_IsConstraintValid({1}, pErrCode);", m_referencedTypeName, varName);
+                c.WriteLine("{0}_IsConstraintValid(&{1}, pErrCode);", C.ID(m_referencedTypeName), varName);
 
             c.P(lev);
             c.WriteLine("if (!ret)");

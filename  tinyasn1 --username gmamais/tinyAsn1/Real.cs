@@ -128,6 +128,25 @@ namespace tinyAsn1
 
         }
 
+        internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            string var = varName;
+            if (!varName.Contains("->"))
+                var = "*" + var;
+
+            c.P(lev);
+            c.WriteLine("BitStream_EncodeReal(pBitStrm, {0});", var);
+        }
+
+        internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            string var = varName;
+            if (varName.Contains("->"))
+                var = "&" + var;
+            c.P(lev);
+            c.WriteLine("BitStream_DecodeReal(pBitStrm, {0});", var);
+        }
+
     }
 
     public partial class RealValue : Asn1Value

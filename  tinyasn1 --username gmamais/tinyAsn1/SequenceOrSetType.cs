@@ -846,10 +846,10 @@ namespace tinyAsn1
 
         internal override void PrintHConstraintConstant(StreamWriterLevel h, string name)
         {
-            base.PrintHConstraintConstant(h, name);
+            base.PrintHConstraintConstant(h, C.ID(name));
             foreach (Child ch in m_children.Values)
             {
-                ch.m_type.PrintHConstraintConstant(h, name + "_" + ch.m_childVarName);
+                ch.m_type.PrintHConstraintConstant(h, C.ID(name) + "_" + C.ID(ch.m_childVarName));
             }
         }
 

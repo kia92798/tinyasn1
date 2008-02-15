@@ -209,6 +209,36 @@ namespace tinyAsn1
             return "";
         }
 
+
+/* Print C backend */
+
+        internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
+        {
+            lev++;
+            long max = maxItems(cns);
+            h.WriteLine("struct {");
+            h.P(lev + 1);
+            h.WriteLine("long nCount;");
+            h.P(lev + 1); h.WriteLine("byte arr[{0}];", max);
+            h.P(lev);
+            h.Write("}");
+        }
+
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel c, string typeName, string varName, int lev)
+        {
+            long max = maxItems(cns);
+            string i = "i" + lev.ToString();
+            string prefix = "";
+            bool topLevel = !varName.Contains("->");
+            if (topLevel)
+                prefix = varName + "->";
+            else
+                prefix = varName + ".";
+
+            c.P(lev); c.WriteLine("{0}nCount = 0;", prefix);
+            c.P(lev); c.WriteLine("memset({0}arr,0x0,{1});", prefix, max);
+        }
+
     }
 
 
@@ -261,6 +291,40 @@ namespace tinyAsn1
             return ret;
         }
 
+        static public List<byte> ConvertToOctetArray(BitStringValue tmp)
+        {
+            List<byte> ret = new List<byte>();
+            string bitString = tmp.Value;
+            int nBitsToInsert = 0;
+            if (bitString.Length % 4 > 0)
+                nBitsToInsert = 4 - bitString.Length % 4;
+            else
+                nBitsToInsert = 0;
+
+            for (int i = 0; i < nBitsToInsert; i++)
+                bitString += "0";
+
+            List<byte> nibles = new List<byte>();
+            while (bitString.Length > 0)
+            {
+                string nible = bitString.Substring(0, 4);
+                nibles.Add(lookup[nible]);
+                bitString = bitString.Substring(4);
+            }
+            if (nibles.Count % 2 != 0)
+                nibles.Insert(0, 0);
+
+            while (nibles.Count > 0)
+            {
+                byte curByte = (byte)(nibles[0] << 4);
+                curByte |= nibles[1];
+                ret.Add(curByte);
+                nibles.RemoveAt(0);
+                nibles.RemoveAt(0);
+            }
+            return ret;
+        }
+
         public OctectStringValue(ITree tree, Module mod, Asn1Type type)
         {
             m_TypeID = Asn1Value.TypeID.OCTECT_STRING;
@@ -269,7 +333,7 @@ namespace tinyAsn1
             m_type = type;
 
             BitStringValue tmp = new BitStringValue(tree, mod, type);
-            string bitString = tmp.Value;
+/*            string bitString = tmp.Value;
             int nBitsToInsert = 0;
             if (bitString.Length % 4 > 0)
                 nBitsToInsert = 4 - bitString.Length % 4;
@@ -296,7 +360,9 @@ namespace tinyAsn1
                 m_value.Add(curByte);
                 nibles.RemoveAt(0);
                 nibles.RemoveAt(0);
-            }
+            }*/
+
+            m_value = ConvertToOctetArray(tmp);
         }
 
 
@@ -442,6 +508,32 @@ namespace tinyAsn1
             return ret;
         }
 
+        internal override void PrintC(StreamWriterLevel c, int lev)
+        {
+            c.WriteLine("{");
+            lev++;
+
+            
+            int cnt = Value.Count;
+
+            c.P(lev); c.WriteLine("{0},",cnt);
+
+            c.P(lev); c.WriteLine("{");
+            for (int i = 0; i < cnt; i++)
+            {
+                c.P(lev + 1);
+                c.Write("0x{0:X2}",Value[i]);
+                if (i != cnt - 1)
+                    c.WriteLine(",");
+                else
+                    c.WriteLine();
+            }
+            c.P(lev); c.WriteLine("}");
+
+            lev--;
+            c.P(lev);
+            c.Write("}");
+        }
 
     }
 

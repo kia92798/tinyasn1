@@ -14,6 +14,24 @@ namespace tinyAsn1
         public ExceptionSpec m_exceptionSpec;
         public bool m_extMarkPresent2 = false;
 
+        string _cid_none = null;
+        public string CID_NONE
+        {
+            get
+            {
+                if (_cid_none == null)
+                {
+                    string[] items = UniquePath.Split('/');
+                    _cid_none = items[items.Length - 1] + "_NONE";
+                }
+                return _cid_none;
+            }
+            set
+            {
+                _cid_none = value;
+            }
+        }
+
         public override string Name { get { return "CHOICE"; } }
 
         //Choices do not have default tag!
@@ -572,7 +590,8 @@ namespace tinyAsn1
             h.WriteLine("enum {");
 //            h.WriteLine("enum {0}_PR {{", typeName);
             h.P(lev + 2);
-            h.WriteLine("{0}_NONE,	/* No components present */",typeName);
+            h.WriteLine("{0},	/* No components present */", CID_NONE);
+//            h.WriteLine("{0}_NONE,	/* No components present */", typeName);
             int i = 0;
             foreach (ChoiceChild ch in m_children.Values)
             {
@@ -624,16 +643,17 @@ namespace tinyAsn1
             else
                 prefix = varName + ".";
 
-            c.P(lev); c.WriteLine("{0}kind = {1}_NONE;", prefix, typeName);
+            c.P(lev); c.WriteLine("{0}kind = {1};", prefix, CID_NONE);
+//            c.P(lev); c.WriteLine("{0}kind = {1}_NONE;", prefix, typeName);
         }
 
         internal override void PrintHConstraintConstant(StreamWriterLevel h, string name)
         {
-            h.WriteLine("#define ERR_{0}_CONSTRAINT_FAILED\t\t{1} /* {2} */", name, Asn1CompilerInvokation.Instance.ConstraintErrorID++, Constraints);
+            h.WriteLine("#define ERR_{0}_CONSTRAINT_FAILED\t\t{1} /* {2} */", C.ID(name), Asn1CompilerInvokation.Instance.ConstraintErrorID++, Constraints);
 //            base.PrintHConstraintConstant(h, name);
             foreach (ChoiceChild ch in m_children.Values)
             {
-                ch.m_type.PrintHConstraintConstant(h, name + "_" + ch.m_childVarName);
+                ch.m_type.PrintHConstraintConstant(h, C.ID(name) + "_" + C.ID(ch.m_childVarName));
             }
         }
 
@@ -688,7 +708,7 @@ namespace tinyAsn1
             get
             {
                 if (_cid == null)
-                    return C.ID(m_childVarName);
+                    return C.ID(m_childVarName)+ "_PRESENT";
                 return _cid;
             }
             set
@@ -891,10 +911,12 @@ namespace tinyAsn1
             c.P(lev + 1);
             c.WriteLine("{0},", ChoiceType.m_children[m_alternativeName].CID);
             c.P(lev + 1);
+            c.Write("{{ .{0}=", ChoiceType.m_children[m_alternativeName].CID.Replace("_PRESENT", ""));
             m_value.PrintC(c, lev + 1);
+            
             c.WriteLine();
             c.P(lev);
-            c.Write("}");
+            c.Write("} }");
         }
     }
 
