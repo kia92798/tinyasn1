@@ -65,7 +65,11 @@ BOOL BitStream_DecodeConstraintWholeNumber(BitStream* pBitStrm, sint* v, sint mi
 void BitStream_EncodeReal(BitStream* pBitStrm, double v);
 flag BitStream_DecodeReal(BitStream* pBitStrm, double* v);
 
+void BitStream_EncodeBitString(BitStream* pBitStrm, byte* pBitString, long nBitsCount);
+flag BitStream_DecodeBitString(BitStream* pBitStrm, byte* pBitString, long* nBitsCount);
 
+void BitStream_EncodeOctetString(BitStream* pBitStrm, byte* pOctString, long nOctetCount);
+flag BitStream_DecodeOctetString(BitStream* pBitStrm, byte* pOctString, long* nOctetCount);
 
 
 

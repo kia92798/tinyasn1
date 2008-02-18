@@ -93,6 +93,15 @@ namespace tinyAsn1
 
         }
 
+        internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            
+        }
+
+        internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            
+        }
     }
 
 

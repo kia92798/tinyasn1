@@ -412,6 +412,29 @@ namespace tinyAsn1
                 h.WriteLine("{0} = {1};", varName, defVal);
 
         }
+
+        internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            string varName2 = varName;
+            if (!varName.Contains("->"))
+                varName2 = "*" + varName;
+
+            c.P(lev);
+            c.WriteLine("switch({0})", varName2);
+            c.P(lev); c.WriteLine("{");
+            int index = 0;
+            foreach (Item it in m_enumValues.Values)
+            {
+                c.P(lev); c.WriteLine("case {0}:", it.CID);
+                c.P(lev + 1);
+                c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, {0}, {1}, {2});", index, 0, RootItemsCount-1);
+                c.P(lev + 1);
+                c.WriteLine("break;");
+                index++;
+            }
+            c.P(lev); c.WriteLine("}");
+
+        }
     }
 
 

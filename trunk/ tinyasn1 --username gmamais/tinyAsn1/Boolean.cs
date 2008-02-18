@@ -97,6 +97,15 @@ namespace tinyAsn1
                 h.WriteLine("{0} = {1};", varName, defVal);
 
         }
+        internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            bool topLevel = !varName.Contains("->");
+            c.P(lev);
+            if (topLevel)
+                c.WriteLine("BitStream_AppendBit(pBitStrm, *{0});", varName);
+            else
+                c.WriteLine("BitStream_AppendBit(pBitStrm, {0});", varName);
+        }
     }
 
     public partial class BooleanValue : Asn1Value

@@ -336,5 +336,20 @@ namespace tinyAsn1
             base.PrintCIsConstraintValid(cns, c, errorCode, typeName, varName, lev);
             
         }
+
+        internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            c.P(lev); 
+            if ((Type is IA5StringType) || !varName.Contains("->"))
+                c.WriteLine("{0}_Encode({1}, pBitStrm, pErrCode, FALSE);", C.ID(m_referencedTypeName), varName);
+            else
+                c.WriteLine("{0}_Encode(&{1}, pBitStrm, pErrCode, FALSE);", C.ID(m_referencedTypeName), varName);
+
+        }
+
+        internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            base.PrintCDecode(cns, c, errorCode, varName, lev);
+        }
     }
 }

@@ -692,6 +692,43 @@ namespace tinyAsn1
             foreach (ChoiceChild ch in m_children.Values)
                 ch.m_type.PrintCIsConstraintValidAux(c);
         }
+
+        internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            int largestIndex = -1;
+            foreach (string v in m_children.Keys)
+            {
+                if (m_children[v].m_extended)
+                    continue;
+                largestIndex++;
+            }
+
+            string varName2 = varName;
+            if (!varName.Contains("->"))
+                varName2 += "->";
+            else
+                varName2 += ".";
+
+            c.P(lev);
+            c.WriteLine("switch({0}kind)", varName2);
+            c.P(lev); c.WriteLine("{");
+            int choiceIndex = 0;
+            foreach (ChoiceChild ch in m_children.Values)
+            {
+                //                c.P(lev); c.WriteLine("case {0}_{1}:", typeName, ch.m_childVarName);
+                c.P(lev); c.WriteLine("case {0}:", ch.CID);
+                //PER.EncodeConstraintWholeNumber(choiceIndex,0,largestIndex)
+                c.P(lev + 1);
+                c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, {0}, {1}, {2});", choiceIndex, 0, largestIndex);
+                ch.m_type.PrintCEncode(ch.m_type.PEREffectiveConstraint, c, errorCode + "_" + ch.m_childVarName,
+                    varName2 + "u." + C.ID(ch.m_childVarName), lev + 1);
+
+                c.P(lev + 1);
+                c.WriteLine("break;");
+                choiceIndex++;
+            }
+            c.P(lev); c.WriteLine("}");
+        }
     }
 
     public partial class ChoiceChild

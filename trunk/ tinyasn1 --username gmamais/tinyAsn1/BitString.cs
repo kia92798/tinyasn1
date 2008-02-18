@@ -341,6 +341,19 @@ namespace tinyAsn1
             c.P(lev); c.WriteLine("{0}nCount = 0;", prefix);
             c.P(lev); c.WriteLine("memset({0}arr,0x0,{1});", prefix, max);
         }
+
+        internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            string prefix = "";
+            bool topLevel = !varName.Contains("->");
+            if (topLevel)
+                prefix = varName + "->";
+            else
+                prefix = varName + ".";
+
+            c.P(lev);
+            c.WriteLine("BitStream_EncodeBitString(pBitStrm, {0}arr, {0}nCount);",prefix);
+        }
     
     
     
