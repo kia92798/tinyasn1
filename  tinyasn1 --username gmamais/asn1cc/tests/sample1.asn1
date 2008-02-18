@@ -8,7 +8,7 @@ the ASN.1 grammar at the the end of the ICD file.
 
 --This a single comment which also doesn't appear in any table.
 
-
+/*
 	OnOff ::= CHOICE {
 		on INTEGER(1..2),
 		off IA5String (SIZE(3)),
@@ -16,7 +16,7 @@ the ASN.1 grammar at the the end of the ICD file.
 	} 
 	
 	off OnOff ::= bitStr : '100101'B
-
+*/
 	MyOct ::= OCTET STRING (SIZE(4))
 
 	mOct MyOct ::= 'ABCDEF01'H
@@ -77,13 +77,13 @@ the ASN.1 grammar at the the end of the ICD file.
 		beta MyStruct2,
 		octStr OCTET STRING (SIZE(4))
 	}
-	myCh MyChoice ::= beta : { a2 9, b2 2.7, c2 gamma}
+/*	myCh MyChoice ::= beta : { a2 9, b2 2.7, c2 gamma}
 	
 	
 	MyArr ::= SEQUENCE (SIZE(1..10)) OF MyChoice
 	
 	myArr MyArr ::= { beta : { a2 9, b2 2.7, c2 gamma}, alpha : { a1 8, b1 4.32, c gamma}, octStr : 'AABBCCDD'H }
-	
+*/	
 	--@This a special comment which appears in the ICD table
 	--@It should appear in front of type assigments 
 	--@CAR DEFINITION

@@ -490,12 +490,9 @@ namespace tinyAsn1
                 c.WriteLine();
                 c.P(lev); c.WriteLine("{");
                 lev++;
-            }
-            if (!topLevel)
-            {
                 c.P(lev); c.WriteLine("int {0};", i);
             }
-            c.P(lev); c.WriteLine("for({0}=0;{0}<{1};{0}++)", i, maxItems(cns));
+            c.P(lev); c.WriteLine("for({0}=0;{0}<{1}nCount;{0}++)", i, prefix);
             c.P(lev); c.WriteLine("{");
             m_type.PrintCIsConstraintValid(m_type.PEREffectiveConstraint, c, errorCode + "_elem",
                 typeName + "_arr", prefix + "arr[" + i + "]", lev + 1);
@@ -506,9 +503,52 @@ namespace tinyAsn1
                 c.P(lev); c.WriteLine("}");
                 c.WriteLine();
             }
-        
-        
         }
+        internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            long min = minItems(cns);
+            long max = maxItems(cns);
+            string i = "i" + lev.ToString();
+            string prefix = "";
+            bool topLevel = !varName.Contains("->");
+            c.P(lev); c.WriteLine("{");
+            lev++;
+            if (topLevel)
+            {
+                prefix = varName + "->";
+                c.P(lev); c.WriteLine("int {0};", i);
+                c.WriteLine();
+            } 
+            else
+            {
+                prefix = varName + ".";
+                c.P(lev); c.WriteLine("int {0};", i);
+                c.WriteLine();
+            }
+            if (min != max)
+            {
+                c.P(lev);
+                c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, {0}nCount, {1}, {2});", prefix, min, max);
+            }
+            else
+            {
+                c.P(lev); c.WriteLine("/* No need to encode length (it is fixed size ({0})*/",min);
+            }
+
+            c.P(lev); c.WriteLine("for({0}=0;{0}<{1}nCount;{0}++)", i, prefix);
+            c.P(lev); c.WriteLine("{");
+            m_type.PrintCEncode(m_type.PEREffectiveConstraint, c, errorCode + "_elem",
+                prefix + "arr[" + i + "]", lev + 1);
+            c.P(lev); c.WriteLine("}");
+            
+//            if (!topLevel)
+            {
+                lev--;
+                c.P(lev); c.WriteLine("}");
+                c.WriteLine();
+            }
+        }
+
     }
 
 

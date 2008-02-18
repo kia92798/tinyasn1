@@ -863,7 +863,7 @@ namespace tinyAsn1
 
             foreach (Child ch in m_children.Values)
             {
-                ch.m_type.PrintCIsConstraintValid(ch.m_type.PEREffectiveConstraint, c, errorCode + "_" + ch.m_childVarName, 
+                ch.m_type.PrintCIsConstraintValid(ch.m_type.PEREffectiveConstraint, c, errorCode + "_" + C.ID(ch.m_childVarName), 
                     typeName + "_" + C.ID(ch.m_childVarName), varName2 + C.ID(ch.m_childVarName), lev);
                 c.WriteLine();
             }
@@ -874,6 +874,30 @@ namespace tinyAsn1
             base.PrintCIsConstraintValidAux(c);
             foreach (Child ch in m_children.Values)
                 ch.m_type.PrintCIsConstraintValidAux(c);
+        }
+
+        internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            string varName2 = varName;
+            if (!varName.Contains("->"))
+                varName2 += "->";
+            else
+                varName2 += ".";
+
+            foreach (Child ch in m_children.Values)
+            {
+                if (ch.m_optional || ch.m_default)
+                {
+                    c.P(lev);
+                    c.WriteLine("BitStream_AppendBit(pBitStrm, {0});", varName2+"exist."+C.ID(ch.m_childVarName));
+                }
+            }
+            
+            foreach (Child ch in m_children.Values)
+            {
+                ch.m_type.PrintCEncode(ch.m_type.PEREffectiveConstraint, c, errorCode + "_" + C.ID(ch.m_childVarName), varName2 + C.ID(ch.m_childVarName), lev);
+                c.WriteLine();
+            }
         }
     }
 

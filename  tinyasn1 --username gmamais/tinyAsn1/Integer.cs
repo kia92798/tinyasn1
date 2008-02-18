@@ -304,9 +304,10 @@ namespace tinyAsn1
             }
             else
             {
-/*                if (cn.Extensible)
+                if (cn.Extensible)
                 {
-                    if (cn.m_extRange != null && cn.m_extRange.isValueWithinRange(Value))
+                    throw new Exception("Extensions not yet implemented. Sorry !!");
+/*                    if (cn.m_extRange != null && cn.m_extRange.isValueWithinRange(Value))
                     {
                         ret.Add(true);
 
@@ -314,9 +315,9 @@ namespace tinyAsn1
                         return ret;
                     }
                     else
-                        ret.Add(false);
+                        ret.Add(false);*/
                 }
-*/
+
 
                 if (!cn.m_rootRange.m_minIsInfinite && !cn.m_rootRange.m_maxIsInfinite)
                 {
