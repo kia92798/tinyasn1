@@ -46,6 +46,23 @@ typedef struct {
 	int currentBit; 
 } BitStream;
 
+typedef struct {
+	uint m_min;
+    flag m_minIsInfinite;
+    flag m_minIsIncluded;    
+    uint m_max;            
+    flag m_maxIsIncluded;
+    flag m_maxIsInfinite;
+} IntegerRange;
+
+typedef struct {
+	int nCount;
+	char pCharArray[];
+} CharSet;
+
+
+
+
 void BitStream_Init(BitStream* pBitStrm, unsigned char* buf, long count);
 void BitStream_AppendBit(BitStream* pBitStrm, flag v);
 sint BitStream_GetLength(BitStream* pBitStrm);
@@ -71,7 +88,9 @@ flag BitStream_DecodeBitString(BitStream* pBitStrm, byte* pBitString, long* nBit
 void BitStream_EncodeOctetString(BitStream* pBitStrm, byte* pOctString, long nOctetCount);
 flag BitStream_DecodeOctetString(BitStream* pBitStrm, byte* pOctString, long* nOctetCount);
 
+void BitStream_EncodeSingleChar(BitStream* pBitStrm, char ch, CharSet* pCharSet);
 
+void BitStream_EncodeIA5String(BitStream* pBitStrm, char* string, IntegerRange* pIR1, flag ext, IntegerRange* pIR2, CharSet* pCharSet);
 
 
 #ifdef  __cplusplus
