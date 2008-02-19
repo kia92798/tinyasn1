@@ -21,6 +21,9 @@ the ASN.1 grammar at the the end of the ICD file.
 
 	mOct MyOct ::= 'ABCDEF01'H
 	
+	
+	
+	
 
 	MyBit ::= BIT STRING (SIZE(20))
 
@@ -58,6 +61,8 @@ the ASN.1 grammar at the the end of the ICD file.
 
 
 	MyStruct ::= SEQUENCE {
+	
+		mitsos SEQUENCE (SIZE(1..4)) OF SEQUENCE (SIZE(1..5)) OF INTEGER (1..1000),
 		a1 INTEGER (1..10),
 		b1 REAL,
 		c MyEnum
@@ -70,7 +75,7 @@ the ASN.1 grammar at the the end of the ICD file.
 		c2 MyEnum
 	}
 	
-	myStruct MyStruct ::= { a1 4, b1 3.14, c alpha}
+--	myStruct MyStruct ::= { a1 4, b1 3.14, c alpha}
 	
 	MyChoice ::= CHOICE {
 		alpha MyStruct,

@@ -215,6 +215,54 @@ namespace tinyAsn1
             else
                 h.WriteLine("memset({0}, 0x0, {1});", varName, maxItems(cns) + 1);
         }
+
+        protected virtual string EncodingCFunctionName  { get { return "BitStream_EncodeIA5String"; } }
+        
+        internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            PERAlphabetAndSizeEffectiveConstraint cn = (PERAlphabetAndSizeEffectiveConstraint)cns;
+            CharSet perAlphaCon = null;
+
+            if (cn != null)
+            {
+                perAlphaCon = cn.m_from;
+                c.P(lev); c.WriteLine("{"); lev++;
+
+                c.P(lev); c.WriteLine("static IntegerRange ir1 = {{ {0}, {1}, {2}, {3}, {4}, {5} }};", cn.m_size.m_rootRange.m_min, (cn.m_size.m_rootRange.m_minIsInfinite ? "TRUE" : "FALSE"), (cn.m_size.m_rootRange.m_minIsIncluded ? "TRUE" : "FALSE")
+                        , cn.m_size.m_rootRange.m_max, (cn.m_size.m_rootRange.m_maxIsInfinite ? "TRUE" : "FALSE"), (cn.m_size.m_rootRange.m_maxIsIncluded ? "TRUE" : "FALSE"));
+                if (cn.m_size.m_extRange != null)
+                {
+                    c.P(lev); c.WriteLine("static IntegerRange ir2 = {{ {0}, {1}, {2}, {3}, {4}, {5} }};", cn.m_size.m_extRange.m_min, (cn.m_size.m_extRange.m_minIsInfinite ? "TRUE" : "FALSE"), (cn.m_size.m_extRange.m_minIsIncluded ? "TRUE" : "FALSE")
+                        , cn.m_size.m_extRange.m_max, (cn.m_size.m_extRange.m_maxIsInfinite ? "TRUE" : "FALSE"), (cn.m_size.m_extRange.m_maxIsIncluded ? "TRUE" : "FALSE"));
+                }
+                if (perAlphaCon != null)
+                {
+                    c.P(lev); c.Write("static CharSet cs = {{ {0}, {{", perAlphaCon.m_set.Count);
+
+                    for (int i = 0; i < perAlphaCon.m_set.Count; i++)
+                    {
+
+                        c.Write("0x{0:X2}", Convert.ToByte(perAlphaCon.m_set[i]));
+                        if (i == perAlphaCon.m_set.Count - 1)
+                            c.WriteLine("} };");
+                        else
+                            c.Write(",");
+                        if ((i + 1) % 15 == 0)
+                        {
+                            c.WriteLine();
+                            c.P(lev + 7);
+                        }
+                    }
+                }
+                c.P(lev); c.WriteLine("{0}(pBitStrm, {1}, &ir1, {2}, {3}, {4});",EncodingCFunctionName, varName, (cn.m_size.m_isExtended ? "TRUE" : "FALSE"), (cn.m_size.m_extRange != null ? "&ir2" : "NULL"), (perAlphaCon != null?"&cs":"NULL"));
+
+                lev--; c.P(lev); c.WriteLine("}");
+            }
+            else
+            {
+                c.P(lev); c.WriteLine("{0}(pBitStrm, {1}, NULL, FALSE, NULL, NULL);", EncodingCFunctionName, varName);
+            }
+        }
     }
 
     public partial class NumericStringType : IA5StringType
@@ -284,6 +332,7 @@ namespace tinyAsn1
         {
             get { return "NUMERIC CHARACTER"; }
         }
+        protected override string EncodingCFunctionName { get { return "BitStream_EncodeNumericString"; } }
     }
 
 
