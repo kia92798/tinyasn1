@@ -862,7 +862,7 @@ h2
             string path = Path.GetDirectoryName(m_fileName);
             string fileName = Path.GetFileNameWithoutExtension(m_fileName);
             if (path != "")
-                path += "\\";
+                path += Path.DirectorySeparatorChar;
 
             using (StreamWriterLevel c = new StreamWriterLevel(path + fileName + ".c"))
             using (StreamWriterLevel h = new StreamWriterLevel(path + fileName + ".h"))
@@ -887,6 +887,11 @@ h2
                     t.PrintH(h, uniqueID);
                 }
 
+                c.WriteLine();
+                foreach (Module m in m_modules)
+                    foreach (ValueAssigment v in m.m_valuesAssigments.Values)
+                        v.PrintExternDeclaration(h);
+
 
                 h.WriteLine("#ifdef  __cplusplus");
                 h.WriteLine("}");
@@ -901,6 +906,7 @@ h2
                 c.WriteLine("*/");
 
                 c.WriteLine("#include <string.h>");
+                c.WriteLine("#include <assert.h>");
 
 
                 c.WriteLine("#include \"{0}\"", fileName + ".h");

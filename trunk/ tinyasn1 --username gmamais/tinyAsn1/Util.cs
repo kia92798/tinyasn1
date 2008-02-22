@@ -269,6 +269,15 @@ namespace tinyAsn1
             return str.Replace('-', '_').Replace('.', '_').Replace('/', '_');
         }
 
+        public static string L(long i)
+        {
+            string sx = "";
+            if (Math.Abs(i) > Int32.MaxValue)
+                sx = "LL";
+            return i.ToString() + sx;
+
+        }
+
     }
 
 }

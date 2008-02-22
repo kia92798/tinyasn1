@@ -285,9 +285,9 @@ namespace tinyAsn1
 
             h.P(lev);
             if (topLevel)
-                h.WriteLine("*{0} = {1};", varName,defValue);
+                h.WriteLine("*{0} = {1};", varName,C.L(defValue));
             else
-                h.WriteLine("{0} = {1};", varName, defValue);
+                h.WriteLine("{0} = {1};", varName, C.L(defValue));
         }
 
         internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
@@ -300,48 +300,123 @@ namespace tinyAsn1
             if (cn == null) //unconstraint integer
             {
                 c.P(lev);
-                c.WriteLine("BitStream_Encode2ndComplementInteger(pBitStrm, {0});", var);
+                c.WriteLine("BitStream_EncodeUnConstraintWholeNumber(pBitStrm, {0});", var);
             }
             else
             {
                 if (cn.Extensible)
                 {
-                    throw new Exception("Extensions not yet implemented. Sorry !!");
-/*                    if (cn.m_extRange != null && cn.m_extRange.isValueWithinRange(Value))
+                    if ((cn.m_extRange == null))
                     {
-                        ret.Add(true);
-
-                        ret.AddRange(PER.EncodeUnConstraintWholeNumber(Value));
-                        return ret;
+                        c.P(lev);
+                        c.WriteLine("BitStream_AppendBitZero(pBitStrm); /* write extension bit*/");
+                        EncodeNormal(cn, c, var, lev);
                     }
                     else
-                        ret.Add(false);*/
-                }
+                    {
+                        c.P(lev);
+                        c.Write("if ");
+                        for (int i = 0; i < m_constraints.Count; i++)
+                        {
+                            string ret = m_constraints[i].PrintCIsRootConstraintValid(c, var, lev);
+                            c.Write(ret);
+                            if (i != m_constraints.Count - 1)
+                                c.Write(" && ");
+                        }
+                        c.WriteLine(" {");
+                        c.P(lev + 1);
+                        c.WriteLine("BitStream_AppendBitZero(pBitStrm); /* value within root range, so ext bit is zero*/");
+                        EncodeNormal(cn, c, var, lev+1);
+                        c.P(lev);
+                        c.WriteLine("} else {");
+                        lev++;
+                        c.P(lev);
+                        c.WriteLine("/* value is not within root range, so ext bit is one and value is encoded as uncostraint*/");
+                        c.P(lev);
+                        c.WriteLine("BitStream_AppendBitOne(pBitStrm);");
+                        c.P(lev);
+                        c.WriteLine("BitStream_EncodeUnConstraintWholeNumber(pBitStrm, {0});", var);
+                        lev--;
+                        c.P(lev);
+                        c.WriteLine("}");
+                    }
 
-
-                if (!cn.m_rootRange.m_minIsInfinite && !cn.m_rootRange.m_maxIsInfinite)
-                {
-                    //ret.AddRange(PER.EncodeConstraintWholeNumber(Value, cn.m_rootRange.m_min, cn.m_rootRange.m_max));
-                    c.P(lev);
-                    c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, {0}, {1}, {2});", var, cn.m_rootRange.m_min, cn.m_rootRange.m_max);
-                }
-                else if (!cn.m_rootRange.m_minIsInfinite && cn.m_rootRange.m_maxIsInfinite)
-                {
-//                    ret.AddRange(PER.EncodeSemiConstraintWholeNumber(Value, cn.m_rootRange.m_min));
-                    c.P(lev);
-                    c.WriteLine("BitStream_EncodeNonNegativeInteger(pBitStrm, {0}-{1});", var, cn.m_rootRange.m_min);
                 }
                 else
-                {
-                    //                    ret.AddRange(PER.EncodeUnConstraintWholeNumber(Value));
-                    c.P(lev);
-                    c.WriteLine("BitStream_Encode2ndComplementInteger(pBitStrm, {0});", var);
-                }
+                    EncodeNormal(cn, c, var, lev);
+
+
 
             }
 
         }
 
+        private void EncodeNormal(PERIntegerEffectiveConstraint cn, StreamWriterLevel c, string var, int lev)
+        {
+            if (!cn.m_rootRange.m_minIsInfinite && !cn.m_rootRange.m_maxIsInfinite)
+            {
+                c.P(lev);
+                c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, {0}, {1}, {2});", var, C.L(cn.m_rootRange.m_min), C.L(cn.m_rootRange.m_max));
+            }
+            else if (!cn.m_rootRange.m_minIsInfinite && cn.m_rootRange.m_maxIsInfinite)
+            {
+                c.P(lev);
+                c.WriteLine("BitStream_EncodeSemiConstraintWholeNumber(pBitStrm, {0}, {1});", var, C.L(cn.m_rootRange.m_min));
+            }
+            else
+            {
+                c.P(lev);
+                c.WriteLine("BitStream_EncodeUnConstraintWholeNumber(pBitStrm, {0});", var);
+            }
+        }
+
+        internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            string var = varName;
+            if (varName.Contains("->"))
+                var = "&" + var;
+            PERIntegerEffectiveConstraint cn = cns as PERIntegerEffectiveConstraint;
+            if (cn == null) //unconstraint integer
+            {
+                c.P(lev);
+                c.WriteLine("ret = BitStream_DecodeUnConstraintWholeNumber(pBitStrm, {0});", var);
+            }
+            else
+            {
+                if (cn.Extensible)
+                {
+                    //                    throw new Exception("Extensions not yet implemented. Sorry !!");
+                }
+                else
+                    DecodeNormal(cn, c, var, lev);
+
+
+            }
+            c.P(lev);
+            c.WriteLine("if (!ret)");
+            c.P(lev + 1);
+            c.WriteLine("return FALSE;");
+
+        }
+
+        private void DecodeNormal(PERIntegerEffectiveConstraint cn, StreamWriterLevel c, string var, int lev)
+        {
+            if (!cn.m_rootRange.m_minIsInfinite && !cn.m_rootRange.m_maxIsInfinite)
+            {
+                c.P(lev);
+                c.WriteLine("ret = BitStream_DecodeConstraintWholeNumber(pBitStrm, {0}, {1}, {2});", var, C.L(cn.m_rootRange.m_min), C.L(cn.m_rootRange.m_max));
+            }
+            else if (!cn.m_rootRange.m_minIsInfinite && cn.m_rootRange.m_maxIsInfinite)
+            {
+                c.P(lev);
+                c.WriteLine("ret = BitStream_DecodeSemiConstraintWholeNumber(pBitStrm, {0}, {1});", var, C.L(cn.m_rootRange.m_min));
+            }
+            else
+            {
+                c.P(lev);
+                c.WriteLine("ret = BitStream_DecodeUnConstraintWholeNumber(pBitStrm, {0});", var);
+            }
+        }
     }
 
 
@@ -461,6 +536,15 @@ namespace tinyAsn1
             }
             return ret;
         }
+
+        public override string ToStringC()
+        {
+            string sx = "";
+            if (Math.Abs(Value) > Int32.MaxValue)
+                sx = "LL";
+            return ToString()+sx;
+        }
+
 
     }
 
