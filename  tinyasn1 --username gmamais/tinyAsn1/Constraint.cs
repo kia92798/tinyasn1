@@ -78,6 +78,7 @@ namespace tinyAsn1
         PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint { get;}
 
         string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev);
+        string PrintCIsRootConstraintValid(StreamWriterLevel c, string varName, int lev);
         void PrintCIsConstraintValidAux(StreamWriterLevel c);
     }
 
@@ -204,6 +205,11 @@ namespace tinyAsn1
         }
         public virtual void PrintCIsConstraintValidAux(StreamWriterLevel c)
         {
+        }
+
+        public virtual string PrintCIsRootConstraintValid(StreamWriterLevel c, string varName, int lev)
+        {
+            throw new Exception("The method or operation is not implemented.");
         }
     }
 
@@ -345,6 +351,10 @@ namespace tinyAsn1
             if (m_extConstr == null)
                 return m_constr.PrintCIsConstraintValid(c, varName, lev);
             return "(" + m_constr.PrintCIsConstraintValid(c, varName, lev) + "||" + m_extConstr.PrintCIsConstraintValid(c, varName, lev) + ")";
+        }
+        public override string PrintCIsRootConstraintValid(StreamWriterLevel c, string varName, int lev)
+        {
+            return m_constr.PrintCIsConstraintValid(c, varName, lev);
         }
     }
     

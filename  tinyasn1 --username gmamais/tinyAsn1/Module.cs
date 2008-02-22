@@ -510,6 +510,10 @@ namespace tinyAsn1
             m_value.PrintC(c, 0);
             c.WriteLine(";");
         }
+        public void PrintExternDeclaration(StreamWriterLevel h)
+        {
+            h.WriteLine("extern {0} {1};", C.ID(m_type.Name), C.ID(m_name));
+        }
     }
 
     public partial class TypeAssigment
