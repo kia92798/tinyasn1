@@ -1,0 +1,14 @@
+#!/bin/bash
+/etc/init.d/stupidVMWARE stop > /dev/null
+sleep 1
+OLDDATE="`date | sed 's/[A-Za-z]* //'`"
+date -s "Nov 21 00:00:00 EET 2007" > /dev/null
+/ossasn1/linux-glibc2.2.trial/8.2.0/bin/_asn1c  sample1.asn1 -uper -c -toed > /dev/null && \
+	gcc -Wall -o ossSample21.exe  -I. -I/ossasn1/linux-glibc2.2.trial/8.2.0/include/ \
+		-L/ossasn1/linux-glibc2.2.trial/8.2.0/lib/ -lm -ldl -lSDL -lpthread -losstoed \
+		-Wl,-R/ossasn1/linux-glibc2.2.trial/8.2.0/lib/ main2.c sample1.c && \
+	./ossSample21.exe || exit 1
+date -s "$OLDDATE" > /dev/null
+#rm -f ossSample1.exe sample1.c sample1.h 
+/etc/init.d/stupidVMWARE start > /dev/null
+exit 0
