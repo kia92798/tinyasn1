@@ -385,7 +385,17 @@ namespace tinyAsn1
             {
                 if (cn.Extensible)
                 {
-                    //                    throw new Exception("Extensions not yet implemented. Sorry !!");
+                    c.P(lev);
+                    c.WriteLine("if (!BitStream_ReadBit(pBitStrm, &ret)) /* read extension bit*/ ");
+                    c.P(lev + 1);
+                    c.WriteLine("return FALSE;");
+
+                    c.P(lev);
+                    c.WriteLine("if (ret==0) /* ext bit is zero ==> value is expecteted with root range*/");
+                    DecodeNormal(cn, c, var, lev+1);
+                    c.P(lev); c.WriteLine("else");
+                    c.P(lev+1);
+                    c.WriteLine("ret = BitStream_DecodeUnConstraintWholeNumber(pBitStrm, {0});", var);
                 }
                 else
                     DecodeNormal(cn, c, var, lev);
