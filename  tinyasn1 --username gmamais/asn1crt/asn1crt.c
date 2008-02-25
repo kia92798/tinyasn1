@@ -113,6 +113,7 @@ void BitStream_AppendBit(BitStream* pBitStrm, flag v)
 	}
 }
 
+
 flag BitStream_ReadBit(BitStream* pBitStrm, flag* v) 
 {
 	*v = pBitStrm->buf[pBitStrm->currentByte] | masks[pBitStrm->currentBit];
