@@ -342,25 +342,30 @@ flag BitStream_DecodeNonNegativeInteger(BitStream* pBitStrm, uint* v, int nBits)
 #endif
 }
 
-/*
+
 void BitStream_EncodeNonNegativeIntegerNeg(BitStream* pBitStrm, uint v, flag negate) 
 {
 #if WORD_SIZE==8
 	if (v<0x100000000LL)
 		BitStream_EncodeNonNegativeInteger32Neg(pBitStrm, (uint32)v, negate);
 	else {
+		int nBits;
 		uint32 hi = (uint32)(v>>32);
 		uint32 lo = (uint32)v;
 		BitStream_EncodeNonNegativeInteger32Neg(pBitStrm, hi, negate);
 
 		//bug !!!!
-		BitStream_EncodeNonNegativeInteger32Neg(pBitStrm, lo, negate);
+		if (negate)
+			lo = ~lo;
+		nBits = GetNumberOfBitsForNonNegativeInteger(lo);
+		BitStream_AppendNBitZero(pBitStrm, 32-nBits);
+		BitStream_EncodeNonNegativeInteger32Neg(pBitStrm, lo, 0);
 	}
 #else
 	BitStream_EncodeNonNegativeInteger32Neg(pBitStrm, v, negate);
 #endif
 }
-*/
+
 int GetNumberOfBitsForNonNegativeInteger32(uint32 v) 
 {
 	int ret=0;
@@ -561,8 +566,8 @@ void BitStream_EncodeUnConstraintWholeNumber(BitStream* pBitStrm, sint v)
 	}
 	else {
 		BitStream_AppendNBitOne(pBitStrm,nBytes*8-GetNumberOfBitsForNonNegativeInteger((uint)(-v-1)));
-		BitStream_EncodeNonNegativeInteger(pBitStrm,~(-v-1));
-//		BitStream_EncodeNonNegativeIntegerNeg(pBitStrm,-v-1, 1);
+//		BitStream_EncodeNonNegativeInteger(pBitStrm,~(-v-1));
+		BitStream_EncodeNonNegativeIntegerNeg(pBitStrm,-v-1, 1);
 	}
 }
 
