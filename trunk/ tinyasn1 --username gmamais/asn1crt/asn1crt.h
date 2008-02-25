@@ -33,7 +33,7 @@ typedef sint32 sint;
 #endif
 
 
-typedef uint flag;
+typedef int flag;
 typedef int BOOL;
 
 typedef char NullType;
