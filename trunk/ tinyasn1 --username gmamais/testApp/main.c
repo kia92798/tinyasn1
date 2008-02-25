@@ -14,6 +14,7 @@ int main(int argc, char* argv[])
 	int errorCode;
 	FILE* fp;
 	MyTestPDU decodePDU;
+	int i;
 
 	/* Encoding Part */
 	BitStream_Init(&bitStrm, perBuffer, MyTestPDU_REQUIRED_BYTES_FOR_ENCODING);
@@ -32,9 +33,13 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 	
-	if (fwrite(perBuffer,1,MyTestPDU_REQUIRED_BYTES_FOR_ENCODING,fp)!=MyTestPDU_REQUIRED_BYTES_FOR_ENCODING)
-		printf("fwrite failed!!\n");
+	fwrite(perBuffer,1,BitStream_GetLength(&bitStrm),fp);
 	fclose(fp);
+	for(i=0; i<BitStream_GetLength(&bitStrm);i++) 
+	{
+		unsigned char c = perBuffer[i];
+		printf("%02x\n",c);
+	}
 
 	/* Decoding Part*/
 
