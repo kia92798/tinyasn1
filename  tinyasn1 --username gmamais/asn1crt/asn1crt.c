@@ -83,7 +83,7 @@ void BitStream_AppendBitZero(BitStream* pBitStrm)
 void BitStream_AppendNBitZero(BitStream* pBitStrm, int nbits) 
 {
 	int totalBits = pBitStrm->currentBit + nbits;
-	pBitStrm->currentBit += totalBits % 8;
+	pBitStrm->currentBit = totalBits % 8;
 	pBitStrm->currentByte += totalBits / 8;
 }
 
@@ -117,7 +117,7 @@ void BitStream_AppendBit(BitStream* pBitStrm, flag v)
 
 flag BitStream_ReadBit(BitStream* pBitStrm, flag* v) 
 {
-	*v = pBitStrm->buf[pBitStrm->currentByte] | masks[pBitStrm->currentBit];
+	*v = pBitStrm->buf[pBitStrm->currentByte] & masks[pBitStrm->currentBit];
 	
 	if (pBitStrm->currentBit<7) 
 		pBitStrm->currentBit++;
