@@ -32,7 +32,8 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 	
-	fwrite(perBuffer,1,MyTestPDU_REQUIRED_BYTES_FOR_ENCODING,fp);
+	if (fwrite(perBuffer,1,MyTestPDU_REQUIRED_BYTES_FOR_ENCODING,fp)!=MyTestPDU_REQUIRED_BYTES_FOR_ENCODING)
+		printf("fwrite failed!!\n");
 	fclose(fp);
 
 	/* Decoding Part*/
