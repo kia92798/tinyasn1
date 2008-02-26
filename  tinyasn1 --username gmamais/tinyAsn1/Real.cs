@@ -198,7 +198,7 @@ namespace tinyAsn1
                 m_base = newBase;
                 //Let mantissa be 1
                 // then exponent is the logarithm of the input value.
-                //However, since we need the expoent to be stored in an INT we get the Floor 
+                //However, since we need the exponent to be stored in an INT we get the Floor 
                 // Floor return the largest integer less than or equal to the specified double-precision floating-point number
                 m_exponent = (Int64)Math.Floor(Math.Log(Math.Abs(d), m_base));
 

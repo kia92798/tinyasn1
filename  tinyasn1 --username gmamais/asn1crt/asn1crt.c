@@ -739,7 +739,7 @@ flag DecodeRealAsBinaryEncoding(BitStream* pBitStrm, int length, byte header, do
 	int factor=1;
 	int expLen;
 	int exp;
-	int N=0;
+	uint N=0;
 	int i;
 
 	if (header & 0x40)
