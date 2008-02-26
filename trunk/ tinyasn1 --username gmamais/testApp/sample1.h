@@ -13,11 +13,10 @@ extern "C" {
 /*
 Definition of :MyTestPDU
 */
-typedef sint  MyTestPDU;
+typedef double MyTestPDU;
 
-#define MyTestPDU_REQUIRED_BYTES_FOR_ENCODING		9
+#define MyTestPDU_REQUIRED_BYTES_FOR_ENCODING		12
 
-#define ERR_MyTestPDU_CONSTRAINT_FAILED		1000 /* (1..256,...,400) */
 
 void MyTestPDU_Initialize(MyTestPDU* pVal);
 flag MyTestPDU_IsConstraintValid(MyTestPDU* val, int* pErrCode);

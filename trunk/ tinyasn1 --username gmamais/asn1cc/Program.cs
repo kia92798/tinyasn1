@@ -13,8 +13,11 @@ using tinyAsn1;
 
 namespace asn1cc
 {
+
+    
     class Program
     {
+
         static int Main(string[] args)
         {
             if (System.Diagnostics.Debugger.IsAttached)

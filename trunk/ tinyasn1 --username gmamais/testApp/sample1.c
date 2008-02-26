@@ -15,11 +15,6 @@ void MyTestPDU_Initialize(MyTestPDU* pVal)
 flag MyTestPDU_IsConstraintValid(MyTestPDU* pVal, int* pErrCode)
 {
     flag ret;
-    ret =(((*pVal>=1) && (*pVal<=256))||(*pVal == 400));
-    if (!ret) {
-        *pErrCode = ERR_MyTestPDU_CONSTRAINT_FAILED;
-        return FALSE;
-    }
     return TRUE;
 }
 
@@ -27,25 +22,16 @@ flag MyTestPDU_Encode(MyTestPDU* pVal, BitStream* pBitStrm, int* pErrCode, flag 
 {
     if (bCheckConstraints && !MyTestPDU_IsConstraintValid(pVal, pErrCode))
         return FALSE;
-    if ((*pVal>=1) && (*pVal<=256)) {
-        BitStream_AppendBitZero(pBitStrm); /* value within root range, so ext bit is zero*/
-        BitStream_EncodeConstraintWholeNumber(pBitStrm, *pVal, 1, 256);
-    } else {
-        /* value is not within root range, so ext bit is one and value is encoded as uncostraint*/
-        BitStream_AppendBitOne(pBitStrm);
-        BitStream_EncodeUnConstraintWholeNumber(pBitStrm, *pVal);
-    }
+    BitStream_EncodeReal(pBitStrm, *pVal);
     return TRUE;
 }
 
 flag MyTestPDU_Decode(MyTestPDU* pVal, BitStream* pBitStrm, int* pErrCode)
 {
     flag ret;
-    ret = BitStream_DecodeConstraintWholeNumber(pBitStrm, pVal, 1, 256);
-    if (!ret)
-        return FALSE;
+    BitStream_DecodeReal(pBitStrm, pVal);
     return TRUE;
 }
 
 
-MyTestPDU testPDU = -256;
+MyTestPDU testPDU = 3.14159265;
