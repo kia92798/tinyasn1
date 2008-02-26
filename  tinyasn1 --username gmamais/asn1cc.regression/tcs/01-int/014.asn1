@@ -1,0 +1,7 @@
+CAR-PARTS DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+	MyTestPDU ::= INTEGER(-1|-2|-40..-8|-103)
+	
+	testPDU MyTestPDU ::= -32
+	
+END
