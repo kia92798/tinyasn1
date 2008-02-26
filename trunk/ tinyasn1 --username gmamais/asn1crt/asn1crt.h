@@ -101,6 +101,10 @@ void BitStream_EncodeSingleChar(BitStream* pBitStrm, char ch, CharSet* pCharSet)
 void BitStream_EncodeIA5String(BitStream* pBitStrm, char* string, IntegerRange* pIR1, flag ext, IntegerRange* pIR2, CharSet* pCharSet);
 
 
+
+void CalculateMantissaAndExponent(double d, int* exp, uint* mantissa);
+int GetNumberOfBitsForNonNegativeInteger(uint v);
+
 #ifdef  __cplusplus
 }
 #endif

@@ -1,5 +1,7 @@
 #include <string.h>
 #include <assert.h>
+#include <math.h>
+#include <float.h>
 
 #include "asn1crt.h"
 
@@ -566,7 +568,6 @@ void BitStream_EncodeUnConstraintWholeNumber(BitStream* pBitStrm, sint v)
 	}
 	else {
 		BitStream_AppendNBitOne(pBitStrm,nBytes*8-GetNumberOfBitsForNonNegativeInteger((uint)(-v-1)));
-//		BitStream_EncodeNonNegativeInteger(pBitStrm,~(-v-1));
 		BitStream_EncodeNonNegativeIntegerNeg(pBitStrm,-v-1, 1);
 	}
 }
@@ -575,7 +576,6 @@ flag BitStream_DecodeUnConstraintWholeNumber(BitStream* pBitStrm, sint* v)
 {
 	sint nBytes;
 	int i;
-	uint uv=0;
 	flag valIsNegative=FALSE;
 	*v=0;
 	
@@ -598,3 +598,192 @@ flag BitStream_DecodeUnConstraintWholeNumber(BitStream* pBitStrm, sint* v)
 	return TRUE;
 }
 
+
+
+/*
+            Bynary encoding will be used
+            REAL = M*B^E
+            where
+            M = S*N*2^F
+
+            ENCODING is done within three parts
+            part 1 is 1 byte header
+            part 2 is 1 or more byte for exponent
+            part 3 is 3 or more byte for mantissa (N)
+
+            First byte        
+            S :0-->+, S:1-->-1
+            Base will be always be 2 (implied by 6th and 5th bit which are zero)
+            ab: F  (0..3)
+            cd:00 --> 1 byte for exponent as 2's complement 
+            cd:01 --> 2 byte for exponent as 2's complement 
+            cd:10 --> 3 byte for exponent as 2's complement 
+            cd:11 --> 1 byte for encoding the length of the exponent, then the expoent 
+
+             8 7 6 5 4 3 2 1 
+            +-+-+-+-+-+-+-+-+
+            |1|S|0|0|a|b|c|d|
+            +-+-+-+-+-+-+-+-+
+*/
+
+
+void BitStream_EncodeReal(BitStream* pBitStrm, double v)
+{
+	byte header=0x80;
+	int nExpLen;
+	int nManLen;
+	int exp;
+	uint mantissa;
+
+
+	if (v==0.0) 
+	{
+		BitStream_EncodeConstraintWholeNumber(pBitStrm, 0, 0, 0xFF);
+		return;
+	}
+
+	if (v==HUGE_VAL) 
+	{
+		BitStream_EncodeConstraintWholeNumber(pBitStrm, 1, 0, 0xFF);
+		BitStream_EncodeConstraintWholeNumber(pBitStrm, 0x40, 0, 0xFF);
+		return;
+	}
+
+	if (v==-HUGE_VAL)
+	{
+		BitStream_EncodeConstraintWholeNumber(pBitStrm, 1, 0, 0xFF);
+		BitStream_EncodeConstraintWholeNumber(pBitStrm, 0x41, 0, 0xFF);
+		return;
+	}
+	if (v < 0) {
+        header |= 0x40;
+		v=-v;
+	}
+
+	CalculateMantissaAndExponent(v, &exp, &mantissa);
+	nExpLen = GetLengthInBytesOfSInt(exp);
+	nManLen = GetLengthInBytesOfUInt(mantissa);
+	assert(exp<=3);
+    if (nExpLen == 2)
+        header |= 1;
+    else if (nExpLen == 3)
+        header |= 2;
+
+
+	/* encode length */
+	BitStream_EncodeConstraintWholeNumber(pBitStrm, 1+nExpLen+nManLen, 0, 0xFF);
+
+	/* encode header */
+	BitStream_EncodeConstraintWholeNumber(pBitStrm, header, 0, 0xFF);
+
+	/* encode exponent */
+	if (exp>=0) {
+		BitStream_AppendNBitZero(pBitStrm,nExpLen*8-GetNumberOfBitsForNonNegativeInteger((uint)exp));
+		BitStream_EncodeNonNegativeInteger(pBitStrm,exp);
+	}
+	else {
+		BitStream_AppendNBitOne(pBitStrm,nExpLen*8-GetNumberOfBitsForNonNegativeInteger((uint)(-exp-1)));
+		BitStream_EncodeNonNegativeIntegerNeg(pBitStrm,-exp-1, 1);
+	}
+
+
+	/* encode mantissa */
+	BitStream_AppendNBitZero(pBitStrm,nManLen*8-GetNumberOfBitsForNonNegativeInteger((uint)(mantissa)));
+	BitStream_EncodeNonNegativeInteger(pBitStrm,mantissa);
+
+}
+
+flag DecodeRealAsBinaryEncoding(BitStream* pBitStrm, int length, byte header, double* v);
+flag DecodeRealUsingDecimalEncoding(BitStream* pBitStrm, int length, byte header, double* v);
+
+flag BitStream_DecodeReal(BitStream* pBitStrm, double* v)
+{
+	byte header;
+	byte length;
+
+	if (!BitStream_ReadByte(pBitStrm, &length))
+		return FALSE;
+	if (length == 0)
+	{
+		*v=0.0;
+		return TRUE;
+	}
+
+	if (!BitStream_ReadByte(pBitStrm, &header))
+		return FALSE;
+
+	if (header==0x40)
+	{
+		*v = HUGE_VAL;
+		return TRUE;
+	}
+
+	if (header==0x41)
+	{
+		*v = -HUGE_VAL;
+		return TRUE;
+	}
+	if (header & 0x80) 
+		return DecodeRealAsBinaryEncoding(pBitStrm, length-1, header, v);
+
+
+	return DecodeRealUsingDecimalEncoding(pBitStrm, length-1, header, v);
+}
+
+
+flag DecodeRealAsBinaryEncoding(BitStream* pBitStrm, int length, byte header, double* v)
+{
+	int sign=1;
+	int base=2;
+	int F;
+	int factor=1;
+	int expLen;
+	int exp;
+	int N=0;
+	int i;
+
+	if (header & 0x40)
+		sign = -1;
+	if (header & 0x10)
+		base = 8;
+	else if (header & 0x20)
+		base = 16;
+
+	F= (header & 0x0C)>>2;
+	factor<<=F;
+
+	expLen = (header & 0x03) + 1;
+
+	if (expLen>length)
+		return FALSE;
+
+	for(i=0;i<expLen;i++) {
+		byte b=0;
+		if (!BitStream_ReadByte(pBitStrm, &b))
+			return FALSE;
+		if (!i) {
+			if (b>0x7F)
+				exp=-1;
+		}
+		exp = exp<<8 | b;
+	}
+	length-=expLen;
+	
+	for(i=0;i<length;i++) {
+		byte b=0;
+		if (!BitStream_ReadByte(pBitStrm, &b))
+			return FALSE;
+		N = N<<8 | b;
+	}
+
+
+	*v = sign*N*factor * pow(base,exp);
+
+	return TRUE;
+}
+
+flag DecodeRealUsingDecimalEncoding(BitStream* pBitStrm, int length, byte header, double* v)
+{
+	assert(0);
+	return TRUE;
+}

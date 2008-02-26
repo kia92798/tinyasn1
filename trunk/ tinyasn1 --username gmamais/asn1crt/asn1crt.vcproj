@@ -150,6 +150,10 @@
 				RelativePath=".\asn1crt.c"
 				>
 			</File>
+			<File
+				RelativePath=".\real.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
