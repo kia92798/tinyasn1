@@ -65,8 +65,8 @@ void BitStream_AppendBitOne(BitStream* pBitStrm)
 	else {
 		pBitStrm->currentBit=0;
 		pBitStrm->currentByte++;
-		assert(pBitStrm->currentByte<pBitStrm->count);
 	}
+	assert(pBitStrm->currentByte*8+pBitStrm->currentBit<=pBitStrm->count*8);
 }
 
 void BitStream_AppendBitZero(BitStream* pBitStrm) 
@@ -76,8 +76,8 @@ void BitStream_AppendBitZero(BitStream* pBitStrm)
 	else {
 		pBitStrm->currentBit=0;
 		pBitStrm->currentByte++;
-		assert(pBitStrm->currentByte<pBitStrm->count);
 	}
+	assert(pBitStrm->currentByte*8+pBitStrm->currentBit<=pBitStrm->count*8);
 }
 
 void BitStream_AppendNBitZero(BitStream* pBitStrm, int nbits) 
@@ -110,8 +110,8 @@ void BitStream_AppendBit(BitStream* pBitStrm, flag v)
 	else {
 		pBitStrm->currentBit=0;
 		pBitStrm->currentByte++;
-		assert(pBitStrm->currentByte<pBitStrm->count);
 	}
+	assert(pBitStrm->currentByte*8+pBitStrm->currentBit<=pBitStrm->count*8);
 }
 
 
@@ -124,10 +124,8 @@ flag BitStream_ReadBit(BitStream* pBitStrm, flag* v)
 	else {
 		pBitStrm->currentBit=0;
 		pBitStrm->currentByte++;
-		assert(pBitStrm->currentByte<pBitStrm->count);
-		return pBitStrm->currentByte<pBitStrm->count;
 	}
-	return TRUE;
+	return pBitStrm->currentByte*8+pBitStrm->currentBit<=pBitStrm->count*8;
 }
 
 void BitStream_AppendByte(BitStream* pBitStrm, byte v, flag negate) 
@@ -137,7 +135,9 @@ void BitStream_AppendByte(BitStream* pBitStrm, byte v, flag negate)
 	if (negate)
 		v=~v;
 	pBitStrm->buf[pBitStrm->currentByte++] |=  v >> cb;
-	assert(pBitStrm->currentByte<pBitStrm->count);
+
+	assert(pBitStrm->currentByte*8+pBitStrm->currentBit<=pBitStrm->count*8);
+
 	if (cb)
 		pBitStrm->buf[pBitStrm->currentByte] |= v << ncb;
 
@@ -155,7 +155,7 @@ flag BitStream_ReadByte(BitStream* pBitStrm, byte* v)
 		*v |= pBitStrm->buf[pBitStrm->currentByte] >> ncb;
 	}
 
-	return pBitStrm->currentByte<pBitStrm->count;
+	return pBitStrm->currentByte*8+pBitStrm->currentBit<=pBitStrm->count*8;
 }
 
 
@@ -174,16 +174,16 @@ void BitStream_AppendPartialByte(BitStream* pBitStrm, byte v, byte nbits, flag n
 		if (pBitStrm->currentBit==8) {
 			pBitStrm->currentBit=0;
 			pBitStrm->currentByte++;
-			assert(pBitStrm->currentByte<pBitStrm->count);
 		}
 	} 
 	else {
 		totalBitsForNextByte = totalBits - 8;
 		pBitStrm->buf[pBitStrm->currentByte++] |= v >> totalBitsForNextByte;
-		assert(pBitStrm->currentByte<pBitStrm->count);
 		pBitStrm->buf[pBitStrm->currentByte] |= v << (8 - totalBitsForNextByte);
 		pBitStrm->currentBit = totalBitsForNextByte;
 	}
+	assert(pBitStrm->currentByte*8+pBitStrm->currentBit<=pBitStrm->count*8);
+
 }
 
 /* nbits 1..7*/
@@ -208,7 +208,7 @@ flag BitStream_ReadPartialByte(BitStream* pBitStrm, byte *v, byte nbits)
 		*v &= masksb[nbits];
 		pBitStrm->currentBit = totalBitsForNextByte;
 	}
-	return pBitStrm->currentByte<pBitStrm->count;
+	return pBitStrm->currentByte*8+pBitStrm->currentBit<=pBitStrm->count*8;
 }
 
 
@@ -473,12 +473,12 @@ void BitStream_Encode2ndComplementInteger(BitStream* pBitStrm, sint v)
 		BitStream_EncodeNonNegativeIntegerNeg(pBitStrm,-v-1, 1);
 	}
 }
-*/
 flag BitStream_Decode2ndComplementInteger(BitStream* pBitStrm, sint* v)
 {
 	assert(0);
 	return TRUE;
 }
+*/
 
  
 void BitStream_EncodeConstraintWholeNumber(BitStream* pBitStrm, sint v, sint min, sint max)
