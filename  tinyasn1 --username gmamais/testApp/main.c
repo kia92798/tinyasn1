@@ -16,7 +16,7 @@
 int main(int argc, char* argv[])
 {
 	BitStream bitStrm;
-	char perBuffer[MyTestPDU_REQUIRED_BYTES_FOR_ENCODING];
+	byte perBuffer[MyTestPDU_REQUIRED_BYTES_FOR_ENCODING];
 	int errorCode;
 	FILE* fp;
 	MyTestPDU decodePDU;

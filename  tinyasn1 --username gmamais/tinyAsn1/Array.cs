@@ -420,6 +420,17 @@ namespace tinyAsn1
         {
             return m_type.DependsOnlyOn(values);
         }
+
+        internal override void VarsNeededForPrintCInitialize(int lev, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+            string var = "i" + lev.ToString();
+            if (!existingVars.ContainsKey(var))
+            {
+                existingVars.Add(var, new CLocalVariable(var,"int",0,"0"));
+            }
+            m_type.VarsNeededForPrintCInitialize(lev + 1, existingVars);
+        }
+
         internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel c, string typeName, string varName, int lev)
         {
             long min = minItems(cns);
@@ -432,41 +443,39 @@ namespace tinyAsn1
             else
             {
                 prefix = varName + ".";
-                c.WriteLine();
-                c.P(lev);c.WriteLine("{");
-                lev++;
+                //c.WriteLine();
+                //c.P(lev);c.WriteLine("{");
+                //lev++;
             }
 
-            c.P(lev); c.WriteLine("int {0};", i);
-  //          if (min != max)
-            {
-                c.P(lev); 
-                c.WriteLine("{0}nCount = 0;", prefix);
-            }
+            //c.P(lev); c.WriteLine("int {0};", i);
+            c.P(lev); 
+            c.WriteLine("{0}nCount = 0;", prefix);
             
             c.P(lev); c.WriteLine("for({0}=0;{0}<{1};{0}++)", i, maxItems(cns));
             c.P(lev); c.WriteLine("{");
             m_type.PrintCInitialize(m_type.PEREffectiveConstraint, null, c, 
                 typeName+"_arr", prefix + "arr[" + i + "]", lev + 1);
             c.P(lev); c.WriteLine("}");
-            if (!topLevel)
-            {
-                lev--;
-                c.P(lev); c.WriteLine("}");
-                c.WriteLine();
-            }
+            //if (!topLevel)
+            //{
+            //    lev--;
+            //    c.P(lev); c.WriteLine("}");
+            //    c.WriteLine();
+            //}
         }
         internal override void PrintHConstraintConstant(StreamWriterLevel h, string name)
         {
             base.PrintHConstraintConstant(h, C.ID(name));
             m_type.PrintHConstraintConstant(h, C.ID(name) + "_elem");
         }
-
+/*
         internal override void PrintCIsConstraintValidAux(StreamWriterLevel c)
         {
             base.PrintCIsConstraintValidAux(c);
             m_type.PrintCIsConstraintValidAux(c);
         }
+ */ 
         internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev)
         {
             long min = minItems(cns);

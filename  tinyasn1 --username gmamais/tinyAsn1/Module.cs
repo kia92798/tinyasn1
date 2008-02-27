@@ -598,16 +598,31 @@ namespace tinyAsn1
             c.WriteLine();
             c.WriteLine("void {0}_Initialize({0}{1} pVal)", uniqueID,star);
             c.WriteLine("{");
+            c.WriteLine();
+            OrderedDictionary<string, CLocalVariable> localVars = new OrderedDictionary<string,CLocalVariable>();
+            m_type.VarsNeededForPrintCInitialize(1,localVars);
+            CLocalVariable.Print(c, localVars);
             m_type.PrintCInitialize(m_type.PEREffectiveConstraint, null, c, uniqueID, "pVal", 1);
             c.WriteLine("}");
             c.WriteLine();
 
-            m_type.PrintCIsConstraintValidAux(c);
+//            m_type.PrintCIsConstraintValidAux(c);
+            //print Constraints aux (used for FROM constraints)
+            foreach (Asn1Type t in m_type.GetMySelfAndAnyChildren<Asn1Type>())
+            {
+                if (t.m_constraints.Count > 0)
+                {
+                    for (int i = 0; i < t.m_constraints.Count; i++)
+                    {
+                        t.m_constraints[i].PrintCIsConstraintValidAux(c);
+                    }
+                }
+
+            }
 
             c.WriteLine();
             c.WriteLine("flag {0}_IsConstraintValid({0}{1} pVal, int* pErrCode)", uniqueID, star);
             c.WriteLine("{");
-            c.P(1); c.WriteLine("flag ret;");
             m_type.PrintCIsConstraintValid(m_type.PEREffectiveConstraint, c, uniqueID, uniqueID, "pVal", 1);
             c.P(1); c.WriteLine("return TRUE;");
             c.WriteLine("}");
@@ -626,8 +641,7 @@ namespace tinyAsn1
 
             c.WriteLine("flag {0}_Decode({0}{1} pVal, BitStream* pBitStrm, int* pErrCode)", uniqueID, star);
             c.WriteLine("{");
-            c.P(1); c.WriteLine("flag ret;");
-            m_type.PrintCDecode(m_type.PEREffectiveConstraint, c, uniqueID, "pVal", 1);
+            m_type.PrintCDecode(m_type.PEREffectiveConstraint, c, "pVal", 1);
             c.P(1); c.WriteLine("return TRUE;");
             c.WriteLine("}");
             c.WriteLine();

@@ -11,12 +11,63 @@ extern "C" {
 #endif
 
 /*
+Definition of :MyOct
+*/
+typedef struct {
+        long nCount;
+        byte arr[4];
+    } MyOct;
+
+#define MyOct_REQUIRED_BYTES_FOR_ENCODING		4
+
+#define ERR_MyOct		1000 /* (SIZE (4)) */
+
+void MyOct_Initialize(MyOct* pVal);
+flag MyOct_IsConstraintValid(MyOct* val, int* pErrCode);
+flag MyOct_Encode(MyOct* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag MyOct_Decode(MyOct* val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
+Definition of :MyBit
+*/
+typedef struct {
+        long nCount; /*Number of bits in the array. Max value is : 20 */
+        byte arr[3];
+    } MyBit;
+
+#define MyBit_REQUIRED_BYTES_FOR_ENCODING		3
+
+#define ERR_MyBit		1001 /* (SIZE (20)) */
+
+void MyBit_Initialize(MyBit* pVal);
+flag MyBit_IsConstraintValid(MyBit* val, int* pErrCode);
+flag MyBit_Encode(MyBit* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag MyBit_Decode(MyBit* val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
+Definition of :MyNull
+*/
+typedef NullType  MyNull;
+
+#define MyNull_REQUIRED_BYTES_FOR_ENCODING		0
+
+
+void MyNull_Initialize(MyNull* pVal);
+flag MyNull_IsConstraintValid(MyNull* val, int* pErrCode);
+flag MyNull_Encode(MyNull* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag MyNull_Decode(MyNull* val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
 Definition of :MyTestPDU
 */
-typedef double MyTestPDU;
+typedef sint  MyTestPDU;
 
-#define MyTestPDU_REQUIRED_BYTES_FOR_ENCODING		12
+#define MyTestPDU_REQUIRED_BYTES_FOR_ENCODING		1
 
+#define ERR_MyTestPDU		1002 /* ((1|2|3)) */
 
 void MyTestPDU_Initialize(MyTestPDU* pVal);
 flag MyTestPDU_IsConstraintValid(MyTestPDU* val, int* pErrCode);
@@ -24,7 +75,492 @@ flag MyTestPDU_Encode(MyTestPDU* val, BitStream* pBitStrm, int* pErrCode, flag b
 flag MyTestPDU_Decode(MyTestPDU* val, BitStream* pBitStrm, int* pErrCode);
 
 
+/*
+Definition of :MyInt2
+*/
+typedef sint  MyInt2;
+
+#define MyInt2_REQUIRED_BYTES_FOR_ENCODING		1
+
+#define ERR_MyInt2		1003 /* (10..100) */
+
+void MyInt2_Initialize(MyInt2* pVal);
+flag MyInt2_IsConstraintValid(MyInt2* val, int* pErrCode);
+flag MyInt2_Encode(MyInt2* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag MyInt2_Decode(MyInt2* val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
+Definition of :MyInt2b
+*/
+typedef sint  MyInt2b;
+
+#define MyInt2b_REQUIRED_BYTES_FOR_ENCODING		2
+
+#define ERR_MyInt2b		1004 /* ((10..100|200..<500)) */
+
+void MyInt2b_Initialize(MyInt2b* pVal);
+flag MyInt2b_IsConstraintValid(MyInt2b* val, int* pErrCode);
+flag MyInt2b_Encode(MyInt2b* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag MyInt2b_Decode(MyInt2b* val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
+Definition of :MyInt3
+*/
+typedef sint  MyInt3;
+
+#define MyInt3_REQUIRED_BYTES_FOR_ENCODING		9
+
+#define ERR_MyInt3		1005 /* (MIN..100) */
+
+void MyInt3_Initialize(MyInt3* pVal);
+flag MyInt3_IsConstraintValid(MyInt3* val, int* pErrCode);
+flag MyInt3_Encode(MyInt3* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag MyInt3_Decode(MyInt3* val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
+Definition of :MyInt4
+*/
+typedef sint  MyInt4;
+
+#define MyInt4_REQUIRED_BYTES_FOR_ENCODING		9
+
+#define ERR_MyInt4		1006 /* (20..MAX) */
+
+void MyInt4_Initialize(MyInt4* pVal);
+flag MyInt4_IsConstraintValid(MyInt4* val, int* pErrCode);
+flag MyInt4_Encode(MyInt4* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag MyInt4_Decode(MyInt4* val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
+Definition of :MyReal
+*/
+typedef double MyReal;
+
+#define MyReal_REQUIRED_BYTES_FOR_ENCODING		12
+
+
+void MyReal_Initialize(MyReal* pVal);
+flag MyReal_IsConstraintValid(MyReal* val, int* pErrCode);
+flag MyReal_Encode(MyReal* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag MyReal_Decode(MyReal* val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
+Definition of :MyEnum
+*/
+typedef enum {
+    alpha = 0,
+    beta = 1,
+    gamma = 2
+} MyEnum;
+
+#define MyEnum_REQUIRED_BYTES_FOR_ENCODING		1
+
+
+void MyEnum_Initialize(MyEnum* pVal);
+flag MyEnum_IsConstraintValid(MyEnum* val, int* pErrCode);
+flag MyEnum_Encode(MyEnum* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag MyEnum_Decode(MyEnum* val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
+Definition of :MyString
+*/
+typedef char MyString[11];
+
+#define MyString_REQUIRED_BYTES_FOR_ENCODING		7
+
+#define ERR_MyString		1007 /* (SIZE (1..10))(FROM (("A".."Z"|"abcde"))) */
+
+void MyString_Initialize(MyString pVal);
+flag MyString_IsConstraintValid(MyString val, int* pErrCode);
+flag MyString_Encode(MyString val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag MyString_Decode(MyString val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
+Definition of :MyBool
+*/
+typedef flag  MyBool;
+
+#define MyBool_REQUIRED_BYTES_FOR_ENCODING		1
+
+
+void MyBool_Initialize(MyBool* pVal);
+flag MyBool_IsConstraintValid(MyBool* val, int* pErrCode);
+flag MyBool_Encode(MyBool* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag MyBool_Decode(MyBool* val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
+Definition of :MyStruct
+*/
+typedef struct {
+    struct {
+        long nCount;
+        struct {
+            long nCount;
+            sint  arr[5];
+        } arr[4];
+    } mitsos;
+    sint  a1;
+    double b1;
+    MyEnum c;
+} MyStruct;
+
+#define MyStruct_REQUIRED_BYTES_FOR_ENCODING		40
+
+#define ERR_MyStruct_mitsos		1008 /* (SIZE (1..4)) */
+#define ERR_MyStruct_mitsos_elem		1009 /* (SIZE (1..5)) */
+#define ERR_MyStruct_mitsos_elem_elem		1010 /* (1..1000) */
+#define ERR_MyStruct_a1		1011 /* (1..10) */
+
+void MyStruct_Initialize(MyStruct* pVal);
+flag MyStruct_IsConstraintValid(MyStruct* val, int* pErrCode);
+flag MyStruct_Encode(MyStruct* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag MyStruct_Decode(MyStruct* val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
+Definition of :MyStruct2
+*/
+typedef struct {
+    sint  a2;
+    double b2;
+    MyEnum c2;
+} MyStruct2;
+
+#define MyStruct2_REQUIRED_BYTES_FOR_ENCODING		13
+
+#define ERR_MyStruct2_a2		1012 /* (1..10) */
+
+void MyStruct2_Initialize(MyStruct2* pVal);
+flag MyStruct2_IsConstraintValid(MyStruct2* val, int* pErrCode);
+flag MyStruct2_Encode(MyStruct2* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag MyStruct2_Decode(MyStruct2* val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
+Definition of :MyChoice
+*/
+typedef struct {
+    enum {
+        MyChoice_NONE,	/* No components present */
+        alpha_PRESENT,
+        beta_PRESENT,
+        octStr_PRESENT
+    } kind;
+    union {
+        MyStruct alpha;
+        MyStruct2 beta;
+        struct {
+            long nCount;
+            byte arr[4];
+        } octStr;
+    } u;
+} MyChoice;
+
+#define MyChoice_REQUIRED_BYTES_FOR_ENCODING		40
+
+#define ERR_MyChoice		1013 /*  */
+#define ERR_MyChoice_octStr		1014 /* (SIZE (4)) */
+
+void MyChoice_Initialize(MyChoice* pVal);
+flag MyChoice_IsConstraintValid(MyChoice* val, int* pErrCode);
+flag MyChoice_Encode(MyChoice* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag MyChoice_Decode(MyChoice* val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
+Definition of :Engine
+*/
+typedef struct {
+    sint  horsePower;
+    double fuelConsumption;
+    sint  co2Emissions;
+} Engine;
+
+#define Engine_REQUIRED_BYTES_FOR_ENCODING		15
+
+#define ERR_Engine_horsePower		1015 /* (0..1001) */
+#define ERR_Engine_co2Emissions		1016 /* (0..300) */
+
+void Engine_Initialize(Engine* pVal);
+flag Engine_IsConstraintValid(Engine* val, int* pErrCode);
+flag Engine_Encode(Engine* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag Engine_Decode(Engine* val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
+Definition of :Wheel
+*/
+typedef struct {
+    sint  radius;
+    sint  tread;
+} Wheel;
+
+#define Wheel_REQUIRED_BYTES_FOR_ENCODING		2
+
+#define ERR_Wheel_radius		1017 /* (5..40) */
+#define ERR_Wheel_tread		1018 /* (2..25) */
+
+void Wheel_Initialize(Wheel* pVal);
+flag Wheel_IsConstraintValid(Wheel* val, int* pErrCode);
+flag Wheel_Encode(Wheel* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag Wheel_Decode(Wheel* val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
+Definition of :SportEquipment
+*/
+typedef struct {
+    flag  aircondition;
+    flag  leatherSofas;
+    flag  xenonLights;
+} SportEquipment;
+
+#define SportEquipment_REQUIRED_BYTES_FOR_ENCODING		1
+
+
+void SportEquipment_Initialize(SportEquipment* pVal);
+flag SportEquipment_IsConstraintValid(SportEquipment* val, int* pErrCode);
+flag SportEquipment_Encode(SportEquipment* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag SportEquipment_Decode(SportEquipment* val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
+Definition of :ClassicEquipment
+*/
+typedef struct {
+    flag  aircondition;
+    flag  leatherSofas;
+} ClassicEquipment;
+
+#define ClassicEquipment_REQUIRED_BYTES_FOR_ENCODING		1
+
+
+void ClassicEquipment_Initialize(ClassicEquipment* pVal);
+flag ClassicEquipment_IsConstraintValid(ClassicEquipment* val, int* pErrCode);
+flag ClassicEquipment_Encode(ClassicEquipment* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag ClassicEquipment_Decode(ClassicEquipment* val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
+Definition of :ExtraEquipment
+*/
+typedef struct {
+    enum {
+        ExtraEquipment_NONE,	/* No components present */
+        ExtraEquipment_sport_PRESENT,
+        ExtraEquipment_classic_PRESENT
+    } kind;
+    union {
+        SportEquipment sport;
+        ClassicEquipment classic;
+    } u;
+} ExtraEquipment;
+
+#define ExtraEquipment_REQUIRED_BYTES_FOR_ENCODING		1
+
+#define ERR_ExtraEquipment		1019 /*  */
+
+void ExtraEquipment_Initialize(ExtraEquipment* pVal);
+flag ExtraEquipment_IsConstraintValid(ExtraEquipment* val, int* pErrCode);
+flag ExtraEquipment_Encode(ExtraEquipment* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag ExtraEquipment_Decode(ExtraEquipment* val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
+Definition of :Vehicle
+*/
+typedef struct {
+    MyString myStr;
+    Engine engine;
+    struct {
+        long nCount;
+        Wheel arr[4];
+    } wheels;
+    enum {
+        color_red = 0,
+        color_green = 1,
+        color_blue = 2,
+        color_black = 3
+    } color;
+    enum {
+        color2_red = 0,
+        color2_green = 1,
+        Vehicle_color2_blue = 2,
+        Vehicle_color2_black = 3
+    } color2;
+    char serialNumber[11];
+    ExtraEquipment extraEquipment;
+    struct {
+        sint  radius;
+        sint  tread;
+        struct {
+            sint  radius;
+            sint  tread;
+            struct {
+                long nCount;
+                sint  arr[10];
+            } intArray;
+            struct {
+                long nCount;
+                struct {
+                    long nCount;
+                    double arr[100];
+                } arr[10];
+            } intDoubleArray;
+            struct {
+                long nCount;
+                struct {
+                    long nCount;
+                    struct {
+                        sint  alpha;
+                        sint  beta;
+                        enum {
+                            orange = 0,
+                            brown = 1,
+                            arr_color2_blue = 2,
+                            arr_color2_black = 3
+                        } color2;
+                        struct {
+                                long nCount;
+                                byte arr[50];
+                            } octstr;
+                        struct {
+                                long nCount; /*Number of bits in the array. Max value is : 20 */
+                                byte arr[3];
+                            } bitstr;
+                        struct {
+                            unsigned int alpha:1;
+                            unsigned int color2:1;
+                        } exist;
+                    } arr[100];
+                } arr[10];
+            } intArryStruct;
+            struct {
+                unsigned int radius:1;
+            } exist;
+        } internal2;
+        struct {
+            unsigned int radius:1;
+            unsigned int internal2:1;
+        } exist;
+    } internal1;
+    struct {
+        long nCount;
+        struct {
+            long nCount;
+            struct {
+                enum {
+                    internalChoiceA_arr_NONE,	/* No components present */
+                    internalChoiceA_arr_sport_PRESENT,
+                    internalChoiceA_arr_classic_PRESENT,
+                    internalChoiceB_PRESENT
+                } kind;
+                union {
+                    SportEquipment sport;
+                    ClassicEquipment classic;
+                    struct {
+                    long nCount;
+                    struct {
+                        long nCount;
+                        struct {
+                            enum {
+                                internalChoiceB_arr_NONE,	/* No components present */
+                                internalChoiceB_arr_sport_PRESENT,
+                                internalChoiceB_arr_classic_PRESENT,
+                                octstr_PRESENT
+                            } kind;
+                            union {
+                                SportEquipment sport;
+                                ClassicEquipment classic;
+                                struct {
+                                    long nCount;
+                                    byte arr[50];
+                                } octstr;
+                            } u;
+                        } arr[9];
+                    } arr[20];
+                } internalChoiceB;
+                } u;
+            } arr[9];
+        } arr[20];
+    } internalChoiceA;
+    struct {
+        unsigned int color:1;
+        unsigned int color2:1;
+        unsigned int serialNumber:1;
+        unsigned int extraEquipment:1;
+    } exist;
+} Vehicle;
+
+#define Vehicle_REQUIRED_BYTES_FOR_ENCODING		1720110
+
+#define ERR_Vehicle_myStr		1020 /* (SIZE (2..6))(FROM ("ABC"))(SIZE (1..10))(FROM (("A".."Z"|"abcde"))) */
+#define ERR_Vehicle_wheels		1021 /* (SIZE (2..4)) */
+#define ERR_Vehicle_color		1022 /* ((red(0)|blue(2))) */
+#define ERR_Vehicle_color2		1023 /* ((red(0)|blue(2))) */
+#define ERR_Vehicle_serialNumber		1024 /* (SIZE (1..10)) */
+#define ERR_Vehicle_internal1_radius		1025 /* (5..40) */
+#define ERR_Vehicle_internal1_tread		1026 /* (2..25) */
+#define ERR_Vehicle_internal1_internal2_radius		1027 /* (5..40) */
+#define ERR_Vehicle_internal1_internal2_tread		1028 /* (2..25) */
+#define ERR_Vehicle_internal1_internal2_intArray		1029 /* (SIZE (10)) */
+#define ERR_Vehicle_internal1_internal2_intArray_elem		1030 /* (1..5) */
+#define ERR_Vehicle_internal1_internal2_intDoubleArray		1031 /* (SIZE (10)) */
+#define ERR_Vehicle_internal1_internal2_intDoubleArray_elem		1032 /* (SIZE (100)) */
+#define ERR_Vehicle_internal1_internal2_intDoubleArray_elem_elem		1033 /* (1..5) */
+#define ERR_Vehicle_internal1_internal2_intArryStruct		1034 /* (SIZE (10)) */
+#define ERR_Vehicle_internal1_internal2_intArryStruct_elem		1035 /* (SIZE (100)) */
+#define ERR_Vehicle_internal1_internal2_intArryStruct_elem_elem_alpha		1036 /* (5..40) */
+#define ERR_Vehicle_internal1_internal2_intArryStruct_elem_elem_beta		1037 /* (2..25) */
+#define ERR_Vehicle_internal1_internal2_intArryStruct_elem_elem_color2		1038 /* ((orange(0)|blue(2))) */
+#define ERR_Vehicle_internal1_internal2_intArryStruct_elem_elem_octstr		1039 /* (SIZE ((1..20|50))) */
+#define ERR_Vehicle_internal1_internal2_intArryStruct_elem_elem_bitstr		1040 /* (SIZE (5..20)) */
+#define ERR_Vehicle_internalChoiceA		1041 /* (SIZE (20)) */
+#define ERR_Vehicle_internalChoiceA_elem		1042 /* (SIZE (9)) */
+#define ERR_Vehicle_internalChoiceA_elem_elem		1043 /*  */
+#define ERR_Vehicle_internalChoiceA_elem_elem_internalChoiceB		1044 /* (SIZE (20)) */
+#define ERR_Vehicle_internalChoiceA_elem_elem_internalChoiceB_elem		1045 /* (SIZE (9)) */
+#define ERR_Vehicle_internalChoiceA_elem_elem_internalChoiceB_elem_elem		1046 /*  */
+#define ERR_Vehicle_internalChoiceA_elem_elem_internalChoiceB_elem_elem_octstr		1047 /* (SIZE ((1..20|50))) */
+
+void Vehicle_Initialize(Vehicle* pVal);
+flag Vehicle_IsConstraintValid(Vehicle* val, int* pErrCode);
+flag Vehicle_Encode(Vehicle* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag Vehicle_Decode(Vehicle* val, BitStream* pBitStrm, int* pErrCode);
+
+
+/*
+Definition of :DayProduction
+*/
+typedef struct {
+    long nCount;
+    Vehicle arr[500];
+} DayProduction;
+
+#define DayProduction_REQUIRED_BYTES_FOR_ENCODING		860054875
+
+#define ERR_DayProduction		1048 /* (SIZE (500)) */
+
+void DayProduction_Initialize(DayProduction* pVal);
+flag DayProduction_IsConstraintValid(DayProduction* val, int* pErrCode);
+flag DayProduction_Encode(DayProduction* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag DayProduction_Decode(DayProduction* val, BitStream* pBitStrm, int* pErrCode);
+
+
+extern MyOct mOct;
 extern MyTestPDU testPDU;
+extern MyReal ar;
+extern MyEnum myEnum;
+extern MyString str;
+extern MyBool myBool;
 #ifdef  __cplusplus
 }
 #endif

@@ -370,7 +370,7 @@ namespace tinyAsn1
             }
         }
 
-        internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
         {
             string var = varName;
             if (varName.Contains("->"))
@@ -379,34 +379,45 @@ namespace tinyAsn1
             if (cn == null) //unconstraint integer
             {
                 c.P(lev);
-                c.WriteLine("ret = BitStream_DecodeUnConstraintWholeNumber(pBitStrm, {0});", var);
+                c.WriteLine("if (!BitStream_DecodeUnConstraintWholeNumber(pBitStrm, {0})) {{", var);
+                c.P(lev+1);
+                c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+                c.P(lev + 1);
+                c.WriteLine("return FALSE;");
+                c.P(lev);
+                c.WriteLine("}");
             }
             else
             {
                 if (cn.Extensible)
                 {
                     c.P(lev);
-                    c.WriteLine("if (!BitStream_ReadBit(pBitStrm, &ret)) /* read extension bit*/ ");
+                    c.WriteLine("if (!BitStream_ReadBit(pBitStrm, &ret)) { /* read extension bit*/ ");
+                    c.P(lev + 1);
+                    c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
                     c.P(lev + 1);
                     c.WriteLine("return FALSE;");
+                    c.P(lev);
+                    c.WriteLine("}");
 
                     c.P(lev);
                     c.WriteLine("if (ret==0) /* ext bit is zero ==> value is expecteted with root range*/");
-                    DecodeNormal(cn, c, var, lev+1);
+                    DecodeNormal(cn, c, var, lev + 1);
                     c.P(lev); c.WriteLine("else");
                     c.P(lev+1);
-                    c.WriteLine("ret = BitStream_DecodeUnConstraintWholeNumber(pBitStrm, {0});", var);
+                    c.WriteLine("if (!BitStream_DecodeUnConstraintWholeNumber(pBitStrm, {0})) {{", var);
+                    c.P(lev + 1);
+                    c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+                    c.P(lev + 1);
+                    c.WriteLine("return FALSE;");
+                    c.P(lev);
+                    c.WriteLine("}");
                 }
                 else
                     DecodeNormal(cn, c, var, lev);
 
 
             }
-            c.P(lev);
-            c.WriteLine("if (!ret)");
-            c.P(lev + 1);
-            c.WriteLine("return FALSE;");
-
         }
 
         private void DecodeNormal(PERIntegerEffectiveConstraint cn, StreamWriterLevel c, string var, int lev)
@@ -414,18 +425,24 @@ namespace tinyAsn1
             if (!cn.m_rootRange.m_minIsInfinite && !cn.m_rootRange.m_maxIsInfinite)
             {
                 c.P(lev);
-                c.WriteLine("ret = BitStream_DecodeConstraintWholeNumber(pBitStrm, {0}, {1}, {2});", var, C.L(cn.m_rootRange.m_min), C.L(cn.m_rootRange.m_max));
+                c.WriteLine("if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, {0}, {1}, {2})) {{", var, C.L(cn.m_rootRange.m_min), C.L(cn.m_rootRange.m_max));
             }
             else if (!cn.m_rootRange.m_minIsInfinite && cn.m_rootRange.m_maxIsInfinite)
             {
                 c.P(lev);
-                c.WriteLine("ret = BitStream_DecodeSemiConstraintWholeNumber(pBitStrm, {0}, {1});", var, C.L(cn.m_rootRange.m_min));
+                c.WriteLine("if (!BitStream_DecodeSemiConstraintWholeNumber(pBitStrm, {0}, {1})) {{", var, C.L(cn.m_rootRange.m_min));
             }
             else
             {
                 c.P(lev);
-                c.WriteLine("ret = BitStream_DecodeUnConstraintWholeNumber(pBitStrm, {0});", var);
+                c.WriteLine("if (!BitStream_DecodeUnConstraintWholeNumber(pBitStrm, {0})) {{", var);
             }
+            c.P(lev + 1);
+            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+            c.P(lev + 1);
+            c.WriteLine("return FALSE;");
+            c.P(lev);
+            c.WriteLine("}");
         }
     }
 

@@ -280,4 +280,36 @@ namespace tinyAsn1
 
     }
 
+    public class CLocalVariable
+    {
+        public string varName = "";
+        public string type = "";
+        public int arrayLen = 0;
+        public string initVal = "";
+        public CLocalVariable(string VarName, string Type, int ArrayLen, string InitVal)
+        {
+            varName = VarName;
+            type = Type;
+            arrayLen = ArrayLen;
+            initVal = InitVal;
+        }
+        public static void Print(StreamWriterLevel c, OrderedDictionary<string, CLocalVariable> vars)
+        {
+            foreach (CLocalVariable v in vars.Values)
+            {
+                c.P(1);
+                if (v.arrayLen == 0)
+                {
+                    c.WriteLine("{0} {1} = {2};", v.type, v.varName, v.initVal);
+                }
+                else
+                {
+                    c.WriteLine("{0} {1}[{2}];", v.type, v.varName, v.arrayLen);
+                }
+            }
+            if (vars.Count > 0)
+                c.WriteLine();
+        }
+    }
+
 }

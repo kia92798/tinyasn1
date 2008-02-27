@@ -649,7 +649,7 @@ namespace tinyAsn1
 
         internal override void PrintHConstraintConstant(StreamWriterLevel h, string name)
         {
-            h.WriteLine("#define ERR_{0}_CONSTRAINT_FAILED\t\t{1} /* {2} */", C.ID(name), Asn1CompilerInvokation.Instance.ConstraintErrorID++, Constraints);
+            h.WriteLine("#define ERR_{0}\t\t{1} /* {2} */", C.ID(name), Asn1CompilerInvokation.Instance.ConstraintErrorID++, Constraints);
 //            base.PrintHConstraintConstant(h, name);
             foreach (ChoiceChild ch in m_children.Values)
             {
@@ -680,19 +680,20 @@ namespace tinyAsn1
             c.P(lev);
             c.WriteLine("default:");
             c.P(lev+1);
-            c.WriteLine("*pErrCode = ERR_{0}_CONSTRAINT_FAILED;", errorCode);
+            c.WriteLine("*pErrCode = ERR_{0};", errorCode);
             c.P(lev + 1);
             c.WriteLine("return FALSE;");
             c.P(lev); c.WriteLine("}");
                         
         }
+/*
         internal override void PrintCIsConstraintValidAux(StreamWriterLevel c)
         {
             base.PrintCIsConstraintValidAux(c);
             foreach (ChoiceChild ch in m_children.Values)
                 ch.m_type.PrintCIsConstraintValidAux(c);
         }
-
+*/
         internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
             int largestIndex = -1;
