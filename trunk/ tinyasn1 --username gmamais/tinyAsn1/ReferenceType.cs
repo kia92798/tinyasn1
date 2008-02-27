@@ -12,6 +12,7 @@ namespace tinyAsn1
         public string m_referencedModName = "";
 
 
+
         static public new ReferenceType CreateFromAntlrAst(ITree tree)
         {
             ReferenceType ret = new ReferenceType();
@@ -317,21 +318,25 @@ namespace tinyAsn1
                 cur = cur.ParentType;
             }
             if (nCount>0)
-                h.WriteLine("#define ERR_{0}_CONSTRAINT_FAILED\t\t{1} /* {2} */", C.ID(name), Asn1CompilerInvokation.Instance.ConstraintErrorID++, conConstraints);
+                h.WriteLine("#define ERR_{0}\t\t{1} /* {2} */", C.ID(name), Asn1CompilerInvokation.Instance.ConstraintErrorID++, conConstraints);
         }
 
         internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev)
         {
-            c.P(lev); c.Write("ret =");
+            c.P(lev); c.Write("if ( !");
             if ((Type is IA5StringType) || !varName.Contains("->"))
-                c.WriteLine("{0}_IsConstraintValid({1}, pErrCode);", C.ID(m_referencedTypeName), varName);
+                c.WriteLine("{0}_IsConstraintValid({1}, pErrCode) )", C.ID(m_referencedTypeName), varName);
             else
-                c.WriteLine("{0}_IsConstraintValid(&{1}, pErrCode);", C.ID(m_referencedTypeName), varName);
+                c.WriteLine("{0}_IsConstraintValid(&{1}, pErrCode) )", C.ID(m_referencedTypeName), varName);
 
             c.P(lev);
-            c.WriteLine("if (!ret)");
+            c.WriteLine("{");
+            //c.P(lev + 1);
+            //c.WriteLine("*pErrCode = ERR_{0};", C.ID(errorCode));
             c.P(lev + 1);
             c.WriteLine("return FALSE;");
+            c.P(lev);
+            c.WriteLine("}");
 
             base.PrintCIsConstraintValid(cns, c, errorCode, typeName, varName, lev);
             
@@ -347,9 +352,9 @@ namespace tinyAsn1
 
         }
 
-        internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
         {
-            base.PrintCDecode(cns, c, errorCode, varName, lev);
+            base.PrintCDecode(cns, c, varName, lev);
         }
     }
 }

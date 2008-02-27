@@ -61,6 +61,8 @@ typedef struct {
 } CharSet;
 
 
+#define ERR_INSUFFICIENT_DATA	101
+
 /* Bit strean functions */
 
 void BitStream_Init(BitStream* pBitStrm, unsigned char* buf, long count);

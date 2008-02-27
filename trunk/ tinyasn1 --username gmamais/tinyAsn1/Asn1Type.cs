@@ -786,6 +786,9 @@ namespace tinyAsn1
             return true;
         }
 
+        internal virtual void VarsNeededForPrintCInitialize(int lev, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+        }
 
         /// <summary>
         /// Initialize type. If there is a default value (i.e. as child of a sequence, or set), this value is used for 
@@ -804,9 +807,10 @@ namespace tinyAsn1
         internal virtual void PrintHConstraintConstant(StreamWriterLevel h, string name)
         {
             if (m_constraints.Count>0)
-                h.WriteLine("#define ERR_{0}_CONSTRAINT_FAILED\t\t{1} /* {2} */", C.ID(name), Asn1CompilerInvokation.Instance.ConstraintErrorID++, Constraints);
+                h.WriteLine("#define ERR_{0}\t\t{1} /* {2} */", C.ID(name), Asn1CompilerInvokation.Instance.ConstraintErrorID++, Constraints);
         }
-
+/*
+ 
         internal virtual void PrintCIsConstraintValidAux(StreamWriterLevel c)
         {
             if (m_constraints.Count > 0)
@@ -817,7 +821,7 @@ namespace tinyAsn1
                 }
             }
         }
-        
+*/        
  
         
 
@@ -830,7 +834,7 @@ namespace tinyAsn1
 
             if (m_constraints.Count > 0)
             {
-                c.P(lev); c.Write("ret =");
+                c.P(lev); c.Write("if ( !");
                 for (int i = 0; i < m_constraints.Count; i++)
                 {
                     string ret = m_constraints[i].PrintCIsConstraintValid(c, varName2, lev);
@@ -838,11 +842,9 @@ namespace tinyAsn1
                     if (i != m_constraints.Count - 1)
                         c.Write(" && ");
                 }
-                c.WriteLine(";");
-                c.P(lev);
-                c.WriteLine("if (!ret) {");
+                c.WriteLine(" ) {");
                 c.P(lev + 1);
-                c.WriteLine("*pErrCode = ERR_{0}_CONSTRAINT_FAILED;", C.ID(errorCode));
+                c.WriteLine("*pErrCode = ERR_{0};", C.ID(errorCode));
                 c.P(lev + 1);
                 c.WriteLine("return FALSE;");
                 c.P(lev);
@@ -858,7 +860,7 @@ namespace tinyAsn1
             c.WriteLine("assert(0);");
         }
         
-        internal virtual void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        internal virtual void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
         {
             //            throw new Exception("Abstract method called");
             c.P(lev);

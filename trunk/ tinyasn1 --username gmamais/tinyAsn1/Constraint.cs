@@ -832,7 +832,7 @@ namespace tinyAsn1
             
             Asn1Value val = Asn1Value.CreateFromAntlrAst(tree);
 //            val = type.ResolveVariable(val);
-            if ((type is IA5StringType) && ( ((IA5StringType)type).IamUsedInPermittedAlphabet))
+            if ((type.GetFinalType() is IA5StringType) && (((IA5StringType)type.GetFinalType()).IamUsedInPermittedAlphabet))
                 return new SinglePAValueConstraint(type, val);
             return new SingleValueConstraint(type, val);
         }
@@ -1028,7 +1028,7 @@ namespace tinyAsn1
                     maxValIsInclude = false;
             }
 
-            if ((type is IA5StringType) && (((IA5StringType)type).IamUsedInPermittedAlphabet))
+            if ((type.GetFinalType() is IA5StringType) && (((IA5StringType)type.GetFinalType()).IamUsedInPermittedAlphabet))
                 return new RangePAConstraint(type, minVal, maxVal, minValIsInclude, maxValIsInclude);
             return new RangeConstraint(type, minVal, maxVal, minValIsInclude, maxValIsInclude);
         }
@@ -1543,8 +1543,8 @@ namespace tinyAsn1
 
             c.WriteLine("flag CheckString{0}(const char* str)", AuxFunctionID);
             c.WriteLine("{");
-            c.P(1); c.WriteLine("int i;");
-            c.P(1); c.WriteLine("int n = strlen(str);");
+            c.P(1); c.WriteLine("size_t i;");
+            c.P(1); c.WriteLine("size_t n = strlen(str);");
             c.P(1);
             c.WriteLine("for(i=0;i<n;i++)");
             c.P(1); c.WriteLine("{");
