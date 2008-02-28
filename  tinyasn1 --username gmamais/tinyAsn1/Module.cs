@@ -602,7 +602,7 @@ namespace tinyAsn1
             OrderedDictionary<string, CLocalVariable> localVars = new OrderedDictionary<string,CLocalVariable>();
             m_type.VarsNeededForPrintCInitialize(1,localVars);
             CLocalVariable.Print(c, localVars);
-            m_type.PrintCInitialize(m_type.PEREffectiveConstraint, null, c, uniqueID, "pVal", 1);
+            m_type.PrintCInitialize(m_type.PEREffectiveConstraint, null, c, uniqueID, "pVal", 1,1);
             c.WriteLine("}");
             c.WriteLine();
 
@@ -623,17 +623,21 @@ namespace tinyAsn1
             c.WriteLine();
             c.WriteLine("flag {0}_IsConstraintValid({0}{1} pVal, int* pErrCode)", uniqueID, star);
             c.WriteLine("{");
-            m_type.PrintCIsConstraintValid(m_type.PEREffectiveConstraint, c, uniqueID, uniqueID, "pVal", 1);
+            localVars.Clear();
+            m_type.VarsNeededForIsConstraintValid(1, localVars);
+            CLocalVariable.Print(c, localVars);
+            m_type.PrintCIsConstraintValid(m_type.PEREffectiveConstraint, c, uniqueID, uniqueID, "pVal", 1, 1);
             c.P(1); c.WriteLine("return TRUE;");
             c.WriteLine("}");
             c.WriteLine();
 
             c.WriteLine("flag {0}_Encode({0}{1} pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints)", uniqueID, star);
             c.WriteLine("{");
+            localVars.Clear();
+            m_type.VarsNeededForEncode(1, localVars);
+            CLocalVariable.Print(c, localVars);
             c.P(1); c.WriteLine("if (bCheckConstraints && !{0}_IsConstraintValid(pVal, pErrCode))", uniqueID);
             c.P(2); c.WriteLine("return FALSE;");
-            
-
             m_type.PrintCEncode(m_type.PEREffectiveConstraint, c, uniqueID, "pVal", 1);
             c.P(1); c.WriteLine("return TRUE;");
             c.WriteLine("}");
@@ -641,6 +645,9 @@ namespace tinyAsn1
 
             c.WriteLine("flag {0}_Decode({0}{1} pVal, BitStream* pBitStrm, int* pErrCode)", uniqueID, star);
             c.WriteLine("{");
+            localVars.Clear();
+            m_type.VarsNeededForDecode(m_type.PEREffectiveConstraint, 1, localVars);
+            CLocalVariable.Print(c, localVars);
             m_type.PrintCDecode(m_type.PEREffectiveConstraint, c, "pVal", 1);
             c.P(1); c.WriteLine("return TRUE;");
             c.WriteLine("}");

@@ -274,7 +274,7 @@ namespace tinyAsn1
             h.Write("sint ");
         }
 
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defaultVal, StreamWriterLevel h, string typeName, string varName, int lev)
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defaultVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
         {
             bool topLevel = !varName.Contains("->");
             long defValue = 0;
@@ -370,6 +370,17 @@ namespace tinyAsn1
             }
         }
 
+        internal override void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+            PERIntegerEffectiveConstraint cn = cns as PERIntegerEffectiveConstraint;
+            if (cns != null && cn.Extensible)
+            {
+                if (!existingVars.ContainsKey("extBit"))
+                {
+                    existingVars.Add("extBit", new CLocalVariable("extBit","flag",0,"FALSE"));
+                }
+            }
+        }
         internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
         {
             string var = varName;
@@ -392,7 +403,7 @@ namespace tinyAsn1
                 if (cn.Extensible)
                 {
                     c.P(lev);
-                    c.WriteLine("if (!BitStream_ReadBit(pBitStrm, &ret)) { /* read extension bit*/ ");
+                    c.WriteLine("if (!BitStream_ReadBit(pBitStrm, &extBit)) { /* read extension bit*/ ");
                     c.P(lev + 1);
                     c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
                     c.P(lev + 1);
@@ -401,7 +412,7 @@ namespace tinyAsn1
                     c.WriteLine("}");
 
                     c.P(lev);
-                    c.WriteLine("if (ret==0) /* ext bit is zero ==> value is expecteted with root range*/");
+                    c.WriteLine("if (extBit==0) /* ext bit is zero ==> value is expecteted with root range*/");
                     DecodeNormal(cn, c, var, lev + 1);
                     c.P(lev); c.WriteLine("else");
                     c.P(lev+1);

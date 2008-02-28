@@ -212,12 +212,12 @@ typedef struct {
     MyEnum c;
 } MyStruct;
 
-#define MyStruct_REQUIRED_BYTES_FOR_ENCODING		40
+#define MyStruct_REQUIRED_BYTES_FOR_ENCODING		48
 
 #define ERR_MyStruct_mitsos		1008 /* (SIZE (1..4)) */
 #define ERR_MyStruct_mitsos_elem		1009 /* (SIZE (1..5)) */
 #define ERR_MyStruct_mitsos_elem_elem		1010 /* (1..1000) */
-#define ERR_MyStruct_a1		1011 /* (1..10) */
+#define ERR_MyStruct_a1		1011 /* (1..10,...) */
 
 void MyStruct_Initialize(MyStruct* pVal);
 flag MyStruct_IsConstraintValid(MyStruct* val, int* pErrCode);
@@ -264,7 +264,7 @@ typedef struct {
     } u;
 } MyChoice;
 
-#define MyChoice_REQUIRED_BYTES_FOR_ENCODING		40
+#define MyChoice_REQUIRED_BYTES_FOR_ENCODING		49
 
 #define ERR_MyChoice		1013 /*  */
 #define ERR_MyChoice_octStr		1014 /* (SIZE (4)) */

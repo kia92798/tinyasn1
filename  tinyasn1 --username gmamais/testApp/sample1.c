@@ -25,15 +25,31 @@ flag MyOct_IsConstraintValid(MyOct* pVal, int* pErrCode)
 
 flag MyOct_Encode(MyOct* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints)
 {
+    int i1 = 0;
+
     if (bCheckConstraints && !MyOct_IsConstraintValid(pVal, pErrCode))
         return FALSE;
-    BitStream_EncodeOctetString(pBitStrm, pVal->arr, pVal->nCount);
+    /* No need to encode length (it is fixed size (4)*/
+    for(i1=0;i1<pVal->nCount;i1++)
+    {
+        BitStream_AppendByte(pBitStrm, pVal->arr[i1], 0);
+    }
     return TRUE;
 }
 
 flag MyOct_Decode(MyOct* pVal, BitStream* pBitStrm, int* pErrCode)
 {
-    assert(0);
+    sint nCount = 0;
+    int i1 = 0;
+
+    pVal->nCount = 4;
+    for(i1=0;i1<pVal->nCount;i1++)
+    {
+        if ( !BitStream_ReadByte(pBitStrm, &pVal->arr[i1]) ) {
+            *pErrCode = ERR_INSUFFICIENT_DATA;
+            return FALSE;
+        }
+    }
     return TRUE;
 }
 
@@ -57,15 +73,26 @@ flag MyBit_IsConstraintValid(MyBit* pVal, int* pErrCode)
 
 flag MyBit_Encode(MyBit* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints)
 {
+    int i1 = 0;
+
     if (bCheckConstraints && !MyBit_IsConstraintValid(pVal, pErrCode))
         return FALSE;
-    BitStream_EncodeBitString(pBitStrm, pVal->arr, pVal->nCount);
+    /* No need to encode length (it is fixed size (20)*/
+    for(i1=0;i1<pVal->nCount;i1++)
+    {
+    }
     return TRUE;
 }
 
 flag MyBit_Decode(MyBit* pVal, BitStream* pBitStrm, int* pErrCode)
 {
-    assert(0);
+    sint nCount = 0;
+    int i1 = 0;
+
+    pVal->nCount = 20;
+    for(i1=0;i1<pVal->nCount;i1++)
+    {
+    }
     return TRUE;
 }
 
@@ -86,11 +113,13 @@ flag MyNull_Encode(MyNull* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheck
 {
     if (bCheckConstraints && !MyNull_IsConstraintValid(pVal, pErrCode))
         return FALSE;
+    /* NULL type */
     return TRUE;
 }
 
 flag MyNull_Decode(MyNull* pVal, BitStream* pBitStrm, int* pErrCode)
 {
+    /* NULL type */
     return TRUE;
 }
 
@@ -328,7 +357,24 @@ flag MyEnum_Encode(MyEnum* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheck
 
 flag MyEnum_Decode(MyEnum* pVal, BitStream* pBitStrm, int* pErrCode)
 {
-    assert(0);
+    sint enumIndex = 0;
+
+    if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &enumIndex, 0, 2)) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    switch(enumIndex)
+    {
+    case 0:
+        *pVal = alpha;
+        break;
+    case 1:
+        *pVal = beta;
+        break;
+    case 2:
+        *pVal = gamma;
+        break;
+    }
     return TRUE;
 }
 
@@ -362,21 +408,43 @@ flag MyString_IsConstraintValid(MyString pVal, int* pErrCode)
 
 flag MyString_Encode(MyString pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints)
 {
+    int i1 = 0;
+
     if (bCheckConstraints && !MyString_IsConstraintValid(pVal, pErrCode))
         return FALSE;
+    BitStream_EncodeConstraintWholeNumber(pBitStrm, strlen(pVal), 1, 10);
+    for(i1=0;i1<strlen(pVal);i1++)
     {
-        static IntegerRange ir1 = { 1, FALSE, TRUE, 10, FALSE, TRUE };
-        static CharSet cs = { 31, {0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,
+        static byte allowedCharSet[] = {0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,
                                     0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A,0x61,0x62,0x63,0x64,
-                                    0x65} };
-        BitStream_EncodeIA5String(pBitStrm, pVal, &ir1, FALSE, NULL, &cs);
+                                    0x65};
+        int charIndex = GetCharIndex(pVal[i1], allowedCharSet,31);
+        BitStream_EncodeConstraintWholeNumber(pBitStrm, charIndex, 0, 31);
     }
     return TRUE;
 }
 
 flag MyString_Decode(MyString pVal, BitStream* pBitStrm, int* pErrCode)
 {
-    assert(0);
+    sint nCount = 0;
+    int i1 = 0;
+
+    if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nCount, 1, 10)) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    for(i1=0;i1<nCount;i1++)
+    {
+        static byte allowedCharSet[] = {0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,
+                                    0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A,0x61,0x62,0x63,0x64,
+                                    0x65};
+        sint charIndex = 0;
+        if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &charIndex, 0, 31)) {
+            *pErrCode = ERR_INSUFFICIENT_DATA;
+            return FALSE;
+        }
+        pVal[i1] = (byte)allowedCharSet[charIndex];
+    }
     return TRUE;
 }
 
@@ -403,7 +471,10 @@ flag MyBool_Encode(MyBool* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheck
 
 flag MyBool_Decode(MyBool* pVal, BitStream* pBitStrm, int* pErrCode)
 {
-    assert(0);
+    if (!BitStream_ReadBit(pBitStrm, pVal)) { 
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
     return TRUE;
 }
 
@@ -431,36 +502,29 @@ void MyStruct_Initialize(MyStruct* pVal)
 
 flag MyStruct_IsConstraintValid(MyStruct* pVal, int* pErrCode)
 {
+    int i1 = 0;
+    int i2 = 0;
+
     if ( !((pVal->mitsos.nCount>=1) && (pVal->mitsos.nCount<=4)) ) {
         *pErrCode = ERR_MyStruct_mitsos;
         return FALSE;
     }
 
-
+    for(i1=0;i1<pVal->mitsos.nCount;i1++)
     {
-        int i1;
-        for(i1=0;i1<pVal->mitsos.nCount;i1++)
+        if ( !((pVal->mitsos.arr[i1].nCount>=1) && (pVal->mitsos.arr[i1].nCount<=5)) ) {
+            *pErrCode = ERR_MyStruct_mitsos_elem;
+            return FALSE;
+        }
+
+        for(i2=0;i2<pVal->mitsos.arr[i1].nCount;i2++)
         {
-            if ( !((pVal->mitsos.arr[i1].nCount>=1) && (pVal->mitsos.arr[i1].nCount<=5)) ) {
-                *pErrCode = ERR_MyStruct_mitsos_elem;
+            if ( !((pVal->mitsos.arr[i1].arr[i2]>=1) && (pVal->mitsos.arr[i1].arr[i2]<=1000)) ) {
+                *pErrCode = ERR_MyStruct_mitsos_elem_elem;
                 return FALSE;
             }
-
-
-            {
-                int i3;
-                for(i3=0;i3<pVal->mitsos.arr[i1].nCount;i3++)
-                {
-                    if ( !((pVal->mitsos.arr[i1].arr[i3]>=1) && (pVal->mitsos.arr[i1].arr[i3]<=1000)) ) {
-                        *pErrCode = ERR_MyStruct_mitsos_elem_elem;
-                        return FALSE;
-                    }
-                }
-            }
-
         }
     }
-
 
     if ( !((pVal->a1>=1) && (pVal->a1<=10)) ) {
         *pErrCode = ERR_MyStruct_a1;
@@ -478,34 +542,33 @@ flag MyStruct_IsConstraintValid(MyStruct* pVal, int* pErrCode)
 
 flag MyStruct_Encode(MyStruct* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints)
 {
+    int i1 = 0;
+    int i2 = 0;
+
     if (bCheckConstraints && !MyStruct_IsConstraintValid(pVal, pErrCode))
         return FALSE;
 
-
+    /*Encode mitsos (SEQUENCE OF)*/
+    BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->mitsos.nCount, 1, 4);
+    for(i1=0;i1<pVal->mitsos.nCount;i1++)
     {
-        int i1;
-
-        BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->mitsos.nCount, 1, 4);
-        for(i1=0;i1<pVal->mitsos.nCount;i1++)
+        /*Encode childlen : (SEQUENCE OF)*/
+        BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->mitsos.arr[i1].nCount, 1, 5);
+        for(i2=0;i2<pVal->mitsos.arr[i1].nCount;i2++)
         {
-            {
-                int i3;
-
-                BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->mitsos.arr[i1].nCount, 1, 5);
-                for(i3=0;i3<pVal->mitsos.arr[i1].nCount;i3++)
-                {
-                    BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->mitsos.arr[i1].arr[i3], 1, 1000);
-                }
-            }
-
+            /*Encode childlen : (INTEGER)*/
+            BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->mitsos.arr[i1].arr[i2], 1, 1000);
         }
     }
 
-
+    /*Encode a1 (INTEGER)*/
+    BitStream_AppendBitZero(pBitStrm); /* write extension bit*/
     BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->a1, 1, 10);
 
+    /*Encode b1 (REAL)*/
     BitStream_EncodeReal(pBitStrm, pVal->b1);
 
+    /*Encode c (MyEnum)*/
     MyEnum_Encode(&pVal->c, pBitStrm, pErrCode, FALSE);
 
     return TRUE;
@@ -513,21 +576,58 @@ flag MyStruct_Encode(MyStruct* pVal, BitStream* pBitStrm, int* pErrCode, flag bC
 
 flag MyStruct_Decode(MyStruct* pVal, BitStream* pBitStrm, int* pErrCode)
 {
-    {
-                assert(0);
+    sint nCount = 0;
+    int i1 = 0;
+    int i2 = 0;
+    flag extBit = FALSE;
 
+        /*Decode mitsos (SEQUENCE OF)*/
+    if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nCount, 1, 4)) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    pVal->mitsos.nCount = (long)nCount;
+    for(i1=0;i1<pVal->mitsos.nCount;i1++)
+    {
+        /*Decode childlen : (SEQUENCE OF)*/
+        if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nCount, 1, 5)) {
+            *pErrCode = ERR_INSUFFICIENT_DATA;
+            return FALSE;
+        }
+        pVal->mitsos.arr[i1].nCount = (long)nCount;
+        for(i2=0;i2<pVal->mitsos.arr[i1].nCount;i2++)
+        {
+            /*Decode childlen : (INTEGER)*/
+            if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->mitsos.arr[i1].arr[i2], 1, 1000)) {
+                *pErrCode = ERR_INSUFFICIENT_DATA;
+                return FALSE;
+            }
+        }
+    }
+    /*Decode a1 (INTEGER)*/
+    if (!BitStream_ReadBit(pBitStrm, &extBit)) { /* read extension bit*/ 
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    if (extBit==0) /* ext bit is zero ==> value is expecteted with root range*/
         if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->a1, 1, 10)) {
             *pErrCode = ERR_INSUFFICIENT_DATA;
             return FALSE;
         }
-
-        if (!BitStream_DecodeReal(pBitStrm, &pVal->b1)) {
-            *pErrCode = ERR_INSUFFICIENT_DATA;
-            return FALSE;
-        }
-
-        assert(0);
-
+    else
+        if (!BitStream_DecodeUnConstraintWholeNumber(pBitStrm, &pVal->a1)) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    /*Decode b1 (REAL)*/
+    if (!BitStream_DecodeReal(pBitStrm, &pVal->b1)) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    /*Decode c (MyEnum)*/
+    if ( !MyEnum_Decode(&pVal->c, pBitStrm, pErrCode) ) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
     }
     return TRUE;
 }
@@ -563,11 +663,13 @@ flag MyStruct2_Encode(MyStruct2* pVal, BitStream* pBitStrm, int* pErrCode, flag 
     if (bCheckConstraints && !MyStruct2_IsConstraintValid(pVal, pErrCode))
         return FALSE;
 
-
+    /*Encode a2 (INTEGER)*/
     BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->a2, 1, 10);
 
+    /*Encode b2 (REAL)*/
     BitStream_EncodeReal(pBitStrm, pVal->b2);
 
+    /*Encode c2 (MyEnum)*/
     MyEnum_Encode(&pVal->c2, pBitStrm, pErrCode, FALSE);
 
     return TRUE;
@@ -575,19 +677,20 @@ flag MyStruct2_Encode(MyStruct2* pVal, BitStream* pBitStrm, int* pErrCode, flag 
 
 flag MyStruct2_Decode(MyStruct2* pVal, BitStream* pBitStrm, int* pErrCode)
 {
-    {
-                if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->a2, 1, 10)) {
-            *pErrCode = ERR_INSUFFICIENT_DATA;
-            return FALSE;
-        }
-
-        if (!BitStream_DecodeReal(pBitStrm, &pVal->b2)) {
-            *pErrCode = ERR_INSUFFICIENT_DATA;
-            return FALSE;
-        }
-
-        assert(0);
-
+        /*Decode a2 (INTEGER)*/
+    if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->a2, 1, 10)) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    /*Decode b2 (REAL)*/
+    if (!BitStream_DecodeReal(pBitStrm, &pVal->b2)) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    /*Decode c2 (MyEnum)*/
+    if ( !MyEnum_Decode(&pVal->c2, pBitStrm, pErrCode) ) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
     }
     return TRUE;
 }
@@ -631,6 +734,8 @@ flag MyChoice_IsConstraintValid(MyChoice* pVal, int* pErrCode)
 
 flag MyChoice_Encode(MyChoice* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints)
 {
+    int i1 = 0;
+
     if (bCheckConstraints && !MyChoice_IsConstraintValid(pVal, pErrCode))
         return FALSE;
     switch(pVal->kind)
@@ -645,7 +750,11 @@ flag MyChoice_Encode(MyChoice* pVal, BitStream* pBitStrm, int* pErrCode, flag bC
         break;
     case octStr_PRESENT:
         BitStream_EncodeConstraintWholeNumber(pBitStrm, 2, 0, 2);
-        BitStream_EncodeOctetString(pBitStrm, pVal->u.octStr.arr, pVal->u.octStr.nCount);
+        /* No need to encode length (it is fixed size (4)*/
+        for(i1=0;i1<pVal->u.octStr.nCount;i1++)
+        {
+            BitStream_AppendByte(pBitStrm, pVal->u.octStr.arr[i1], 0);
+        }
         break;
     }
     return TRUE;
@@ -653,7 +762,39 @@ flag MyChoice_Encode(MyChoice* pVal, BitStream* pBitStrm, int* pErrCode, flag bC
 
 flag MyChoice_Decode(MyChoice* pVal, BitStream* pBitStrm, int* pErrCode)
 {
-    assert(0);
+    sint nChoiceIndex = 0;
+    sint nCount = 0;
+    int i1 = 0;
+
+    if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nChoiceIndex, 0, 2)) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    switch(nChoiceIndex)
+    {
+    case alpha_PRESENT:
+        if ( !MyStruct_Decode(&pVal->u.alpha, pBitStrm, pErrCode) ) {
+            *pErrCode = ERR_INSUFFICIENT_DATA;
+            return FALSE;
+        }
+        break;
+    case beta_PRESENT:
+        if ( !MyStruct2_Decode(&pVal->u.beta, pBitStrm, pErrCode) ) {
+            *pErrCode = ERR_INSUFFICIENT_DATA;
+            return FALSE;
+        }
+        break;
+    case octStr_PRESENT:
+        pVal->u.octStr.nCount = 4;
+        for(i1=0;i1<pVal->u.octStr.nCount;i1++)
+        {
+            if ( !BitStream_ReadByte(pBitStrm, &pVal->u.octStr.arr[i1]) ) {
+                *pErrCode = ERR_INSUFFICIENT_DATA;
+                return FALSE;
+            }
+        }
+        break;
+    }
     return TRUE;
 }
 
@@ -688,11 +829,13 @@ flag Engine_Encode(Engine* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheck
     if (bCheckConstraints && !Engine_IsConstraintValid(pVal, pErrCode))
         return FALSE;
 
-
+    /*Encode horsePower (INTEGER)*/
     BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->horsePower, 0, 1001);
 
+    /*Encode fuelConsumption (REAL)*/
     BitStream_EncodeReal(pBitStrm, pVal->fuelConsumption);
 
+    /*Encode co2Emissions (INTEGER)*/
     BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->co2Emissions, 0, 300);
 
     return TRUE;
@@ -700,22 +843,20 @@ flag Engine_Encode(Engine* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheck
 
 flag Engine_Decode(Engine* pVal, BitStream* pBitStrm, int* pErrCode)
 {
-    {
-                if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->horsePower, 0, 1001)) {
-            *pErrCode = ERR_INSUFFICIENT_DATA;
-            return FALSE;
-        }
-
-        if (!BitStream_DecodeReal(pBitStrm, &pVal->fuelConsumption)) {
-            *pErrCode = ERR_INSUFFICIENT_DATA;
-            return FALSE;
-        }
-
-        if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->co2Emissions, 0, 300)) {
-            *pErrCode = ERR_INSUFFICIENT_DATA;
-            return FALSE;
-        }
-
+        /*Decode horsePower (INTEGER)*/
+    if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->horsePower, 0, 1001)) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    /*Decode fuelConsumption (REAL)*/
+    if (!BitStream_DecodeReal(pBitStrm, &pVal->fuelConsumption)) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    /*Decode co2Emissions (INTEGER)*/
+    if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->co2Emissions, 0, 300)) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
     }
     return TRUE;
 }
@@ -749,9 +890,10 @@ flag Wheel_Encode(Wheel* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckCo
     if (bCheckConstraints && !Wheel_IsConstraintValid(pVal, pErrCode))
         return FALSE;
 
-
+    /*Encode radius (INTEGER)*/
     BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->radius, 5, 40);
 
+    /*Encode tread (INTEGER)*/
     BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->tread, 2, 25);
 
     return TRUE;
@@ -759,17 +901,15 @@ flag Wheel_Encode(Wheel* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckCo
 
 flag Wheel_Decode(Wheel* pVal, BitStream* pBitStrm, int* pErrCode)
 {
-    {
-                if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->radius, 5, 40)) {
-            *pErrCode = ERR_INSUFFICIENT_DATA;
-            return FALSE;
-        }
-
-        if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->tread, 2, 25)) {
-            *pErrCode = ERR_INSUFFICIENT_DATA;
-            return FALSE;
-        }
-
+        /*Decode radius (INTEGER)*/
+    if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->radius, 5, 40)) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    /*Decode tread (INTEGER)*/
+    if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->tread, 2, 25)) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
     }
     return TRUE;
 }
@@ -797,11 +937,13 @@ flag SportEquipment_Encode(SportEquipment* pVal, BitStream* pBitStrm, int* pErrC
     if (bCheckConstraints && !SportEquipment_IsConstraintValid(pVal, pErrCode))
         return FALSE;
 
-
+    /*Encode aircondition (BOOLEAN)*/
     BitStream_AppendBit(pBitStrm, pVal->aircondition);
 
+    /*Encode leatherSofas (BOOLEAN)*/
     BitStream_AppendBit(pBitStrm, pVal->leatherSofas);
 
+    /*Encode xenonLights (BOOLEAN)*/
     BitStream_AppendBit(pBitStrm, pVal->xenonLights);
 
     return TRUE;
@@ -809,13 +951,20 @@ flag SportEquipment_Encode(SportEquipment* pVal, BitStream* pBitStrm, int* pErrC
 
 flag SportEquipment_Decode(SportEquipment* pVal, BitStream* pBitStrm, int* pErrCode)
 {
-    {
-                assert(0);
-
-        assert(0);
-
-        assert(0);
-
+        /*Decode aircondition (BOOLEAN)*/
+    if (!BitStream_ReadBit(pBitStrm, &pVal->aircondition)) { 
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    /*Decode leatherSofas (BOOLEAN)*/
+    if (!BitStream_ReadBit(pBitStrm, &pVal->leatherSofas)) { 
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    /*Decode xenonLights (BOOLEAN)*/
+    if (!BitStream_ReadBit(pBitStrm, &pVal->xenonLights)) { 
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
     }
     return TRUE;
 }
@@ -841,9 +990,10 @@ flag ClassicEquipment_Encode(ClassicEquipment* pVal, BitStream* pBitStrm, int* p
     if (bCheckConstraints && !ClassicEquipment_IsConstraintValid(pVal, pErrCode))
         return FALSE;
 
-
+    /*Encode aircondition (BOOLEAN)*/
     BitStream_AppendBit(pBitStrm, pVal->aircondition);
 
+    /*Encode leatherSofas (BOOLEAN)*/
     BitStream_AppendBit(pBitStrm, pVal->leatherSofas);
 
     return TRUE;
@@ -851,11 +1001,15 @@ flag ClassicEquipment_Encode(ClassicEquipment* pVal, BitStream* pBitStrm, int* p
 
 flag ClassicEquipment_Decode(ClassicEquipment* pVal, BitStream* pBitStrm, int* pErrCode)
 {
-    {
-                assert(0);
-
-        assert(0);
-
+        /*Decode aircondition (BOOLEAN)*/
+    if (!BitStream_ReadBit(pBitStrm, &pVal->aircondition)) { 
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    /*Decode leatherSofas (BOOLEAN)*/
+    if (!BitStream_ReadBit(pBitStrm, &pVal->leatherSofas)) { 
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
     }
     return TRUE;
 }
@@ -911,7 +1065,27 @@ flag ExtraEquipment_Encode(ExtraEquipment* pVal, BitStream* pBitStrm, int* pErrC
 
 flag ExtraEquipment_Decode(ExtraEquipment* pVal, BitStream* pBitStrm, int* pErrCode)
 {
-    assert(0);
+    sint nChoiceIndex = 0;
+
+    if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nChoiceIndex, 0, 1)) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    switch(nChoiceIndex)
+    {
+    case ExtraEquipment_sport_PRESENT:
+        if ( !SportEquipment_Decode(&pVal->u.sport, pBitStrm, pErrCode) ) {
+            *pErrCode = ERR_INSUFFICIENT_DATA;
+            return FALSE;
+        }
+        break;
+    case ExtraEquipment_classic_PRESENT:
+        if ( !ClassicEquipment_Decode(&pVal->u.classic, pBitStrm, pErrCode) ) {
+            *pErrCode = ERR_INSUFFICIENT_DATA;
+            return FALSE;
+        }
+        break;
+    }
     return TRUE;
 }
 
@@ -991,6 +1165,11 @@ flag CheckString2(const char* str)
 
 flag Vehicle_IsConstraintValid(Vehicle* pVal, int* pErrCode)
 {
+    int i1 = 0;
+    int i2 = 0;
+    int i3 = 0;
+    int i4 = 0;
+
     if ( !MyString_IsConstraintValid(pVal->myStr, pErrCode) )
     {
         return FALSE;
@@ -1010,18 +1189,13 @@ flag Vehicle_IsConstraintValid(Vehicle* pVal, int* pErrCode)
         return FALSE;
     }
 
-
+    for(i1=0;i1<pVal->wheels.nCount;i1++)
     {
-        int i1;
-        for(i1=0;i1<pVal->wheels.nCount;i1++)
+        if ( !Wheel_IsConstraintValid(&pVal->wheels.arr[i1], pErrCode) )
         {
-            if ( !Wheel_IsConstraintValid(&pVal->wheels.arr[i1], pErrCode) )
-            {
-                return FALSE;
-            }
+            return FALSE;
         }
     }
-
 
     if ( !((pVal->color == color_red) || (pVal->color == color_blue)) ) {
         *pErrCode = ERR_Vehicle_color;
@@ -1068,101 +1242,76 @@ flag Vehicle_IsConstraintValid(Vehicle* pVal, int* pErrCode)
         return FALSE;
     }
 
-
+    for(i1=0;i1<pVal->internal1.internal2.intArray.nCount;i1++)
     {
-        int i1;
-        for(i1=0;i1<pVal->internal1.internal2.intArray.nCount;i1++)
-        {
-            if ( !((pVal->internal1.internal2.intArray.arr[i1]>=1) && (pVal->internal1.internal2.intArray.arr[i1]<=5)) ) {
-                *pErrCode = ERR_Vehicle_internal1_internal2_intArray_elem;
-                return FALSE;
-            }
+        if ( !((pVal->internal1.internal2.intArray.arr[i1]>=1) && (pVal->internal1.internal2.intArray.arr[i1]<=5)) ) {
+            *pErrCode = ERR_Vehicle_internal1_internal2_intArray_elem;
+            return FALSE;
         }
     }
-
 
     if ( !(pVal->internal1.internal2.intDoubleArray.nCount == 10) ) {
         *pErrCode = ERR_Vehicle_internal1_internal2_intDoubleArray;
         return FALSE;
     }
 
-
+    for(i1=0;i1<pVal->internal1.internal2.intDoubleArray.nCount;i1++)
     {
-        int i1;
-        for(i1=0;i1<pVal->internal1.internal2.intDoubleArray.nCount;i1++)
+        if ( !(pVal->internal1.internal2.intDoubleArray.arr[i1].nCount == 100) ) {
+            *pErrCode = ERR_Vehicle_internal1_internal2_intDoubleArray_elem;
+            return FALSE;
+        }
+
+        for(i2=0;i2<pVal->internal1.internal2.intDoubleArray.arr[i1].nCount;i2++)
         {
-            if ( !(pVal->internal1.internal2.intDoubleArray.arr[i1].nCount == 100) ) {
-                *pErrCode = ERR_Vehicle_internal1_internal2_intDoubleArray_elem;
+            if ( !((pVal->internal1.internal2.intDoubleArray.arr[i1].arr[i2]>=1) && (pVal->internal1.internal2.intDoubleArray.arr[i1].arr[i2]<=5)) ) {
+                *pErrCode = ERR_Vehicle_internal1_internal2_intDoubleArray_elem_elem;
                 return FALSE;
             }
-
-
-            {
-                int i3;
-                for(i3=0;i3<pVal->internal1.internal2.intDoubleArray.arr[i1].nCount;i3++)
-                {
-                    if ( !((pVal->internal1.internal2.intDoubleArray.arr[i1].arr[i3]>=1) && (pVal->internal1.internal2.intDoubleArray.arr[i1].arr[i3]<=5)) ) {
-                        *pErrCode = ERR_Vehicle_internal1_internal2_intDoubleArray_elem_elem;
-                        return FALSE;
-                    }
-                }
-            }
-
         }
     }
-
 
     if ( !(pVal->internal1.internal2.intArryStruct.nCount == 10) ) {
         *pErrCode = ERR_Vehicle_internal1_internal2_intArryStruct;
         return FALSE;
     }
 
-
+    for(i1=0;i1<pVal->internal1.internal2.intArryStruct.nCount;i1++)
     {
-        int i1;
-        for(i1=0;i1<pVal->internal1.internal2.intArryStruct.nCount;i1++)
+        if ( !(pVal->internal1.internal2.intArryStruct.arr[i1].nCount == 100) ) {
+            *pErrCode = ERR_Vehicle_internal1_internal2_intArryStruct_elem;
+            return FALSE;
+        }
+
+        for(i2=0;i2<pVal->internal1.internal2.intArryStruct.arr[i1].nCount;i2++)
         {
-            if ( !(pVal->internal1.internal2.intArryStruct.arr[i1].nCount == 100) ) {
-                *pErrCode = ERR_Vehicle_internal1_internal2_intArryStruct_elem;
+            if ( !((pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].alpha>=5) && (pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].alpha<=40)) ) {
+                *pErrCode = ERR_Vehicle_internal1_internal2_intArryStruct_elem_elem_alpha;
                 return FALSE;
             }
 
+            if ( !((pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].beta>=2) && (pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].beta<=25)) ) {
+                *pErrCode = ERR_Vehicle_internal1_internal2_intArryStruct_elem_elem_beta;
+                return FALSE;
+            }
 
-            {
-                int i3;
-                for(i3=0;i3<pVal->internal1.internal2.intArryStruct.arr[i1].nCount;i3++)
-                {
-                    if ( !((pVal->internal1.internal2.intArryStruct.arr[i1].arr[i3].alpha>=5) && (pVal->internal1.internal2.intArryStruct.arr[i1].arr[i3].alpha<=40)) ) {
-                        *pErrCode = ERR_Vehicle_internal1_internal2_intArryStruct_elem_elem_alpha;
-                        return FALSE;
-                    }
+            if ( !((pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].color2 == orange) || (pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].color2 == arr_color2_blue)) ) {
+                *pErrCode = ERR_Vehicle_internal1_internal2_intArryStruct_elem_elem_color2;
+                return FALSE;
+            }
 
-                    if ( !((pVal->internal1.internal2.intArryStruct.arr[i1].arr[i3].beta>=2) && (pVal->internal1.internal2.intArryStruct.arr[i1].arr[i3].beta<=25)) ) {
-                        *pErrCode = ERR_Vehicle_internal1_internal2_intArryStruct_elem_elem_beta;
-                        return FALSE;
-                    }
+            if ( !(((pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].octstr.nCount>=1) && (pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].octstr.nCount<=20)) || (pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].octstr.nCount == 50)) ) {
+                *pErrCode = ERR_Vehicle_internal1_internal2_intArryStruct_elem_elem_octstr;
+                return FALSE;
+            }
 
-                    if ( !((pVal->internal1.internal2.intArryStruct.arr[i1].arr[i3].color2 == orange) || (pVal->internal1.internal2.intArryStruct.arr[i1].arr[i3].color2 == arr_color2_blue)) ) {
-                        *pErrCode = ERR_Vehicle_internal1_internal2_intArryStruct_elem_elem_color2;
-                        return FALSE;
-                    }
-
-                    if ( !(((pVal->internal1.internal2.intArryStruct.arr[i1].arr[i3].octstr.nCount>=1) && (pVal->internal1.internal2.intArryStruct.arr[i1].arr[i3].octstr.nCount<=20)) || (pVal->internal1.internal2.intArryStruct.arr[i1].arr[i3].octstr.nCount == 50)) ) {
-                        *pErrCode = ERR_Vehicle_internal1_internal2_intArryStruct_elem_elem_octstr;
-                        return FALSE;
-                    }
-
-                    if ( !((pVal->internal1.internal2.intArryStruct.arr[i1].arr[i3].bitstr.nCount>=5) && (pVal->internal1.internal2.intArryStruct.arr[i1].arr[i3].bitstr.nCount<=20)) ) {
-                        *pErrCode = ERR_Vehicle_internal1_internal2_intArryStruct_elem_elem_bitstr;
-                        return FALSE;
-                    }
-
-                }
+            if ( !((pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].bitstr.nCount>=5) && (pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].bitstr.nCount<=20)) ) {
+                *pErrCode = ERR_Vehicle_internal1_internal2_intArryStruct_elem_elem_bitstr;
+                return FALSE;
             }
 
         }
     }
-
 
 
 
@@ -1171,103 +1320,89 @@ flag Vehicle_IsConstraintValid(Vehicle* pVal, int* pErrCode)
         return FALSE;
     }
 
-
+    for(i1=0;i1<pVal->internalChoiceA.nCount;i1++)
     {
-        int i1;
-        for(i1=0;i1<pVal->internalChoiceA.nCount;i1++)
+        if ( !(pVal->internalChoiceA.arr[i1].nCount == 9) ) {
+            *pErrCode = ERR_Vehicle_internalChoiceA_elem;
+            return FALSE;
+        }
+
+        for(i2=0;i2<pVal->internalChoiceA.arr[i1].nCount;i2++)
         {
-            if ( !(pVal->internalChoiceA.arr[i1].nCount == 9) ) {
-                *pErrCode = ERR_Vehicle_internalChoiceA_elem;
-                return FALSE;
-            }
-
-
+            switch(pVal->internalChoiceA.arr[i1].arr[i2].kind)
             {
-                int i3;
-                for(i3=0;i3<pVal->internalChoiceA.arr[i1].nCount;i3++)
+            case internalChoiceA_arr_sport_PRESENT:
+                if ( !SportEquipment_IsConstraintValid(&pVal->internalChoiceA.arr[i1].arr[i2].u.sport, pErrCode) )
                 {
-                    switch(pVal->internalChoiceA.arr[i1].arr[i3].kind)
-                    {
-                    case internalChoiceA_arr_sport_PRESENT:
-                        if ( !SportEquipment_IsConstraintValid(&pVal->internalChoiceA.arr[i1].arr[i3].u.sport, pErrCode) )
-                        {
-                            return FALSE;
-                        }
-                        break;
-                    case internalChoiceA_arr_classic_PRESENT:
-                        if ( !ClassicEquipment_IsConstraintValid(&pVal->internalChoiceA.arr[i1].arr[i3].u.classic, pErrCode) )
-                        {
-                            return FALSE;
-                        }
-                        break;
-                    case internalChoiceB_PRESENT:
-                        if ( !(pVal->internalChoiceA.arr[i1].arr[i3].u.internalChoiceB.nCount == 20) ) {
-                            *pErrCode = ERR_Vehicle_internalChoiceA_elem_elem_internalChoiceB;
-                            return FALSE;
-                        }
+                    return FALSE;
+                }
+                break;
+            case internalChoiceA_arr_classic_PRESENT:
+                if ( !ClassicEquipment_IsConstraintValid(&pVal->internalChoiceA.arr[i1].arr[i2].u.classic, pErrCode) )
+                {
+                    return FALSE;
+                }
+                break;
+            case internalChoiceB_PRESENT:
+                if ( !(pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.nCount == 20) ) {
+                    *pErrCode = ERR_Vehicle_internalChoiceA_elem_elem_internalChoiceB;
+                    return FALSE;
+                }
 
-
-                        {
-                            int i6;
-                            for(i6=0;i6<pVal->internalChoiceA.arr[i1].arr[i3].u.internalChoiceB.nCount;i6++)
-                            {
-                                if ( !(pVal->internalChoiceA.arr[i1].arr[i3].u.internalChoiceB.arr[i6].nCount == 9) ) {
-                                    *pErrCode = ERR_Vehicle_internalChoiceA_elem_elem_internalChoiceB_elem;
-                                    return FALSE;
-                                }
-
-
-                                {
-                                    int i8;
-                                    for(i8=0;i8<pVal->internalChoiceA.arr[i1].arr[i3].u.internalChoiceB.arr[i6].nCount;i8++)
-                                    {
-                                        switch(pVal->internalChoiceA.arr[i1].arr[i3].u.internalChoiceB.arr[i6].arr[i8].kind)
-                                        {
-                                        case internalChoiceB_arr_sport_PRESENT:
-                                            if ( !SportEquipment_IsConstraintValid(&pVal->internalChoiceA.arr[i1].arr[i3].u.internalChoiceB.arr[i6].arr[i8].u.sport, pErrCode) )
-                                            {
-                                                return FALSE;
-                                            }
-                                            break;
-                                        case internalChoiceB_arr_classic_PRESENT:
-                                            if ( !ClassicEquipment_IsConstraintValid(&pVal->internalChoiceA.arr[i1].arr[i3].u.internalChoiceB.arr[i6].arr[i8].u.classic, pErrCode) )
-                                            {
-                                                return FALSE;
-                                            }
-                                            break;
-                                        case octstr_PRESENT:
-                                            if ( !(((pVal->internalChoiceA.arr[i1].arr[i3].u.internalChoiceB.arr[i6].arr[i8].u.octstr.nCount>=1) && (pVal->internalChoiceA.arr[i1].arr[i3].u.internalChoiceB.arr[i6].arr[i8].u.octstr.nCount<=20)) || (pVal->internalChoiceA.arr[i1].arr[i3].u.internalChoiceB.arr[i6].arr[i8].u.octstr.nCount == 50)) ) {
-                                                *pErrCode = ERR_Vehicle_internalChoiceA_elem_elem_internalChoiceB_elem_elem_octstr;
-                                                return FALSE;
-                                            }
-                                            break;
-                                        default:
-                                            *pErrCode = ERR_Vehicle_internalChoiceA_elem_elem_internalChoiceB_elem_elem;
-                                            return FALSE;
-                                        }
-                                    }
-                                }
-
-                            }
-                        }
-
-                        break;
-                    default:
-                        *pErrCode = ERR_Vehicle_internalChoiceA_elem_elem;
+                for(i3=0;i3<pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.nCount;i3++)
+                {
+                    if ( !(pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].nCount == 9) ) {
+                        *pErrCode = ERR_Vehicle_internalChoiceA_elem_elem_internalChoiceB_elem;
                         return FALSE;
                     }
-                }
-            }
 
+                    for(i4=0;i4<pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].nCount;i4++)
+                    {
+                        switch(pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].arr[i4].kind)
+                        {
+                        case internalChoiceB_arr_sport_PRESENT:
+                            if ( !SportEquipment_IsConstraintValid(&pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].arr[i4].u.sport, pErrCode) )
+                            {
+                                return FALSE;
+                            }
+                            break;
+                        case internalChoiceB_arr_classic_PRESENT:
+                            if ( !ClassicEquipment_IsConstraintValid(&pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].arr[i4].u.classic, pErrCode) )
+                            {
+                                return FALSE;
+                            }
+                            break;
+                        case octstr_PRESENT:
+                            if ( !(((pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].arr[i4].u.octstr.nCount>=1) && (pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].arr[i4].u.octstr.nCount<=20)) || (pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].arr[i4].u.octstr.nCount == 50)) ) {
+                                *pErrCode = ERR_Vehicle_internalChoiceA_elem_elem_internalChoiceB_elem_elem_octstr;
+                                return FALSE;
+                            }
+                            break;
+                        default:
+                            *pErrCode = ERR_Vehicle_internalChoiceA_elem_elem_internalChoiceB_elem_elem;
+                            return FALSE;
+                        }
+                    }
+                }
+                break;
+            default:
+                *pErrCode = ERR_Vehicle_internalChoiceA_elem_elem;
+                return FALSE;
+            }
         }
     }
-
 
     return TRUE;
 }
 
 flag Vehicle_Encode(Vehicle* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints)
 {
+    int i1 = 0;
+    int i2 = 0;
+    int i3 = 0;
+    int i4 = 0;
+    int i5 = 0;
+
     if (bCheckConstraints && !Vehicle_IsConstraintValid(pVal, pErrCode))
         return FALSE;
     /* Encode Bit Mask for optional and default fields*/
@@ -1276,23 +1411,22 @@ flag Vehicle_Encode(Vehicle* pVal, BitStream* pBitStrm, int* pErrCode, flag bChe
     BitStream_AppendBit(pBitStrm, pVal->exist.serialNumber);
     BitStream_AppendBit(pBitStrm, pVal->exist.extraEquipment);
 
-
+    /*Encode myStr (MyString)*/
     MyString_Encode(pVal->myStr, pBitStrm, pErrCode, FALSE);
 
+    /*Encode engine (Engine)*/
     Engine_Encode(&pVal->engine, pBitStrm, pErrCode, FALSE);
 
+    /*Encode wheels (SEQUENCE OF)*/
+    BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->wheels.nCount, 2, 4);
+    for(i1=0;i1<pVal->wheels.nCount;i1++)
     {
-        int i1;
-
-        BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->wheels.nCount, 2, 4);
-        for(i1=0;i1<pVal->wheels.nCount;i1++)
-        {
-            Wheel_Encode(&pVal->wheels.arr[i1], pBitStrm, pErrCode, FALSE);
-        }
+        /*Encode childlen : (Wheel)*/
+        Wheel_Encode(&pVal->wheels.arr[i1], pBitStrm, pErrCode, FALSE);
     }
 
-
-    if ( pVal->exist.color )
+    /*Encode color (ENUMERATED)*/
+    if ( pVal->exist.color ) {
         switch(pVal->color)
         {
         case color_red:
@@ -1308,8 +1442,10 @@ flag Vehicle_Encode(Vehicle* pVal, BitStream* pBitStrm, int* pErrCode, flag bChe
             BitStream_EncodeConstraintWholeNumber(pBitStrm, 3, 0, 3);
             break;
         }
+    }
 
-    if ( pVal->exist.color2 )
+    /*Encode color2 (ENUMERATED)*/
+    if ( pVal->exist.color2 ) {
         switch(pVal->color2)
         {
         case color2_red:
@@ -1325,255 +1461,510 @@ flag Vehicle_Encode(Vehicle* pVal, BitStream* pBitStrm, int* pErrCode, flag bChe
             BitStream_EncodeConstraintWholeNumber(pBitStrm, 3, 0, 3);
             break;
         }
+    }
 
-    if ( pVal->exist.serialNumber )
+    /*Encode serialNumber (IA5String)*/
+    if ( pVal->exist.serialNumber ) {
+        BitStream_EncodeConstraintWholeNumber(pBitStrm, strlen(pVal->serialNumber), 1, 10);
+        for(i1=0;i1<strlen(pVal->serialNumber);i1++)
         {
-            static IntegerRange ir1 = { 1, FALSE, TRUE, 10, FALSE, TRUE };
-            BitStream_EncodeIA5String(pBitStrm, pVal->serialNumber, &ir1, FALSE, NULL, NULL);
+            static byte allowedCharSet[] = {0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,
+                                        0x0F,0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,
+                                        0x1E,0x1F,0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2A,0x2B,0x2C,
+                                        0x2D,0x2E,0x2F,0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x3A,0x3B,
+                                        0x3C,0x3D,0x3E,0x3F,0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,
+                                        0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,
+                                        0x5A,0x5B,0x5C,0x5D,0x5E,0x5F,0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67,0x68,
+                                        0x69,0x6A,0x6B,0x6C,0x6D,0x6E,0x6F,0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77,
+                                        0x78,0x79,0x7A,0x7B,0x7C,0x7D,0x7E,0x7F};
+            int charIndex = GetCharIndex(pVal->serialNumber[i1], allowedCharSet,128);
+            BitStream_EncodeConstraintWholeNumber(pBitStrm, charIndex, 0, 128);
         }
+    }
 
-    if ( pVal->exist.extraEquipment )
+    /*Encode extraEquipment (ExtraEquipment)*/
+    if ( pVal->exist.extraEquipment ) {
         ExtraEquipment_Encode(&pVal->extraEquipment, pBitStrm, pErrCode, FALSE);
+    }
 
+    /*Encode internal1 (SEQUENCE)*/
     /* Encode Bit Mask for optional and default fields*/
     BitStream_AppendBit(pBitStrm, pVal->internal1.exist.radius);
     BitStream_AppendBit(pBitStrm, pVal->internal1.exist.internal2);
 
-
-    if ( pVal->internal1.exist.radius )
+    /*Encode radius (INTEGER)*/
+    if ( pVal->internal1.exist.radius ) {
         BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->internal1.radius, 5, 40);
+    }
 
+    /*Encode tread (INTEGER)*/
     BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->internal1.tread, 2, 25);
 
-    if ( pVal->internal1.exist.internal2 )
+    /*Encode internal2 (SEQUENCE)*/
+    if ( pVal->internal1.exist.internal2 ) {
         /* Encode Bit Mask for optional and default fields*/
         BitStream_AppendBit(pBitStrm, pVal->internal1.internal2.exist.radius);
 
-
-        if ( pVal->internal1.internal2.exist.radius )
+        /*Encode radius (INTEGER)*/
+        if ( pVal->internal1.internal2.exist.radius ) {
             BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->internal1.internal2.radius, 5, 40);
+        }
 
+        /*Encode tread (INTEGER)*/
         BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->internal1.internal2.tread, 2, 25);
 
+        /*Encode intArray (SEQUENCE OF)*/
+        /* No need to encode length (it is fixed size (10)*/
+        for(i1=0;i1<pVal->internal1.internal2.intArray.nCount;i1++)
         {
-            int i2;
+            /*Encode childlen : (INTEGER)*/
+            BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->internal1.internal2.intArray.arr[i1], 1, 5);
+        }
 
-            /* No need to encode length (it is fixed size (10)*/
-            for(i2=0;i2<pVal->internal1.internal2.intArray.nCount;i2++)
+        /*Encode intDoubleArray (SEQUENCE OF)*/
+        /* No need to encode length (it is fixed size (10)*/
+        for(i1=0;i1<pVal->internal1.internal2.intDoubleArray.nCount;i1++)
+        {
+            /*Encode childlen : (SEQUENCE OF)*/
+            /* No need to encode length (it is fixed size (100)*/
+            for(i2=0;i2<pVal->internal1.internal2.intDoubleArray.arr[i1].nCount;i2++)
             {
-                BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->internal1.internal2.intArray.arr[i2], 1, 5);
+                /*Encode childlen : (REAL)*/
+                BitStream_EncodeReal(pBitStrm, pVal->internal1.internal2.intDoubleArray.arr[i1].arr[i2]);
             }
         }
 
-
+        /*Encode intArryStruct (SEQUENCE OF)*/
+        /* No need to encode length (it is fixed size (10)*/
+        for(i1=0;i1<pVal->internal1.internal2.intArryStruct.nCount;i1++)
         {
-            int i2;
-
-            /* No need to encode length (it is fixed size (10)*/
-            for(i2=0;i2<pVal->internal1.internal2.intDoubleArray.nCount;i2++)
+            /*Encode childlen : (SEQUENCE OF)*/
+            /* No need to encode length (it is fixed size (100)*/
+            for(i2=0;i2<pVal->internal1.internal2.intArryStruct.arr[i1].nCount;i2++)
             {
-                {
-                    int i4;
+                /*Encode childlen : (SEQUENCE)*/
+                /* Encode Bit Mask for optional and default fields*/
+                BitStream_AppendBit(pBitStrm, pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].exist.alpha);
+                BitStream_AppendBit(pBitStrm, pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].exist.color2);
 
-                    /* No need to encode length (it is fixed size (100)*/
-                    for(i4=0;i4<pVal->internal1.internal2.intDoubleArray.arr[i2].nCount;i4++)
+                /*Encode alpha (INTEGER)*/
+                if ( pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].exist.alpha ) {
+                    BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].alpha, 5, 40);
+                }
+
+                /*Encode beta (INTEGER)*/
+                BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].beta, 2, 25);
+
+                /*Encode color2 (ENUMERATED)*/
+                if ( pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].exist.color2 ) {
+                    switch(pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].color2)
                     {
-                        BitStream_EncodeReal(pBitStrm, pVal->internal1.internal2.intDoubleArray.arr[i2].arr[i4]);
+                    case orange:
+                        BitStream_EncodeConstraintWholeNumber(pBitStrm, 0, 0, 3);
+                        break;
+                    case brown:
+                        BitStream_EncodeConstraintWholeNumber(pBitStrm, 1, 0, 3);
+                        break;
+                    case arr_color2_blue:
+                        BitStream_EncodeConstraintWholeNumber(pBitStrm, 2, 0, 3);
+                        break;
+                    case arr_color2_black:
+                        BitStream_EncodeConstraintWholeNumber(pBitStrm, 3, 0, 3);
+                        break;
                     }
+                }
+
+                /*Encode octstr (OCTET STRING)*/
+                BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].octstr.nCount, 1, 50);
+                for(i3=0;i3<pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].octstr.nCount;i3++)
+                {
+                    BitStream_AppendByte(pBitStrm, pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].octstr.arr[i3], 0);
+                }
+
+                /*Encode bitstr (BIT STRING)*/
+                BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].bitstr.nCount, 5, 20);
+                for(i3=0;i3<pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].bitstr.nCount;i3++)
+                {
                 }
 
             }
         }
 
-
-        {
-            int i2;
-
-            /* No need to encode length (it is fixed size (10)*/
-            for(i2=0;i2<pVal->internal1.internal2.intArryStruct.nCount;i2++)
-            {
-                {
-                    int i4;
-
-                    /* No need to encode length (it is fixed size (100)*/
-                    for(i4=0;i4<pVal->internal1.internal2.intArryStruct.arr[i2].nCount;i4++)
-                    {
-                        /* Encode Bit Mask for optional and default fields*/
-                        BitStream_AppendBit(pBitStrm, pVal->internal1.internal2.intArryStruct.arr[i2].arr[i4].exist.alpha);
-                        BitStream_AppendBit(pBitStrm, pVal->internal1.internal2.intArryStruct.arr[i2].arr[i4].exist.color2);
-
-
-                        if ( pVal->internal1.internal2.intArryStruct.arr[i2].arr[i4].exist.alpha )
-                            BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->internal1.internal2.intArryStruct.arr[i2].arr[i4].alpha, 5, 40);
-
-                        BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->internal1.internal2.intArryStruct.arr[i2].arr[i4].beta, 2, 25);
-
-                        if ( pVal->internal1.internal2.intArryStruct.arr[i2].arr[i4].exist.color2 )
-                            switch(pVal->internal1.internal2.intArryStruct.arr[i2].arr[i4].color2)
-                            {
-                            case orange:
-                                BitStream_EncodeConstraintWholeNumber(pBitStrm, 0, 0, 3);
-                                break;
-                            case brown:
-                                BitStream_EncodeConstraintWholeNumber(pBitStrm, 1, 0, 3);
-                                break;
-                            case arr_color2_blue:
-                                BitStream_EncodeConstraintWholeNumber(pBitStrm, 2, 0, 3);
-                                break;
-                            case arr_color2_black:
-                                BitStream_EncodeConstraintWholeNumber(pBitStrm, 3, 0, 3);
-                                break;
-                            }
-
-                        BitStream_EncodeOctetString(pBitStrm, pVal->internal1.internal2.intArryStruct.arr[i2].arr[i4].octstr.arr, pVal->internal1.internal2.intArryStruct.arr[i2].arr[i4].octstr.nCount);
-
-                        BitStream_EncodeBitString(pBitStrm, pVal->internal1.internal2.intArryStruct.arr[i2].arr[i4].bitstr.arr, pVal->internal1.internal2.intArryStruct.arr[i2].arr[i4].bitstr.nCount);
-
-                    }
-                }
-
-            }
-        }
-
-
-
-
-    {
-        int i1;
-
-        /* No need to encode length (it is fixed size (20)*/
-        for(i1=0;i1<pVal->internalChoiceA.nCount;i1++)
-        {
-            {
-                int i3;
-
-                /* No need to encode length (it is fixed size (9)*/
-                for(i3=0;i3<pVal->internalChoiceA.arr[i1].nCount;i3++)
-                {
-                    switch(pVal->internalChoiceA.arr[i1].arr[i3].kind)
-                    {
-                    case internalChoiceA_arr_sport_PRESENT:
-                        BitStream_EncodeConstraintWholeNumber(pBitStrm, 0, 0, 2);
-                        SportEquipment_Encode(&pVal->internalChoiceA.arr[i1].arr[i3].u.sport, pBitStrm, pErrCode, FALSE);
-                        break;
-                    case internalChoiceA_arr_classic_PRESENT:
-                        BitStream_EncodeConstraintWholeNumber(pBitStrm, 1, 0, 2);
-                        ClassicEquipment_Encode(&pVal->internalChoiceA.arr[i1].arr[i3].u.classic, pBitStrm, pErrCode, FALSE);
-                        break;
-                    case internalChoiceB_PRESENT:
-                        BitStream_EncodeConstraintWholeNumber(pBitStrm, 2, 0, 2);
-                        {
-                            int i6;
-
-                            /* No need to encode length (it is fixed size (20)*/
-                            for(i6=0;i6<pVal->internalChoiceA.arr[i1].arr[i3].u.internalChoiceB.nCount;i6++)
-                            {
-                                {
-                                    int i8;
-
-                                    /* No need to encode length (it is fixed size (9)*/
-                                    for(i8=0;i8<pVal->internalChoiceA.arr[i1].arr[i3].u.internalChoiceB.arr[i6].nCount;i8++)
-                                    {
-                                        switch(pVal->internalChoiceA.arr[i1].arr[i3].u.internalChoiceB.arr[i6].arr[i8].kind)
-                                        {
-                                        case internalChoiceB_arr_sport_PRESENT:
-                                            BitStream_EncodeConstraintWholeNumber(pBitStrm, 0, 0, 2);
-                                            SportEquipment_Encode(&pVal->internalChoiceA.arr[i1].arr[i3].u.internalChoiceB.arr[i6].arr[i8].u.sport, pBitStrm, pErrCode, FALSE);
-                                            break;
-                                        case internalChoiceB_arr_classic_PRESENT:
-                                            BitStream_EncodeConstraintWholeNumber(pBitStrm, 1, 0, 2);
-                                            ClassicEquipment_Encode(&pVal->internalChoiceA.arr[i1].arr[i3].u.internalChoiceB.arr[i6].arr[i8].u.classic, pBitStrm, pErrCode, FALSE);
-                                            break;
-                                        case octstr_PRESENT:
-                                            BitStream_EncodeConstraintWholeNumber(pBitStrm, 2, 0, 2);
-                                            BitStream_EncodeOctetString(pBitStrm, pVal->internalChoiceA.arr[i1].arr[i3].u.internalChoiceB.arr[i6].arr[i8].u.octstr.arr, pVal->internalChoiceA.arr[i1].arr[i3].u.internalChoiceB.arr[i6].arr[i8].u.octstr.nCount);
-                                            break;
-                                        }
-                                    }
-                                }
-
-                            }
-                        }
-
-                        break;
-                    }
-                }
-            }
-
-        }
     }
 
+
+    /*Encode internalChoiceA (SEQUENCE OF)*/
+    /* No need to encode length (it is fixed size (20)*/
+    for(i1=0;i1<pVal->internalChoiceA.nCount;i1++)
+    {
+        /*Encode childlen : (SEQUENCE OF)*/
+        /* No need to encode length (it is fixed size (9)*/
+        for(i2=0;i2<pVal->internalChoiceA.arr[i1].nCount;i2++)
+        {
+            /*Encode childlen : (CHOICE)*/
+            switch(pVal->internalChoiceA.arr[i1].arr[i2].kind)
+            {
+            case internalChoiceA_arr_sport_PRESENT:
+                BitStream_EncodeConstraintWholeNumber(pBitStrm, 0, 0, 2);
+                SportEquipment_Encode(&pVal->internalChoiceA.arr[i1].arr[i2].u.sport, pBitStrm, pErrCode, FALSE);
+                break;
+            case internalChoiceA_arr_classic_PRESENT:
+                BitStream_EncodeConstraintWholeNumber(pBitStrm, 1, 0, 2);
+                ClassicEquipment_Encode(&pVal->internalChoiceA.arr[i1].arr[i2].u.classic, pBitStrm, pErrCode, FALSE);
+                break;
+            case internalChoiceB_PRESENT:
+                BitStream_EncodeConstraintWholeNumber(pBitStrm, 2, 0, 2);
+                /* No need to encode length (it is fixed size (20)*/
+                for(i3=0;i3<pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.nCount;i3++)
+                {
+                    /*Encode childlen : (SEQUENCE OF)*/
+                    /* No need to encode length (it is fixed size (9)*/
+                    for(i4=0;i4<pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].nCount;i4++)
+                    {
+                        /*Encode childlen : (CHOICE)*/
+                        switch(pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].arr[i4].kind)
+                        {
+                        case internalChoiceB_arr_sport_PRESENT:
+                            BitStream_EncodeConstraintWholeNumber(pBitStrm, 0, 0, 2);
+                            SportEquipment_Encode(&pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].arr[i4].u.sport, pBitStrm, pErrCode, FALSE);
+                            break;
+                        case internalChoiceB_arr_classic_PRESENT:
+                            BitStream_EncodeConstraintWholeNumber(pBitStrm, 1, 0, 2);
+                            ClassicEquipment_Encode(&pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].arr[i4].u.classic, pBitStrm, pErrCode, FALSE);
+                            break;
+                        case octstr_PRESENT:
+                            BitStream_EncodeConstraintWholeNumber(pBitStrm, 2, 0, 2);
+                            BitStream_EncodeConstraintWholeNumber(pBitStrm, pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].arr[i4].u.octstr.nCount, 1, 50);
+                            for(i5=0;i5<pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].arr[i4].u.octstr.nCount;i5++)
+                            {
+                                BitStream_AppendByte(pBitStrm, pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].arr[i4].u.octstr.arr[i5], 0);
+                            }
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+        }
+    }
 
     return TRUE;
 }
 
 flag Vehicle_Decode(Vehicle* pVal, BitStream* pBitStrm, int* pErrCode)
 {
+    byte bitMask[1];
+    sint nCount = 0;
+    int i1 = 0;
+    sint enumIndex = 0;
+    int i2 = 0;
+    int i3 = 0;
+    sint nChoiceIndex = 0;
+    int i4 = 0;
+    int i5 = 0;
+
+    if (!BitStream_ReadBits(pBitStrm, bitMask, 4))
+        return FALSE;
+    /*Decode myStr (MyString)*/
+    if ( !MyString_Decode(pVal->myStr, pBitStrm, pErrCode) ) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    /*Decode engine (Engine)*/
+    if ( !Engine_Decode(&pVal->engine, pBitStrm, pErrCode) ) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    /*Decode wheels (SEQUENCE OF)*/
+    if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nCount, 2, 4)) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    pVal->wheels.nCount = (long)nCount;
+    for(i1=0;i1<pVal->wheels.nCount;i1++)
     {
-        byte bitMask[1];
-        if (!BitStream_ReadBits(pBitStrm, bitMask, 4))
+        /*Decode childlen : (Wheel)*/
+        if ( !Wheel_Decode(&pVal->wheels.arr[i1], pBitStrm, pErrCode) ) {
+            *pErrCode = ERR_INSUFFICIENT_DATA;
             return FALSE;
-        assert(0);
-
-        assert(0);
-
-        assert(0);
-
-        if (bitMask[0] & 0x80)
-            assert(0);
-
-        if (bitMask[0] & 0x40)
-            assert(0);
-
-        if (bitMask[0] & 0x20)
-            assert(0);
-
-        if (bitMask[0] & 0x10)
-            assert(0);
-
+        }
+    }
+    /*Decode color (ENUMERATED)*/
+    if ((bitMask[0] & 0x80) != 0 ) {
+        if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &enumIndex, 0, 3)) {
+            *pErrCode = ERR_INSUFFICIENT_DATA;
+            return FALSE;
+        }
+        switch(enumIndex)
         {
-            byte bitMask[1];
-            if (!BitStream_ReadBits(pBitStrm, bitMask, 2))
-                return FALSE;
-            if (bitMask[0] & 0x80)
-                if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->internal1.radius, 5, 40)) {
-                    *pErrCode = ERR_INSUFFICIENT_DATA;
-                    return FALSE;
-                }
-
-            if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->internal1.tread, 2, 25)) {
+        case 0:
+            pVal->color = color_red;
+            break;
+        case 1:
+            pVal->color = color_green;
+            break;
+        case 2:
+            pVal->color = color_blue;
+            break;
+        case 3:
+            pVal->color = color_black;
+            break;
+        }
+    }
+    /*Decode color2 (ENUMERATED)*/
+    if ((bitMask[0] & 0x40) != 0 ) {
+        if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &enumIndex, 0, 3)) {
+            *pErrCode = ERR_INSUFFICIENT_DATA;
+            return FALSE;
+        }
+        switch(enumIndex)
+        {
+        case 0:
+            pVal->color2 = color2_red;
+            break;
+        case 1:
+            pVal->color2 = color2_green;
+            break;
+        case 2:
+            pVal->color2 = Vehicle_color2_blue;
+            break;
+        case 3:
+            pVal->color2 = Vehicle_color2_black;
+            break;
+        }
+    }
+    /*Decode serialNumber (IA5String)*/
+    if ((bitMask[0] & 0x20) != 0 ) {
+        if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nCount, 1, 10)) {
+            *pErrCode = ERR_INSUFFICIENT_DATA;
+            return FALSE;
+        }
+        for(i1=0;i1<nCount;i1++)
+        {
+            static byte allowedCharSet[] = {0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,
+                                        0x0F,0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,
+                                        0x1E,0x1F,0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2A,0x2B,0x2C,
+                                        0x2D,0x2E,0x2F,0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x3A,0x3B,
+                                        0x3C,0x3D,0x3E,0x3F,0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,
+                                        0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,
+                                        0x5A,0x5B,0x5C,0x5D,0x5E,0x5F,0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67,0x68,
+                                        0x69,0x6A,0x6B,0x6C,0x6D,0x6E,0x6F,0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77,
+                                        0x78,0x79,0x7A,0x7B,0x7C,0x7D,0x7E,0x7F};
+            sint charIndex = 0;
+            if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &charIndex, 0, 128)) {
                 *pErrCode = ERR_INSUFFICIENT_DATA;
                 return FALSE;
             }
-
-            if (bitMask[0] & 0x40)
-                {
-                    byte bitMask[1];
-                    if (!BitStream_ReadBits(pBitStrm, bitMask, 1))
-                        return FALSE;
-                    if (bitMask[0] & 0x80)
-                        if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->internal1.internal2.radius, 5, 40)) {
-                            *pErrCode = ERR_INSUFFICIENT_DATA;
-                            return FALSE;
-                        }
-
-                    if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->internal1.internal2.tread, 2, 25)) {
+            pVal->serialNumber[i1] = (byte)allowedCharSet[charIndex];
+        }
+    }
+    /*Decode extraEquipment (ExtraEquipment)*/
+    if ((bitMask[0] & 0x10) != 0 ) {
+        if ( !ExtraEquipment_Decode(&pVal->extraEquipment, pBitStrm, pErrCode) ) {
+            *pErrCode = ERR_INSUFFICIENT_DATA;
+            return FALSE;
+        }
+    }
+    /*Decode internal1 (SEQUENCE)*/
+    if (!BitStream_ReadBits(pBitStrm, bitMask, 2))
+        return FALSE;
+    /*Decode radius (INTEGER)*/
+    if ((bitMask[0] & 0x80) != 0 ) {
+        if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->internal1.radius, 5, 40)) {
+            *pErrCode = ERR_INSUFFICIENT_DATA;
+            return FALSE;
+        }
+    }
+    /*Decode tread (INTEGER)*/
+    if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->internal1.tread, 2, 25)) {
+        *pErrCode = ERR_INSUFFICIENT_DATA;
+        return FALSE;
+    }
+    /*Decode internal2 (SEQUENCE)*/
+    if ((bitMask[0] & 0x40) != 0 ) {
+        if (!BitStream_ReadBits(pBitStrm, bitMask, 1))
+            return FALSE;
+        /*Decode radius (INTEGER)*/
+        if ((bitMask[0] & 0x80) != 0 ) {
+            if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->internal1.internal2.radius, 5, 40)) {
+                *pErrCode = ERR_INSUFFICIENT_DATA;
+                return FALSE;
+            }
+        }
+        /*Decode tread (INTEGER)*/
+        if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->internal1.internal2.tread, 2, 25)) {
+            *pErrCode = ERR_INSUFFICIENT_DATA;
+            return FALSE;
+        }
+        /*Decode intArray (SEQUENCE OF)*/
+        pVal->internal1.internal2.intArray.nCount = 10;
+        for(i1=0;i1<pVal->internal1.internal2.intArray.nCount;i1++)
+        {
+            /*Decode childlen : (INTEGER)*/
+            if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->internal1.internal2.intArray.arr[i1], 1, 5)) {
+                *pErrCode = ERR_INSUFFICIENT_DATA;
+                return FALSE;
+            }
+        }
+        /*Decode intDoubleArray (SEQUENCE OF)*/
+        pVal->internal1.internal2.intDoubleArray.nCount = 10;
+        for(i1=0;i1<pVal->internal1.internal2.intDoubleArray.nCount;i1++)
+        {
+            /*Decode childlen : (SEQUENCE OF)*/
+            pVal->internal1.internal2.intDoubleArray.arr[i1].nCount = 100;
+            for(i2=0;i2<pVal->internal1.internal2.intDoubleArray.arr[i1].nCount;i2++)
+            {
+                /*Decode childlen : (REAL)*/
+                if (!BitStream_DecodeReal(pBitStrm, &pVal->internal1.internal2.intDoubleArray.arr[i1].arr[i2])) {
+                    *pErrCode = ERR_INSUFFICIENT_DATA;
+                    return FALSE;
+                }
+            }
+        }
+        /*Decode intArryStruct (SEQUENCE OF)*/
+        pVal->internal1.internal2.intArryStruct.nCount = 10;
+        for(i1=0;i1<pVal->internal1.internal2.intArryStruct.nCount;i1++)
+        {
+            /*Decode childlen : (SEQUENCE OF)*/
+            pVal->internal1.internal2.intArryStruct.arr[i1].nCount = 100;
+            for(i2=0;i2<pVal->internal1.internal2.intArryStruct.arr[i1].nCount;i2++)
+            {
+                /*Decode childlen : (SEQUENCE)*/
+                if (!BitStream_ReadBits(pBitStrm, bitMask, 2))
+                    return FALSE;
+                /*Decode alpha (INTEGER)*/
+                if ((bitMask[0] & 0x80) != 0 ) {
+                    if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].alpha, 5, 40)) {
                         *pErrCode = ERR_INSUFFICIENT_DATA;
                         return FALSE;
                     }
-
-                    assert(0);
-
-                    assert(0);
-
-                    assert(0);
-
                 }
-
+                /*Decode beta (INTEGER)*/
+                if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].beta, 2, 25)) {
+                    *pErrCode = ERR_INSUFFICIENT_DATA;
+                    return FALSE;
+                }
+                /*Decode color2 (ENUMERATED)*/
+                if ((bitMask[0] & 0x40) != 0 ) {
+                    if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &enumIndex, 0, 3)) {
+                        *pErrCode = ERR_INSUFFICIENT_DATA;
+                        return FALSE;
+                    }
+                    switch(enumIndex)
+                    {
+                    case 0:
+                        pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].color2 = orange;
+                        break;
+                    case 1:
+                        pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].color2 = brown;
+                        break;
+                    case 2:
+                        pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].color2 = arr_color2_blue;
+                        break;
+                    case 3:
+                        pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].color2 = arr_color2_black;
+                        break;
+                    }
+                }
+                /*Decode octstr (OCTET STRING)*/
+                if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nCount, 1, 50)) {
+                    *pErrCode = ERR_INSUFFICIENT_DATA;
+                    return FALSE;
+                }
+                pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].octstr.nCount = (long)nCount;
+                for(i3=0;i3<pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].octstr.nCount;i3++)
+                {
+                    if ( !BitStream_ReadByte(pBitStrm, &pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].octstr.arr[i3]) ) {
+                        *pErrCode = ERR_INSUFFICIENT_DATA;
+                        return FALSE;
+                    }
+                }
+                /*Decode bitstr (BIT STRING)*/
+                if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nCount, 5, 20)) {
+                    *pErrCode = ERR_INSUFFICIENT_DATA;
+                    return FALSE;
+                }
+                pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].bitstr.nCount = (long)nCount;
+                for(i3=0;i3<pVal->internal1.internal2.intArryStruct.arr[i1].arr[i2].bitstr.nCount;i3++)
+                {
+                }
+            }
         }
-
-        assert(0);
-
+    }
+    /*Decode internalChoiceA (SEQUENCE OF)*/
+    pVal->internalChoiceA.nCount = 20;
+    for(i1=0;i1<pVal->internalChoiceA.nCount;i1++)
+    {
+        /*Decode childlen : (SEQUENCE OF)*/
+        pVal->internalChoiceA.arr[i1].nCount = 9;
+        for(i2=0;i2<pVal->internalChoiceA.arr[i1].nCount;i2++)
+        {
+            /*Decode childlen : (CHOICE)*/
+            if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nChoiceIndex, 0, 2)) {
+                *pErrCode = ERR_INSUFFICIENT_DATA;
+                return FALSE;
+            }
+            switch(nChoiceIndex)
+            {
+            case internalChoiceA_arr_sport_PRESENT:
+                if ( !SportEquipment_Decode(&pVal->internalChoiceA.arr[i1].arr[i2].u.sport, pBitStrm, pErrCode) ) {
+                    *pErrCode = ERR_INSUFFICIENT_DATA;
+                    return FALSE;
+                }
+                break;
+            case internalChoiceA_arr_classic_PRESENT:
+                if ( !ClassicEquipment_Decode(&pVal->internalChoiceA.arr[i1].arr[i2].u.classic, pBitStrm, pErrCode) ) {
+                    *pErrCode = ERR_INSUFFICIENT_DATA;
+                    return FALSE;
+                }
+                break;
+            case internalChoiceB_PRESENT:
+                pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.nCount = 20;
+                for(i3=0;i3<pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.nCount;i3++)
+                {
+                    /*Decode childlen : (SEQUENCE OF)*/
+                    pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].nCount = 9;
+                    for(i4=0;i4<pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].nCount;i4++)
+                    {
+                        /*Decode childlen : (CHOICE)*/
+                        if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nChoiceIndex, 0, 2)) {
+                            *pErrCode = ERR_INSUFFICIENT_DATA;
+                            return FALSE;
+                        }
+                        switch(nChoiceIndex)
+                        {
+                        case internalChoiceB_arr_sport_PRESENT:
+                            if ( !SportEquipment_Decode(&pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].arr[i4].u.sport, pBitStrm, pErrCode) ) {
+                                *pErrCode = ERR_INSUFFICIENT_DATA;
+                                return FALSE;
+                            }
+                            break;
+                        case internalChoiceB_arr_classic_PRESENT:
+                            if ( !ClassicEquipment_Decode(&pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].arr[i4].u.classic, pBitStrm, pErrCode) ) {
+                                *pErrCode = ERR_INSUFFICIENT_DATA;
+                                return FALSE;
+                            }
+                            break;
+                        case octstr_PRESENT:
+                            if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nCount, 1, 50)) {
+                                *pErrCode = ERR_INSUFFICIENT_DATA;
+                                return FALSE;
+                            }
+                            pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].arr[i4].u.octstr.nCount = (long)nCount;
+                            for(i5=0;i5<pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].arr[i4].u.octstr.nCount;i5++)
+                            {
+                                if ( !BitStream_ReadByte(pBitStrm, &pVal->internalChoiceA.arr[i1].arr[i2].u.internalChoiceB.arr[i3].arr[i4].u.octstr.arr[i5]) ) {
+                                    *pErrCode = ERR_INSUFFICIENT_DATA;
+                                    return FALSE;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+        }
     }
     return TRUE;
 }
@@ -1594,7 +1985,8 @@ void DayProduction_Initialize(DayProduction* pVal)
 
 flag DayProduction_IsConstraintValid(DayProduction* pVal, int* pErrCode)
 {
-    int i1;
+    int i1 = 0;
+
     if ( !(pVal->nCount == 500) ) {
         *pErrCode = ERR_DayProduction;
         return FALSE;
@@ -1612,24 +2004,33 @@ flag DayProduction_IsConstraintValid(DayProduction* pVal, int* pErrCode)
 
 flag DayProduction_Encode(DayProduction* pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints)
 {
+    int i1 = 0;
+
     if (bCheckConstraints && !DayProduction_IsConstraintValid(pVal, pErrCode))
         return FALSE;
+    /* No need to encode length (it is fixed size (500)*/
+    for(i1=0;i1<pVal->nCount;i1++)
     {
-        int i1;
-
-        /* No need to encode length (it is fixed size (500)*/
-        for(i1=0;i1<pVal->nCount;i1++)
-        {
-            Vehicle_Encode(&pVal->arr[i1], pBitStrm, pErrCode, FALSE);
-        }
+        /*Encode childlen : (Vehicle)*/
+        Vehicle_Encode(&pVal->arr[i1], pBitStrm, pErrCode, FALSE);
     }
-
     return TRUE;
 }
 
 flag DayProduction_Decode(DayProduction* pVal, BitStream* pBitStrm, int* pErrCode)
 {
-    assert(0);
+    sint nCount = 0;
+    int i1 = 0;
+
+    pVal->nCount = 500;
+    for(i1=0;i1<pVal->nCount;i1++)
+    {
+        /*Decode childlen : (Vehicle)*/
+        if ( !Vehicle_Decode(&pVal->arr[i1], pBitStrm, pErrCode) ) {
+            *pErrCode = ERR_INSUFFICIENT_DATA;
+            return FALSE;
+        }
+    }
     return TRUE;
 }
 

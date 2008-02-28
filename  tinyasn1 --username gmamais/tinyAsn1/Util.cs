@@ -19,7 +19,12 @@ namespace tinyAsn1
             m_values.Add(value);
             m_keys.Add(key);
         }
-
+        public void Clear()
+        {
+            m_keys.Clear();
+            m_keyval.Clear();
+            m_values.Clear();
+        }
         public TValue this[TKey key] {
             get
             {
@@ -53,6 +58,7 @@ namespace tinyAsn1
         {
             return m_keyval.GetHashCode();
         }
+
     }
 
 
@@ -309,6 +315,16 @@ namespace tinyAsn1
             }
             if (vars.Count > 0)
                 c.WriteLine();
+        }
+
+        public static int GetArrayIndex(string varName)
+        {
+            int ret = 0;
+            foreach (char ch in varName.ToCharArray())
+                if (ch == '[')
+                    ret++;
+            return ret;
+
         }
     }
 

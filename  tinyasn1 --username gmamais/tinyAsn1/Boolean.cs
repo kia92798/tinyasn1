@@ -83,7 +83,7 @@ namespace tinyAsn1
         {
             h.Write("flag ");
         }
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defaultVal, StreamWriterLevel h, string typeName, string varName, int lev)
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defaultVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
         {
             bool topLevel = !varName.Contains("->");
             BooleanValue b = defaultVal as BooleanValue;
@@ -105,6 +105,23 @@ namespace tinyAsn1
                 c.WriteLine("BitStream_AppendBit(pBitStrm, *{0});", varName);
             else
                 c.WriteLine("BitStream_AppendBit(pBitStrm, {0});", varName);
+        }
+
+        internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            string var2 = varName;
+            if (varName.Contains("->"))
+                var2 = "&" + varName;
+            
+            c.P(lev);
+            c.WriteLine("if (!BitStream_ReadBit(pBitStrm, {0})) {{ ",var2);
+            c.P(lev + 1);
+            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+            c.P(lev + 1);
+            c.WriteLine("return FALSE;");
+            c.P(lev);
+            c.WriteLine("}");
+
         }
     }
 

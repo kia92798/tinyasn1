@@ -327,7 +327,7 @@ namespace tinyAsn1
             h.Write("}");
         }
 
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel c, string typeName, string varName, int lev)
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel c, string typeName, string varName, int lev, int arrayDepth)
         {
             long max = (long)Math.Ceiling((double)maxItems(cns) / 8.0);
             string i = "i" + lev.ToString();
@@ -341,7 +341,7 @@ namespace tinyAsn1
             c.P(lev); c.WriteLine("{0}nCount = 0;", prefix);
             c.P(lev); c.WriteLine("memset({0}arr,0x0,{1});", prefix, max);
         }
-
+/*
         internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
             string prefix = "";
@@ -354,8 +354,12 @@ namespace tinyAsn1
             c.P(lev);
             c.WriteLine("BitStream_EncodeBitString(pBitStrm, {0}arr, {0}nCount);",prefix);
         }
-    
-    
+
+        internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            base.PrintCDecode(cns, c, varName, lev);
+        }
+  */  
     
     }
 
