@@ -297,7 +297,7 @@ namespace tinyAsn1
             }
             return false;
         }
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev)
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
         {
             h.P(lev);
             if ((Type is IA5StringType) || !varName.Contains("->"))
@@ -321,7 +321,7 @@ namespace tinyAsn1
                 h.WriteLine("#define ERR_{0}\t\t{1} /* {2} */", C.ID(name), Asn1CompilerInvokation.Instance.ConstraintErrorID++, conConstraints);
         }
 
-        internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev)
+        internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev, int arrayDepth)
         {
             c.P(lev); c.Write("if ( !");
             if ((Type is IA5StringType) || !varName.Contains("->"))
@@ -338,7 +338,7 @@ namespace tinyAsn1
             c.P(lev);
             c.WriteLine("}");
 
-            base.PrintCIsConstraintValid(cns, c, errorCode, typeName, varName, lev);
+            base.PrintCIsConstraintValid(cns, c, errorCode, typeName, varName, lev, arrayDepth);
             
         }
 
@@ -354,7 +354,17 @@ namespace tinyAsn1
 
         internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
         {
-            base.PrintCDecode(cns, c, varName, lev);
+            c.P(lev);
+            if ((Type is IA5StringType) || !varName.Contains("->"))
+                c.WriteLine("if ( !{0}_Decode({1}, pBitStrm, pErrCode) ) {{", C.ID(m_referencedTypeName), varName);
+            else
+                c.WriteLine("if ( !{0}_Decode(&{1}, pBitStrm, pErrCode) ) {{", C.ID(m_referencedTypeName), varName);
+            c.P(lev + 1);
+            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+            c.P(lev + 1);
+            c.WriteLine("return FALSE;");
+            c.P(lev);
+            c.WriteLine("}");
         }
     }
 }

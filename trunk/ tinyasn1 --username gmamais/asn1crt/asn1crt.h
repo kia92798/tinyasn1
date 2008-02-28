@@ -46,19 +46,6 @@ typedef struct {
 	int currentBit; 
 } BitStream;
 
-typedef struct {
-	uint m_min;
-    flag m_minIsInfinite;
-    flag m_minIsIncluded;    
-    uint m_max;            
-    flag m_maxIsIncluded;
-    flag m_maxIsInfinite;
-} IntegerRange;
-
-typedef struct {
-	int nCount;
-	char pCharArray[];
-} CharSet;
 
 
 #define ERR_INSUFFICIENT_DATA	101
@@ -72,7 +59,7 @@ sint BitStream_GetLength(BitStream* pBitStrm);
 void BitStream_AppendBitOne(BitStream* pBitStrm);
 void BitStream_AppendBitZero(BitStream* pBitStrm);
 flag BitStream_ReadBit(BitStream* pBitStrm, flag* v);
-
+flag BitStream_ReadBits(BitStream* pBitStrm, byte* BuffToWrite, int nBitsToReas);
 
 /* Integer functions */
 
@@ -92,6 +79,7 @@ flag BitStream_DecodeConstraintWholeNumber(BitStream* pBitStrm, sint* v, sint mi
 void BitStream_EncodeReal(BitStream* pBitStrm, double v);
 flag BitStream_DecodeReal(BitStream* pBitStrm, double* v);
 
+/*
 void BitStream_EncodeBitString(BitStream* pBitStrm, byte* pBitString, long nBitsCount);
 flag BitStream_DecodeBitString(BitStream* pBitStrm, byte* pBitString, long* nBitsCount);
 
@@ -101,7 +89,7 @@ flag BitStream_DecodeOctetString(BitStream* pBitStrm, byte* pOctString, long* nO
 void BitStream_EncodeSingleChar(BitStream* pBitStrm, char ch, CharSet* pCharSet);
 
 void BitStream_EncodeIA5String(BitStream* pBitStrm, char* string, IntegerRange* pIR1, flag ext, IntegerRange* pIR2, CharSet* pCharSet);
-
+*/
 
 
 void CalculateMantissaAndExponent(double d, int* exp, uint* mantissa);

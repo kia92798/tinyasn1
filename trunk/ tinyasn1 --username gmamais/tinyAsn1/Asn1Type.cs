@@ -786,7 +786,7 @@ namespace tinyAsn1
             return true;
         }
 
-        internal virtual void VarsNeededForPrintCInitialize(int lev, OrderedDictionary<string, CLocalVariable> existingVars)
+        internal virtual void VarsNeededForPrintCInitialize(int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {
         }
 
@@ -799,7 +799,7 @@ namespace tinyAsn1
         /// <param name="typeName"></param>
         /// <param name="varName"></param>
         /// <param name="lev"></param>
-        internal virtual void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev)
+        internal virtual void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
         {
             throw new Exception("Abstract method called");
         }
@@ -821,12 +821,14 @@ namespace tinyAsn1
                 }
             }
         }
-*/        
- 
-        
+*/
+
+        internal virtual void VarsNeededForIsConstraintValid(int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+        }
 
 
-        internal virtual void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev)
+        internal virtual void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev, int arrayDepth)
         {
             string varName2 = varName;
             if (!varName.Contains("->"))
@@ -852,6 +854,9 @@ namespace tinyAsn1
             }
 
         }
+        internal virtual void VarsNeededForEncode(int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+        }
 
         internal virtual void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
@@ -859,7 +864,11 @@ namespace tinyAsn1
             c.P(lev);
             c.WriteLine("assert(0);");
         }
-        
+
+        internal virtual void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+
+        }
         internal virtual void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
         {
             //            throw new Exception("Abstract method called");

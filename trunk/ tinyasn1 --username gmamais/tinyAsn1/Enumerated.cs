@@ -398,7 +398,7 @@ namespace tinyAsn1
             h.P(lev);
             h.Write("}");
         }
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev)
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
         {
             bool topLevel = !varName.Contains("->");
             EnumeratedValue v = defauleVal as EnumeratedValue;
@@ -435,7 +435,48 @@ namespace tinyAsn1
             c.P(lev); c.WriteLine("}");
 
         }
+
+        internal override void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+            if (!existingVars.ContainsKey("enumIndex"))
+            {
+                existingVars.Add("enumIndex", new CLocalVariable("enumIndex", "sint", 0, "0"));
+            }
+        }
+        internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            string varName2 = varName;
+            if (!varName.Contains("->"))
+                varName2 = "*" + varName;
+
+            c.P(lev);
+            c.WriteLine("if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &enumIndex, {0}, {1})) {{", 0, RootItemsCount - 1);
+            c.P(lev + 1);
+            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+            c.P(lev + 1);
+            c.WriteLine("return FALSE;");
+            c.P(lev);
+            c.WriteLine("}");
+            c.P(lev);
+            c.WriteLine("switch(enumIndex)");
+            c.P(lev); c.WriteLine("{");
+            int index = 0;
+            foreach (Item it in m_enumValues.Values)
+            {
+                c.P(lev); c.WriteLine("case {0}:", index);
+                c.P(lev + 1);
+                c.WriteLine("{0} = {1};", varName2, it.CID);
+                c.P(lev + 1);
+                c.WriteLine("break;");
+                index++;
+            }
+
+            
+            c.P(lev); c.WriteLine("}");
+        }
     }
+
+   
 
 
     public partial class EnumeratedValue : Asn1Value

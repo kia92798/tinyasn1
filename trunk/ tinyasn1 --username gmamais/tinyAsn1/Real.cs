@@ -112,7 +112,7 @@ namespace tinyAsn1
         {
             h.Write("double");
         }
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defaultVal, StreamWriterLevel h, string typeName, string varName, int lev)
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defaultVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
         {
             bool topLevel = !varName.Contains("->");
             double defValue = 0;

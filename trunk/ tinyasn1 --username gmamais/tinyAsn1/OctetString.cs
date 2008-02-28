@@ -224,7 +224,7 @@ namespace tinyAsn1
             h.Write("}");
         }
 
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel c, string typeName, string varName, int lev)
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel c, string typeName, string varName, int lev, int arrayDepth)
         {
             long max = maxItems(cns);
             string i = "i" + lev.ToString();
@@ -239,6 +239,23 @@ namespace tinyAsn1
             c.P(lev); c.WriteLine("memset({0}arr,0x0,{1});", prefix, max);
         }
 
+        protected override void PrintCEncodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+            c.P(lev);
+            c.WriteLine("BitStream_AppendByte(pBitStrm, {0}, 0);",varName);
+        }
+        protected override void PrintCDecodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            c.P(lev);
+            c.WriteLine("if ( !BitStream_ReadByte(pBitStrm, &{0}) ) {{", varName);
+            c.P(lev + 1);
+            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+            c.P(lev + 1);
+            c.WriteLine("return FALSE;");
+            c.P(lev);
+            c.WriteLine("}");
+        }
+/*
         internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
             string prefix = "";
@@ -251,6 +268,7 @@ namespace tinyAsn1
             c.P(lev);
             c.WriteLine("BitStream_EncodeOctetString(pBitStrm, {0}arr, {0}nCount);", prefix);
         }
+ */ 
     }
 
 

@@ -836,7 +836,7 @@ namespace tinyAsn1
             }
         }
 
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel c, string typeName, string varName, int lev)
+        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel c, string typeName, string varName, int lev, int arrayDepth)
         {
             bool topLevel = !varName.Contains("->");
             string prefix = "";
@@ -847,8 +847,8 @@ namespace tinyAsn1
 
             foreach (Child ch in m_children.Values)
             {
-                ch.m_type.PrintCInitialize(ch.m_type.PEREffectiveConstraint, ch.m_defaultValue, c, 
-                    typeName + "_" + C.ID(ch.m_childVarName), prefix + C.ID(ch.m_childVarName), lev);
+                ch.m_type.PrintCInitialize(ch.m_type.PEREffectiveConstraint, ch.m_defaultValue, c,
+                    typeName + "_" + C.ID(ch.m_childVarName), prefix + C.ID(ch.m_childVarName), lev, arrayDepth);
             }
         }
 
@@ -861,7 +861,15 @@ namespace tinyAsn1
             }
         }
 
-        internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev)
+        internal override void VarsNeededForIsConstraintValid(int lev, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+            foreach (Child ch in m_children.Values)
+            {
+                ch.m_type.VarsNeededForIsConstraintValid(lev, existingVars);
+            }
+        }
+
+        internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev, int arrayDepth)
         {
             string varName2 = varName;
             if (!varName.Contains("->"))
@@ -872,7 +880,7 @@ namespace tinyAsn1
             foreach (Child ch in m_children.Values)
             {
                 ch.m_type.PrintCIsConstraintValid(ch.m_type.PEREffectiveConstraint, c, errorCode + "_" + C.ID(ch.m_childVarName), 
-                    typeName + "_" + C.ID(ch.m_childVarName), varName2 + C.ID(ch.m_childVarName), lev);
+                    typeName + "_" + C.ID(ch.m_childVarName), varName2 + C.ID(ch.m_childVarName), lev, arrayDepth);
                 c.WriteLine();
             }
         }
@@ -884,6 +892,14 @@ namespace tinyAsn1
                 ch.m_type.PrintCIsConstraintValidAux(c);
         }
 */
+        internal override void VarsNeededForEncode(int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+            foreach (Child ch in m_children.Values)
+            {
+                ch.m_type.VarsNeededForEncode(arrayDepth, existingVars);
+            }
+        }
+
         internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
             string varName2 = varName;
@@ -906,18 +922,42 @@ namespace tinyAsn1
                 }
             }
             c.WriteLine();
-            c.WriteLine();
             foreach (Child ch in m_children.Values)
             {
+                c.P(lev); c.WriteLine("/*Encode {0} ({1})*/", ch.m_childVarName, ch.m_type.Name);
                 if (ch.m_optional || ch.m_default)
                 {
                     c.P(lev);
-                    c.WriteLine("if ( {0}exist.{1} )",varName2,C.ID(ch.m_childVarName));
+                    c.WriteLine("if ( {0}exist.{1} ) {{",varName2,C.ID(ch.m_childVarName));
                     ch.m_type.PrintCEncode(ch.m_type.PEREffectiveConstraint, c, errorCode + "_" + C.ID(ch.m_childVarName), varName2 + C.ID(ch.m_childVarName), lev+1);
+                    c.P(lev); c.WriteLine("}");
+
                 } 
                 else
                     ch.m_type.PrintCEncode(ch.m_type.PEREffectiveConstraint, c, errorCode + "_" + C.ID(ch.m_childVarName), varName2 + C.ID(ch.m_childVarName), lev);
                 c.WriteLine();
+            }
+        }
+
+        internal override void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+
+            int nBitMaskLength = (int)Math.Ceiling(GetNumberOfOptionalOrDefaultFields() / 8.0);
+            if (nBitMaskLength > 0)
+            {
+                if (!existingVars.ContainsKey("bitMask"))
+                    existingVars.Add("bitMask", new CLocalVariable("bitMask", "byte", nBitMaskLength, ""));
+                else
+                {
+                    CLocalVariable lv = existingVars["bitMask"];
+                    if (lv.arrayLen < nBitMaskLength)
+                        lv.arrayLen = nBitMaskLength;
+                }
+            }
+
+            foreach (Child ch in m_children.Values)
+            {
+                ch.m_type.VarsNeededForDecode(ch.m_type.PEREffectiveConstraint, arrayDepth, existingVars);
             }
         }
 
@@ -930,12 +970,12 @@ namespace tinyAsn1
                 varName2 += ".";
 
             int nBitMaskLength = (int)Math.Ceiling(GetNumberOfOptionalOrDefaultFields() / 8.0);
-            c.P(lev); c.WriteLine("{"); lev++;
+            //c.P(lev); c.WriteLine("{"); lev++;
             c.P(lev);
             if (nBitMaskLength > 0)
             {
-                c.WriteLine("byte bitMask[{0}];", nBitMaskLength);
-                c.P(lev);
+                //c.WriteLine("byte bitMask[{0}];", nBitMaskLength);
+                //c.P(lev);
                 c.WriteLine("if (!BitStream_ReadBits(pBitStrm, bitMask, {0}))", GetNumberOfOptionalOrDefaultFields());
                 c.P(lev + 1);
                 c.WriteLine("return FALSE;");
@@ -945,12 +985,14 @@ namespace tinyAsn1
             int currentBit = 0;
             foreach (Child ch in m_children.Values)
             {
+                c.P(lev); c.WriteLine("/*Decode {0} ({1})*/", ch.m_childVarName, ch.m_type.Name);
                 if (ch.m_optional || ch.m_default)
                 {
                     byte cb = 0x80;
                     c.P(lev);
-                    c.WriteLine("if (bitMask[{0}] & 0x{1:X2})", currentByte, (cb >> currentBit));
+                    c.WriteLine("if ((bitMask[{0}] & 0x{1:X2}) != 0 ) {{", currentByte, (cb >> currentBit));
                     ch.m_type.PrintCDecode(ch.m_type.PEREffectiveConstraint, c, varName2 + C.ID(ch.m_childVarName), lev+1);
+                    c.P(lev); c.WriteLine("}");
                     currentBit++;
                     if (currentBit == 8)
                     {
@@ -962,9 +1004,8 @@ namespace tinyAsn1
                 {
                     ch.m_type.PrintCDecode(ch.m_type.PEREffectiveConstraint, c, varName2 + C.ID(ch.m_childVarName), lev);
                 }
-                c.WriteLine();
             }
-            lev--; c.P(lev); c.WriteLine("}"); 
+            //lev--; c.P(lev); c.WriteLine("}"); 
         }
     }
 
