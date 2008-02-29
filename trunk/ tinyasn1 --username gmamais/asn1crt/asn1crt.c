@@ -31,6 +31,7 @@ uint64 masks2b[] = {0x0, 0xFF,
 void BitStream_AppendByte(BitStream* pBitStrm, byte v, flag negate);
 int GetNumberOfBitsForNonNegativeInteger(uint v);
 void BitStream_AppendPartialByte(BitStream* pBitStrm, byte v, byte nbits, flag negate);
+flag BitStream_ReadPartialByte(BitStream* pBitStrm, byte *v, byte nbits);
 
 
 
