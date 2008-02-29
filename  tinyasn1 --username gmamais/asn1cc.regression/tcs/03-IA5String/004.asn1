@@ -1,0 +1,7 @@
+CAR-PARTS DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+	MyTestPDU ::= IA5String(SIZE(20))
+	
+	testPDU MyTestPDU ::= "George Mamais       "
+	
+END

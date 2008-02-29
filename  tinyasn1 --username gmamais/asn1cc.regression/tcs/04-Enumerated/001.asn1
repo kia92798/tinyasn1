@@ -1,0 +1,9 @@
+CAR-PARTS DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+	MyTestPDU ::= ENUMERATED {
+		alpha(1), beta(200)
+	}
+	
+	testPDU MyTestPDU ::= beta
+		
+END
