@@ -316,6 +316,43 @@ namespace tinyAsn1
             }
         }
 
+        /// <summary>
+        /// It checks that
+        /// * All strings, SEQUENCE OFs, SETs etc have SIZE constraint and that MAX is bounded
+        /// 
+        /// </summary>
+        private void CheckStrictConstraintsNeededForAsn1cc()
+        {
+            foreach(Asn1File f in m_files)
+                foreach (Module m in f.m_modules)
+                {
+                    foreach (SizeableType st in m.GetTypes<SizeableType>())
+                    {
+                        PERSizeEffectiveConstraint sz = st.PEREffectiveConstraint as PERSizeEffectiveConstraint;
+                        if (sz == null)
+                            ErrorReporter.SemanticError(f.m_fileName, st.antlrNode.Line, "This type({0}) must have a non extensible size constraint", st.Name);
+                        if (sz.Extensible || sz.m_size.m_isExtended)
+                            ErrorReporter.SemanticError(f.m_fileName, st.antlrNode.Line, "This type({0}) must have a non extensible size constraint", st.Name);
+                        if (sz.m_size.m_rootRange.m_maxIsInfinite)
+                            ErrorReporter.SemanticError(f.m_fileName, st.antlrNode.Line, "This type({0}) must have a non extensible size constraint with finite upper value", st.Name);
+                    }
+                    foreach (SequenceOrSetType sq in m.GetTypes<SequenceOrSetType>())
+                    {
+                        if (sq.IsPERExtensible())
+                            ErrorReporter.SemanticError(f.m_fileName, sq.antlrNode.Line, "This type({0}) cannot be extensible", sq.Name);
+                    }
+                    foreach (ChoiceType ch in m.GetTypes<ChoiceType>())
+                    {
+                        if (ch.IsPERExtensible())
+                            ErrorReporter.SemanticError(f.m_fileName, ch.antlrNode.Line, "This type({0}) cannot be extensible", ch.Name);
+                    }
+                    foreach (EnumeratedType en in GetTypes<EnumeratedType>())
+                    {
+                        if (en.IsPERExtensible())
+                            ErrorReporter.SemanticError(f.m_fileName, en.antlrNode.Line, "This type({0}) cannot be extensible", en.Name);
+                    }
+                }
+        }
 
         private void EnsureUniqueEnumerated()
         {
@@ -339,7 +376,7 @@ namespace tinyAsn1
                                 }
                         }
                         enumKeys.Add(item.CID);
-                    }
+                    } 
                 }
 
                 foreach (ChoiceType ch in GetTypes<ChoiceType>())
@@ -387,7 +424,7 @@ namespace tinyAsn1
 
         public void printC()
         {
-
+            CheckStrictConstraintsNeededForAsn1cc();
             EnsureUniqueEnumerated();
             foreach (Asn1File file in m_files)
                 file.printC();
@@ -906,7 +943,7 @@ h2
                 c.WriteLine("*/");
 
                 c.WriteLine("#include <string.h>");
-                c.WriteLine("#include <assert.h>");
+//                c.WriteLine("#include <assert.h>");
 
 
                 c.WriteLine("#include \"{0}\"", fileName + ".h");

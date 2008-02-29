@@ -215,55 +215,6 @@ namespace tinyAsn1
             else
                 h.WriteLine("memset({0}, 0x0, {1});", varName, maxItems(cns) + 1);
         }
-/*
-        protected virtual string EncodingCFunctionName  { get { return "BitStream_EncodeIA5String"; } }
-
-        internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
-        {
-            PERAlphabetAndSizeEffectiveConstraint cn = (PERAlphabetAndSizeEffectiveConstraint)cns;
-            CharSet perAlphaCon = null;
-
-            if (cn != null)
-            {
-                perAlphaCon = cn.m_from;
-                c.P(lev); c.WriteLine("{"); lev++;
-
-                c.P(lev); c.WriteLine("static IntegerRange ir1 = {{ {0}, {1}, {2}, {3}, {4}, {5} }};", cn.m_size.m_rootRange.m_min, (cn.m_size.m_rootRange.m_minIsInfinite ? "TRUE" : "FALSE"), (cn.m_size.m_rootRange.m_minIsIncluded ? "TRUE" : "FALSE")
-                        , cn.m_size.m_rootRange.m_max, (cn.m_size.m_rootRange.m_maxIsInfinite ? "TRUE" : "FALSE"), (cn.m_size.m_rootRange.m_maxIsIncluded ? "TRUE" : "FALSE"));
-                if (cn.m_size.m_extRange != null)
-                {
-                    c.P(lev); c.WriteLine("static IntegerRange ir2 = {{ {0}, {1}, {2}, {3}, {4}, {5} }};", cn.m_size.m_extRange.m_min, (cn.m_size.m_extRange.m_minIsInfinite ? "TRUE" : "FALSE"), (cn.m_size.m_extRange.m_minIsIncluded ? "TRUE" : "FALSE")
-                        , cn.m_size.m_extRange.m_max, (cn.m_size.m_extRange.m_maxIsInfinite ? "TRUE" : "FALSE"), (cn.m_size.m_extRange.m_maxIsIncluded ? "TRUE" : "FALSE"));
-                }
-                if (perAlphaCon != null)
-                {
-                    c.P(lev); c.Write("static CharSet cs = {{ {0}, {{", perAlphaCon.m_set.Count);
-
-                    for (int i = 0; i < perAlphaCon.m_set.Count; i++)
-                    {
-
-                        c.Write("0x{0:X2}", Convert.ToByte(perAlphaCon.m_set[i]));
-                        if (i == perAlphaCon.m_set.Count - 1)
-                            c.WriteLine("} };");
-                        else
-                            c.Write(",");
-                        if ((i + 1) % 15 == 0)
-                        {
-                            c.WriteLine();
-                            c.P(lev + 7);
-                        }
-                    }
-                }
-                c.P(lev); c.WriteLine("{0}(pBitStrm, {1}, &ir1, {2}, {3}, {4});",EncodingCFunctionName, varName, (cn.m_size.m_isExtended ? "TRUE" : "FALSE"), (cn.m_size.m_extRange != null ? "&ir2" : "NULL"), (perAlphaCon != null?"&cs":"NULL"));
-
-                lev--; c.P(lev); c.WriteLine("}");
-            }
-            else
-            {
-                c.P(lev); c.WriteLine("{0}(pBitStrm, {1}, NULL, FALSE, NULL, NULL);", EncodingCFunctionName, varName);
-            }
-        }
- */
 
         internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
@@ -271,12 +222,6 @@ namespace tinyAsn1
             long max = maxItems(cns);
             string i = "i" + (CLocalVariable.GetArrayIndex(varName) + 1);
             string prefix = varName;
-            bool topLevel = !varName.Contains("->");
-
-            //if (topLevel)
-            //    prefix = varName + "->";
-            //else
-            //    prefix = varName + ".";
 
             if (min != max)
             {
@@ -287,7 +232,6 @@ namespace tinyAsn1
             {
                 c.P(lev); c.WriteLine("/* No need to encode length (it is fixed size ({0})*/", min);
             }
-
             c.P(lev); c.WriteLine("for({0}=0;{0}<strlen({1});{0}++)", i, prefix);
             c.P(lev); c.WriteLine("{");
             PrintCEncodeItem(cns, c, errorCode + "_elem", prefix + "[" + i + "]", lev + 1);
@@ -326,7 +270,7 @@ namespace tinyAsn1
             c.P(lev);
             c.WriteLine("int charIndex = GetCharIndex({0}, allowedCharSet,{1});", varName, tmp.Count);
             c.P(lev);
-            c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, charIndex, {0}, {1});", 0, tmp.Count);
+            c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, charIndex, {0}, {1});", 0, tmp.Count-1);
         }
 
         internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
@@ -335,8 +279,9 @@ namespace tinyAsn1
             long max = maxItems(cns);
             string i = "i" + (CLocalVariable.GetArrayIndex(varName) + 1);
             string prefix = varName;
-            bool topLevel = !varName.Contains("->");
 
+            c.P(lev);
+            c.WriteLine("memset({0}, 0x0, {1});", varName, maxItems(cns) + 1);
             if (min != max)
             {
                 c.P(lev);
@@ -352,7 +297,7 @@ namespace tinyAsn1
             else
             {
                 c.P(lev);
-                c.WriteLine("{nCount = {0};", max);
+                c.WriteLine("nCount = {0};", max);
             }
             c.P(lev); c.WriteLine("for({0}=0;{0}<nCount;{0}++)", i);
             c.P(lev); c.WriteLine("{");
@@ -393,7 +338,7 @@ namespace tinyAsn1
             c.P(lev);
             c.WriteLine("sint charIndex = 0;");
             c.P(lev);
-            c.WriteLine("if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &charIndex, {0}, {1})) {{", 0, tmp.Count);
+            c.WriteLine("if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &charIndex, {0}, {1})) {{", 0, tmp.Count-1);
             c.P(lev + 1);
             c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
             c.P(lev + 1);
@@ -402,7 +347,7 @@ namespace tinyAsn1
             c.WriteLine("}");
 
             c.P(lev);
-            c.WriteLine("{0} = (byte)allowedCharSet[charIndex];",varName);
+            c.WriteLine("{0} = allowedCharSet[charIndex];",varName);
         }
 
     }

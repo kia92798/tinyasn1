@@ -222,7 +222,14 @@ namespace tinyAsn1
             : base(ErrMsg)
         {
         }
+    }
 
+    public class ErrorReporter
+    {
+        public static void SemanticError(string inputFileName, int line, string msg, params object[] args)
+        {
+            throw new SemanticErrorException("Error: " + inputFileName +"(" + line+") : "+string.Format(msg,args));
+        }
     }
 
     public delegate void OnAntrlNode(ITree root);
@@ -326,6 +333,7 @@ namespace tinyAsn1
             return ret;
 
         }
+
     }
 
 }

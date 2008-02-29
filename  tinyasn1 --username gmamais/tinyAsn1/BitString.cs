@@ -341,9 +341,40 @@ namespace tinyAsn1
             c.P(lev); c.WriteLine("{0}nCount = 0;", prefix);
             c.P(lev); c.WriteLine("memset({0}arr,0x0,{1});", prefix, max);
         }
-/*
+
+
         internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
+            long min = minItems(cns);
+            long max = maxItems(cns);
+            string i = "i" + (CLocalVariable.GetArrayIndex(varName) + 1);
+            string prefix = "";
+            bool topLevel = !varName.Contains("->");
+
+            if (topLevel)
+                prefix = varName + "->";
+            else
+                prefix = varName + ".";
+
+            if (min != max)
+            {
+                c.P(lev);
+                c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, {0}nCount, {1}, {2});", prefix, min, max);
+            }
+            else
+            {
+                c.P(lev); c.WriteLine("/* No need to encode length (it is fixed size ({0})*/", min);
+            }
+
+            c.P(lev);
+            c.WriteLine("BitStream_AppendBits(pBitStrm, {0}arr, {0}nCount);", prefix);
+        }
+        
+        internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            long min = minItems(cns);
+            long max = maxItems(cns);
+            string i = "i" + (CLocalVariable.GetArrayIndex(varName) + 1);
             string prefix = "";
             bool topLevel = !varName.Contains("->");
             if (topLevel)
@@ -351,15 +382,37 @@ namespace tinyAsn1
             else
                 prefix = varName + ".";
 
+            if (min != max)
+            {
+                c.P(lev);
+                c.WriteLine("if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nCount, {0}, {1})) {{", min, max);
+                c.P(lev + 1);
+                c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+                c.P(lev + 1);
+                c.WriteLine("return FALSE;");
+                c.P(lev);
+                c.WriteLine("}");
+                c.P(lev);
+                c.WriteLine("{0}nCount = (long)nCount;", prefix);
+
+            }
+            else
+            {
+                c.P(lev);
+                c.WriteLine("{0}nCount = {1};", prefix, max);
+            }
+
             c.P(lev);
-            c.WriteLine("BitStream_EncodeBitString(pBitStrm, {0}arr, {0}nCount);",prefix);
+            c.WriteLine("if (!BitStream_ReadBits(pBitStrm, {0}arr, {0}nCount)) {{", prefix);
+            c.P(lev + 1);
+            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+            c.P(lev + 1);
+            c.WriteLine("return FALSE;");
+            c.P(lev);
+            c.WriteLine("}");
+
         }
 
-        internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
-        {
-            base.PrintCDecode(cns, c, varName, lev);
-        }
-  */  
     
     }
 

@@ -976,9 +976,13 @@ namespace tinyAsn1
             {
                 //c.WriteLine("byte bitMask[{0}];", nBitMaskLength);
                 //c.P(lev);
-                c.WriteLine("if (!BitStream_ReadBits(pBitStrm, bitMask, {0}))", GetNumberOfOptionalOrDefaultFields());
+                c.WriteLine("if (!BitStream_ReadBits(pBitStrm, bitMask, {0})) {{", GetNumberOfOptionalOrDefaultFields());
+                c.P(lev + 1);
+                c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
                 c.P(lev + 1);
                 c.WriteLine("return FALSE;");
+                c.P(lev);
+                c.WriteLine("}");
             }
 
             int currentByte = 0;
@@ -993,6 +997,15 @@ namespace tinyAsn1
                     c.WriteLine("if ((bitMask[{0}] & 0x{1:X2}) != 0 ) {{", currentByte, (cb >> currentBit));
                     ch.m_type.PrintCDecode(ch.m_type.PEREffectiveConstraint, c, varName2 + C.ID(ch.m_childVarName), lev+1);
                     c.P(lev); c.WriteLine("}");
+                    if (ch.m_defaultValue != null)
+                    {
+                        c.P(lev); c.WriteLine("else");
+                        c.P(lev); c.WriteLine("{");
+                        ch.m_type.PrintCInitialize(ch.m_type.PEREffectiveConstraint, ch.m_defaultValue, c, "", varName2 + C.ID(ch.m_childVarName), lev + 1, CLocalVariable.GetArrayIndex(varName) + 1);
+                        c.P(lev); c.WriteLine("}");
+                    }
+
+
                     currentBit++;
                     if (currentBit == 8)
                     {

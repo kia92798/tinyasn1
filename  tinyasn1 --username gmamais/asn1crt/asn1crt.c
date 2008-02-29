@@ -30,6 +30,7 @@ uint64 masks2b[] = {0x0, 0xFF,
 /***********************************************************************************************/
 void BitStream_AppendByte(BitStream* pBitStrm, byte v, flag negate);
 int GetNumberOfBitsForNonNegativeInteger(uint v);
+void BitStream_AppendPartialByte(BitStream* pBitStrm, byte v, byte nbits, flag negate);
 
 
 
@@ -102,6 +103,20 @@ void BitStream_AppendNBitOne(BitStream* pBitStrm, int nbits)
 
 }
 
+void BitStream_AppendBits(BitStream* pBitStrm, byte* srcBuffer, int nbits)
+{
+	int i=0;
+	byte lastByte=0;
+
+	while(nbits>=8) {
+		BitStream_AppendByte(pBitStrm, srcBuffer[i], FALSE);
+		nbits-=8;
+		i++;
+	}
+	lastByte = srcBuffer[i]>>(8-nbits);
+	BitStream_AppendPartialByte(pBitStrm, lastByte, nbits,FALSE);
+}
+
 void BitStream_AppendBit(BitStream* pBitStrm, flag v) 
 {
 	if (v) 
@@ -133,7 +148,7 @@ flag BitStream_ReadBit(BitStream* pBitStrm, flag* v)
 void BitStream_AppendByte(BitStream* pBitStrm, byte v, flag negate) 
 {
 	int cb = pBitStrm->currentBit;
-	int ncb = 8 - pBitStrm->currentBit;
+	int ncb = 8 - cb;
 	if (negate)
 		v=~v;
 	pBitStrm->buf[pBitStrm->currentByte++] |=  v >> cb;
@@ -145,6 +160,19 @@ void BitStream_AppendByte(BitStream* pBitStrm, byte v, flag negate)
 
 }
 
+void BitStream_AppendByte0(BitStream* pBitStrm, byte v) 
+{
+	int cb = pBitStrm->currentBit;
+	int ncb = 8 - cb;
+
+	pBitStrm->buf[pBitStrm->currentByte++] |=  v >> cb;
+
+	assert(pBitStrm->currentByte*8+pBitStrm->currentBit<=pBitStrm->count*8);
+
+	if (cb)
+		pBitStrm->buf[pBitStrm->currentByte] |= v << ncb;
+
+}
 
 
 flag BitStream_ReadByte(BitStream* pBitStrm, byte* v) 
@@ -158,6 +186,26 @@ flag BitStream_ReadByte(BitStream* pBitStrm, byte* v)
 	}
 
 	return pBitStrm->currentByte*8+pBitStrm->currentBit<=pBitStrm->count*8;
+}
+
+flag BitStream_ReadBits(BitStream* pBitStrm, byte* BuffToWrite, int nbits)
+{
+
+	int i=0;
+	byte lastByte=0;
+
+	while(nbits>=8) {
+		if (!BitStream_ReadByte(pBitStrm, &BuffToWrite[i]))
+			return FALSE;
+		nbits-=8;
+		i++;
+	}
+	if (!BitStream_ReadPartialByte(pBitStrm, &BuffToWrite[i], nbits))
+		return FALSE;
+	
+	BuffToWrite[i] <<=8-nbits;
+	
+	return TRUE;
 }
 
 
@@ -786,4 +834,14 @@ flag DecodeRealUsingDecimalEncoding(BitStream* pBitStrm, int length, byte header
 {
 	assert(0);
 	return TRUE;
+}
+
+
+int GetCharIndex(char ch, byte Set[], int setLen)
+{
+	int i=0;
+	for(i=0; i<setLen; i++)
+		if (ch == Set[i])
+			return i;
+	return 0;
 }

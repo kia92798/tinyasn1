@@ -55,11 +55,16 @@ typedef struct {
 void BitStream_Init(BitStream* pBitStrm, unsigned char* buf, long count);
 void BitStream_AttachBuffer(BitStream* pBitStrm, unsigned char* buf, long count);
 void BitStream_AppendBit(BitStream* pBitStrm, flag v);
+void BitStream_AppendBits(BitStream* pBitStrm, byte* srcBuffer, int nBitsToWrite);
+void BitStream_AppendByte(BitStream* pBitStrm, byte v, flag negate);
+void BitStream_AppendByte0(BitStream* pBitStrm, byte v);
+
 sint BitStream_GetLength(BitStream* pBitStrm);
 void BitStream_AppendBitOne(BitStream* pBitStrm);
 void BitStream_AppendBitZero(BitStream* pBitStrm);
 flag BitStream_ReadBit(BitStream* pBitStrm, flag* v);
-flag BitStream_ReadBits(BitStream* pBitStrm, byte* BuffToWrite, int nBitsToReas);
+flag BitStream_ReadBits(BitStream* pBitStrm, byte* BuffToWrite, int nBitsToRead);
+flag BitStream_ReadByte(BitStream* pBitStrm, byte* v);
 
 /* Integer functions */
 
@@ -94,6 +99,8 @@ void BitStream_EncodeIA5String(BitStream* pBitStrm, char* string, IntegerRange* 
 
 void CalculateMantissaAndExponent(double d, int* exp, uint* mantissa);
 int GetNumberOfBitsForNonNegativeInteger(uint v);
+
+int GetCharIndex(char ch, byte allowedCharSet[], int setLen);
 
 #ifdef  __cplusplus
 }
