@@ -836,7 +836,7 @@ namespace tinyAsn1
 
             if (m_constraints.Count > 0)
             {
-                c.P(lev); c.Write("if ( !");
+                c.P(lev); c.Write("if ( !(");
                 for (int i = 0; i < m_constraints.Count; i++)
                 {
                     string ret = m_constraints[i].PrintCIsConstraintValid(c, varName2, lev);
@@ -844,7 +844,7 @@ namespace tinyAsn1
                     if (i != m_constraints.Count - 1)
                         c.Write(" && ");
                 }
-                c.WriteLine(" ) {");
+                c.WriteLine(") ) {");
                 c.P(lev + 1);
                 c.WriteLine("*pErrCode = ERR_{0};", C.ID(errorCode));
                 c.P(lev + 1);

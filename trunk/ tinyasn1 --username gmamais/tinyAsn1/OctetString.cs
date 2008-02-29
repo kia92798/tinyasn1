@@ -242,7 +242,7 @@ namespace tinyAsn1
         protected override void PrintCEncodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
             c.P(lev);
-            c.WriteLine("BitStream_AppendByte(pBitStrm, {0}, 0);",varName);
+            c.WriteLine("BitStream_AppendByte0(pBitStrm, {0});",varName);
         }
         protected override void PrintCDecodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
         {

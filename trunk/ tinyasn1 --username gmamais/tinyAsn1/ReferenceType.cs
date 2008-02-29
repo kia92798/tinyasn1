@@ -299,11 +299,18 @@ namespace tinyAsn1
         }
         internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
         {
-            h.P(lev);
-            if ((Type is IA5StringType) || !varName.Contains("->"))
-                h.WriteLine("{0}_Initialize({1});", C.ID(m_referencedTypeName), varName);
+            if (m_constraints.Count == 0)
+            {
+                h.P(lev);
+                if ((Type is IA5StringType) || !varName.Contains("->"))
+                    h.WriteLine("{0}_Initialize({1});", C.ID(m_referencedTypeName), varName);
+                else
+                    h.WriteLine("{0}_Initialize(&{1});", C.ID(m_referencedTypeName), varName);
+            }
             else
-                h.WriteLine("{0}_Initialize(&{1});", C.ID(m_referencedTypeName), varName);
+            {
+                Type.PrintCInitialize(cns, defauleVal, h, typeName, varName, lev, arrayDepth);
+            }
 
         }
         internal override void PrintHConstraintConstant(StreamWriterLevel h, string name)
@@ -344,27 +351,41 @@ namespace tinyAsn1
 
         internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
-            c.P(lev); 
-            if ((Type is IA5StringType) || !varName.Contains("->"))
-                c.WriteLine("{0}_Encode({1}, pBitStrm, pErrCode, FALSE);", C.ID(m_referencedTypeName), varName);
+            if (m_constraints.Count == 0)
+            {
+                c.P(lev);
+                if ((Type is IA5StringType) || !varName.Contains("->"))
+                    c.WriteLine("{0}_Encode({1}, pBitStrm, pErrCode, FALSE);", C.ID(m_referencedTypeName), varName);
+                else
+                    c.WriteLine("{0}_Encode(&{1}, pBitStrm, pErrCode, FALSE);", C.ID(m_referencedTypeName), varName);
+            }
             else
-                c.WriteLine("{0}_Encode(&{1}, pBitStrm, pErrCode, FALSE);", C.ID(m_referencedTypeName), varName);
+            {
+                Type.PrintCEncode(cns, c, errorCode, varName, lev);
+            }
 
         }
 
         internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
         {
-            c.P(lev);
-            if ((Type is IA5StringType) || !varName.Contains("->"))
-                c.WriteLine("if ( !{0}_Decode({1}, pBitStrm, pErrCode) ) {{", C.ID(m_referencedTypeName), varName);
+            if (m_constraints.Count == 0)
+            {
+                c.P(lev);
+                if ((Type is IA5StringType) || !varName.Contains("->"))
+                    c.WriteLine("if ( !{0}_Decode({1}, pBitStrm, pErrCode) ) {{", C.ID(m_referencedTypeName), varName);
+                else
+                    c.WriteLine("if ( !{0}_Decode(&{1}, pBitStrm, pErrCode) ) {{", C.ID(m_referencedTypeName), varName);
+                c.P(lev + 1);
+                c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+                c.P(lev + 1);
+                c.WriteLine("return FALSE;");
+                c.P(lev);
+                c.WriteLine("}");
+            }
             else
-                c.WriteLine("if ( !{0}_Decode(&{1}, pBitStrm, pErrCode) ) {{", C.ID(m_referencedTypeName), varName);
-            c.P(lev + 1);
-            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
-            c.P(lev + 1);
-            c.WriteLine("return FALSE;");
-            c.P(lev);
-            c.WriteLine("}");
+            {
+                Type.PrintCDecode(cns, c, varName, lev);
+            }
         }
     }
 }

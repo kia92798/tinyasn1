@@ -107,7 +107,15 @@ namespace asn1cc
             {
                 compInv.debug();
             }
-            compInv.printC();
+            try
+            {
+                compInv.printC();
+            }
+            catch (SemanticErrorException ex)
+            {
+                Console.Error.WriteLine(ex.Message);
+                return 2;
+            }
 
             return 0;
         }
