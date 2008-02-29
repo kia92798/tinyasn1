@@ -12,6 +12,8 @@ extern "C" {
 
 /*
 Definition of :MyTestPDU
+-- This a test
+
 */
 typedef struct {
     sint  int1;

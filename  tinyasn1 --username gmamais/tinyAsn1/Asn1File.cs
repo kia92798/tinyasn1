@@ -422,10 +422,36 @@ namespace tinyAsn1
             }
         }
 
+        void FixComments()
+        {
+            foreach(Asn1File f in m_files)
+                foreach (Module m in f.m_modules)
+                {
+                    foreach (TypeAssigment ta in m.m_typeAssigments.Values)
+                    {
+                        int i=1;
+                        while (ta.antlrNode.TokenStartIndex - i > 0)
+                        {
+                            IToken t = f.m_tokes[ta.antlrNode.TokenStartIndex - i];
+                            i++;
+                            if (t.Type == asn1Lexer.WS)
+                                continue;
+                            else if (t.Type == asn1Lexer.COMMENT)
+                                ta.m_comments.Insert(0, t.Text);
+                            else if (t.Type == asn1Lexer.COMMENT2)
+                                ta.m_comments.Insert(0, t.Text);
+                            else
+                                break;
+                        }
+                       
+                    }
+                }
+        }
         public void printC()
         {
             CheckStrictConstraintsNeededForAsn1cc();
             EnsureUniqueEnumerated();
+            FixComments();
             foreach (Asn1File file in m_files)
                 file.printC();
         }
@@ -495,7 +521,7 @@ namespace tinyAsn1
             ret.tree = tree;
 
             for (int i = 0; i < tree.ChildCount; i++)
-                ret.m_modules.Add(Module.CreateFromAntlrAst(tree.GetChild(i)));
+                ret.m_modules.Add(Module.CreateFromAntlrAst(tree.GetChild(i),ret));
 
             return ret;
         }
