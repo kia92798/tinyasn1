@@ -19,6 +19,7 @@ namespace tinyAsn1
         public string m_moduleID = "";
         public TaggingMode m_taggingMode = TaggingMode.EXPLICIT;     // clause 12.2
         public bool m_extensibilityImplied = false;
+        public Asn1File m_file = null;
 
         public List<string> m_exportedTypes = new List<string>();
         public List<string> m_exportedVariables = new List<string>();
@@ -113,7 +114,7 @@ namespace tinyAsn1
         internal static Module CurrentlyConstructModule = null;
         //^(MODULE_DEF modulereference moduleTag? EXTENSIBILITY? exports? imports? typeAssigment* valueAssigment* valueSetAssigment*)
         internal bool bExportAll = false;
-        static public Module CreateFromAntlrAst(ITree tree)
+        static public Module CreateFromAntlrAst(ITree tree, Asn1File file)
         {
 
             Module curModule;
@@ -123,6 +124,7 @@ namespace tinyAsn1
 
             curModule = new Module();
             curModule.tree = tree;
+            curModule.m_file = file;
 
             CurrentlyConstructModule = curModule;
             for (int i = 0; i < tree.ChildCount; i++)
@@ -157,7 +159,7 @@ namespace tinyAsn1
                         curModule.m_imports.Add(ImportedModule.CreateFromAntlrAst(child, curModule));
                         break;
                     case asn1Parser.TYPE_ASSIG:
-                        TypeAssigment typeAssig = TypeAssigment.CreateFromAntlrAst(child);
+                        TypeAssigment typeAssig = TypeAssigment.CreateFromAntlrAst(child, curModule);
                         if (curModule.isTypeDeclared(typeAssig.m_name))
                             throw new SemanticErrorException(typeAssig.m_name + " has alrady been defined or imported. Line: " + child.Line);
                         curModule.m_typeAssigments.Add(typeAssig.m_name, typeAssig);
@@ -522,14 +524,20 @@ namespace tinyAsn1
         public string m_name;
         public Asn1Type m_type;
         public bool m_createdThroughTabulization = false;
+        public Module m_module = null;
+        public ITree antlrNode;
 
         //^(TYPE_ASSIG typereference type)
-        static public TypeAssigment CreateFromAntlrAst(ITree tree)
+        static public TypeAssigment CreateFromAntlrAst(ITree tree, Module module)
         {
 
             TypeAssigment ret = new TypeAssigment();
+            ret.antlrNode = tree;
+            ret.m_module = module;
             ret.m_name = tree.GetChild(0).Text;
             ret.m_type = Asn1Type.CreateFromAntlrAst(tree.GetChild(1));
+
+
             for (int i = 2; i < tree.ChildCount; i++)
             {
                 string comment = tree.GetChild(i).Text.Replace("--@", "").Replace("\r", "").Replace("\n", "").Replace("--", "");
@@ -562,7 +570,10 @@ namespace tinyAsn1
             //print type declaration
             h.WriteLine("/*");
             h.WriteLine("Definition of :{0}", m_name);
+            foreach(string line in m_comments)
+                h.WriteLine("{0}", line);
             h.WriteLine("*/");
+
             h.Write("typedef ");
             m_type.PrintHTypeDeclaration(m_type.PEREffectiveConstraint, h, uniqueID, "", 0);
             if (!(m_type is IA5StringType))

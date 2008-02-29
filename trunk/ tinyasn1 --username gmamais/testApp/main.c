@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 
 
 	t1 = GetTickCount();
-	for(i=0;i<4000000;i++) {
+//	for(i=0;i<4000000;i++) {
 
 	/* Encoding Part */
 	BitStream_Init(&bitStrm, perBuffer, MyTestPDU_REQUIRED_BYTES_FOR_ENCODING);
@@ -63,14 +63,19 @@ int main(int argc, char* argv[])
 		return errorCode;
 	}
 	
-	}
+//	}
 	t2 = GetTickCount();
 	printf("Total Time %ld", t2-t1);
-/*	if (memcmp(&testPDU, &decodePDU, sizeof(MyTestPDU))!=0) 
+
+//	printf("Size is %d\n",sizeof(MyTestPDU));
+
+
+	
+	if (memcmp(&testPDU, &decodePDU, sizeof(MyTestPDU))!=0) 
 	{
 		printf("Comparison of encoded and decoded PDU failed.\n");
 		return 2;
-	} */
+	} 
 
 	
 	return 0;
