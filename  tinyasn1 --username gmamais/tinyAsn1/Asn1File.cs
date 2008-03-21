@@ -215,8 +215,11 @@ namespace tinyAsn1
                 v.Value.UniquePath = v.Key;
 
 
+            FixComments();
+
         }
 
+        
         private bool Phase1Finished()
         {
             foreach (Asn1File f in m_files)
@@ -424,12 +427,13 @@ namespace tinyAsn1
 
         void FixComments()
         {
-            foreach(Asn1File f in m_files)
+            foreach (Asn1File f in m_files)
+            {
                 foreach (Module m in f.m_modules)
                 {
                     foreach (TypeAssigment ta in m.m_typeAssigments.Values)
                     {
-                        int i=1;
+                        int i = 1;
                         while (ta.antlrNode.TokenStartIndex - i > 0)
                         {
                             IToken t = f.m_tokes[ta.antlrNode.TokenStartIndex - i];
@@ -443,15 +447,68 @@ namespace tinyAsn1
                             else
                                 break;
                         }
-                       
                     }
                 }
+            }
+
+            foreach (Asn1File f in m_files)
+            {
+                foreach (Module m in f.m_modules)
+                {
+                    foreach (SequenceOrSetType sq in m.GetTypes<SequenceOrSetType>())
+                    {
+                        foreach (SequenceOrSetType.Child ch in sq.m_children.Values)
+                        {
+                            int i = 1;
+                            while (ch.antlrNode.TokenStartIndex - i > 0)
+                            {
+                                IToken t = f.m_tokes[ch.antlrNode.TokenStartIndex - i];
+                                i++;
+                                if (t.Type == asn1Lexer.WS)
+                                    continue;
+                                else if (t.Type == asn1Lexer.COMMENT)
+                                    ch.m_comments.Insert(0, t.Text);
+                                else if (t.Type == asn1Lexer.COMMENT2)
+                                    ch.m_comments.Insert(0, t.Text);
+                                else
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+            foreach (Asn1File f in m_files)
+            {
+                foreach (Module m in f.m_modules)
+                {
+                    foreach (ChoiceType sq in m.GetTypes<ChoiceType>())
+                    {
+                        foreach (ChoiceChild ch in sq.m_children.Values)
+                        {
+                            int i = 1;
+                            while (ch.antlrNode.TokenStartIndex - i > 0)
+                            {
+                                IToken t = f.m_tokes[ch.antlrNode.TokenStartIndex - i];
+                                i++;
+                                if (t.Type == asn1Lexer.WS)
+                                    continue;
+                                else if (t.Type == asn1Lexer.COMMENT)
+                                    ch.m_comments.Insert(0, t.Text);
+                                else if (t.Type == asn1Lexer.COMMENT2)
+                                    ch.m_comments.Insert(0, t.Text);
+                                else
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+
         }
         public void printC()
         {
             CheckStrictConstraintsNeededForAsn1cc();
             EnsureUniqueEnumerated();
-            FixComments();
             foreach (Asn1File file in m_files)
                 file.printC();
         }

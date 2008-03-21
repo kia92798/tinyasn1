@@ -47,6 +47,7 @@ namespace tinyAsn1
             public bool m_extended = false;
             public int? m_version=null;
             public List<string> m_comments = new List<string>();
+            public ITree antlrNode = null;
 
             public Child()
             {
@@ -61,6 +62,7 @@ namespace tinyAsn1
                 m_defaultValue = o.m_defaultValue;
                 m_extended = o.m_extended;
                 m_version = o.m_version;
+                antlrNode = o.antlrNode;
             }
 
             public void PrintAsn1(StreamWriterLevel o, int lev)
@@ -88,6 +90,7 @@ namespace tinyAsn1
                 Child ret = new Child();
                 ret.m_version = version;
                 ret.m_extended = extended;
+                ret.antlrNode = tree;
 
                 for (int i = 0; i < tree.ChildCount; i++)
                 {
@@ -794,6 +797,7 @@ namespace tinyAsn1
 //            h.WriteLine("struct {0} {{", typeName);
             foreach (Child ch in m_children.Values)
             {
+                h.WriteComment(ch.m_comments,lev+1);
                 h.P(lev + 1);
                 ch.m_type.PrintHTypeDeclaration(ch.m_type.PEREffectiveConstraint, h, 
                     typeName + "_" + C.ID(ch.m_childVarName), C.ID(ch.m_childVarName), lev + 1);
@@ -892,11 +896,11 @@ namespace tinyAsn1
                 ch.m_type.PrintCIsConstraintValidAux(c);
         }
 */
-        internal override void VarsNeededForEncode(int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        internal override void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {
             foreach (Child ch in m_children.Values)
             {
-                ch.m_type.VarsNeededForEncode(arrayDepth, existingVars);
+                ch.m_type.VarsNeededForEncode(ch.m_type.PEREffectiveConstraint, arrayDepth, existingVars);
             }
         }
 

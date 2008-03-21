@@ -567,13 +567,15 @@ namespace tinyAsn1
 
         internal void PrintH(StreamWriterLevel h, string uniqueID)
         {
-            //print type declaration
-            h.WriteLine("/*");
-            h.WriteLine("Definition of :{0}", m_name);
-            foreach(string line in m_comments)
-                h.WriteLine("{0}", line);
-            h.WriteLine("*/");
+            ////print type declaration
+            //h.WriteLine("/*");
+            //h.WriteLine("Definition of :{0}", m_name);
+            //foreach(string line in m_comments)
+            //    h.WriteLine("{0}", line);
+            //h.WriteLine("*/");
 
+            h.WriteComment(m_comments, 0);
+            
             h.Write("typedef ");
             m_type.PrintHTypeDeclaration(m_type.PEREffectiveConstraint, h, uniqueID, "", 0);
             if (!(m_type is IA5StringType))
@@ -645,7 +647,7 @@ namespace tinyAsn1
             c.WriteLine("flag {0}_Encode({0}{1} pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints)", uniqueID, star);
             c.WriteLine("{");
             localVars.Clear();
-            m_type.VarsNeededForEncode(1, localVars);
+            m_type.VarsNeededForEncode(m_type.PEREffectiveConstraint, 1, localVars);
             CLocalVariable.Print(c, localVars);
             c.P(1); c.WriteLine("if (bCheckConstraints && !{0}_IsConstraintValid(pVal, pErrCode))", uniqueID);
             c.P(2); c.WriteLine("return FALSE;");

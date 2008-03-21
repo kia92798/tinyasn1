@@ -77,6 +77,31 @@ namespace tinyAsn1
                 ret += line + "<br/>";
             return ret;
         }
+        public void WriteComment(List<string> comments, int lev)
+        {
+            List<string> comments2 = new List<string>();
+            foreach (string li in comments)
+            {
+                string line = li.Replace("--", "").Trim();
+                if (line.Length > 0)
+                    comments2.Add(line);
+            }
+            if (comments2.Count == 0)
+                return;
+            if (comments2.Count == 1)
+            {
+                P(lev); WriteLine("/* {0} */", comments2[0]);
+            }
+            else
+            {
+                P(lev); WriteLine("/*");
+                foreach (string li in comments2)
+                {
+                    P(lev); WriteLine(li);
+                }
+                P(lev); WriteLine("*/");
+            }
+        }
     }
 
     public class SemanticTreeNode : ITree
@@ -224,6 +249,10 @@ namespace tinyAsn1
         }
     }
 
+    public class AbstractMethodCalledException : Exception
+    {
+    }
+
     public class ErrorReporter
     {
         public static void SemanticError(string inputFileName, int line, string msg, params object[] args)
@@ -288,9 +317,38 @@ namespace tinyAsn1
             if (Math.Abs(i) > Int32.MaxValue)
                 sx = "LL";
             return i.ToString() + sx;
-
         }
+#if obsolete
+        public static string CodeTemplate(string code, int lev, params KeyValuePair<string, string>[] replacements)
+        {
+            System.IO.StringWriter wr = new StringWriter();
+            foreach (KeyValuePair<string, string> p in replacements)
+            {
+                if (!code.Contains(p.Key))
+                    throw new ArgumentException("key attribute '" + p.Key + "' is not contained in the code template");
+            }
+            
 
+            List<string> lines = new List<string>(code.Split('\n'));
+            
+            foreach(string line in lines) 
+            {
+                
+                for (int i = 0; i < lev; i++)
+                    wr.Write("    ");
+                string curLine = line.TrimEnd();
+                
+                foreach (KeyValuePair<string, string> p in replacements)
+                {
+                    if (curLine.Contains(p.Key))
+                        curLine = curLine.Replace(p.Key, p.Value);
+                }
+                wr.WriteLine(curLine);
+                
+            }
+            return wr.ToString();
+        }
+#endif
     }
 
     public class CLocalVariable

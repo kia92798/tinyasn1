@@ -710,6 +710,11 @@ namespace tinyAsn1
             }
         }
 
+        public virtual bool IsOctetAligned(PEREffectiveConstraint cns)
+        {
+            throw new AbstractMethodCalledException();
+        }
+
 
 //Backend functions
         public virtual void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas)
@@ -854,7 +859,7 @@ namespace tinyAsn1
             }
 
         }
-        internal virtual void VarsNeededForEncode(int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        internal virtual void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {
         }
 
