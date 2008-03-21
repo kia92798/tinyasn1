@@ -49,6 +49,7 @@ typedef struct {
 
 
 #define ERR_INSUFFICIENT_DATA	101
+#define ERR_INCORRECT_PER_STREAM	102
 
 /* Bit strean functions */
 

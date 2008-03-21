@@ -269,6 +269,16 @@ namespace tinyAsn1
             return 16;
         }
 
+        public override bool IsOctetAligned(PEREffectiveConstraint cns)
+        {
+            PERIntegerEffectiveConstraint cn = (PERIntegerEffectiveConstraint)cns;
+            if (cn == null)
+                return true;
+            if (cn.m_rootRange.m_maxIsInfinite || cn.m_rootRange.m_minIsInfinite)
+                return true;
+            return cn.m_rootRange.m_max - cn.m_rootRange.m_min + 1 >= 256;
+        }
+
         internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
             h.Write("sint ");

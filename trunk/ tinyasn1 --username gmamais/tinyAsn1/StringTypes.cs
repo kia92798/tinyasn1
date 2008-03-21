@@ -223,19 +223,27 @@ namespace tinyAsn1
             string i = "i" + (CLocalVariable.GetArrayIndex(varName) + 1);
             string prefix = varName;
 
-            if (min != max)
+            if (max < 0x10000)
             {
-                c.P(lev);
-                c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, strlen({0}), {1}, {2});", prefix, min, max);
+                if (min != max)
+                {
+                    c.P(lev);
+                    c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, strlen({0}), {1}, {2});", prefix, min, max);
+                }
+                else
+                {
+                    c.P(lev); c.WriteLine("/* No need to encode length (it is fixed size ({0})*/", min);
+                }
+                c.P(lev); c.WriteLine("for({0}=0;{0}<strlen({1});{0}++)", i, prefix);
+                c.P(lev); c.WriteLine("{");
+                PrintCEncodeItem(cns, c, errorCode + "_elem", prefix + "[" + i + "]", lev + 1);
+                c.P(lev); c.WriteLine("}");
             }
             else
             {
-                c.P(lev); c.WriteLine("/* No need to encode length (it is fixed size ({0})*/", min);
+                PrintCEncodeFragmentation(cns, c, errorCode, varName, lev,
+                    string.Format("nCount = strlen({0});", prefix), "", max, i, prefix);
             }
-            c.P(lev); c.WriteLine("for({0}=0;{0}<strlen({1});{0}++)", i, prefix);
-            c.P(lev); c.WriteLine("{");
-            PrintCEncodeItem(cns, c, errorCode + "_elem", prefix + "[" + i + "]", lev + 1);
-            c.P(lev); c.WriteLine("}");
         }
 
         protected override void PrintCEncodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)

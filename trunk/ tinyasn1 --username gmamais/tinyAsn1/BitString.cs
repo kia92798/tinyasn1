@@ -347,7 +347,7 @@ namespace tinyAsn1
         {
             long min = minItems(cns);
             long max = maxItems(cns);
-            string i = "i" + (CLocalVariable.GetArrayIndex(varName) + 1);
+//            string i = "i" + (CLocalVariable.GetArrayIndex(varName) + 1);
             string prefix = "";
             bool topLevel = !varName.Contains("->");
 
@@ -355,19 +355,27 @@ namespace tinyAsn1
                 prefix = varName + "->";
             else
                 prefix = varName + ".";
-
-            if (min != max)
+            if (max < 0x10000)
             {
+
+                if (min != max)
+                {
+                    c.P(lev);
+                    c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, {0}nCount, {1}, {2});", prefix, min, max);
+                }
+                else
+                {
+                    c.P(lev); c.WriteLine("/* No need to encode length (it is fixed size ({0})*/", min);
+                }
+
                 c.P(lev);
-                c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, {0}nCount, {1}, {2});", prefix, min, max);
+                c.WriteLine("BitStream_AppendBits(pBitStrm, {0}arr, {0}nCount);", prefix);
             }
             else
             {
-                c.P(lev); c.WriteLine("/* No need to encode length (it is fixed size ({0})*/", min);
+                c.P(lev);
+                c.WriteLine("BitStream_AppendBitsWithFragmentation(pBitStrm, {0}arr, {0}nCount);", prefix);
             }
-
-            c.P(lev);
-            c.WriteLine("BitStream_AppendBits(pBitStrm, {0}arr, {0}nCount);", prefix);
         }
         
         internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)

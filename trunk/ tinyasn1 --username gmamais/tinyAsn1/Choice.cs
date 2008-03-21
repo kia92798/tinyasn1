@@ -613,6 +613,8 @@ namespace tinyAsn1
 //            h.WriteLine("union {0}_data {{", typeName);
             foreach (ChoiceChild ch in m_children.Values)
             {
+                h.WriteComment(ch.m_comments, lev + 2);
+
                 h.P(lev + 2);
                 ch.m_type.PrintHTypeDeclaration(ch.m_type.PEREffectiveConstraint, h, 
                     typeName + "_" + C.ID(ch.m_childVarName), 
@@ -703,11 +705,11 @@ namespace tinyAsn1
         }
 */
 
-        internal override void VarsNeededForEncode(int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        internal override void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {
             foreach (ChoiceChild ch in m_children.Values)
             {
-                ch.m_type.VarsNeededForEncode(arrayDepth, existingVars);
+                ch.m_type.VarsNeededForEncode(ch.m_type.PEREffectiveConstraint, arrayDepth, existingVars);
             }
         }
 
@@ -808,6 +810,7 @@ namespace tinyAsn1
         public bool m_extended = false;
         public int? m_version = null;
         public List<string> m_comments = new List<string>();
+        public ITree antlrNode = null;
 
         string _cid = null;
         public string CID
@@ -842,6 +845,7 @@ namespace tinyAsn1
             ChoiceChild ret = new ChoiceChild();
             ret.m_version = version;
             ret.m_extended = extended;
+            ret.antlrNode = tree;
 
             for (int i = 0; i < tree.ChildCount; i++)
             {
