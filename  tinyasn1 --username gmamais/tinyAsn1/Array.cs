@@ -244,12 +244,15 @@ namespace tinyAsn1
             }
             if (maxItems(cns) > 0x10000)
             {
-                if (!existingVars.ContainsKey("nCount"))
-                    existingVars.Add("nCount", new CLocalVariable("nCount", "long", 0, "0"));
-                if (!existingVars.ContainsKey("curBlockSize"))
-                    existingVars.Add("curBlockSize", new CLocalVariable("curBlockSize", "long", 0, "0"));
-                if (!existingVars.ContainsKey("curItem"))
-                    existingVars.Add("curItem", new CLocalVariable("curItem", "long", 0, "0"));
+                var = "nCount" + arrayDepth.ToString();
+                if (!existingVars.ContainsKey(var))
+                    existingVars.Add(var, new CLocalVariable(var, "long", 0, "0"));
+                var = "curBlockSize" + arrayDepth.ToString();
+                if (!existingVars.ContainsKey(var))
+                    existingVars.Add(var, new CLocalVariable(var, "long", 0, "0"));
+                var = "curItem" + arrayDepth.ToString();
+                if (!existingVars.ContainsKey(var))
+                    existingVars.Add(var, new CLocalVariable(var, "long", 0, "0"));
             }
         }
         internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
@@ -257,6 +260,10 @@ namespace tinyAsn1
             long min = minItems(cns);
             long max = maxItems(cns);
             string i = "i" + (CLocalVariable.GetArrayIndex(varName) + 1);
+            string nCount = "nCount" + (CLocalVariable.GetArrayIndex(varName) + 1);
+            string curBlockSize = "curBlockSize" + (CLocalVariable.GetArrayIndex(varName) + 1);
+            string curItem = "curItem" + (CLocalVariable.GetArrayIndex(varName) + 1);
+
             string prefix = "";
             bool topLevel = !varName.Contains("->");
 
@@ -284,57 +291,58 @@ namespace tinyAsn1
             else
             {
                 PrintCEncodeFragmentation(cns, c, errorCode, varName, lev, 
-                    string.Format("nCount = {0}nCount;", prefix), "arr", max,i,prefix);
+                    string.Format(nCount+" = {0}nCount;", prefix), "arr", max,i,prefix,
+                    nCount, curBlockSize, curItem);
             }
         }
 
         protected virtual void PrintCEncodeFragmentation(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev,
-            string nCountInit, string arrName, long max, string i, string prefix)
+            string nCountInit, string arrName, long max, string i, string prefix, string nCount, string curBlockSize, string curItem)
         {
 
             c.P(lev); c.WriteLine("/* Fragmentation required since {0} is grater than 64K*/", max);
 
             c.P(lev); c.WriteLine(nCountInit);
-            c.P(lev); c.WriteLine("curBlockSize = 0;");
-            c.P(lev); c.WriteLine("curItem = 0;");
-            c.P(lev); c.WriteLine("while (nCount >= 0x4000)");
+            c.P(lev); c.WriteLine("{0} = 0;", curBlockSize);
+            c.P(lev); c.WriteLine("{0} = 0;", curItem);
+            c.P(lev); c.WriteLine("while ({0} >= 0x4000)", nCount);
             c.P(lev++); c.WriteLine("{");
-            c.P(lev); c.WriteLine("if (nCount >= 0x10000)");
+            c.P(lev); c.WriteLine("if ({0} >= 0x10000)", nCount);
             c.P(lev++); c.WriteLine("{");
-            c.P(lev); c.WriteLine("curBlockSize = 0x10000;");
+            c.P(lev); c.WriteLine("{0} = 0x10000;", curBlockSize);
             c.P(lev); c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, 0xC4, 0, 0xFF);");
             c.P(--lev); c.WriteLine("}");
-            c.P(lev); c.WriteLine("else if (nCount >= 0xC000)");
+            c.P(lev); c.WriteLine("else if ({0} >= 0xC000)", nCount);
             c.P(lev++); c.WriteLine("{");
-            c.P(lev); c.WriteLine("curBlockSize = 0xC000;");
+            c.P(lev); c.WriteLine("{0} = 0xC000;", curBlockSize);
             c.P(lev); c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, 0xC3, 0, 0xFF);");
             c.P(--lev); c.WriteLine("}");
-            c.P(lev); c.WriteLine("else if (nCount >= 0x8000)");
+            c.P(lev); c.WriteLine("else if ({0} >= 0x8000)", nCount);
             c.P(lev++); c.WriteLine("{");
-            c.P(lev); c.WriteLine("curBlockSize = 0x8000;");
+            c.P(lev); c.WriteLine("{0} = 0x8000;", curBlockSize);
             c.P(lev); c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, 0xC2, 0, 0xFF);");
             c.P(--lev); c.WriteLine("}");
             c.P(lev); c.WriteLine("else");
             c.P(lev++); c.WriteLine("{");
-            c.P(lev); c.WriteLine("curBlockSize = 0x4000;");
+            c.P(lev); c.WriteLine("{0} = 0x4000;", curBlockSize);
             c.P(lev); c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, 0xC1, 0, 0xFF);");
             c.P(--lev); c.WriteLine("}");
 
-            c.P(lev); c.WriteLine("for({0}=curItem; {0} < curBlockSize + curItem; {0}++)", i);
+            c.P(lev); c.WriteLine("for({0}={1}; {0} < {2} + {1}; {0}++)", i, curItem, curBlockSize);
             c.P(lev); c.WriteLine("{");
             PrintCEncodeItem(cns, c, errorCode + "_elem", prefix + arrName + "[" + i + "]", lev + 1);
             c.P(lev); c.WriteLine("}");
-            c.P(lev); c.WriteLine("curItem += curBlockSize;");
-            c.P(lev); c.WriteLine("nCount -= curBlockSize;");
+            c.P(lev); c.WriteLine("{0} += {1};", curItem, curBlockSize);
+            c.P(lev); c.WriteLine("{0} -= {1};", nCount, curBlockSize);
             c.P(--lev); c.WriteLine("}");
-            c.P(lev); c.WriteLine("if (nCount <= 0x7F)");
-            c.P(lev + 1); c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, nCount, 0, 0xFF);");
+            c.P(lev); c.WriteLine("if ({0} <= 0x7F)", nCount);
+            c.P(lev + 1); c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, {0}, 0, 0xFF);", nCount);
             c.P(lev); c.WriteLine("else");
             c.P(lev++); c.WriteLine("{");
             c.P(lev); c.WriteLine("BitStream_AppendBit(pBitStrm, 1);");
-            c.P(lev); c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, nCount, 0, 0x7FFF);");
+            c.P(lev); c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, {0}, 0, 0x7FFF);", nCount);
             c.P(--lev); c.WriteLine("}");
-            c.P(lev); c.WriteLine("for({0}=curItem; {0} < curItem + nCount; {0}++)", i);
+            c.P(lev); c.WriteLine("for({0}={1}; {0} < {1} + {2}; {0}++)", i, curItem, nCount);
             c.P(lev); c.WriteLine("{");
             PrintCEncodeItem(cns, c, errorCode + "_elem", prefix + arrName+ "[" + i + "]", lev + 1);
             c.P(lev); c.WriteLine("}");
@@ -347,21 +355,36 @@ namespace tinyAsn1
 
         internal override void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {
-            if (!existingVars.ContainsKey("nCount"))
+            string var;
+            if (maxItems(cns) <= 0x10000)
             {
-                existingVars.Add("nCount", new CLocalVariable("nCount", "long", 0, "0"));
+                if (!existingVars.ContainsKey("nCount"))
+                {
+                    existingVars.Add("nCount", new CLocalVariable("nCount", "long", 0, "0"));
+                }
             }
-            string var = "i" + arrayDepth.ToString();
+            else
+            {
+                var = "nCount" + arrayDepth.ToString();
+                if (!existingVars.ContainsKey(var))
+                    existingVars.Add(var, new CLocalVariable(var, "long", 0, "0"));
+            }
+            var = "i" + arrayDepth.ToString();
             if (!existingVars.ContainsKey(var))
             {
                 existingVars.Add(var, new CLocalVariable(var, "int", 0, "0"));
             }
             if (maxItems(cns) > 0x10000)
             {
-                if (!existingVars.ContainsKey("curBlockSize"))
-                    existingVars.Add("curBlockSize", new CLocalVariable("curBlockSize", "long", 0, "0"));
-                if (!existingVars.ContainsKey("curItem"))
-                    existingVars.Add("curItem", new CLocalVariable("curItem", "long", 0, "0"));
+                var = "length" + arrayDepth.ToString();
+                if (!existingVars.ContainsKey(var))
+                    existingVars.Add(var, new CLocalVariable(var, "sint", 0, "0"));
+                var = "curBlockSize" + arrayDepth.ToString();
+                if (!existingVars.ContainsKey(var))
+                    existingVars.Add(var, new CLocalVariable(var, "long", 0, "0"));
+                var = "curItem" + arrayDepth.ToString();
+                if (!existingVars.ContainsKey(var))
+                    existingVars.Add(var, new CLocalVariable(var, "long", 0, "0"));
             }
         }
 
@@ -370,6 +393,11 @@ namespace tinyAsn1
             long min = minItems(cns);
             long max = maxItems(cns);
             string i = "i" + (CLocalVariable.GetArrayIndex(varName) + 1);
+            string length = "length" + (CLocalVariable.GetArrayIndex(varName) + 1);
+            string curBlockSize = "curBlockSize" + (CLocalVariable.GetArrayIndex(varName) + 1);
+//            string curItem = "curItem" + (CLocalVariable.GetArrayIndex(varName) + 1);
+            string nCount = "nCount" + (CLocalVariable.GetArrayIndex(varName) + 1);
+
             string prefix = "";
             bool topLevel = !varName.Contains("->");
             if (topLevel)
@@ -407,77 +435,87 @@ namespace tinyAsn1
             {
                 c.P(lev); c.WriteLine("/* Fragmentation required since {0} is grater than 64K*/", max);
                 PrintCDecodeFragmentation(cns, c, varName, lev,
-                        string.Format("nCount = {0}nCount;", prefix), "arr", max, i, prefix);
+                        "arr", max, i, prefix, length, curBlockSize, nCount);
 
             }
         }
 
         protected virtual void PrintCDecodeFragmentation(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev,
-            string nCountInit, string arrName, long max, string i, string prefix)
+            string arrName, long max, string i, string prefix,
+            string length, string curBlockSize, string nCount)
         {
-
-            c.P(lev); c.WriteLine("if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &length, 0, 0xFF))");
-            c.P(lev++); c.WriteLine("{");
-            c.P(lev); c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
-            c.P(lev); c.WriteLine("return FALSE;");
-            c.P(--lev); c.WriteLine("}");
-#if ccode
-    /* Fragmentation required since 100000 is grater than 64K*/
-	while((length & 0xC0)>0) 
-	{
-		if (length == 0xC4)
-			curBlockSize = 0x10000;
-		else if (length == 0xC3)
-			curBlockSize = 0xC000;
-		else if (length == 0xC2)
-			curBlockSize = 0x8000;
-		else if (length == 0xC1)
-			curBlockSize = 0x4000;
-		else {
-			*pErrCode = ERR_INCORRECT_PER_STREAM;
-			return FALSE;
-		}
-		if (nCount+curBlockSize>100000)
-		{
-			*pErrCode = ERR_INSUFFICIENT_DATA;
-			return FALSE;
-		}
-
-		for(i1=0;i1<curBlockSize;i1++)
-		{
-			//[nCount+i];
-		}
-		nCount+=curBlockSize;
-
-		if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &length, 0, 0xFF)) {
-			*pErrCode = ERR_INSUFFICIENT_DATA;
-			return FALSE;
-		}
-	}
-	if ( (length & 0x80)>0) 
-	{
-		sint len2;
-		len2<<=8;
-		if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &len2, 0, 0xFF)) {
-			*pErrCode = ERR_INSUFFICIENT_DATA;
-			return FALSE;
-		}
-		length |= len2;
-		length |= 0x7FFF;
-	}
-	
-	if (nCount+length>100000)
-	{
+            c.P(lev); c.WriteLine("/* Fragmentation required since {0} is grater than 64K*/", max);
+            c.WriteCodeBlock(lev,
+@"if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &{1}, 0, 0xFF))
+{{
+    *pErrCode = ERR_INSUFFICIENT_DATA;
+    return FALSE;
+}}
+while(({1} & 0xC0)>0) 
+{{
+	if ({1} == 0xC4)
+		{2} = 0x10000;
+	else if ({1} == 0xC3)
+		{2} = 0xC000;
+	else if ({1} == 0xC2)
+		{2} = 0x8000;
+	else if ({1} == 0xC1)
+		{2} = 0x4000;
+	else {{
+		*pErrCode = ERR_INCORRECT_PER_STREAM;
+		return FALSE;
+	}}
+	if ({3}+{2}>100000)
+	{{
 		*pErrCode = ERR_INSUFFICIENT_DATA;
 		return FALSE;
-	}
-	for(i1=0;i1<length;i1++)
-	{
-		//[nCount+i];
-	}
-	nCount+=length;
-	//.nCount = nCount;
-#endif
+	}}
+
+	for({0}=0;{0}<{2};{0}++)
+	{{", i, length, curBlockSize, nCount);
+
+            PrintCDecodeItem(cns, c, prefix + arrName+ "[" + i + "]", lev + 2);
+            
+            c.WriteCodeBlock(lev,
+@"    }}
+	{3}+={2};
+
+	if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &{1}, 0, 0xFF)) {{
+		*pErrCode = ERR_INSUFFICIENT_DATA;
+		return FALSE;
+	}}
+}}
+if ( ({1} & 0x80)>0) 
+{{
+	sint len2;
+	len2<<=8;
+	if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &len2, 0, 0xFF)) {{
+		*pErrCode = ERR_INSUFFICIENT_DATA;
+		return FALSE;
+	}}
+	{1} |= len2;
+	{1} |= 0x7FFF;
+}}
+
+if ({3}+{1}>100000)
+{{
+	*pErrCode = ERR_INSUFFICIENT_DATA;
+	return FALSE;
+}}
+for({0}=0;{0}<{1};{0}++)
+{{
+", i, length,curBlockSize,nCount);
+            PrintCDecodeItem(cns, c, prefix + arrName + "[" + i + "]", lev + 1);
+
+            c.WriteCodeBlock(lev,
+@"}}
+{0}+=(long){1};", nCount, length);
+            if (arrName != "")
+            {
+                c.P(lev);
+                c.WriteLine("{0}nCount = (long){1};", prefix, nCount);
+            }
+
         }
 
         protected virtual void PrintCDecodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
