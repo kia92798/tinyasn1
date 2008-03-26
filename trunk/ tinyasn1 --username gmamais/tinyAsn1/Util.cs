@@ -102,6 +102,18 @@ namespace tinyAsn1
                 P(lev); WriteLine("*/");
             }
         }
+
+        public void WriteCodeBlock(int lev, string codeBlock, params object[] args)
+        {
+
+            List<string> lines = new List<string>(string.Format(codeBlock, args).Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries));
+            
+            foreach (string line in lines)
+            {
+                P(lev);
+                WriteLine(line.TrimEnd(Environment.NewLine.ToCharArray()));
+            }
+        }
     }
 
     public class SemanticTreeNode : ITree

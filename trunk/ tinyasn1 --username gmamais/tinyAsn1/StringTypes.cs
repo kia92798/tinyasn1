@@ -222,6 +222,9 @@ namespace tinyAsn1
             long max = maxItems(cns);
             string i = "i" + (CLocalVariable.GetArrayIndex(varName) + 1);
             string prefix = varName;
+            string nCount = "nCount" + (CLocalVariable.GetArrayIndex(varName) + 1);
+            string curBlockSize = "curBlockSize" + (CLocalVariable.GetArrayIndex(varName) + 1);
+            string curItem = "curItem" + (CLocalVariable.GetArrayIndex(varName) + 1);
 
             if (max < 0x10000)
             {
@@ -242,7 +245,7 @@ namespace tinyAsn1
             else
             {
                 PrintCEncodeFragmentation(cns, c, errorCode, varName, lev,
-                    string.Format("nCount = strlen({0});", prefix), "", max, i, prefix);
+                    string.Format(nCount+" = strlen({0});", prefix), "", max, i, prefix,nCount, curBlockSize, curItem);
             }
         }
 
@@ -286,31 +289,43 @@ namespace tinyAsn1
             long min = minItems(cns);
             long max = maxItems(cns);
             string i = "i" + (CLocalVariable.GetArrayIndex(varName) + 1);
+            string length = "length" + (CLocalVariable.GetArrayIndex(varName) + 1);
+            string curBlockSize = "curBlockSize" + (CLocalVariable.GetArrayIndex(varName) + 1);
+//            string curItem = "curItem" + (CLocalVariable.GetArrayIndex(varName) + 1);
+            string nCount = "nCount" + (CLocalVariable.GetArrayIndex(varName) + 1);
             string prefix = varName;
 
             c.P(lev);
             c.WriteLine("memset({0}, 0x0, {1});", varName, maxItems(cns) + 1);
-            if (min != max)
+            if (max < 0x10000)
             {
-                c.P(lev);
-                c.WriteLine("if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nCount, {0}, {1})) {{", min, max);
-                c.P(lev + 1);
-                c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
-                c.P(lev + 1);
-                c.WriteLine("return FALSE;");
-                c.P(lev);
-                c.WriteLine("}");
+                if (min != max)
+                {
+                    c.P(lev);
+                    c.WriteLine("if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nCount, {0}, {1})) {{", min, max);
+                    c.P(lev + 1);
+                    c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+                    c.P(lev + 1);
+                    c.WriteLine("return FALSE;");
+                    c.P(lev);
+                    c.WriteLine("}");
 
+                }
+                else
+                {
+                    c.P(lev);
+                    c.WriteLine("nCount = {0};", max);
+                }
+                c.P(lev); c.WriteLine("for({0}=0;{0}<nCount;{0}++)", i);
+                c.P(lev); c.WriteLine("{");
+                PrintCDecodeItem(cns, c, prefix + "[" + i + "]", lev + 1);
+                c.P(lev); c.WriteLine("}");
             }
             else
             {
-                c.P(lev);
-                c.WriteLine("nCount = {0};", max);
+                PrintCDecodeFragmentation(cns, c, varName, lev,
+                        "", max, i, prefix, length, curBlockSize, nCount);
             }
-            c.P(lev); c.WriteLine("for({0}=0;{0}<nCount;{0}++)", i);
-            c.P(lev); c.WriteLine("{");
-            PrintCDecodeItem(cns, c, prefix + "[" + i + "]", lev + 1);
-            c.P(lev); c.WriteLine("}");
 
         }
 
