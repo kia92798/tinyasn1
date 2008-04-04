@@ -166,18 +166,19 @@ namespace tinyAsn1
                 o.WriteLine("<td class=\"no\">{0}</td>",index);
                 o.WriteLine("<td class=\"field\">{0}</td>",m_childVarName);
                 o.WriteLine("<td class=\"comment\">{0}</td>", o.BR(m_comments));
-                if (m_type is ReferenceType)
-                    o.WriteLine("<td class=\"type\"> <a href=\"#ICD_{0}\">{1}</a></td>",m_type.Name.Replace("-","_"),m_type.Name);
-                else
-                    o.WriteLine("<td class=\"type\">{0}</td>",m_type.Name);
-                
-                o.WriteLine("<td class=\"constraint\">{0}</td>",m_type.Constraints);
                 if (m_optional)
                     o.WriteLine("<td class=\"optional\">Yes</td>");
                 else if (m_default)
                     o.WriteLine("<td class=\"optional\">Def</td>");
                 else
                     o.WriteLine("<td class=\"optional\">No</td>");
+
+                if (m_type is ReferenceType)
+                    o.WriteLine("<td class=\"type\"> <a href=\"#ICD_{0}\">{1}</a></td>",m_type.Name.Replace("-","_"),m_type.Name);
+                else
+                    o.WriteLine("<td class=\"type\">{0}</td>",m_type.Name);
+
+                o.WriteLine("<td class=\"constraint\">{0}</td>", o.Constraint(m_type.Constraints));
                 
                 o.WriteLine("<td class=\"min\">{0}</td>",(m_type.MinBitsInPER==-1?"&#8734":m_type.MinBitsInPER.ToString()));
                 o.WriteLine("<td class=\"max\">{0}</td>", (m_type.MaxBitsInPER == -1 ? "&#8734" : m_type.MaxBitsInPER.ToString()));
@@ -736,9 +737,10 @@ namespace tinyAsn1
             o.WriteLine("<td class=\"hrNo\">No</td>");
             o.WriteLine("<td class=\"hrField\">Field</td>");
             o.WriteLine("<td class=\"hrComment\">Comment</td>");
+            o.WriteLine("<td class=\"hrOptional\">Optional</td>");
+
             o.WriteLine("<td class=\"hrType\">Type</td>");
             o.WriteLine("<td class=\"hrconstraint\">Constraint</td>");
-            o.WriteLine("<td class=\"hrOptional\">Optional</td>");
             o.WriteLine("<td class=\"hrMin\">Min Length (bits)</td>");
             o.WriteLine("<td class=\"hrMax\">Max Length (bits)</td>");
             o.WriteLine("</tr>");
@@ -764,10 +766,10 @@ namespace tinyAsn1
             o.WriteLine("<td class=\"no\">0</td>");
             o.WriteLine("<td class=\"field\">Preamble</td>");
             o.WriteLine("<td class=\"comment\">{0}</td>", "Special field used by PER to indicate the presence of optional and default fields.");
+            o.WriteLine("<td class=\"optional\">No</td>");
             o.WriteLine("<td class=\"type\">{0}</td>", "Bit mask");
 
-            o.WriteLine("<td class=\"constraint\">{0}</td>", "-");
-            o.WriteLine("<td class=\"optional\">No</td>" );
+            o.WriteLine("<td class=\"constraint\">{0}</td>", o.Constraint("N.A."));
             o.WriteLine("<td class=\"min\">{0}</td>", PreambleLength);
             o.WriteLine("<td class=\"max\">{0}</td>", PreambleLength);
             o.WriteLine("</tr>");
@@ -824,13 +826,30 @@ namespace tinyAsn1
             h.Write("}");
         }
 
-        internal override bool DependsOnlyOn(List<TypeAssigment> values)
+        internal override bool DependsOnlyOn(List<string> values)
         {
             foreach (Child ch in m_children.Values)
                 if (!ch.m_type.DependsOnlyOn(values))
                     return false;
             return true;
         }
+
+        internal override List<string> TypesIDepend()
+        {
+            List <string> ret = new List<string>();
+
+            foreach (Child ch in m_children.Values)
+            {
+                foreach (string d in ch.m_type.TypesIDepend())
+                {
+                    if (!ret.Contains(d))
+                        ret.Add(d);
+                }
+            }
+
+            return ret;
+        }
+
 
         internal override void VarsNeededForPrintCInitialize(int lev, OrderedDictionary<string, CLocalVariable> existingVars)
         {

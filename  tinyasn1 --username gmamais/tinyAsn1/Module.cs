@@ -598,9 +598,17 @@ namespace tinyAsn1
             h.WriteLine();
         }
 
-        internal bool DependsOnlyOn(List<TypeAssigment> values)
+        internal bool DependsOnlyOn(List<string> values)
         {
             return m_type.DependsOnlyOn(values);
+        }
+
+        internal List<string> TypesIDepend()
+        {
+            List<string> ret = new List<string>(m_type.TypesIDepend());
+            if (ret.Contains(this.m_name))
+                ret.Remove(m_name);
+            return ret;
         }
 
         internal void PrintC(StreamWriterLevel c, string uniqueID)

@@ -144,7 +144,7 @@ namespace autoICD
         static int Usage()
         {
             Console.Error.WriteLine("Automatic ICD Generator");
-            Console.Error.WriteLine("Current Version is: 0.92");
+            Console.Error.WriteLine("Current Version is: 0.93");
             Console.Error.WriteLine("Usage:");
             Console.Error.WriteLine("autoICD -o outputFileName.html -debug -encodeVariables -icd file1, file2, ..., fileN ");
             Console.Error.WriteLine("\t -debug\tre-prints the AST using ASN.1. Usefull only for debug purposes.");

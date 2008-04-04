@@ -146,8 +146,10 @@ namespace tinyAsn1
 
             }
 
-            foreach (Asn1File f in m_files)
-                f.GetTypesWithNoDepends();
+            CheckDependencies();
+
+            //foreach (Asn1File f in m_files)
+            //    f.GetTypesWithNoDepends();
 
 //Phase 2: Resolve constraints
 //The AST may be traversed multiple times during phase 2
@@ -505,6 +507,54 @@ namespace tinyAsn1
             }
 
         }
+
+        
+        void CheckDependencies()
+        {
+            List<string> ret = new List<string>();
+            List<TypeAssigment> tmp = new List<TypeAssigment>();
+
+            foreach(Asn1File f in m_files)
+                foreach (Module m in f.m_modules)
+                    foreach (TypeAssigment t in m.m_typeAssigments.Values)
+                        tmp.Add(t);
+
+            while (tmp.Count > 0)
+            {
+                int lenBefore = tmp.Count;
+                foreach (Asn1File f in m_files)
+                {
+                    foreach (Module m in f.m_modules)
+                    {
+                        foreach (TypeAssigment t in m.m_typeAssigments.Values)
+                        {
+                            if (t.DependsOnlyOn(ret) && !ret.Contains(t.m_name))
+                            {
+                                ret.Add(t.m_name);
+                                tmp.Remove(t);
+                            }
+                        }
+                    }
+                }
+                if (lenBefore == tmp.Count)
+                {
+                    Console.Error.WriteLine("Cyclic dependencies detected");
+                    List<string> tmpstr = new List<string>();
+                    foreach (TypeAssigment t in tmp)
+                        tmpstr.Add(t.m_name);
+                    foreach (TypeAssigment t in tmp)
+                    {
+                        Console.Error.WriteLine("Type {0} depends on: ",t.m_name);
+                        List<string> dps = t.TypesIDepend();
+                        foreach (string l in dps)
+                            Console.Error.WriteLine("\t{0}", l);
+                    }
+                    throw new SemanticErrorException("Error: Asn1 grammar has cyclic dependencies");
+                }
+            }
+
+        }
+
         public void printC()
         {
             CheckStrictConstraintsNeededForAsn1cc();
@@ -597,7 +647,7 @@ namespace tinyAsn1
             Tabularize();
 
             wr.WriteLine("    <div style=\"width: 100%\">");
-            wr.WriteLine(string.Format("    <h1 >File : {0}</h1>", System.IO.Path.GetFileName(m_fileName)));
+            wr.WriteLine(string.Format("    <h1 >Asn1 file : {0}</h1>", System.IO.Path.GetFileName(m_fileName)));
 
             foreach (Module m in m_modules)
                 m.PrintHtml(wr, lev);
@@ -946,29 +996,36 @@ h2
 
         internal List<TypeAssigment> GetTypesWithNoDepends()
         {
+            
             List<TypeAssigment> ret = new List<TypeAssigment>();
             List<TypeAssigment> tmp = new List<TypeAssigment>();
+            List<string> retStr = new List<string>();
 
             foreach (Module m in m_modules)
+            {
+                foreach (ImportedModule imp in m.m_imports)
+                    retStr.AddRange(imp.m_importedTypes);
                 foreach (TypeAssigment t in m.m_typeAssigments.Values)
                     tmp.Add(t);
+            }
 
             while (tmp.Count > 0)
             {
                 int lenBefore = tmp.Count;
                 foreach (Module m in m_modules)
+                {
                     foreach (TypeAssigment t in m.m_typeAssigments.Values)
                     {
-                        if (t.DependsOnlyOn(ret) && !ret.Contains(t))
+                        if (t.DependsOnlyOn(retStr) && !ret.Contains(t))
                         {
                             ret.Add(t);
                             tmp.Remove(t);
+                            retStr.Add(t.m_name);
                         }
                     }
+                }
                 if (lenBefore == tmp.Count)
                 {
-                    foreach (TypeAssigment t in tmp)
-                        Console.Error.WriteLine(t.m_name);
                     throw new SemanticErrorException("Error: Asn1 grammar has cyclic dependencies");
                 }
             }

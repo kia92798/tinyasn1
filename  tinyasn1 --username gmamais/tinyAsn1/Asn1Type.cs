@@ -754,7 +754,7 @@ namespace tinyAsn1
 
 
             o.WriteLine("<tr class=\"OddRow\">");
-            o.WriteLine("    <td class=\"constraint\" colspan=\"2\">{0}</td>", Constraints);
+            o.WriteLine("    <td class=\"constraint\" colspan=\"2\">{0}</td>", o.Constraint(Constraints));
             o.WriteLine("    <td class=\"min\" >{0}</td>", MinBitsInPER);
             o.WriteLine("    <td class=\"max\" >{0}</td>", MaxBitsInPER);
             o.WriteLine("</tr>");
@@ -786,10 +786,17 @@ namespace tinyAsn1
             throw new Exception("Abstract method called");
         }
 
-        internal virtual bool DependsOnlyOn(List<TypeAssigment> values)
+        internal virtual bool DependsOnlyOn(List<string> values)
         {
             return true;
         }
+
+
+        internal virtual List<string> TypesIDepend()
+        {
+            return new List<string>();
+        }
+
 
         internal virtual void VarsNeededForPrintCInitialize(int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {

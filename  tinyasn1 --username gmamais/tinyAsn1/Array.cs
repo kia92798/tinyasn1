@@ -142,7 +142,7 @@ namespace tinyAsn1
 
             o.WriteLine("<td class=\"type\">{0}</td>", "unsigned int");
 
-            o.WriteLine("<td class=\"constraint\">{0}</td>", cns.ToString());
+            o.WriteLine("<td class=\"constraint\">{0}</td>", o.Constraint(cns.ToString()));
             o.WriteLine("<td class=\"min\">{0}</td>", minSizeBitsInPER(cns));
             o.WriteLine("<td class=\"max\">{0}</td>", maxSizeBitsInPER(cns));
             o.WriteLine("</tr>");
@@ -158,7 +158,7 @@ namespace tinyAsn1
             o.WriteLine("<td class=\"comment\">{0}</td>", "");
             o.WriteLine("<td class=\"type\">{0}</td>", TypeName);
 
-            o.WriteLine("<td class=\"constraint\">{0}</td>", ItemConstraint(cns));
+            o.WriteLine("<td class=\"constraint\">{0}</td>", o.Constraint(ItemConstraint(cns)));
             o.WriteLine("<td class=\"min\">{0}</td>", (minItemBitsInPER(cns) == -1 ? "&#8734" : minItemBitsInPER(cns).ToString()));
             o.WriteLine("<td class=\"max\">{0}</td>", (maxItemBitsInPER(cns) == -1 ? "&#8734" : maxItemBitsInPER(cns).ToString()));
             o.WriteLine("</tr>");
@@ -703,10 +703,15 @@ for({0}=0;{0}<{1};{0}++)
             h.P(lev);
             h.Write("}");
         }
-        
-        internal override bool DependsOnlyOn(List<TypeAssigment> values)
+                               
+        internal override bool DependsOnlyOn(List<string> values)
         {
             return m_type.DependsOnlyOn(values);
+        }
+
+        internal override List<string> TypesIDepend()
+        {
+            return m_type.TypesIDepend();
         }
 
         internal override void VarsNeededForPrintCInitialize(int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)

@@ -1,8 +1,8 @@
 0) Comile and test new functionality
 1) update usage()
-2) build rar file in the debug directory with a new name (6 files)
+2) build rar file in the debug directory with a new name (7 files)
 3) upload the new rar in DataModelling/ 
-4) upload the autoICD.exe in the DataModelling/OnlineDemo/ 
+4) upload the autoICD.exe and tinyAsn1.dll in the DataModelling/OnlineDemo/ 
 5) update history page and update it (do not forget the date)
 6) update the download page
 
