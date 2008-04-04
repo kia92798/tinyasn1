@@ -288,15 +288,27 @@ namespace tinyAsn1
             h.Write(C.ID(m_referencedTypeName));
         }
 
-        internal override bool DependsOnlyOn(List<TypeAssigment> values)
+        internal override bool DependsOnlyOn(List<string> values)
         {
-            foreach (TypeAssigment t in values)
+            foreach (string str in values)
             {
-                if (m_referencedTypeName == t.m_name)
+                if (m_referencedTypeName == str)
                     return true;
             }
             return false;
         }
+
+        internal override List<string> TypesIDepend()
+        {
+            List<string> ret = new List<string>();
+
+            ret.Add(m_referencedTypeName);
+
+            ret.AddRange(Type.TypesIDepend());
+
+            return ret;
+        }
+
         internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
         {
             if (m_constraints.Count == 0)

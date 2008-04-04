@@ -74,8 +74,24 @@ namespace tinyAsn1
         {
             string ret = "";
             foreach (string line in lines)
-                ret += line + "<br/>";
+            {
+                string l =line;
+                while (l.StartsWith("-"))
+                    l = l.Substring(1);
+                if (l.StartsWith("/*") && l.EndsWith("*/"))
+                    l = l.Substring(2, l.Length - 4);
+                ret += l + "<br/>";
+            }
             return ret;
+        }
+
+        public string Constraint(string constraint)
+        {
+            if (constraint == "")
+                return "N.A.";
+            if (constraint.StartsWith("(") && constraint.EndsWith(")"))
+                return constraint.Substring(1, constraint.Length - 2);
+            return constraint;
         }
         public void WriteComment(List<string> comments, int lev)
         {

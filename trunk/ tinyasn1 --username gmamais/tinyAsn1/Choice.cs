@@ -577,7 +577,7 @@ namespace tinyAsn1
             o.WriteLine("<td class=\"comment\">{0}</td>", "Special field used by PER to indicate which choice alternative is present.");
             o.WriteLine("<td class=\"type\">{0}</td>", "unsigned int");
 
-            o.WriteLine("<td class=\"constraint\">{0}</td>", "-");
+            o.WriteLine("<td class=\"constraint\">{0}</td>", o.Constraint("N.A."));
             o.WriteLine("<td class=\"min\">{0}</td>", nBits);
             o.WriteLine("<td class=\"max\">{0}</td>", nBits);
             o.WriteLine("</tr>");
@@ -629,13 +629,30 @@ namespace tinyAsn1
             h.P(lev);
             h.Write("}");
         }
-        internal override bool DependsOnlyOn(List<TypeAssigment> values)
+        internal override bool DependsOnlyOn(List<string> values)
         {
             foreach (ChoiceChild ch in m_children.Values)
                 if (!ch.m_type.DependsOnlyOn(values))
                     return false;
             return true;
         }
+
+        internal override List<string> TypesIDepend()
+        {
+            List<string> ret = new List<string>();
+
+            foreach (ChoiceChild ch in m_children.Values)
+            {
+                foreach (string d in ch.m_type.TypesIDepend())
+                {
+                    if (!ret.Contains(d))
+                        ret.Add(d);
+                }
+            }
+
+            return ret;
+        }
+
         internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel c, string typeName, string varName, int lev, int arrayDepth)
         {
             bool topLevel = !varName.Contains("->");
@@ -900,7 +917,7 @@ namespace tinyAsn1
             else
                 o.WriteLine("<td class=\"type\">{0}</td>", m_type.Name);
 
-            o.WriteLine("<td class=\"constraint\">{0}</td>", m_type.Constraints);
+            o.WriteLine("<td class=\"constraint\">{0}</td>", o.Constraint(m_type.Constraints));
             o.WriteLine("<td class=\"min\">{0}</td>", (m_type.MinBitsInPER == -1 ? "&#8734" : m_type.MinBitsInPER.ToString()));
             o.WriteLine("<td class=\"max\">{0}</td>", (m_type.MaxBitsInPER == -1 ? "&#8734" : m_type.MaxBitsInPER.ToString()));
             o.WriteLine("</tr>");
