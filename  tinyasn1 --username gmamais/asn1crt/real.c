@@ -22,10 +22,10 @@
 
 #ifndef FREXP_UNSUPPORTED
 
-void CalculateMantissaAndExponent(double d, int* exp, uint* mantissa)
+void CalculateMantissaAndExponent(double d, int* exp, asn1SccUint* mantissa)
 {
 	double dman = frexp(d,exp);
-	*mantissa = (uint)(MANTISSA_FACTOR*dman);
+	*mantissa = (asn1SccUint)(MANTISSA_FACTOR*dman);
 	(*exp) -= EXPONENET_FACTOR;
 }
 
@@ -294,15 +294,15 @@ double negpow2[] = {
 1.42404726944461E-306, 7.12023634722304E-307, 3.56011817361152E-307, 1.78005908680576E-307, 8.90029543402881E-308, 4.4501477170144E-308, 2.2250738585072E-308
 };
 
-//int GetNumberOfBitsForNonNegativeInteger(uint v) 
+//int GetNumberOfBitsForNonNegativeInteger(asn1SccUint v) 
 int mylog2(double v)
 {
 	if (v<2) {
 		v=1.0/v;
-		return -GetNumberOfBitsForNonNegativeInteger((uint)v);
+		return -GetNumberOfBitsForNonNegativeInteger((asn1SccUint)v);
 	}
 
-	return GetNumberOfBitsForNonNegativeInteger((uint)v);
+	return GetNumberOfBitsForNonNegativeInteger((asn1SccUint)v);
 }
 
 
@@ -313,7 +313,7 @@ double log2(double v)
 
 double mypow2(int exp)
 {
-	uint ret=1;
+	asn1SccUint ret=1;
 	if (exp>=0) {
 /*		while(exp) 
 		{
@@ -338,14 +338,14 @@ double pow2(double v)
 	return pow(2.0, v);
 }
 
-double myReal(uint* mantissa, int exp) 
+double myReal(asn1SccUint* mantissa, int exp) 
 {
 	return (*mantissa) * mypow2(exp);
 //	return (*mantissa) * pow2(exp);
 }
 
 
-void CalculateMantissaAndExponent(double d, int* exp, uint* mantissa)
+void CalculateMantissaAndExponent(double d, int* exp, asn1SccUint* mantissa)
 {
 	double error;
 	double dmantissa;
@@ -366,13 +366,13 @@ void CalculateMantissaAndExponent(double d, int* exp, uint* mantissa)
 		now mantissa has a value in the range [1..base)
 	*/
 	dmantissa = d/mypow2(*exp);
-	*mantissa = (uint)dmantissa;
+	*mantissa = (asn1SccUint)dmantissa;
 
 	error = fabs((double)(d-myReal(mantissa,*exp)))/d;
     while ( (*mantissa <= MAX_MANTISSA) && (error > DBL_EPSILON) && nCount--)
     {
 		dmantissa *=2;
-		*mantissa = (uint)dmantissa;
+		*mantissa = (asn1SccUint)dmantissa;
 		(*exp)--;
 		error = fabs((double)(d-myReal(mantissa,*exp)))/d;
 	}

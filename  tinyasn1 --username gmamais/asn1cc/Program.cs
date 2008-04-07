@@ -48,6 +48,21 @@ namespace asn1cc
                 {
                     if (args[i] == "-debug")
                         debug = true;
+                    else if (args[i] == "-typePrefix")
+                    {
+                        try
+                        {
+                            i++;
+                            compInv.TypePrefix = args[i];
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.Error.WriteLine("-typePrefix argument specified, but not prefix was given");
+                            Console.Error.WriteLine(ex.Message);
+                            return Usage();
+                        }
+
+                    }
                     else
                     {
                         Console.Error.WriteLine("Unrecognized option: " + args[i]);
@@ -125,8 +140,8 @@ namespace asn1cc
             Console.Error.WriteLine("ASN.1 Certified compiler");
             Console.Error.WriteLine("Current Version is: 0.92");
             Console.Error.WriteLine("Usage:");
-            Console.Error.WriteLine("asn1cc -debug file1, file2, ..., fileN ");
-            Console.Error.WriteLine("\t -debug\tre-prints the AST using ASN.1. Usefull only for debug purposes.");
+            Console.Error.WriteLine("asn1cc -debug -typePrefix prefix file1, file2, ..., fileN ");
+            Console.Error.WriteLine("\t -debug\tre-prints the AST using ASN.1. Useful only for debug purposes.");
             Console.Error.WriteLine("Example:");
             Console.Error.WriteLine("\tasn1cc MyFile.asn1");
             return 4;

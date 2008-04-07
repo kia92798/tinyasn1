@@ -9,13 +9,13 @@
 byte masks[] = {0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01};
 byte masksb[] = {0x0, 0x1, 0x3, 0x7, 0xF, 0x1F, 0x3F, 0x7F, 0xFF};
 
-uint32 masks2[] = {0x0, 0xFF, 
+asn1SccUint32 masks2[] = {0x0, 0xFF, 
 						0xFF00, 
 						0xFF0000, 
 						0xFF000000
 					};
 #if WORD_SIZE==8
-uint64 masks2b[] = {0x0, 0xFF, 
+asn1SccUint64 masks2b[] = {0x0, 0xFF, 
 						0xFF00, 
 						0xFF0000, 
 						0xFF000000, 
@@ -29,7 +29,7 @@ uint64 masks2b[] = {0x0, 0xFF,
 /*   Bit Stream Functions																	   */
 /***********************************************************************************************/
 void BitStream_AppendByte(BitStream* pBitStrm, byte v, flag negate);
-int GetNumberOfBitsForNonNegativeInteger(uint v);
+int GetNumberOfBitsForNonNegativeInteger(asn1SccUint v);
 void BitStream_AppendPartialByte(BitStream* pBitStrm, byte v, byte nbits, flag negate);
 flag BitStream_ReadPartialByte(BitStream* pBitStrm, byte *v, byte nbits);
 
@@ -51,7 +51,7 @@ void BitStream_AttachBuffer(BitStream* pBitStrm, unsigned char* buf, long count)
 	pBitStrm->currentBit=0;	
 }
 
-sint BitStream_GetLength(BitStream* pBitStrm)
+asn1SccSint BitStream_GetLength(BitStream* pBitStrm)
 {
 	int ret = pBitStrm->currentByte;
 	if (pBitStrm->currentBit)
@@ -281,10 +281,10 @@ flag BitStream_ReadPartialByte(BitStream* pBitStrm, byte *v, byte nbits)
 
 
 
-void BitStream_EncodeNonNegativeInteger32Neg(BitStream* pBitStrm, uint32 v, flag negate) 
+void BitStream_EncodeNonNegativeInteger32Neg(BitStream* pBitStrm, asn1SccUint32 v, flag negate) 
 {
 	int cc;
-	uint32 curMask;
+	asn1SccUint32 curMask;
 	int pbits;
 
 	if (v==0)
@@ -304,7 +304,7 @@ void BitStream_EncodeNonNegativeInteger32Neg(BitStream* pBitStrm, uint32 v, flag
 		curMask = 0x80000000;
 	}
 
-/*	curMask = ((uint32)1) << (cc-1); */
+/*	curMask = ((asn1SccUint32)1) << (cc-1); */
 
 
 	while( (v & curMask)==0 ) {
@@ -320,14 +320,14 @@ void BitStream_EncodeNonNegativeInteger32Neg(BitStream* pBitStrm, uint32 v, flag
 	}
 
 	while (cc) {
-		uint32 t1 = v & masks2[cc>>3]; /* equiv to cc/8 */
+		asn1SccUint32 t1 = v & masks2[cc>>3]; /* equiv to cc/8 */
 		cc-=8;
 		BitStream_AppendByte(pBitStrm, (byte)(t1 >>cc), negate);
 	}
 
 }
 
-flag BitStream_DecodeNonNegativeInteger32Neg(BitStream* pBitStrm, uint32* v, int nBits) 
+flag BitStream_DecodeNonNegativeInteger32Neg(BitStream* pBitStrm, asn1SccUint32* v, int nBits) 
 {
 	byte b;
 	*v = 0;
@@ -351,15 +351,15 @@ flag BitStream_DecodeNonNegativeInteger32Neg(BitStream* pBitStrm, uint32* v, int
 
 
 
-void BitStream_EncodeNonNegativeInteger(BitStream* pBitStrm, uint v) 
+void BitStream_EncodeNonNegativeInteger(BitStream* pBitStrm, asn1SccUint v) 
 {
 
 #if WORD_SIZE==8
 	if (v<0x100000000LL)
-		BitStream_EncodeNonNegativeInteger32Neg(pBitStrm, (uint32)v, 0);
+		BitStream_EncodeNonNegativeInteger32Neg(pBitStrm, (asn1SccUint32)v, 0);
 	else {
-		uint32 hi = (uint32)(v>>32);
-		uint32 lo = (uint32)v;
+		asn1SccUint32 hi = (asn1SccUint32)(v>>32);
+		asn1SccUint32 lo = (asn1SccUint32)v;
 		int nBits;
 		BitStream_EncodeNonNegativeInteger32Neg(pBitStrm, hi, 0); 
 
@@ -373,11 +373,11 @@ void BitStream_EncodeNonNegativeInteger(BitStream* pBitStrm, uint v)
 }
 
 
-flag BitStream_DecodeNonNegativeInteger(BitStream* pBitStrm, uint* v, int nBits)
+flag BitStream_DecodeNonNegativeInteger(BitStream* pBitStrm, asn1SccUint* v, int nBits)
 {
 #if WORD_SIZE==8
-		uint32 hi=0;
-		uint32 lo=0;
+		asn1SccUint32 hi=0;
+		asn1SccUint32 lo=0;
 		flag ret;
 
 		if (nBits<=32)
@@ -399,15 +399,15 @@ flag BitStream_DecodeNonNegativeInteger(BitStream* pBitStrm, uint* v, int nBits)
 }
 
 
-void BitStream_EncodeNonNegativeIntegerNeg(BitStream* pBitStrm, uint v, flag negate) 
+void BitStream_EncodeNonNegativeIntegerNeg(BitStream* pBitStrm, asn1SccUint v, flag negate) 
 {
 #if WORD_SIZE==8
 	if (v<0x100000000LL)
-		BitStream_EncodeNonNegativeInteger32Neg(pBitStrm, (uint32)v, negate);
+		BitStream_EncodeNonNegativeInteger32Neg(pBitStrm, (asn1SccUint32)v, negate);
 	else {
 		int nBits;
-		uint32 hi = (uint32)(v>>32);
-		uint32 lo = (uint32)v;
+		asn1SccUint32 hi = (asn1SccUint32)(v>>32);
+		asn1SccUint32 lo = (asn1SccUint32)v;
 		BitStream_EncodeNonNegativeInteger32Neg(pBitStrm, hi, negate);
 
 		//bug !!!!
@@ -422,7 +422,7 @@ void BitStream_EncodeNonNegativeIntegerNeg(BitStream* pBitStrm, uint v, flag neg
 #endif
 }
 
-int GetNumberOfBitsForNonNegativeInteger32(uint32 v) 
+int GetNumberOfBitsForNonNegativeInteger32(asn1SccUint32 v) 
 {
 	int ret=0;
 
@@ -445,13 +445,13 @@ int GetNumberOfBitsForNonNegativeInteger32(uint32 v)
 	return ret;
 }
 
-int GetNumberOfBitsForNonNegativeInteger(uint v) 
+int GetNumberOfBitsForNonNegativeInteger(asn1SccUint v) 
 {
 #if WORD_SIZE==8
 	if (v<0x100000000LL)
-		return GetNumberOfBitsForNonNegativeInteger32((uint32)v);
+		return GetNumberOfBitsForNonNegativeInteger32((asn1SccUint32)v);
 	else {
-		uint32 hi = (uint32)(v>>32);
+		asn1SccUint32 hi = (asn1SccUint32)(v>>32);
 		return 32 + GetNumberOfBitsForNonNegativeInteger32(hi);
 	}
 #else
@@ -459,22 +459,22 @@ int GetNumberOfBitsForNonNegativeInteger(uint v)
 #endif
 }
 /*
-int GetNumberOfBitsForSignedNegativeInteger(sint v) 
+int GetNumberOfBitsForSignedNegativeInteger(asn1SccSint v) 
 {
     if (v >= 0)
-        return GetNumberOfBitsForNonNegativeInteger((uint)v);
+        return GetNumberOfBitsForNonNegativeInteger((asn1SccUint)v);
 
-    return GetNumberOfBitsForNonNegativeInteger((sint)(-v - 1));
+    return GetNumberOfBitsForNonNegativeInteger((asn1SccSint)(-v - 1));
 }
 */
-int GetLengthInBytesOfUInt(uint v)
+int GetLengthInBytesOfUInt(asn1SccUint v)
 {
 	int ret=0;
-	uint32 v32 = (uint32)v;
+	asn1SccUint32 v32 = (asn1SccUint32)v;
 #if WORD_SIZE==8
 	if (v>0xFFFFFFFF) {
 		ret = 4;
-		v32 = (uint32)(v>>32);
+		v32 = (asn1SccUint32)(v>>32);
 	} 
 #endif
 	
@@ -487,14 +487,14 @@ int GetLengthInBytesOfUInt(uint v)
     return ret+4;
 }
 
-int GetLengthSIntHelper(uint v)
+int GetLengthSIntHelper(asn1SccUint v)
 {
 	int ret=0;
-	uint32 v32 = (uint32)v;
+	asn1SccUint32 v32 = (asn1SccUint32)v;
 #if WORD_SIZE==8
 	if (v>0x7FFFFFFF) {
 		ret = 4;
-		v32 = (uint32)(v>>32);
+		v32 = (asn1SccUint32)(v>>32);
 	} 
 #endif
 
@@ -507,18 +507,18 @@ int GetLengthSIntHelper(uint v)
     return ret+4;
 }
 
-int GetLengthInBytesOfSInt(sint v)
+int GetLengthInBytesOfSInt(asn1SccSint v)
 {
     if (v >= 0)
-        return GetLengthSIntHelper((sint)v);
+        return GetLengthSIntHelper((asn1SccSint)v);
 
-    return GetLengthSIntHelper((sint)(-v - 1));
+    return GetLengthSIntHelper((asn1SccSint)(-v - 1));
 }
 
 
 
 /*
-void BitStream_Encode2ndComplementInteger(BitStream* pBitStrm, sint v)
+void BitStream_Encode2ndComplementInteger(BitStream* pBitStrm, asn1SccSint v)
 {
 	if (v>=0) {
 		BitStream_AppendBitZero(pBitStrm);
@@ -529,7 +529,7 @@ void BitStream_Encode2ndComplementInteger(BitStream* pBitStrm, sint v)
 		BitStream_EncodeNonNegativeIntegerNeg(pBitStrm,-v-1, 1);
 	}
 }
-flag BitStream_Decode2ndComplementInteger(BitStream* pBitStrm, sint* v)
+flag BitStream_Decode2ndComplementInteger(BitStream* pBitStrm, asn1SccSint* v)
 {
 	assert(0);
 	return TRUE;
@@ -537,11 +537,11 @@ flag BitStream_Decode2ndComplementInteger(BitStream* pBitStrm, sint* v)
 */
 
  
-void BitStream_EncodeConstraintWholeNumber(BitStream* pBitStrm, sint v, sint min, sint max)
+void BitStream_EncodeConstraintWholeNumber(BitStream* pBitStrm, asn1SccSint v, asn1SccSint min, asn1SccSint max)
 {
 	int nRangeBits;
 	int nBits;
-	uint range = max-min;
+	asn1SccUint range = max-min;
 	assert(min<=max);
 	if(!range)
 		return;
@@ -553,11 +553,11 @@ void BitStream_EncodeConstraintWholeNumber(BitStream* pBitStrm, sint v, sint min
 
 
 
-flag BitStream_DecodeConstraintWholeNumber(BitStream* pBitStrm, sint* v, sint min, sint max)
+flag BitStream_DecodeConstraintWholeNumber(BitStream* pBitStrm, asn1SccSint* v, asn1SccSint min, asn1SccSint max)
 {
-	uint uv;
+	asn1SccUint uv;
 	int nRangeBits;
-	uint range = max-min;
+	asn1SccUint range = max-min;
 	assert(min<=max);
 
 	*v=0;
@@ -577,22 +577,22 @@ flag BitStream_DecodeConstraintWholeNumber(BitStream* pBitStrm, sint* v, sint mi
 
 
      
-void BitStream_EncodeSemiConstraintWholeNumber(BitStream* pBitStrm, sint v, sint min)
+void BitStream_EncodeSemiConstraintWholeNumber(BitStream* pBitStrm, asn1SccSint v, asn1SccSint min)
 {
-	int nBytes = GetLengthInBytesOfUInt((uint)(v - min));
+	int nBytes = GetLengthInBytesOfUInt((asn1SccUint)(v - min));
 	
 	/* encode length */
     BitStream_EncodeConstraintWholeNumber(pBitStrm, nBytes, 0, 255); /*8 bits, first bit is always 0*/
 	/* put required zeros*/
-	BitStream_AppendNBitZero(pBitStrm,nBytes*8-GetNumberOfBitsForNonNegativeInteger((uint)(v-min)));
+	BitStream_AppendNBitZero(pBitStrm,nBytes*8-GetNumberOfBitsForNonNegativeInteger((asn1SccUint)(v-min)));
 	/*Encode number */
 	BitStream_EncodeNonNegativeInteger(pBitStrm,v-min);
 }
 
 
-flag BitStream_DecodeSemiConstraintWholeNumber(BitStream* pBitStrm, sint* v, sint min)
+flag BitStream_DecodeSemiConstraintWholeNumber(BitStream* pBitStrm, asn1SccSint* v, asn1SccSint min)
 {
-	sint nBytes;
+	asn1SccSint nBytes;
 	int i;
 	*v=0;
 	if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nBytes, 0, 255))
@@ -609,7 +609,7 @@ flag BitStream_DecodeSemiConstraintWholeNumber(BitStream* pBitStrm, sint* v, sin
 
 
 
-void BitStream_EncodeUnConstraintWholeNumber(BitStream* pBitStrm, sint v)
+void BitStream_EncodeUnConstraintWholeNumber(BitStream* pBitStrm, asn1SccSint v)
 {
 	int nBytes = GetLengthInBytesOfSInt(v);
 	
@@ -617,18 +617,18 @@ void BitStream_EncodeUnConstraintWholeNumber(BitStream* pBitStrm, sint v)
     BitStream_EncodeConstraintWholeNumber(pBitStrm, nBytes, 0, 255); /*8 bits, first bit is always 0*/
 
 	if (v>=0) {
-		BitStream_AppendNBitZero(pBitStrm,nBytes*8-GetNumberOfBitsForNonNegativeInteger((uint)v));
+		BitStream_AppendNBitZero(pBitStrm,nBytes*8-GetNumberOfBitsForNonNegativeInteger((asn1SccUint)v));
 		BitStream_EncodeNonNegativeInteger(pBitStrm,v);
 	}
 	else {
-		BitStream_AppendNBitOne(pBitStrm,nBytes*8-GetNumberOfBitsForNonNegativeInteger((uint)(-v-1)));
+		BitStream_AppendNBitOne(pBitStrm,nBytes*8-GetNumberOfBitsForNonNegativeInteger((asn1SccUint)(-v-1)));
 		BitStream_EncodeNonNegativeIntegerNeg(pBitStrm,-v-1, 1);
 	}
 }
 
-flag BitStream_DecodeUnConstraintWholeNumber(BitStream* pBitStrm, sint* v)
+flag BitStream_DecodeUnConstraintWholeNumber(BitStream* pBitStrm, asn1SccSint* v)
 {
-	sint nBytes;
+	asn1SccSint nBytes;
 	int i;
 	flag valIsNegative=FALSE;
 	*v=0;
@@ -687,7 +687,7 @@ void BitStream_EncodeReal(BitStream* pBitStrm, double v)
 	int nExpLen;
 	int nManLen;
 	int exp;
-	uint mantissa;
+	asn1SccUint mantissa;
 
 
 	if (v==0.0) 
@@ -732,17 +732,17 @@ void BitStream_EncodeReal(BitStream* pBitStrm, double v)
 
 	/* encode exponent */
 	if (exp>=0) {
-		BitStream_AppendNBitZero(pBitStrm,nExpLen*8-GetNumberOfBitsForNonNegativeInteger((uint)exp));
+		BitStream_AppendNBitZero(pBitStrm,nExpLen*8-GetNumberOfBitsForNonNegativeInteger((asn1SccUint)exp));
 		BitStream_EncodeNonNegativeInteger(pBitStrm,exp);
 	}
 	else {
-		BitStream_AppendNBitOne(pBitStrm,nExpLen*8-GetNumberOfBitsForNonNegativeInteger((uint)(-exp-1)));
+		BitStream_AppendNBitOne(pBitStrm,nExpLen*8-GetNumberOfBitsForNonNegativeInteger((asn1SccUint)(-exp-1)));
 		BitStream_EncodeNonNegativeIntegerNeg(pBitStrm,-exp-1, 1);
 	}
 
 
 	/* encode mantissa */
-	BitStream_AppendNBitZero(pBitStrm,nManLen*8-GetNumberOfBitsForNonNegativeInteger((uint)(mantissa)));
+	BitStream_AppendNBitZero(pBitStrm,nManLen*8-GetNumberOfBitsForNonNegativeInteger((asn1SccUint)(mantissa)));
 	BitStream_EncodeNonNegativeInteger(pBitStrm,mantissa);
 
 }
@@ -793,7 +793,7 @@ flag DecodeRealAsBinaryEncoding(BitStream* pBitStrm, int length, byte header, do
 	int factor=1;
 	int expLen;
 	int exp;
-	uint N=0;
+	asn1SccUint N=0;
 	int i;
 
 	if (header & 0x40)

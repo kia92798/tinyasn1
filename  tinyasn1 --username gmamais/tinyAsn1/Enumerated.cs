@@ -440,7 +440,7 @@ namespace tinyAsn1
         {
             if (!existingVars.ContainsKey("enumIndex"))
             {
-                existingVars.Add("enumIndex", new CLocalVariable("enumIndex", "sint", 0, "0"));
+                existingVars.Add("enumIndex", new CLocalVariable("enumIndex", "asn1SccSint", 0, "0"));
             }
         }
         internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
