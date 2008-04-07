@@ -281,7 +281,7 @@ namespace tinyAsn1
 
         internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
-            h.Write("sint ");
+            h.Write("asn1SccSint ");
         }
 
         internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defaultVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)

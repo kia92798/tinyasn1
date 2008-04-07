@@ -10,6 +10,8 @@ namespace tinyAsn1
 {
     public partial class Asn1CompilerInvokation
     {
+        public string TypePrefix = string.Empty;
+
         public List<Asn1File> m_files = new List<Asn1File>();
 
         public IEnumerable<T> GetTypes<T>() where T : Asn1Type
@@ -1060,7 +1062,7 @@ h2
 
                 foreach (TypeAssigment t in tmp)
                 {
-                    string uniqueID = Asn1CompilerInvokation.Instance.GetUniqueID(C.ID(t.m_name));
+                    string uniqueID = Asn1CompilerInvokation.Instance.TypePrefix+ Asn1CompilerInvokation.Instance.GetUniqueID(C.ID(t.m_name));
                     t.PrintH(h, uniqueID);
                 }
 
@@ -1089,7 +1091,7 @@ h2
                 c.WriteLine("#include \"{0}\"", fileName + ".h");
                 foreach (TypeAssigment t in tmp)
                 {
-                    string uniqueID = Asn1CompilerInvokation.Instance.GetUniqueID(C.ID(t.m_name));
+                    string uniqueID = Asn1CompilerInvokation.Instance.TypePrefix + Asn1CompilerInvokation.Instance.GetUniqueID(C.ID(t.m_name));
                     t.PrintC(c, uniqueID);
                 }
 

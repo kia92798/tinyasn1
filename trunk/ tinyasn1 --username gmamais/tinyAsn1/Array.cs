@@ -378,7 +378,7 @@ namespace tinyAsn1
             {
                 var = "length" + arrayDepth.ToString();
                 if (!existingVars.ContainsKey(var))
-                    existingVars.Add(var, new CLocalVariable(var, "sint", 0, "0"));
+                    existingVars.Add(var, new CLocalVariable(var, "asn1SccSint", 0, "0"));
                 var = "curBlockSize" + arrayDepth.ToString();
                 if (!existingVars.ContainsKey(var))
                     existingVars.Add(var, new CLocalVariable(var, "long", 0, "0"));
@@ -854,16 +854,16 @@ for({0}=0;{0}<{1};{0}++)
 
         internal override void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {
-/*            if (!existingVars.ContainsKey("nCount"))
-            {
-                existingVars.Add("nCount", new CLocalVariable("nCount", "sint", 0, "0"));
-            }
-            string var = "i" + arrayDepth.ToString();
-            if (!existingVars.ContainsKey(var))
-            {
-                existingVars.Add(var, new CLocalVariable(var, "int", 0, "0"));
-            }
- */
+            /*            if (!existingVars.ContainsKey("nCount"))
+                        {
+                            existingVars.Add("nCount", new CLocalVariable("nCount", "asn1SccSint", 0, "0"));
+                        }
+                        string var = "i" + arrayDepth.ToString();
+                        if (!existingVars.ContainsKey(var))
+                        {
+                            existingVars.Add(var, new CLocalVariable(var, "int", 0, "0"));
+                        }
+             */
             base.VarsNeededForDecode(cns, arrayDepth, existingVars);
             m_type.VarsNeededForDecode(m_type.PEREffectiveConstraint, arrayDepth + 1, existingVars);
         }

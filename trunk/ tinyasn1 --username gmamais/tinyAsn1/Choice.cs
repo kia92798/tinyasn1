@@ -768,7 +768,7 @@ namespace tinyAsn1
         internal override void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {
             if (!existingVars.ContainsKey("nChoiceIndex"))
-                existingVars.Add("nChoiceIndex", new CLocalVariable("nChoiceIndex","sint",0,"0"));
+                existingVars.Add("nChoiceIndex", new CLocalVariable("nChoiceIndex", "asn1SccSint", 0, "0"));
             foreach (ChoiceChild ch in m_children.Values)
             {
                 ch.m_type.VarsNeededForDecode(ch.m_type.PEREffectiveConstraint, arrayDepth, existingVars);

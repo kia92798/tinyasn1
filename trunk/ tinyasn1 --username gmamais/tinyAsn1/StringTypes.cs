@@ -359,7 +359,7 @@ namespace tinyAsn1
                 }
             }
             c.P(lev);
-            c.WriteLine("sint charIndex = 0;");
+            c.WriteLine("asn1SccSint charIndex = 0;");
             c.P(lev);
             c.WriteLine("if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &charIndex, {0}, {1})) {{", 0, tmp.Count-1);
             c.P(lev + 1);
