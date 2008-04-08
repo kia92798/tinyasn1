@@ -1,0 +1,29 @@
+CAR-PARTS DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+
+	MyTestPDU ::= SEQUENCE (SIZE(0..20)) OF SEQUENCE {
+		int1	INTEGER(0..15),
+		int2	INTEGER(0..65535),
+		enm		ENUMERATED {
+					one(1), two(2), three(3),
+					 four(4), thousand(1000)
+				},
+		buf	 OCTET STRING (SIZE(10)),
+		gg  SEQUENCE {
+			int1	INTEGER(0..15),
+			int2	INTEGER(0..65535),
+			enm	ENUMERATED {
+					one(1), two(2), three(3),
+					 four(4), thousand(1000)
+				},
+			buf	[APPLICATION 104]	OCTET STRING (SIZE(10))
+		} OPTIONAL
+	}
+	
+	testPDU MyTestPDU ::=  { 
+							{int1 10, int2 200, enm one, buf '00112233445566778899'H}
+							}
+
+	MyInt ::= INTEGER
+	
+END

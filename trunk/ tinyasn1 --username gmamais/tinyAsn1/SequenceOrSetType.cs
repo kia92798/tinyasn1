@@ -902,8 +902,22 @@ namespace tinyAsn1
 
             foreach (Child ch in m_children.Values)
             {
-                ch.m_type.PrintCIsConstraintValid(ch.m_type.PEREffectiveConstraint, c, errorCode + "_" + C.ID(ch.m_childVarName), 
-                    typeName + "_" + C.ID(ch.m_childVarName), varName2 + C.ID(ch.m_childVarName), lev, arrayDepth);
+                if (ch.m_optional || ch.m_default)
+                {
+                    c.P(lev);
+                    c.WriteLine("if ( {0}exist.{1} ) {{", varName2, C.ID(ch.m_childVarName));
+
+                    ch.m_type.PrintCIsConstraintValid(ch.m_type.PEREffectiveConstraint, c, errorCode + "_" + C.ID(ch.m_childVarName),
+                        typeName + "_" + C.ID(ch.m_childVarName), varName2 + C.ID(ch.m_childVarName), lev+1, arrayDepth);
+
+                    c.P(lev); c.WriteLine("}");
+
+                }
+                else
+                {
+                    ch.m_type.PrintCIsConstraintValid(ch.m_type.PEREffectiveConstraint, c, errorCode + "_" + C.ID(ch.m_childVarName),
+                        typeName + "_" + C.ID(ch.m_childVarName), varName2 + C.ID(ch.m_childVarName), lev, arrayDepth);
+                }
                 c.WriteLine();
             }
         }
@@ -1017,13 +1031,25 @@ namespace tinyAsn1
                 {
                     byte cb = 0x80;
                     c.P(lev);
+                    c.WriteLine("{0}exist.{1} = 0;", varName2, C.ID(ch.m_childVarName));
+
+                    c.P(lev);
                     c.WriteLine("if ((bitMask[{0}] & 0x{1:X2}) != 0 ) {{", currentByte, (cb >> currentBit));
+
+                    c.P(lev+1);
+                    c.WriteLine("{0}exist.{1} = 1;", varName2, C.ID(ch.m_childVarName));
+
+
                     ch.m_type.PrintCDecode(ch.m_type.PEREffectiveConstraint, c, varName2 + C.ID(ch.m_childVarName), lev+1);
                     c.P(lev); c.WriteLine("}");
                     if (ch.m_defaultValue != null)
                     {
                         c.P(lev); c.WriteLine("else");
                         c.P(lev); c.WriteLine("{");
+
+                        c.P(lev + 1);
+                        c.WriteLine("{0}exist.{1} = 1;", varName2, C.ID(ch.m_childVarName));
+
                         ch.m_type.PrintCInitialize(ch.m_type.PEREffectiveConstraint, ch.m_defaultValue, c, "", varName2 + C.ID(ch.m_childVarName), lev + 1, CLocalVariable.GetArrayIndex(varName) + 1);
                         c.P(lev); c.WriteLine("}");
                     }
@@ -1291,17 +1317,67 @@ namespace tinyAsn1
 
         internal override void PrintC(StreamWriterLevel c, int lev)
         {
+            //calculate optional fields which are present
+            SequenceOrSetType myType = m_type.GetFinalType() as SequenceOrSetType;
+            List<string> existedFields = new List<string>();
+            if (myType.GetNumberOfOptionalOrDefaultFields() > 0)
+            {
+                foreach (string varName in myType.m_children.Keys)
+                {
+                    SequenceOrSetType.Child ch = myType.m_children[varName];
+                    if (ch.m_optional || ch.m_defaultValue != null)
+                    {
+                        if (m_children.ContainsKey(varName))
+                        {
+                            existedFields.Add(varName);
+                        }
+                    }
+                }
+            }
+
+
+
             c.WriteLine("{");
             int cnt = m_children.Count;
             for (int i = 0; i < cnt; i++)
             {
                 c.P(lev+1);
+                c.Write(".{0} = ", m_children.Keys[i]);
                 m_children.Values[i].PrintC(c, lev + 1);
-                if (i != cnt - 1)
+                if (i != cnt - 1 || existedFields.Count>0)
                     c.WriteLine(",");
                 else
                     c.WriteLine();
             }
+
+
+
+            if (existedFields.Count > 0)
+            {
+                lev++;
+                c.P(lev);
+                c.WriteLine(".exist = {");
+                lev++;
+
+                cnt = existedFields.Count;
+                for (int i = 0; i < cnt; i++)
+                {
+                    c.P(lev);
+                    c.Write(".{0} = 1", existedFields[i]);
+                    if (i != cnt - 1)
+                        c.WriteLine(",");
+                    else
+                        c.WriteLine();
+                }
+                lev--;
+                c.P(lev);
+                c.WriteLine("}");
+                lev--;
+            }
+
+
+
+
             c.P(lev);
             c.Write("}");
         }

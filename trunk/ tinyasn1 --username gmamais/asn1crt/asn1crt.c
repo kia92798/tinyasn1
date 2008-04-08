@@ -114,13 +114,17 @@ void BitStream_AppendBits(BitStream* pBitStrm, byte* srcBuffer, int nbits)
 		nbits-=8;
 		i++;
 	}
-	lastByte = srcBuffer[i]>>(8-nbits);
-	BitStream_AppendPartialByte(pBitStrm, lastByte, nbits,FALSE);
+	lastByte = (byte)(srcBuffer[i]>>(8-nbits));
+	BitStream_AppendPartialByte(pBitStrm, lastByte, (byte)nbits,FALSE);
 }
 
 void BitStream_AppendBitsWithFragmentation(BitStream* pBitStrm, byte* srcBuffer, int nbits)
 {
 	assert(0);
+	pBitStrm = pBitStrm;
+	srcBuffer = srcBuffer;
+	nbits = nbits;
+
 }
 
 void BitStream_AppendBit(BitStream* pBitStrm, flag v) 
@@ -185,7 +189,7 @@ flag BitStream_ReadByte(BitStream* pBitStrm, byte* v)
 {
 	int cb = pBitStrm->currentBit;
 	int ncb = 8 - pBitStrm->currentBit;
-	*v=	pBitStrm->buf[pBitStrm->currentByte++]  << cb;
+	*v=	(byte)(pBitStrm->buf[pBitStrm->currentByte++]  << cb);
 
 	if (cb) {
 		*v |= pBitStrm->buf[pBitStrm->currentByte] >> ncb;
@@ -198,7 +202,7 @@ flag BitStream_ReadBits(BitStream* pBitStrm, byte* BuffToWrite, int nbits)
 {
 
 	int i=0;
-	byte lastByte=0;
+//	byte lastByte=0;
 
 	while(nbits>=8) {
 		if (!BitStream_ReadByte(pBitStrm, &BuffToWrite[i]))
@@ -206,7 +210,7 @@ flag BitStream_ReadBits(BitStream* pBitStrm, byte* BuffToWrite, int nbits)
 		nbits-=8;
 		i++;
 	}
-	if (!BitStream_ReadPartialByte(pBitStrm, &BuffToWrite[i], nbits))
+	if (!BitStream_ReadPartialByte(pBitStrm, &BuffToWrite[i], (byte)nbits))
 		return FALSE;
 	
 	BuffToWrite[i] <<=8-nbits;
@@ -250,7 +254,7 @@ flag BitStream_ReadPartialByte(BitStream* pBitStrm, byte *v, byte nbits)
 	int totalBitsForNextByte;
 
 	if (totalBits<=8) {
-		*v = (pBitStrm->buf[pBitStrm->currentByte] >> (8 -totalBits)) & masksb[nbits];
+		*v = (byte)((pBitStrm->buf[pBitStrm->currentByte] >> (8 -totalBits)) & masksb[nbits]);
 		pBitStrm->currentBit+=nbits;
 		if (pBitStrm->currentBit==8) {
 			pBitStrm->currentBit=0;
@@ -259,7 +263,7 @@ flag BitStream_ReadPartialByte(BitStream* pBitStrm, byte *v, byte nbits)
 	} 
 	else {
 		totalBitsForNextByte = totalBits - 8;
-		*v = pBitStrm->buf[pBitStrm->currentByte++] << totalBitsForNextByte;
+		*v = (byte)(pBitStrm->buf[pBitStrm->currentByte++] << totalBitsForNextByte);
 		*v |= pBitStrm->buf[pBitStrm->currentByte] >> (8 - totalBitsForNextByte);
 		*v &= masksb[nbits];
 		pBitStrm->currentBit = totalBitsForNextByte;
@@ -316,7 +320,7 @@ void BitStream_EncodeNonNegativeInteger32Neg(BitStream* pBitStrm, asn1SccUint32 
 	pbits = cc % 8;
 	if (pbits) {
 		cc-=pbits;
-		BitStream_AppendPartialByte(pBitStrm,(byte)(v>>cc), pbits, negate);
+		BitStream_AppendPartialByte(pBitStrm,(byte)(v>>cc), (byte)pbits, negate);
 	}
 
 	while (cc) {
@@ -341,7 +345,7 @@ flag BitStream_DecodeNonNegativeInteger32Neg(BitStream* pBitStrm, asn1SccUint32*
 	if (nBits) 
 	{
 		*v<<=nBits;
-		if (!BitStream_ReadPartialByte(pBitStrm, &b, nBits))
+		if (!BitStream_ReadPartialByte(pBitStrm, &b, (byte)nBits))
 			return FALSE;
 		*v|=b;
 	}
@@ -839,6 +843,11 @@ flag DecodeRealAsBinaryEncoding(BitStream* pBitStrm, int length, byte header, do
 flag DecodeRealUsingDecimalEncoding(BitStream* pBitStrm, int length, byte header, double* v)
 {
 	assert(0);
+
+	pBitStrm = pBitStrm;
+	length = length;
+	header = header;
+	v = v;
 	return TRUE;
 }
 
