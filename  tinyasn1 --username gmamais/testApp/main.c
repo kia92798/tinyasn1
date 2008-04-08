@@ -15,16 +15,27 @@
 
 int main(int argc, char* argv[])
 {
+
 	BitStream bitStrm;
+	BitStream bitStrm2;
+	int encSize1;
 	byte perBuffer[MyTestPDU_REQUIRED_BYTES_FOR_ENCODING];
+	byte perBuffer2[MyTestPDU_REQUIRED_BYTES_FOR_ENCODING];
 	int errorCode;
-//	FILE* fp;
+	FILE* fp;
 	MyTestPDU decodePDU;
 	int i;
-	unsigned long t1,t2;
+
+	//Just to disable warning
+	argc = argc;
+	argv = argv;
 
 
-	t1 = GetTickCount();
+
+//	unsigned long t1,t2;
+
+
+//	t1 = GetTickCount();
 //	for(i=0;i<4000000;i++) {
 
 	/* Encoding Part */
@@ -37,25 +48,29 @@ int main(int argc, char* argv[])
 	}
 	
 	/* Write PER stream to a file*/
-/*	fp = fopen("asn1cc.per_out.dat","wb");
+	fp = fopen("asn1cc.per_out.dat","wb");
 	if (fp==NULL) 
 	{
 		printf("fopen failed !!!\n");
 		return 1;
 	}
+
+	encSize1 = BitStream_GetLength(&bitStrm);
 	
-	fwrite(perBuffer,1,BitStream_GetLength(&bitStrm),fp);
+	fwrite(perBuffer,1,(size_t)BitStream_GetLength(&bitStrm),fp);
 	fclose(fp);
-	for(i=0; i<BitStream_GetLength(&bitStrm);i++) 
-	{
-		unsigned char c = perBuffer[i];
-		printf("%02x\n",c);
-	}
-*/
+	//for(i=0; i<BitStream_GetLength(&bitStrm);i++) 
+	//{
+	//	unsigned char c = perBuffer[i];
+	//	printf("%02x\n",c);
+	//}
+
 
 	/* Decoding Part*/
 
 	BitStream_AttachBuffer(&bitStrm, perBuffer, MyTestPDU_REQUIRED_BYTES_FOR_ENCODING);
+
+//	MyTestPDU_Initialize(&decodePDU);
 
 	if (!MyTestPDU_Decode(&decodePDU, &bitStrm, &errorCode))
 	{
@@ -64,18 +79,43 @@ int main(int argc, char* argv[])
 	}
 	
 //	}
-	t2 = GetTickCount();
-	printf("Total Time %ld", t2-t1);
+//	t2 = GetTickCount();
+//	printf("Total Time %ld\n", t2-t1);
 
 //	printf("Size is %d\n",sizeof(MyTestPDU));
 
 
+//	printf("sizeof(MyTestPDU) is %d\n",sizeof(MyTestPDU));
+
 	
-	if (memcmp(&testPDU, &decodePDU, sizeof(MyTestPDU))!=0) 
+	//if (memcmp(&testPDU, &decodePDU, sizeof(MyTestPDU))!=0) 
+	//{
+	//	printf("Comparison of encoded and decoded PDU failed.\n");
+	//	return 2;
+	//} 
+
+	BitStream_Init(&bitStrm2, perBuffer2, MyTestPDU_REQUIRED_BYTES_FOR_ENCODING);
+
+	if (!MyTestPDU_Encode(&decodePDU,&bitStrm2, &errorCode, TRUE)) 
 	{
-		printf("Comparison of encoded and decoded PDU failed.\n");
+		printf("Re-Encode failed. Error code is %d\n", errorCode);
+		return errorCode;
+	}
+
+	if (encSize1!=BitStream_GetLength(&bitStrm2)) 
+	{
+		printf("Encoded sizes are different %d != %d \n", encSize1, BitStream_GetLength(&bitStrm2));
 		return 2;
+	}
+
+
+	if (memcmp(perBuffer, perBuffer2, MyTestPDU_REQUIRED_BYTES_FOR_ENCODING)!=0) 
+	{
+		printf("Comparison of encoded and re-encoded PDU failed.\n");
+		return 3;
 	} 
+
+
 
 	
 	return 0;

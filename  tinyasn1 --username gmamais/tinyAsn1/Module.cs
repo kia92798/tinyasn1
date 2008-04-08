@@ -673,6 +673,20 @@ namespace tinyAsn1
             c.P(1); c.WriteLine("return TRUE;");
             c.WriteLine("}");
             c.WriteLine();
+
+/*
+            c.WriteLine("void {0}_PrintXml({0}{1} pVal, FILE* fp)", uniqueID, star);
+            c.WriteLine("{");
+            c.P(1);
+            c.Write("fprintf(fp,\"<{0}>\"", m_name);
+
+
+            c.P(1);
+            c.Write("fprintf(fp,\"</{0}>\"", m_name);
+            c.WriteLine("}");
+            c.WriteLine();
+ */ 
+
         }
     }
 

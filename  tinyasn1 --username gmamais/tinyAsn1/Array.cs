@@ -246,13 +246,13 @@ namespace tinyAsn1
             {
                 var = "nCount" + arrayDepth.ToString();
                 if (!existingVars.ContainsKey(var))
-                    existingVars.Add(var, new CLocalVariable(var, "long", 0, "0"));
+                    existingVars.Add(var, new CLocalVariable(var, "asn1SccSint", 0, "0"));
                 var = "curBlockSize" + arrayDepth.ToString();
                 if (!existingVars.ContainsKey(var))
-                    existingVars.Add(var, new CLocalVariable(var, "long", 0, "0"));
+                    existingVars.Add(var, new CLocalVariable(var, "asn1SccSint", 0, "0"));
                 var = "curItem" + arrayDepth.ToString();
                 if (!existingVars.ContainsKey(var))
-                    existingVars.Add(var, new CLocalVariable(var, "long", 0, "0"));
+                    existingVars.Add(var, new CLocalVariable(var, "asn1SccSint", 0, "0"));
             }
         }
         internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
@@ -360,14 +360,14 @@ namespace tinyAsn1
             {
                 if (!existingVars.ContainsKey("nCount"))
                 {
-                    existingVars.Add("nCount", new CLocalVariable("nCount", "long", 0, "0"));
+                    existingVars.Add("nCount", new CLocalVariable("nCount", "asn1SccSint", 0, "0"));
                 }
             }
             else
             {
                 var = "nCount" + arrayDepth.ToString();
                 if (!existingVars.ContainsKey(var))
-                    existingVars.Add(var, new CLocalVariable(var, "long", 0, "0"));
+                    existingVars.Add(var, new CLocalVariable(var, "asn1SccSint", 0, "0"));
             }
             var = "i" + arrayDepth.ToString();
             if (!existingVars.ContainsKey(var))
@@ -381,10 +381,10 @@ namespace tinyAsn1
                     existingVars.Add(var, new CLocalVariable(var, "asn1SccSint", 0, "0"));
                 var = "curBlockSize" + arrayDepth.ToString();
                 if (!existingVars.ContainsKey(var))
-                    existingVars.Add(var, new CLocalVariable(var, "long", 0, "0"));
+                    existingVars.Add(var, new CLocalVariable(var, "asn1SccSint", 0, "0"));
                 var = "curItem" + arrayDepth.ToString();
                 if (!existingVars.ContainsKey(var))
-                    existingVars.Add(var, new CLocalVariable(var, "long", 0, "0"));
+                    existingVars.Add(var, new CLocalVariable(var, "asn1SccSint", 0, "0"));
             }
         }
 
@@ -487,7 +487,7 @@ while(({1} & 0xC0)>0)
 }}
 if ( ({1} & 0x80)>0) 
 {{
-	sint len2;
+	asn1SccSint len2;
 	len2<<=8;
 	if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &len2, 0, 0xFF)) {{
 		*pErrCode = ERR_INSUFFICIENT_DATA;

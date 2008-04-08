@@ -4,6 +4,7 @@ import sys
 
 def Work(fname):
     os.system("cd ../asn1cc/;rm asn1cc.per_out.dat sample1.asn1 sample1.c sample1.h sample1.exe ")
+    os.system("cp ../../testApp/main.c ../asn1cc/")
     cmd = "cp "+ fname +" ../asn1cc/sample1.asn1"
     print cmd
     res = os.system(cmd) / 256
@@ -20,19 +21,37 @@ def Work(fname):
 	return
 	#sys.exit(res);
 
-    os.system("cd ../oss/;rm ossSample1.exe sample1.asn1  sample1.c sample1.h oss.per_out.dat")
-    cmd = "cp "+ fname +" ../oss/sample1.asn1"
-    os.system(cmd)
-    cmd = "cd ../oss/;./runOss"
+
+    cmd = 'ssh gmamais@192.168.0.145 "cd tinyAsn1/asn1cc.regression/oss && rm ossSample1.exe sample1.asn1  sample1.c sample1.h oss.per_out.dat"'
+    print cmd
+    res = os.system(cmd) / 256
+    if res != 0:
+	log.write("[%s]command %s failed!\n" % (fname,cmd))
+	return
+
+    cmd = "scp "+ fname +" gmamais@192.168.0.145:tinyAsn1/asn1cc.regression/oss/sample1.asn1"
+    print cmd
+    res = os.system(cmd) / 256
+    if res != 0:
+	log.write("[%s]command %s failed!\n" % (fname,cmd))
+	return
+        
+    cmd = 'ssh gmamais@192.168.0.145 "cd tinyAsn1/asn1cc.regression/oss && ./runOss"'
     print cmd
     res = os.system(cmd) / 256
     if res != 0:
 	log.write("[%s]command %s failed!\n" % (fname,cmd))
 	return	
-	#sys.exit(res);
+
+    cmd = "scp gmamais@192.168.0.145:tinyAsn1/asn1cc.regression/oss/oss.per_out.dat ../oss/"
+    print cmd
+    res = os.system(cmd) / 256
+    if res != 0:
+	log.write("[%s]command %s failed!\n" % (fname,cmd))
+	return	
 
 
-    cmd = "diff ../asn1cc/asn1cc.per_out.dat ../oss/oss.per_out.dat"
+    cmd = "/cygdrive/c/WINDOWS/system32/fc /b `cygpath -w ../asn1cc/asn1cc.per_out.dat` `cygpath -w ../oss/oss.per_out.dat`"
     print cmd
     res = os.system(cmd) / 256
     if res != 0:

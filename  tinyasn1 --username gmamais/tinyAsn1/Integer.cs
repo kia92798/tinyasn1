@@ -422,15 +422,17 @@ namespace tinyAsn1
                     c.WriteLine("}");
 
                     c.P(lev);
-                    c.WriteLine("if (extBit==0) /* ext bit is zero ==> value is expecteted with root range*/");
+                    c.WriteLine("if (extBit==0) { /* ext bit is zero ==> value is expecteted with root range*/");
                     DecodeNormal(cn, c, var, lev + 1);
-                    c.P(lev); c.WriteLine("else");
+                    c.P(lev); c.WriteLine("} else {");
                     c.P(lev+1);
                     c.WriteLine("if (!BitStream_DecodeUnConstraintWholeNumber(pBitStrm, {0})) {{", var);
-                    c.P(lev + 1);
+                    c.P(lev + 2);
                     c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
-                    c.P(lev + 1);
+                    c.P(lev + 2);
                     c.WriteLine("return FALSE;");
+                    c.P(lev+1);
+                    c.WriteLine("}");
                     c.P(lev);
                     c.WriteLine("}");
                 }
