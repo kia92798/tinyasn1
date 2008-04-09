@@ -17,12 +17,7 @@ if res != 0:
         log.write("asn1cc failed %s\n" % fname)
 	sys.exit(1);
 
-<<<<<<< .mine
-#cmd = "/cygdrive/c/MinGW/bin/gcc -o " + baseName+".exe -I../../asn1crt/ -I. main.c  ../../asn1crt/asn1crt.c ../../asn1crt/real.c " + baseName + ".c"
-cmd = "/cygdrive/c/MinGW/bin/gcc -fpack-struct -o " + baseName+".exe  -I. main.c  asn1crt.c real.c " + baseName + ".c"
-=======
-cmd = "gcc -o " + baseName+".exe -I../../asn1crt/ -I. main.c  ../../asn1crt/asn1crt.c ../../asn1crt/real.c " + baseName + ".c"
->>>>>>> .r131
+cmd = "/cygdrive/c/MinGW/bin/gcc -fpack-struct -g -o " + baseName+".exe  -I. main.c  asn1crt.c real.c " + baseName + ".c"
 print cmd
 res = os.system(cmd) / 256
 if res != 0:
