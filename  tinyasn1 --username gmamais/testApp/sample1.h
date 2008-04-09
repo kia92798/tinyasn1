@@ -11,67 +11,60 @@ extern "C" {
 #endif
 
 typedef struct {
-    long nCount;
-    struct {
+    enum {
+        MyTestPDU_NONE,	/* No components present */
+        int1_PRESENT,
+        int2_PRESENT,
+        enm_PRESENT,
+        buf_PRESENT,
+        gg_PRESENT
+    } kind;
+    union {
         asn1SccSint  int1;
         asn1SccSint  int2;
         enum {
-            arr_enm_one = 1,
-            arr_enm_two = 2,
-            arr_enm_three = 3,
-            arr_enm_four = 4,
-            arr_enm_thousand = 1000
+        MyTestPDU_enm_one = 1,
+        MyTestPDU_enm_two = 2,
+        MyTestPDU_enm_three = 3,
+        MyTestPDU_enm_four = 4,
+        MyTestPDU_enm_thousand = 1000
+    } enm;
+        struct {
+            long nCount;
+            byte arr[10];
+        } buf;
+        struct {
+        asn1SccSint  int1;
+        asn1SccSint  int2;
+        enum {
+            gg_enm_one = 1,
+            gg_enm_two = 2,
+            gg_enm_three = 3,
+            gg_enm_four = 4,
+            gg_enm_thousand = 1000
         } enm;
         struct {
                 long nCount;
                 byte arr[10];
             } buf;
-        struct {
-            asn1SccSint  int1;
-            asn1SccSint  int2;
-            enum {
-                gg_enm_one = 1,
-                gg_enm_two = 2,
-                gg_enm_three = 3,
-                gg_enm_four = 4,
-                gg_enm_thousand = 1000
-            } enm;
-            struct {
-                    long nCount;
-                    byte arr[10];
-                } buf;
-        } gg;
-        struct {
-            unsigned int gg:1;
-        } exist;
-    } arr[20];
+    } gg;
+    } u;
 } MyTestPDU;
 
-#define MyTestPDU_REQUIRED_BYTES_FOR_ENCODING		519
+#define MyTestPDU_REQUIRED_BYTES_FOR_ENCODING		14
 
-#define ERR_MyTestPDU		1000 /* (SIZE (0..20)) */
-#define ERR_MyTestPDU_elem_int1		1001 /* (0..15) */
-#define ERR_MyTestPDU_elem_int2		1002 /* (0..65535) */
-#define ERR_MyTestPDU_elem_buf		1003 /* (SIZE (10)) */
-#define ERR_MyTestPDU_elem_gg_int1		1004 /* (0..15) */
-#define ERR_MyTestPDU_elem_gg_int2		1005 /* (0..65535) */
-#define ERR_MyTestPDU_elem_gg_buf		1006 /* (SIZE (10)) */
+#define ERR_MyTestPDU		1000 /*  */
+#define ERR_MyTestPDU_int1		1001 /* (0..15) */
+#define ERR_MyTestPDU_int2		1002 /* (0..65535) */
+#define ERR_MyTestPDU_buf		1003 /* (SIZE (10)) */
+#define ERR_MyTestPDU_gg_int1		1004 /* (0..15) */
+#define ERR_MyTestPDU_gg_int2		1005 /* (0..65535) */
+#define ERR_MyTestPDU_gg_buf		1006 /* (SIZE (10)) */
 
 void MyTestPDU_Initialize(MyTestPDU* pVal);
 flag MyTestPDU_IsConstraintValid(MyTestPDU* val, int* pErrCode);
 flag MyTestPDU_Encode(MyTestPDU* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
 flag MyTestPDU_Decode(MyTestPDU* val, BitStream* pBitStrm, int* pErrCode);
-
-
-typedef asn1SccSint  MyInt;
-
-#define MyInt_REQUIRED_BYTES_FOR_ENCODING		9
-
-
-void MyInt_Initialize(MyInt* pVal);
-flag MyInt_IsConstraintValid(MyInt* val, int* pErrCode);
-flag MyInt_Encode(MyInt* val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
-flag MyInt_Decode(MyInt* val, BitStream* pBitStrm, int* pErrCode);
 
 
 extern MyTestPDU testPDU;

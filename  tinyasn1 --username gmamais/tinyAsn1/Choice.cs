@@ -806,10 +806,13 @@ namespace tinyAsn1
             int choiceIndex = 0;
             foreach (ChoiceChild ch in m_children.Values)
             {
-                c.P(lev); c.WriteLine("case {0}:", ch.CID);
+                c.P(lev); c.WriteLine("case {0}:", choiceIndex);
                 ch.m_type.PrintCDecode(ch.m_type.PEREffectiveConstraint, c, 
                     varName2 + "u." + C.ID(ch.m_childVarName), lev + 1);
 
+
+                c.P(lev + 1);
+                c.WriteLine("{0}kind = {1};", varName2, ch.CID);
                 c.P(lev + 1);
                 c.WriteLine("break;");
                 choiceIndex++;
@@ -1037,9 +1040,9 @@ namespace tinyAsn1
         {
             c.WriteLine("{");
             c.P(lev + 1);
-            c.WriteLine("{0},", ChoiceType.m_children[m_alternativeName].CID);
+            c.WriteLine(".kind = {0},", ChoiceType.m_children[m_alternativeName].CID);
             c.P(lev + 1);
-            c.Write("{{ .{0}=", ChoiceType.m_children[m_alternativeName].CID.Replace("_PRESENT", ""));
+            c.Write(".u = {{ .{0}=", ChoiceType.m_children[m_alternativeName].CID.Replace("_PRESENT", ""));
             m_value.PrintC(c, lev + 1);
             
             c.WriteLine();
