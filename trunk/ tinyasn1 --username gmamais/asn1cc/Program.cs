@@ -132,6 +132,7 @@ namespace asn1cc
                 return 2;
             }
 
+            Asn1CompilerInvokation.CheckRecursiveFuncSetIsEmpty();
             return 0;
         }
 

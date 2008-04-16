@@ -7,7 +7,7 @@ using Antlr.Runtime;
 namespace tinyAsn1
 {
 
-    public partial class EnumeratedType : Asn1Type
+    public partial class EnumeratedType : Asn1Type, IInternalContentsInHtml
     {
         internal List<NumberedItem> m_enumValuesPriv = new List<NumberedItem>();
         public OrderedDictionary<string, Item> m_enumValues = new OrderedDictionary<string, Item>();
@@ -379,6 +379,21 @@ namespace tinyAsn1
             return ret;
         }
 
+        public string InternalContentsInHtml(List<IConstraint> additionalConstraints)
+        {
+            string ret = "<pre>Enumeration's values:<br/>";
+
+            foreach (Item it in m_enumValues.Values)
+            {
+                EnumeratedValue val = new EnumeratedValue(it.m_value, it.m_id, null, m_module, this);
+                if (isValueAllowed(val,additionalConstraints))
+                    ret += string.Format("\t{0}({1})<br/>", it.m_id, it.m_value);
+            }
+            ret += "</pre>";
+            return ret;
+        }
+
+
         internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
             h.WriteLine("enum {");
@@ -398,6 +413,7 @@ namespace tinyAsn1
             h.P(lev);
             h.Write("}");
         }
+
         internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
         {
             bool topLevel = !varName.Contains("->");
@@ -474,6 +490,8 @@ namespace tinyAsn1
             
             c.P(lev); c.WriteLine("}");
         }
+
+
     }
 
    

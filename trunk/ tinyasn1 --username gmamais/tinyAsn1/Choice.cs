@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Antlr.Runtime.Tree;
 using Antlr.Runtime;
+using MB = System.Reflection.MethodBase;
 
 namespace tinyAsn1
 {
@@ -24,11 +25,11 @@ namespace tinyAsn1
                     string[] items = UniquePath.Split('/');
                     _cid_none = items[items.Length - 1] + "_NONE";
                 }
-                return _cid_none;
+                return C.ID(_cid_none);
             }
             set
             {
-                _cid_none = value;
+                _cid_none = C.ID(value);
             }
         }
 
@@ -190,6 +191,9 @@ namespace tinyAsn1
 
         public override void PerformAutomaticTagging()
         {
+            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return;
+
             int curTag = 0;
             foreach (ChoiceChild ch in m_children.Values)
             {
@@ -208,6 +212,9 @@ namespace tinyAsn1
                 }
                 ch.m_type.PerformAutomaticTagging();
             }
+
+            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+
         }
 
 
@@ -274,10 +281,22 @@ namespace tinyAsn1
 
         public override bool AreConstraintsResolved()
         {
+            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return true;
+
+            bool ret = true;
             foreach (ChoiceChild ch in m_children.Values)
                 if (!ch.m_type.AreConstraintsResolved())
-                    return false;
-            return base.AreConstraintsResolved();
+                {
+                    ret = false;
+                }
+
+            ret = ret && base.AreConstraintsResolved();
+
+            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+
+            return ret;
+
         }
         
         public override bool isValueAllowed(Asn1Value val)
@@ -391,6 +410,11 @@ namespace tinyAsn1
 
         public override void CheckChildrensTags()
         {
+            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return;
+
+            
+
             List<TagSequence> chTags = getChildrenTags();
 
             for (int i = 0; i < chTags.Count; i++)
@@ -400,8 +424,8 @@ namespace tinyAsn1
                     {
 
                         string err = string.Format("Error: Tag clash for type defined in line {0}." +
-                        "The type contains has two children (or grandchilden a choice child) with the same tag. " +
-                        "The child that clashes are located in lines: {1} and {2}", antlrNode.Line, chTags[i].m_tags[0].m_type.antlrNode.Line, chTags[j].m_tags[0].m_type.antlrNode.Line);
+                        "The type has two children with the same tag. " +
+                        "The children that clashes are located in lines: {1} and {2}. Use AUTOMATIC TAGS!", antlrNode.Line, chTags[i].m_tags[0].m_type.antlrNode.Line, chTags[j].m_tags[0].m_type.antlrNode.Line);
                         throw new SemanticErrorException(err);
                     }
 
@@ -412,6 +436,8 @@ namespace tinyAsn1
             {
                 ch.m_type.CheckChildrensTags();
             }
+            
+            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
 
         }
         
@@ -454,6 +480,9 @@ namespace tinyAsn1
 
         public override long minBitsInPER(PEREffectiveConstraint cns)
         {
+            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return 0;
+
             long ret = 0;
             if (IsPERExtensible())
                 ret++;
@@ -470,27 +499,36 @@ namespace tinyAsn1
             ret+=PER.GetNumberOfBitsForNonNegativeInteger(nRootChildren);
             ret += smallestChild;
 
+            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+
             return ret;
         }
 
         public override long maxBitsInPER(PEREffectiveConstraint cns)
         {
+            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return -1;
+
             long ret = 0;
             if (IsPERExtensible())
-                return -1;
-            UInt16 nRootChildren = 0;
-            long largestChild = 0;
-            foreach (ChoiceChild ch in m_children.Values)
+                ret = -1;
+            else
             {
-                if (ch.m_extended)
-                    continue;
-                if (ch.m_type.MaxBitsInPER > largestChild)
-                    largestChild = ch.m_type.MaxBitsInPER;
-                nRootChildren++;
+                UInt16 nRootChildren = 0;
+                long largestChild = 0;
+                foreach (ChoiceChild ch in m_children.Values)
+                {
+                    if (ch.m_extended)
+                        continue;
+                    if (ch.m_type.MaxBitsInPER > largestChild)
+                        largestChild = ch.m_type.MaxBitsInPER;
+                    nRootChildren++;
+                }
+                ret += PER.GetNumberOfBitsForNonNegativeInteger(nRootChildren);
+                ret += largestChild;
             }
-            ret += PER.GetNumberOfBitsForNonNegativeInteger(nRootChildren);
-            ret += largestChild;
 
+            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
 
             return ret;
         }
@@ -823,7 +861,7 @@ namespace tinyAsn1
 
     }
 
-    public partial class ChoiceChild
+    public partial class ChoiceChild 
     {
         public string m_childVarName = "";
         public Asn1Type m_type;

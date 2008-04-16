@@ -138,6 +138,8 @@ namespace autoICD
             {
                 compInv.PrintHtml(outFileName);
             }
+
+            Asn1CompilerInvokation.CheckRecursiveFuncSetIsEmpty();
             return 0;
         }
 

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using Antlr.Runtime.Tree;
 using Antlr.Runtime;
+using MB = System.Reflection.MethodBase;
 
 namespace tinyAsn1
 {
-    public partial class ReferenceType : Asn1Type
+    public partial class ReferenceType : Asn1Type, IInternalContentsInHtml
     {
         public string m_referencedTypeName = "";
         public string m_referencedModName = "";
@@ -77,6 +78,7 @@ namespace tinyAsn1
             return Type;
         }
 
+        
 
         public override Asn1Type ParentType
         {
@@ -203,6 +205,20 @@ namespace tinyAsn1
 
         public override bool AreConstraintsResolved()
         {
+            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return true;
+            
+            bool ret = _AreConstraintsResolved();
+
+            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            return ret;
+
+        }
+
+
+
+        bool _AreConstraintsResolved()
+        {
             if (!ParentType.AreConstraintsResolved())
                 return false;
             if (m_AntlrConstraints.Count > m_constraints.Count)
@@ -267,6 +283,24 @@ namespace tinyAsn1
         public override long maxBitsInPER(PEREffectiveConstraint cns)
         {
             return Type.maxBitsInPER(cns);
+        }
+
+        public string InternalContentsInHtml(List<IConstraint> additionalConstraints)
+        {
+            string ret = string.Empty;
+            IInternalContentsInHtml g = Type as IInternalContentsInHtml;
+            if (g != null)
+            {
+                List<IConstraint> replica = new List<IConstraint>(additionalConstraints);
+                Asn1Type cur = this;
+                while (cur != g)
+                {
+                    replica.AddRange(cur.m_constraints);
+                    cur = cur.ParentType;
+                }
+                return g.InternalContentsInHtml(replica);
+            }
+            return ret;
         }
 
 
