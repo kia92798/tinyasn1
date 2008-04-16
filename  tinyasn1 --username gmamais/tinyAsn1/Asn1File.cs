@@ -10,6 +10,7 @@ namespace tinyAsn1
 {
     public partial class Asn1CompilerInvokation
     {
+
         public string TypePrefix = string.Empty;
 
         public List<Asn1File> m_files = new List<Asn1File>();
@@ -148,7 +149,7 @@ namespace tinyAsn1
 
             }
 
-            CheckDependencies();
+//            CheckDependencies();
 
             //foreach (Asn1File f in m_files)
             //    f.GetTypesWithNoDepends();
@@ -429,84 +430,98 @@ namespace tinyAsn1
             }
         }
 
-        void FixComments()
+
+
+        private void FixComment(List<IToken> FileTokens, List<IToken> alreadyTakenComments, int lastTokenLineNo,
+            int prevTokenIndex, int nextTokenIndex, List<string> comments)
         {
+            while (nextTokenIndex < FileTokens.Count)
+            {
+                IToken t = FileTokens[nextTokenIndex++];
+                if (alreadyTakenComments.Contains(t))
+                    break;
+                if (t.Line != lastTokenLineNo)
+                    break;
+                if (t.Type == asn1Lexer.WS)
+                    continue;
+                else if (t.Type == asn1Lexer.COMMENT || t.Type == asn1Lexer.COMMENT2)
+                {
+                    comments.Insert(0, t.Text);
+                    alreadyTakenComments.Add(t);
+                }
+                else
+                    break;
+
+            }
+
+            //if no comments were found at the same line look back
+            if (comments.Count == 0)
+            {
+
+                while (prevTokenIndex >= 0)
+                {
+                    IToken t = FileTokens[prevTokenIndex--];
+                    if (alreadyTakenComments.Contains(t))
+                        break;
+                    if (t.Type == asn1Lexer.WS)
+                        continue;
+                    else if (t.Type == asn1Lexer.COMMENT || t.Type == asn1Lexer.COMMENT2)
+                    {
+                        comments.Insert(0, t.Text);
+                        alreadyTakenComments.Add(t);
+                    }
+                    else
+                        break;
+                }
+            }
+        }
+
+        private void FixComments()
+        {
+            List<IToken> alreadyTakenComments = new List<IToken>();
             foreach (Asn1File f in m_files)
             {
                 foreach (Module m in f.m_modules)
                 {
                     foreach (TypeAssigment ta in m.m_typeAssigments.Values)
                     {
-                        int i = 1;
-                        while (ta.antlrNode.TokenStartIndex - i > 0)
-                        {
-                            IToken t = f.m_tokes[ta.antlrNode.TokenStartIndex - i];
-                            i++;
-                            if (t.Type == asn1Lexer.WS)
-                                continue;
-                            else if (t.Type == asn1Lexer.COMMENT)
-                                ta.m_comments.Insert(0, t.Text);
-                            else if (t.Type == asn1Lexer.COMMENT2)
-                                ta.m_comments.Insert(0, t.Text);
-                            else
-                                break;
-                        }
+                        FixComment(f.m_tokes, alreadyTakenComments, f.m_tokes[ta.antlrNode.TokenStopIndex].Line,
+                            ta.antlrNode.TokenStartIndex - 1, ta.antlrNode.TokenStopIndex + 1, ta.m_comments);
+
+                        //int i = 1;
+                        //while (ta.antlrNode.TokenStartIndex - i > 0)
+                        //{
+                        //    IToken t = f.m_tokes[ta.antlrNode.TokenStartIndex - i];
+                        //    if (alreadyTakenComments.Contains(t))
+                        //        break;
+                        //    i++;
+                        //    if (t.Type == asn1Lexer.WS)
+                        //        continue;
+                        //    else if (t.Type == asn1Lexer.COMMENT || t.Type == asn1Lexer.COMMENT2)
+                        //    {
+                        //        ta.m_comments.Insert(0, t.Text);
+                        //        alreadyTakenComments.Add(t);
+                        //    }
+                        //    else
+                        //        break;
+                        //}
                     }
                 }
             }
 
             foreach (Asn1File f in m_files)
-            {
                 foreach (Module m in f.m_modules)
-                {
                     foreach (SequenceOrSetType sq in m.GetTypes<SequenceOrSetType>())
-                    {
                         foreach (SequenceOrSetType.Child ch in sq.m_children.Values)
-                        {
-                            int i = 1;
-                            while (ch.antlrNode.TokenStartIndex - i > 0)
-                            {
-                                IToken t = f.m_tokes[ch.antlrNode.TokenStartIndex - i];
-                                i++;
-                                if (t.Type == asn1Lexer.WS)
-                                    continue;
-                                else if (t.Type == asn1Lexer.COMMENT)
-                                    ch.m_comments.Insert(0, t.Text);
-                                else if (t.Type == asn1Lexer.COMMENT2)
-                                    ch.m_comments.Insert(0, t.Text);
-                                else
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
+                            FixComment(f.m_tokes, alreadyTakenComments, f.m_tokes[ch.antlrNode.TokenStopIndex].Line,
+                                ch.antlrNode.TokenStartIndex - 1, ch.antlrNode.TokenStopIndex + 2, ch.m_comments);
+
             foreach (Asn1File f in m_files)
-            {
                 foreach (Module m in f.m_modules)
-                {
                     foreach (ChoiceType sq in m.GetTypes<ChoiceType>())
-                    {
                         foreach (ChoiceChild ch in sq.m_children.Values)
-                        {
-                            int i = 1;
-                            while (ch.antlrNode.TokenStartIndex - i > 0)
-                            {
-                                IToken t = f.m_tokes[ch.antlrNode.TokenStartIndex - i];
-                                i++;
-                                if (t.Type == asn1Lexer.WS)
-                                    continue;
-                                else if (t.Type == asn1Lexer.COMMENT)
-                                    ch.m_comments.Insert(0, t.Text);
-                                else if (t.Type == asn1Lexer.COMMENT2)
-                                    ch.m_comments.Insert(0, t.Text);
-                                else
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
+                            FixComment(f.m_tokes, alreadyTakenComments, f.m_tokes[ch.antlrNode.TokenStopIndex].Line,
+                                ch.antlrNode.TokenStartIndex - 1, ch.antlrNode.TokenStopIndex + 2, ch.m_comments);
 
         }
 
@@ -579,6 +594,32 @@ namespace tinyAsn1
 
         int _constraintErrorID = 1000;
         public int ConstraintErrorID { get { return _constraintErrorID; } set { _constraintErrorID = value; } }
+
+
+        private static Dictionary<string, int> functionPasses = new Dictionary<string, int>();
+
+        public static bool EnterRecursiveFunc(string methodName, object obj)
+        {
+            string curInstance = methodName + obj.GetHashCode().ToString();
+            if (functionPasses.ContainsKey(curInstance))
+                return false;
+            
+            functionPasses.Add(curInstance, 0);
+            return true;
+        }
+
+        public static void LeaveRecursiveFunc(string methodName, object obj)
+        {
+            string curInstance = methodName + obj.GetHashCode().ToString();
+            functionPasses.Remove(curInstance);
+        }
+
+        public static void CheckRecursiveFuncSetIsEmpty()
+        {
+            if (functionPasses.Count != 0)
+                throw new Exception("Internal Error : Recursive Functions Set is NOT empty !");
+        }
+
     }
 
 

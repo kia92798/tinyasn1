@@ -494,6 +494,20 @@ namespace tinyAsn1
             return true;
         }
 
+        public virtual bool isValueAllowed(Asn1Value val, List<IConstraint> addionalConstraints)
+        {
+            bool ret = isValueAllowed(val);
+            if (!ret)
+                return false;
+            foreach (IConstraint cn in addionalConstraints)
+            {
+                if (!cn.isValueAllowed(val))
+                    return false;
+            }
+            return true;
+
+        }
+
         /// <summary>
         /// Returns parent type. It must be overwritten in Reference Type
         /// </summary>
@@ -596,6 +610,8 @@ namespace tinyAsn1
                 return ret;
             }
         }
+
+
 
         public virtual void PrintAsn1(StreamWriterLevel o, int lev)
         {
@@ -766,6 +782,8 @@ namespace tinyAsn1
 
         }
 
+
+
         /// <summary>
         /// Must be overriden in Contstucted types
         /// </summary>
@@ -887,6 +905,8 @@ namespace tinyAsn1
             c.P(lev);
             c.WriteLine("assert(0);");
         }
+
+
     }
 
 
@@ -901,7 +921,14 @@ namespace tinyAsn1
         string Value { get;}
     }
 
+    public interface IInternalContentsInHtml
+    {
+        string InternalContentsInHtml(List<IConstraint> additionalConstraints);
+    }
 
+ 
+
+  
     public partial class Asn1Value : IComparable
     {
         internal ITree antlrNode;

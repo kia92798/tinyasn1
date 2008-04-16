@@ -32,7 +32,9 @@ namespace tinyAsn1
             switch (val.antlrNode.Type)
             {
                 case asn1Parser.StringLiteral:
+                case asn1Parser.VALUE_LIST:
                     return new IA5StringValue(val.antlrNode, m_module, this);
+
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
                     if (m_module.isValueDeclared(referenceId))
@@ -198,7 +200,9 @@ namespace tinyAsn1
         protected override string ItemConstraint(PEREffectiveConstraint cns)
         {
             PERAlphabetAndSizeEffectiveConstraint cn = (PERAlphabetAndSizeEffectiveConstraint)cns;
-            return cn.m_from.ToString();
+            if (cn.m_from!=null)
+                return cn.m_from.ToString();
+            return "";
         }
         internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
@@ -466,18 +470,51 @@ namespace tinyAsn1
             antlrNode = tree;
             m_type = type;
 
-            if (antlrNode.Type != asn1Parser.StringLiteral)
+            if (antlrNode.Type == asn1Parser.StringLiteral)
+            {
+                m_value = antlrNode.Text;
+                if (m_value == null)
+                    m_value = "";
+
+                m_value = m_value.Replace("\"\"", "\"");
+                if (m_value.StartsWith("\""))
+                    m_value = m_value.Substring(1);
+                if (m_value.EndsWith("\""))
+                    m_value = m_value.Substring(0, m_value.Length - 1);
+            }
+            else if (antlrNode.Type == asn1Parser.VALUE_LIST)
+            {
+                if (antlrNode.ChildCount == 2 && antlrNode.GetChild(0).Type == asn1Parser.INT && antlrNode.GetChild(1).Type == asn1Parser.INT)
+                {
+                    try
+                    {
+                        int col = int.Parse(antlrNode.GetChild(0).Text);
+                        int row = int.Parse(antlrNode.GetChild(1).Text);
+                        if (col<0 || col>7)
+                            ErrorReporter.SemanticError(mod.m_file.m_fileName, antlrNode.Line, "column value in IA5String 2-turpe must be in 0..7 range");
+                        if (row<0 || row>15)
+                            ErrorReporter.SemanticError(mod.m_file.m_fileName, antlrNode.Line, "row value in IA5String 2-turpe must be in 0..15 range");
+                        byte value = (byte)(col * 16 + row);
+                        m_value = Convert.ToChar(value).ToString();
+                    }
+                    catch (OverflowException)
+                    {
+                        ErrorReporter.SemanticError(mod.m_file.m_fileName, antlrNode.Line, "value in IA5String 2-turpe is too large");
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < antlrNode.ChildCount; i++)
+                    {
+                        IA5StringValue vc = m_type.ResolveVariable(Asn1Value.CreateFromAntlrAst(antlrNode.GetChild(i))) as IA5StringValue;
+                        if (vc != null)
+                            m_value += vc.m_value;
+                    }
+                }
+            } 
+            else
                 throw new Exception("INTERNAL ERROR");
 
-            m_value = antlrNode.Text;
-            if (m_value == null)
-                m_value = "";
-
-            m_value = m_value.Replace("\"\"", "\"");
-            if (m_value.StartsWith("\""))
-                m_value = m_value.Substring(1);
-            if (m_value.EndsWith("\""))
-                m_value = m_value.Substring(0, m_value.Length - 1);
 
         }
 

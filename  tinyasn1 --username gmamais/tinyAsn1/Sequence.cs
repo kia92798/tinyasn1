@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Antlr.Runtime.Tree;
 using Antlr.Runtime;
+using MB = System.Reflection.MethodBase;
 
 namespace tinyAsn1
 {
@@ -31,9 +32,12 @@ namespace tinyAsn1
 
         public override void CheckChildrensTags()
         {
+            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return;
+
             string err = "Error: Tag clash for type defined in line {0}." +
-            "The type contains has two children (or grandchilden a choice child) with the same tag. " +
-            "The child that clashes are located in lines: {1} and {2}";
+            "The type has two children with the same tag. " +
+            "The children that clashes are located in lines: {1} and {2}. Use AUTOMATIC TAGS";
 
             List<TagSequence> chTags = new List<TagSequence>();
 
@@ -116,6 +120,7 @@ namespace tinyAsn1
                 ch.m_type.CheckChildrensTags();
 
             }
+            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
         }
 
         public override bool Compatible(Asn1Type other)

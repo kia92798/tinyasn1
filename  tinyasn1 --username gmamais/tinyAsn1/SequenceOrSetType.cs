@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Antlr.Runtime.Tree;
 using Antlr.Runtime;
+using MB = System.Reflection.MethodBase;
 
 namespace tinyAsn1
 {
@@ -159,13 +160,18 @@ namespace tinyAsn1
 
             public void PrintHtml(StreamWriterLevel o, int p, int index)
             {
+                IInternalContentsInHtml intCont = m_type as IInternalContentsInHtml;
+
                 string cssClass = "OddRow";
                 if (index%2==0)
                     cssClass="EvenRow";
                 o.WriteLine("<tr class=\""+cssClass+"\">");
                 o.WriteLine("<td class=\"no\">{0}</td>",index);
                 o.WriteLine("<td class=\"field\">{0}</td>",m_childVarName);
-                o.WriteLine("<td class=\"comment\">{0}</td>", o.BR(m_comments));
+                if (intCont == null)
+                    o.WriteLine("<td class=\"comment\">{0}</td>", o.BR(m_comments));
+                else
+                    o.WriteLine("<td class=\"comment\">{0}</td>", o.BR(m_comments)+intCont.InternalContentsInHtml(m_type.m_constraints));
                 if (m_optional)
                     o.WriteLine("<td class=\"optional\">Yes</td>");
                 else if (m_default)
@@ -416,6 +422,9 @@ namespace tinyAsn1
 
         public override void PerformAutomaticTagging()
         {
+            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return;
+
             int curTag = 0;
             foreach (Child ch in m_children.Values)
             {
@@ -434,6 +443,8 @@ namespace tinyAsn1
                 }
                 ch.m_type.PerformAutomaticTagging();
             }
+
+            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
         }
 
 
@@ -507,10 +518,21 @@ namespace tinyAsn1
 
         public override bool AreConstraintsResolved()
         {
+            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return true;
+            
+            bool ret = true;
             foreach (Child ch in m_children.Values)
                 if (!ch.m_type.AreConstraintsResolved())
-                    return false;
-            return base.AreConstraintsResolved();
+                {
+                    ret = false;
+                    break;
+                }
+            
+            ret = ret && base.AreConstraintsResolved();
+
+            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            return ret;
         }
         public override bool isValueAllowed(Asn1Value val)
         {
@@ -672,25 +694,42 @@ namespace tinyAsn1
 
         public override long maxBitsInPER(PEREffectiveConstraint cns)
         {
-            if (IsPERExtensible())
+            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
                 return -1;
 
-            long ret = PreambleLength;
-            foreach (Child ch in m_children.Values)
+            long ret = 0;
+
+            if (IsPERExtensible())
+                ret = -1;
+            else
             {
-                if (ch.m_extended)
-                    continue;
-                long m = ch.m_type.MaxBitsInPER;
-                if (m == -1)
-                    return -1;
-                ret += m;
+
+                ret = PreambleLength;
+                foreach (Child ch in m_children.Values)
+                {
+                    if (ch.m_extended)
+                        continue;
+                    long m = ch.m_type.MaxBitsInPER;
+                    if (m == -1)
+                    {
+                        ret = -1;
+                        break;
+                    }
+                    ret += m;
+                }
             }
+
+            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
 
             return ret;
         }
 
         public override long minBitsInPER(PEREffectiveConstraint cns)
         {
+
+            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return 0;
+
             long ret = PreambleLength;
             if (IsPERExtensible())
                 ret++;
@@ -701,9 +740,15 @@ namespace tinyAsn1
                     continue;
                 long m = ch.m_type.MinBitsInPER;
                 if (m == -1)
-                    return -1;
+                {
+                    ret = -1;
+                    break;
+                }
                 ret += m;
             }
+            
+            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+
             return ret;
         }
 
