@@ -6,7 +6,7 @@ using Antlr.Runtime;
 
 namespace tinyAsn1
 {
-    public partial class BitStringType : SizeableType
+    public partial class BitStringType : SizeableType, IInternalContentsInHtml
     {
         internal List<NumberedItem> m_namedBitsPriv = new List<NumberedItem>();
         public OrderedDictionary<string, Int64> m_namedBits = new OrderedDictionary<string, Int64>();
@@ -312,6 +312,27 @@ namespace tinyAsn1
         {
             return "";
         }
+
+
+        public string InternalContentsInHtml(List<IConstraint> additionalConstraints)
+        {
+            string ret = string.Empty;
+            int cnt = m_namedBits.Count;
+            if (cnt > 0)
+            {
+                ret = "Bit strings's special values:<br/>";
+                for (int i = 0; i < cnt; i++)
+                {
+                    string namedBit = m_namedBits.Keys[i];
+                    long val = m_namedBits.Values[i];
+                    ret += string.Format("\t{0}({1})", namedBit, val);
+                    if (i < cnt - 1)
+                        ret += ", ";
+                }
+            }
+            return ret;
+        }
+
 
         /* Print C backend */
 

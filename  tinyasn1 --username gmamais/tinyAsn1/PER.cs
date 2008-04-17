@@ -475,7 +475,9 @@ namespace tinyAsn1
 
         public override string ToString()
         {
-            return "SIZE["+ m_size.ToString()+"]";
+            if (m_size.ToString() != PERIntegerEffectiveConstraint.UncostraintPosInteger.ToString())
+                return "SIZE("+ m_size.ToString()+")";
+            return string.Empty;
         }
 
 
@@ -722,11 +724,14 @@ namespace tinyAsn1
         }
         public override string ToString()
         {
-            string ret = "null";
-            if (m_size !=null)
-                ret+= "SIZE[" + m_size.ToString() + "]";
+            string ret = string.Empty;
+            if (m_size != null)
+            {
+                if (m_size.ToString() != PERIntegerEffectiveConstraint.UncostraintPosInteger.ToString())
+                    return "SIZE(" + m_size.ToString() + ")";
+            }
             if (m_from != null)
-                ret += " FROM[\"" + m_from.ToString() + "\"]";
+                ret += " FROM(\"" + m_from.ToString() + "\")";
             return ret;
         }
     }

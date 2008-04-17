@@ -11,7 +11,7 @@ using Antlr.Runtime.Tree;
 using System.IO;
 using tinyAsn1;
 
-namespace asn1cc
+namespace asn1scc
 {
 
     
@@ -57,11 +57,32 @@ namespace asn1cc
                         }
                         catch (Exception ex)
                         {
-                            Console.Error.WriteLine("-typePrefix argument specified, but not prefix was given");
+                            Console.Error.WriteLine("-typePrefix argument specified, but not prefix was given.");
                             Console.Error.WriteLine(ex.Message);
                             return Usage();
                         }
 
+                    }
+                    else if (args[i] == "-useSpecialComments")
+                        Asn1CompilerInvokation.UseSpecialComments = true;
+                    else if (args[i] == "-o")
+                    {
+                        try
+                        {
+                            i++;
+                            string outFileDir = args[i];
+                            if (!System.IO.Directory.Exists(outFileDir))
+                            {
+                                Console.Error.WriteLine("{0} is not a valid directory.", outFileDir);
+                                return Usage();
+                            }
+                            Asn1CompilerInvokation.m_outDirectory = outFileDir;
+                        }
+                        catch (Exception )
+                        {
+                            Console.Error.WriteLine("-o argument specified, but no directory was given.");
+                            return Usage();
+                        }
                     }
                     else
                     {
@@ -77,7 +98,7 @@ namespace asn1cc
 
             if (inputFiles.Count == 0)
             {
-                Console.Error.WriteLine("No input files");
+                Console.Error.WriteLine("No input files.");
                 return Usage();
             }
 
@@ -138,12 +159,26 @@ namespace asn1cc
 
         static int Usage()
         {
+            Console.Error.WriteLine();
             Console.Error.WriteLine("ASN.1 Certified compiler");
-            Console.Error.WriteLine("Current Version is: 0.92");
+            Console.Error.WriteLine("Current Version is: 0.93");
             Console.Error.WriteLine("Usage:");
-            Console.Error.WriteLine("asn1cc -debug -typePrefix prefix file1, file2, ..., fileN ");
-            Console.Error.WriteLine("\t -debug\tre-prints the AST using ASN.1. Useful only for debug purposes.");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("asn1scc [-debug] [-typePrefix prefix] [-useSpecialComments] [-o outdir] file1, file2, ..., fileN ");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("\t -debug\t\t\tre-prints the AST using ASN.1.");
+            Console.Error.WriteLine("\t\t\t\tUseful only for debug purposes.");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("\t -typePrefix\t\tadds 'prefix' to all generated C data types.");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("\t -useSpecialComments\tOnly comments starting with --@ will be copied");
+            Console.Error.WriteLine("\t\t\t\tto the generated files");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("\t -o outdir\t\tdirectory where all files are produced.");
+            Console.Error.WriteLine("\t\t\t\tDefault is current directory");
+            Console.Error.WriteLine();
             Console.Error.WriteLine("Example:");
+            Console.Error.WriteLine();
             Console.Error.WriteLine("\tasn1cc MyFile.asn1");
             return 4;
         }

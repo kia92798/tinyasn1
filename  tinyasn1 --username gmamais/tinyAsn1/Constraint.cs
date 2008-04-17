@@ -84,6 +84,18 @@ namespace tinyAsn1
 
     public class BaseConstraint : IConstraint
     {
+        public static string AsString(List<IConstraint> cons)
+        {
+            string ret = string.Empty;
+            if (cons != null)
+            {
+                foreach (IConstraint con in cons)
+                    ret += con.ToString(true);
+            }
+
+            return ret;
+        }
+
         public virtual bool isValueAllowed(Asn1Value val)
         {
             throw new Exception("Abstract method called");

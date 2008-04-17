@@ -499,10 +499,13 @@ namespace tinyAsn1
             bool ret = isValueAllowed(val);
             if (!ret)
                 return false;
-            foreach (IConstraint cn in addionalConstraints)
+            if (addionalConstraints != null)
             {
-                if (!cn.isValueAllowed(val))
-                    return false;
+                foreach (IConstraint cn in addionalConstraints)
+                {
+                    if (!cn.isValueAllowed(val))
+                        return false;
+                }
             }
             return true;
 
@@ -603,11 +606,7 @@ namespace tinyAsn1
         {
             get
             {
-                string ret = "";
-                foreach (IConstraint con in m_constraints)
-                    ret+=con.ToString(true);
-
-                return ret;
+                return BaseConstraint.AsString(m_constraints);
             }
         }
 
@@ -733,7 +732,7 @@ namespace tinyAsn1
 
 
 //Backend functions
-        public virtual void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas)
+        public virtual void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas, List<IConstraint> additonalConstraints)
         {
             o.WriteLine("<a name=\"{0}\"></a>", "ICD_" + tas.m_name.Replace("-", "_"));
             o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
@@ -754,6 +753,9 @@ namespace tinyAsn1
             o.WriteLine("</td>");
             o.WriteLine("</tr>");
 
+            IInternalContentsInHtml pThis = this as IInternalContentsInHtml;
+            if (pThis!=null)
+                comment.Add(pThis.InternalContentsInHtml(additonalConstraints));
             if (comment.Count > 0)
             {
                 o.WriteLine("<tr class=\"CommentRow\">");
@@ -770,7 +772,7 @@ namespace tinyAsn1
 
 
             o.WriteLine("<tr class=\"OddRow\">");
-            o.WriteLine("    <td class=\"constraint\" colspan=\"2\">{0}</td>", o.Constraint(Constraints));
+            o.WriteLine("    <td class=\"constraint\" colspan=\"2\">{0}</td>", o.Constraint(Constraints + BaseConstraint.AsString(additonalConstraints)));
             o.WriteLine("    <td class=\"min\" >{0}</td>", MinBitsInPER);
             o.WriteLine("    <td class=\"max\" >{0}</td>", MaxBitsInPER);
             o.WriteLine("</tr>");

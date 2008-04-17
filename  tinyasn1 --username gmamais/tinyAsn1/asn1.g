@@ -196,7 +196,7 @@ valueSetAssigment
 	;		
 */	
 typeAssigment 
-	:	SPECIAL_COMMENT* typereference a=ASSIG_OP type -> ^(TYPE_ASSIG[$a] typereference type SPECIAL_COMMENT*)
+	:	/*SPECIAL_COMMENT**/ typereference a=ASSIG_OP type -> ^(TYPE_ASSIG[$a] typereference type /*SPECIAL_COMMENT* */)
 	;	
 	
 /* ********************************************************************************************************************* */
@@ -314,7 +314,7 @@ choiceItemsList
 	;
 	
 choiceItem
-	:	SPECIAL_COMMENT* identifier type				->  ^(CHOICE_ITEM identifier type SPECIAL_COMMENT*)
+	:	/*SPECIAL_COMMENT* */ identifier type				->  ^(CHOICE_ITEM identifier type /*SPECIAL_COMMENT* */)
 	;	
 
 choiceListExtension
@@ -360,7 +360,7 @@ componentTypeList
 	;
 	
 componentType
-	:	SPECIAL_COMMENT* identifier type (optOrDef=OPTIONAL | optOrDef=DEFAULT value)?	-> ^(SEQUENCE_ITEM identifier type $optOrDef? ^(DEFAULT_VALUE value)? SPECIAL_COMMENT*)
+	:	/*SPECIAL_COMMENT* */ identifier type (optOrDef=OPTIONAL | optOrDef=DEFAULT value)?	-> ^(SEQUENCE_ITEM identifier type $optOrDef? ^(DEFAULT_VALUE value)? /*SPECIAL_COMMENT* */)
 		| a=COMPONENTS OF type											-> ^(COMPONENTS_OF[$a] type)
 	;	
 	
@@ -759,10 +759,11 @@ COMMENT
     :   '/*' ( options {greedy=false;} : . )* '*/' {$channel=HIDDEN;}
     ;
 
+/*
 SPECIAL_COMMENT
     :   '--@' ( options {greedy=false;} : . )* ('--'|'\r'?'\n') 
     ;
-
+*/
 COMMENT2
     :   '--' ( options {greedy=false;} : . )* ('--'|'\r'?'\n') {$channel=HIDDEN;}
     ;

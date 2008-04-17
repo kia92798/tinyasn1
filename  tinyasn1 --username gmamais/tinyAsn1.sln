@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tinyAsn1", "tinyAsn1\tinyAsn1.csproj", "{AA87CFEC-3291-4F26-8ACC-3FDD380805D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "asn1cc", "asn1cc\asn1cc.csproj", "{699A8418-D632-4C0C-9A1E-1938F6313F31}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "asn1scc", "asn1cc\asn1scc.csproj", "{699A8418-D632-4C0C-9A1E-1938F6313F31}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autoICD", "autoICD\autoICD.csproj", "{8E158748-B327-45FA-A0F0-60024667118D}"
 EndProject

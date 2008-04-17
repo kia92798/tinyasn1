@@ -551,7 +551,7 @@ namespace tinyAsn1
             }
         }
 
-        public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas)
+        public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas, List<IConstraint> additonalConstraints)
         {
             o.WriteLine("<a name=\"{0}\"></a>", "ICD_" + tas.m_name.Replace("-", "_"));
             o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
@@ -609,10 +609,18 @@ namespace tinyAsn1
             if (IsPERExtensible())
                 nBits++;
 
+            string commentFld = "Special field used by PER to indicate which choice alternative is present.<br/><ul>";
+
+            for (int i=0; i<m_children.Values.Count; i++)
+            {
+                commentFld += string.Format("<li>{0} &#8658 {1}</li>", i, m_children.Values[i].m_childVarName);
+            }
+            commentFld += "</ul>";
+
             o.WriteLine("<tr class=\"" + cssClass + "\">");
-            o.WriteLine("<td class=\"no\">0</td>");
+            o.WriteLine("<td class=\"no\">1</td>");
             o.WriteLine("<td class=\"field\">ChoiceIndex</td>");
-            o.WriteLine("<td class=\"comment\">{0}</td>", "Special field used by PER to indicate which choice alternative is present.");
+            o.WriteLine("<td class=\"comment\">{0}</td>", commentFld);
             o.WriteLine("<td class=\"type\">{0}</td>", "unsigned int");
 
             o.WriteLine("<td class=\"constraint\">{0}</td>", o.Constraint("N.A."));
@@ -916,9 +924,9 @@ namespace tinyAsn1
                     case asn1Parser.TYPE_DEF:
                         ret.m_type = Asn1Type.CreateFromAntlrAst(child);
                         break;
-                    case asn1Parser.SPECIAL_COMMENT:
-                        ret.m_comments.Add(child.Text.Replace("--@", "").Replace("\r", "").Replace("\n", "").Replace("--", ""));
-                        break;
+                    //case asn1Parser.SPECIAL_COMMENT:
+                    //    ret.m_comments.Add(child.Text.Replace("--@", "").Replace("\r", "").Replace("\n", "").Replace("--", ""));
+                    //    break;
                     default:
                         throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
                 }
@@ -950,7 +958,7 @@ namespace tinyAsn1
             if (index % 2 == 0)
                 cssClass = "EvenRow";
             o.WriteLine("<tr class=\"" + cssClass + "\">");
-            o.WriteLine("<td class=\"no\">{0}</td>", index);
+            o.WriteLine("<td class=\"no\">{0}</td>", 2);
             o.WriteLine("<td class=\"field\">{0}</td>", m_childVarName);
             o.WriteLine("<td class=\"comment\">{0}</td>", o.BR(m_comments));
             if (m_type is ReferenceType)
