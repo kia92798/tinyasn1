@@ -113,9 +113,9 @@ namespace tinyAsn1
                         case asn1Parser.DEFAULT_VALUE:
                             ret.m_defaultValue = Asn1Value.CreateFromAntlrAst(child.GetChild(0));
                             break;
-                        case asn1Parser.SPECIAL_COMMENT:
-                            ret.m_comments.Add(child.Text.Replace("--@", "").Replace("\r", "").Replace("\n", "").Replace("--", ""));
-                            break;
+                        //case asn1Parser.SPECIAL_COMMENT:
+                        //    ret.m_comments.Add(child.Text.Replace("--@", "").Replace("\r", "").Replace("\n", "").Replace("--", ""));
+                        //    break;
                         default:
                             throw new Exception("Internal Error, unexpected child: " + child.Text + " for node: " + tree.Text);
                     }
@@ -753,7 +753,7 @@ namespace tinyAsn1
         }
 
 
-        public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas)
+        public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas, List<IConstraint> additonalConstraints)
         {
             o.WriteLine("<a name=\"{0}\"></a>", "ICD_" + tas.m_name.Replace("-", "_"));
             o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
@@ -806,11 +806,25 @@ namespace tinyAsn1
         }
         public void PrintPreambleHtml(StreamWriterLevel o, int p)
         {
+            string comment = "Special field used by PER to indicate the presence of optional and default fields.";
+            List<Child> tmp = new List<Child>();
+            foreach (Child ch in m_children.Values)
+            {
+                if (ch.m_optional || ch.m_defaultValue != null)
+                    tmp.Add(ch);
+            }
+            if (tmp.Count > 0)
+            {
+                comment += "<br/><ul>";
+                for (int i = 0; i < tmp.Count; i++)
+                    comment += string.Format("<li>bit{0} == 1 &#8658 {1} is present</li>", i, tmp[i].m_childVarName);
+                comment += "</ul>";
+            }
             string cssClass = "OddRow";
             o.WriteLine("<tr class=\"" + cssClass + "\">");
-            o.WriteLine("<td class=\"no\">0</td>");
+            o.WriteLine("<td class=\"no\">1</td>");
             o.WriteLine("<td class=\"field\">Preamble</td>");
-            o.WriteLine("<td class=\"comment\">{0}</td>", "Special field used by PER to indicate the presence of optional and default fields.");
+            o.WriteLine("<td class=\"comment\">{0}</td>", comment);
             o.WriteLine("<td class=\"optional\">No</td>");
             o.WriteLine("<td class=\"type\">{0}</td>", "Bit mask");
 

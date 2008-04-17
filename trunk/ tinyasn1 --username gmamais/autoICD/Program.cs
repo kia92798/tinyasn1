@@ -52,6 +52,8 @@ namespace autoICD
                         encodeVars = true;
                     else if (args[i] == "-icd")
                         genOutput = true;
+                    else if (args[i] == "-useSpecialComments")
+                        Asn1CompilerInvokation.UseSpecialComments = true;
                     else if (args[i] == "-o")
                     {
                         try
@@ -145,14 +147,29 @@ namespace autoICD
 
         static int Usage()
         {
+            Console.Error.WriteLine();
             Console.Error.WriteLine("Automatic ICD Generator");
             Console.Error.WriteLine("Current Version is: 0.93");
             Console.Error.WriteLine("Usage:");
-            Console.Error.WriteLine("autoICD -o outputFileName.html -debug -encodeVariables -icd file1, file2, ..., fileN ");
-            Console.Error.WriteLine("\t -debug\tre-prints the AST using ASN.1. Usefull only for debug purposes.");
-            Console.Error.WriteLine("\t -enc\tcreates one .dat file with PER encoding for each variable");
-            Console.Error.WriteLine("\t -icd\tgenerates ICD Documents");
-            Console.Error.WriteLine("\t -o outputFileName.html\tthe generated ICD file name.");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("autoICD [-o fileName.html] [-debug] [-encodeVariables] [-icd] [-useSpecialComments] file1.asn1, file2.asn1, ..., fileN.asn1 ");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("\t -o fileName.html\tthe generated ICD file name.");
+            Console.Error.WriteLine("\t\t\t\tIf omitted, the name of the generated ICD will");
+            Console.Error.WriteLine("\t\t\t\tbe file1.html.");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("\t -debug\t\t\tre-prints the AST using ASN.1.");
+            Console.Error.WriteLine("\t\t\t\tUseful only for debug purposes.");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("\t -encodeVariables\tcreates one .dat file with uPER encoding");
+            Console.Error.WriteLine("\t\t\t\tfor each variable that exists in the asn1 input");
+            Console.Error.WriteLine("\t\t\t\tfiles.");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("\t -icd\t\t\tgenerates ICD Documents");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("\t -useSpecialComments\tOnly comments starting with --@ will be");
+            Console.Error.WriteLine("\t\t\t\tcopied to the ICD tables.");
+            Console.Error.WriteLine();
             Console.Error.WriteLine("Example:");
             Console.Error.WriteLine("\tautoICD -icd MyFile.asn1");
             return 4;

@@ -76,6 +76,8 @@ namespace tinyAsn1
             foreach (string line in lines)
             {
                 string l =line;
+                if (l.StartsWith("--@"))
+                    l = l.Substring(3);
                 while (l.StartsWith("-"))
                     l = l.Substring(1);
                 if (l.StartsWith("/*") && l.EndsWith("*/"))
@@ -98,7 +100,7 @@ namespace tinyAsn1
             List<string> comments2 = new List<string>();
             foreach (string li in comments)
             {
-                string line = li.Replace("--", "").Trim();
+                string line = li.Replace("--@", "").Replace("--", "").Trim();
                 if (line.Length > 0)
                     comments2.Add(line);
             }

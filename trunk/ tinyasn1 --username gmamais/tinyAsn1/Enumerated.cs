@@ -379,17 +379,29 @@ namespace tinyAsn1
             return ret;
         }
 
+
+
+
         public string InternalContentsInHtml(List<IConstraint> additionalConstraints)
         {
-            string ret = "<pre>Enumeration's values:<br/>";
-
+            string ret = "Enumeration's values:<br/>";
+            List<Item> tmpList = new List<Item>();
             foreach (Item it in m_enumValues.Values)
             {
                 EnumeratedValue val = new EnumeratedValue(it.m_value, it.m_id, null, m_module, this);
-                if (isValueAllowed(val,additionalConstraints))
-                    ret += string.Format("\t{0}({1})<br/>", it.m_id, it.m_value);
+                if (isValueAllowed(val, additionalConstraints))
+                    tmpList.Add(it);
             }
-            ret += "</pre>";
+
+            int cnt = tmpList.Count;
+            for (int i = 0; i < cnt; i++ )
+            {
+                Item it = tmpList[i];
+                ret += string.Format("\t{0}({1})", it.m_id, it.m_value);
+                if (i < cnt - 1)
+                    ret += ", ";
+            }
+//            ret += "</pre>";
             return ret;
         }
 

@@ -304,9 +304,9 @@ namespace tinyAsn1
         }
 
 
-        public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas)
+        public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas, List<IConstraint> additonalConstraints)
         {
-            Type.PrintHtml(cns, o, lev, comment, tas);
+            Type.PrintHtml(cns, o, lev, comment, tas, m_constraints);
         }
         public static ReferenceType CreateByName(TypeAssigment newTas)
         {

@@ -73,7 +73,7 @@ namespace tinyAsn1
             throw new Exception("Abstract method called");
         }
 
-        public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas)
+        public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas, List<IConstraint> additonalConstraints)
         {
             o.WriteLine("<a name=\"{0}\"></a>", "ICD_" + tas.m_name.Replace("-", "_"));
             o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
@@ -91,6 +91,9 @@ namespace tinyAsn1
             o.WriteLine("</td>");
             o.WriteLine("</tr>");
 
+            IInternalContentsInHtml pThis = this as IInternalContentsInHtml;
+            if (pThis != null)
+                comment.Add(pThis.InternalContentsInHtml(additonalConstraints));
             if (comment.Count > 0)
             {
                 o.WriteLine("<tr class=\"CommentRow\">");
@@ -109,7 +112,7 @@ namespace tinyAsn1
             o.WriteLine("</tr>");
 
 
-            PrintSizeLengthHtml(cns, o, lev + 1);
+            PrintSizeLengthHtml(cns, o, lev + 1, BaseConstraint.AsString(additonalConstraints));
             PrintItemHtml(cns, o, 1);
             o.WriteLine("<tr class=\"CommentRow\">");
             o.WriteLine("<td class=\"threeDots\" colspan=\"7\"> <p>. . .</p> </td>");
@@ -123,7 +126,7 @@ namespace tinyAsn1
  
         }
 
-        private void PrintSizeLengthHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int p)
+        private void PrintSizeLengthHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int p, string additonalConstraints)
         {
             string cssClass = "OddRow";
             long mnItems = minItems(cns);
@@ -142,9 +145,9 @@ namespace tinyAsn1
 
             o.WriteLine("<td class=\"type\">{0}</td>", "unsigned int");
 
-            o.WriteLine("<td class=\"constraint\">{0}</td>", o.Constraint(cns.ToString()));
+            o.WriteLine("<td class=\"constraint\">{0}</td>", o.Constraint(cns.ToString() + additonalConstraints));
             o.WriteLine("<td class=\"min\">{0}</td>", minSizeBitsInPER(cns));
-            o.WriteLine("<td class=\"max\">{0}</td>", maxSizeBitsInPER(cns));
+            o.WriteLine("<td class=\"max\">{0}</td>", (maxSizeBitsInPER(cns)==-1 ? "&#8734" :maxSizeBitsInPER(cns).ToString()) );
             o.WriteLine("</tr>");
         }
 

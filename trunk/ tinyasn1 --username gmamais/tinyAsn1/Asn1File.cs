@@ -12,6 +12,7 @@ namespace tinyAsn1
     {
 
         public string TypePrefix = string.Empty;
+        public static string m_outDirectory = Environment.CurrentDirectory;
 
         public List<Asn1File> m_files = new List<Asn1File>();
 
@@ -435,6 +436,8 @@ namespace tinyAsn1
         private void FixComment(List<IToken> FileTokens, List<IToken> alreadyTakenComments, int lastTokenLineNo,
             int prevTokenIndex, int nextTokenIndex, List<string> comments)
         {
+
+            //first see if there comments on the same line
             while (nextTokenIndex < FileTokens.Count)
             {
                 IToken t = FileTokens[nextTokenIndex++];
@@ -446,15 +449,26 @@ namespace tinyAsn1
                     continue;
                 else if (t.Type == asn1Lexer.COMMENT || t.Type == asn1Lexer.COMMENT2)
                 {
-                    comments.Insert(0, t.Text);
-                    alreadyTakenComments.Add(t);
+                    if (Asn1CompilerInvokation.UseSpecialComments)
+                    {
+                        if (t.Text.StartsWith("--@"))
+                        {
+                            comments.Insert(0, t.Text);
+                            alreadyTakenComments.Add(t);
+                        }
+                    }
+                    else
+                    {
+                        comments.Insert(0, t.Text);
+                        alreadyTakenComments.Add(t);
+                    }
                 }
                 else
                     break;
 
             }
 
-            //if no comments were found at the same line look back
+            //if no comments were found at the same line, then look back (above)
             if (comments.Count == 0)
             {
 
@@ -467,8 +481,19 @@ namespace tinyAsn1
                         continue;
                     else if (t.Type == asn1Lexer.COMMENT || t.Type == asn1Lexer.COMMENT2)
                     {
-                        comments.Insert(0, t.Text);
-                        alreadyTakenComments.Add(t);
+                        if (Asn1CompilerInvokation.UseSpecialComments)
+                        {
+                            if (t.Text.StartsWith("--@"))
+                            {
+                                comments.Insert(0, t.Text);
+                                alreadyTakenComments.Add(t);
+                            }
+                        }
+                        else
+                        {
+                            comments.Insert(0, t.Text);
+                            alreadyTakenComments.Add(t);
+                        }
                     }
                     else
                         break;
@@ -480,34 +505,11 @@ namespace tinyAsn1
         {
             List<IToken> alreadyTakenComments = new List<IToken>();
             foreach (Asn1File f in m_files)
-            {
                 foreach (Module m in f.m_modules)
-                {
                     foreach (TypeAssigment ta in m.m_typeAssigments.Values)
-                    {
                         FixComment(f.m_tokes, alreadyTakenComments, f.m_tokes[ta.antlrNode.TokenStopIndex].Line,
                             ta.antlrNode.TokenStartIndex - 1, ta.antlrNode.TokenStopIndex + 1, ta.m_comments);
 
-                        //int i = 1;
-                        //while (ta.antlrNode.TokenStartIndex - i > 0)
-                        //{
-                        //    IToken t = f.m_tokes[ta.antlrNode.TokenStartIndex - i];
-                        //    if (alreadyTakenComments.Contains(t))
-                        //        break;
-                        //    i++;
-                        //    if (t.Type == asn1Lexer.WS)
-                        //        continue;
-                        //    else if (t.Type == asn1Lexer.COMMENT || t.Type == asn1Lexer.COMMENT2)
-                        //    {
-                        //        ta.m_comments.Insert(0, t.Text);
-                        //        alreadyTakenComments.Add(t);
-                        //    }
-                        //    else
-                        //        break;
-                        //}
-                    }
-                }
-            }
 
             foreach (Asn1File f in m_files)
                 foreach (Module m in f.m_modules)
@@ -619,6 +621,12 @@ namespace tinyAsn1
             if (functionPasses.Count != 0)
                 throw new Exception("Internal Error : Recursive Functions Set is NOT empty !");
         }
+
+        /// <summary>
+        /// When set to true (i.e. via an argument in the command line) only those comments starting
+        /// with the special symbol @ are copied into the ICD 
+        /// </summary>
+        public static bool UseSpecialComments = false;
 
     }
 
@@ -760,8 +768,8 @@ namespace tinyAsn1
                 }
                 else if (t.Type == asn1Lexer.COMMENT || t.Type == asn1Lexer.COMMENT2)
                     ret += "<font  color=\"#008000\" ><i>" + t.Text + "</i></font>";
-                else if (t.Type == asn1Lexer.SPECIAL_COMMENT)
-                    ret += "<font  color=\"#808080\" >" + t.Text + "</font>";
+                //else if (t.Type == asn1Lexer.SPECIAL_COMMENT)
+                //    ret += "<font  color=\"#808080\" >" + t.Text + "</font>";
                 else
                     ret += t.Text;
             }
@@ -1079,9 +1087,9 @@ h2
 
         internal void printC()
         {
-            string path = Path.GetDirectoryName(m_fileName);
+            string path = Asn1CompilerInvokation.m_outDirectory;
             string fileName = Path.GetFileNameWithoutExtension(m_fileName);
-            if (path != "")
+            if (path != "" && !path.EndsWith(Path.DirectorySeparatorChar.ToString()))
                 path += Path.DirectorySeparatorChar;
 
             using (StreamWriterLevel c = new StreamWriterLevel(path + fileName + ".c"))
