@@ -797,6 +797,7 @@ flag DecodeRealAsBinaryEncoding(BitStream* pBitStrm, int length, byte header, do
 	int factor=1;
 	int expLen;
 	int exp;
+	asn1SccSint sn=0;
 	asn1SccUint N=0;
 	int i;
 
@@ -834,8 +835,11 @@ flag DecodeRealAsBinaryEncoding(BitStream* pBitStrm, int length, byte header, do
 		N = N<<8 | b;
 	}
 
+	sn = N;
+	if (sign<0) 
+		sn = -sn;
 
-	*v = sign*N*factor * pow(base,exp);
+	*v = sn*factor * pow(base,exp);
 
 	return TRUE;
 }
