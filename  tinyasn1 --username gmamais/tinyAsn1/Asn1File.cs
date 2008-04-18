@@ -438,7 +438,8 @@ namespace tinyAsn1
         {
 
             //first see if there comments on the same line
-            while (nextTokenIndex < FileTokens.Count)
+
+            while (nextTokenIndex >=0 && nextTokenIndex < FileTokens.Count)
             {
                 IToken t = FileTokens[nextTokenIndex++];
                 if (alreadyTakenComments.Contains(t))
@@ -472,7 +473,7 @@ namespace tinyAsn1
             if (comments.Count == 0)
             {
 
-                while (prevTokenIndex >= 0)
+                while (prevTokenIndex >= 0 && prevTokenIndex < FileTokens.Count)
                 {
                     IToken t = FileTokens[prevTokenIndex--];
                     if (alreadyTakenComments.Contains(t))
@@ -504,6 +505,13 @@ namespace tinyAsn1
         private void FixComments()
         {
             List<IToken> alreadyTakenComments = new List<IToken>();
+
+            foreach (Asn1File f in m_files)
+                foreach (Module m in f.m_modules)
+                    FixComment(f.m_tokes, alreadyTakenComments, -1,
+                        m.tree.TokenStartIndex - 1, -1, m.m_comments);
+
+
             foreach (Asn1File f in m_files)
                 foreach (Module m in f.m_modules)
                     foreach (TypeAssigment ta in m.m_typeAssigments.Values)

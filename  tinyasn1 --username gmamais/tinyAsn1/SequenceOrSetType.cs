@@ -756,7 +756,8 @@ namespace tinyAsn1
         public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas, List<IConstraint> additonalConstraints)
         {
             o.WriteLine("<a name=\"{0}\"></a>", "ICD_" + tas.m_name.Replace("-", "_"));
-            o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
+            o.WriteLine("<table border=\"0\" width=\"100%\" >");
+//            o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
             o.WriteLine("<tbody>");
             o.WriteLine("<tr  bgcolor=\"{0}\">", (tas.m_createdThroughTabulization ? "#379CEE" : "#FF8f00"));
             o.WriteLine("<td height=\"35\" colspan=\"4\">");
@@ -806,18 +807,26 @@ namespace tinyAsn1
         }
         public void PrintPreambleHtml(StreamWriterLevel o, int p)
         {
-            string comment = "Special field used by PER to indicate the presence of optional and default fields.";
+            string comment = "Special field used by PER to indicate the presence/absence of optional and default fields.";
+            if (IsPERExtensible())
+                comment = "Special field used by PER to (a) mark the presense of extension(s) and (b) to indicate the presence/absence of optional and default fields.";
             List<Child> tmp = new List<Child>();
             foreach (Child ch in m_children.Values)
             {
                 if (ch.m_optional || ch.m_defaultValue != null)
                     tmp.Add(ch);
             }
-            if (tmp.Count > 0)
+            if (tmp.Count > 0 || IsPERExtensible())
             {
-                comment += "<br/><ul>";
+                comment += "<br/><ul type=\"square\">";
+                int bitStart = 0;
+                if (IsPERExtensible())
+                {
+                    comment += string.Format("<li>bit0 == 1 &#8658 extension(s) is present");
+                    bitStart++;
+                }
                 for (int i = 0; i < tmp.Count; i++)
-                    comment += string.Format("<li>bit{0} == 1 &#8658 {1} is present</li>", i, tmp[i].m_childVarName);
+                    comment += string.Format("<li>bit{0} == 1 &#8658 <font  color=\"#5F9EA0\" >{1}</font> is present</li>", i + bitStart, tmp[i].m_childVarName);
                 comment += "</ul>";
             }
             string cssClass = "OddRow";

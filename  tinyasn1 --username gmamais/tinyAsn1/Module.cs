@@ -20,6 +20,7 @@ namespace tinyAsn1
         public TaggingMode m_taggingMode = TaggingMode.EXPLICIT;     // clause 12.2
         public bool m_extensibilityImplied = false;
         public Asn1File m_file = null;
+        public List<string> m_comments = new List<string>();
 
         public List<string> m_exportedTypes = new List<string>();
         public List<string> m_exportedVariables = new List<string>();
@@ -109,7 +110,7 @@ namespace tinyAsn1
         internal Dictionary<string, Int64> m_resolvedIntegerVars = new Dictionary<string, Int64>();
 
 
-        ITree tree;
+        public ITree tree;
 
         internal static Module CurrentlyConstructModule = null;
         //^(MODULE_DEF modulereference moduleTag? EXTENSIBILITY? exports? imports? typeAssigment* valueAssigment* valueSetAssigment*)
@@ -373,6 +374,9 @@ namespace tinyAsn1
         {
             wr.WriteLine("<div style=\"width: 100%\">");
             wr.WriteLine(string.Format("<h2 >Module : {0}</h2>", m_moduleID));
+            wr.WriteLine("<font face=\"Verdana\" color=\"DimGray\">");
+            wr.WriteLine(wr.BR(m_comments));
+            wr.WriteLine("</font>");
             foreach (TypeAssigment tas in m_typeAssigments.Values)
                 tas.PrintHtml(wr, p + 1);
             wr.WriteLine("</div>");
@@ -559,9 +563,9 @@ namespace tinyAsn1
 
         public void PrintHtml(StreamWriterLevel wr, int p)
         {
-            wr.WriteLine("        <div style=\"width: 100%; float:left\" >");
+//            wr.WriteLine("        <div style=\"width: 100%; float:left\" >");
             m_type.PrintHtml(m_type.PEREffectiveConstraint, wr, p, m_comments, this, null);
-            wr.WriteLine("        </div>");
+//            wr.WriteLine("        </div>");
             wr.WriteLine("&nbsp;<br/>");
         }
 

@@ -394,14 +394,18 @@ namespace tinyAsn1
             }
 
             int cnt = tmpList.Count;
+            ret += "<ul type=\"square\">";
             for (int i = 0; i < cnt; i++ )
             {
                 Item it = tmpList[i];
-                ret += string.Format("\t{0}({1})", it.m_id, it.m_value);
-                if (i < cnt - 1)
-                    ret += ", ";
+                ret += string.Format("<li><font  color=\"#5F9EA0\" >{0}</font>({1})</li>", it.m_id, it.m_value);
+                //if (i < cnt - 1)
+                //    ret += ", ";
+                //if (i % 3 == 2)
+                //    ret += "<br/>";
             }
-//            ret += "</pre>";
+            ret += "</ul>";
+            //            ret += "</pre>";
             return ret;
         }
 

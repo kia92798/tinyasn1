@@ -321,14 +321,18 @@ namespace tinyAsn1
             if (cnt > 0)
             {
                 ret = "Bit strings's special values:<br/>";
+                ret += "<ul type=\"square\">";
                 for (int i = 0; i < cnt; i++)
                 {
                     string namedBit = m_namedBits.Keys[i];
                     long val = m_namedBits.Values[i];
-                    ret += string.Format("\t{0}({1})", namedBit, val);
-                    if (i < cnt - 1)
-                        ret += ", ";
+                    ret += string.Format("<li><font  color=\"#5F9EA0\" >{0}</font>({1})</li>", namedBit, val);
+                    //if (i < cnt - 1)
+                    //    ret += ", ";
+                    //if (i % 3 == 2)
+                    //    ret += "<br/>";
                 }
+                ret += "</ul>";
             }
             return ret;
         }
