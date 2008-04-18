@@ -439,7 +439,7 @@ namespace tinyAsn1
                 ret = "(";
             for (int i = 0; i < cnt - 1; i++)
             {
-                ret += m_items[i].ToString() + "|";
+                ret += m_items[i].ToString() + " | ";
             }
 
             ret += m_items[cnt-1].ToString();
@@ -579,7 +579,7 @@ namespace tinyAsn1
                 ret += "(";
             for (int i = 0; i < cnt - 1; i++)
             {
-                ret += m_items[i].ToString() + "^";
+                ret += m_items[i].ToString() + " ^ ";
             }
 
             ret += m_items[cnt - 1].ToString();

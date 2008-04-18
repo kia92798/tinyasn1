@@ -735,7 +735,8 @@ namespace tinyAsn1
         public virtual void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas, List<IConstraint> additonalConstraints)
         {
             o.WriteLine("<a name=\"{0}\"></a>", "ICD_" + tas.m_name.Replace("-", "_"));
-            o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
+            o.WriteLine("<table border=\"0\" width=\"100%\" >");
+//            o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
             o.WriteLine("<tbody>");
 
             o.WriteLine("<tr  bgcolor=\"{0}\">", (tas.m_createdThroughTabulization ? "#379CEE" : "#FF8f00"));
@@ -754,12 +755,13 @@ namespace tinyAsn1
             o.WriteLine("</tr>");
 
             IInternalContentsInHtml pThis = this as IInternalContentsInHtml;
+            string tmp = string.Empty;
             if (pThis!=null)
-                comment.Add(pThis.InternalContentsInHtml(additonalConstraints));
-            if (comment.Count > 0)
+                tmp = pThis.InternalContentsInHtml(additonalConstraints);
+            if (comment.Count > 0 || tmp.Length>0)
             {
                 o.WriteLine("<tr class=\"CommentRow\">");
-                o.WriteLine("<td class=\"comment2\" colspan=\"4\">" + o.BR(comment) + "</td>");
+                o.WriteLine("<td class=\"comment2\" colspan=\"4\">" + o.BR(comment) + tmp + "</td>");
                 o.WriteLine("</tr>");
             }
 

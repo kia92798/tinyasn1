@@ -76,7 +76,8 @@ namespace tinyAsn1
         public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas, List<IConstraint> additonalConstraints)
         {
             o.WriteLine("<a name=\"{0}\"></a>", "ICD_" + tas.m_name.Replace("-", "_"));
-            o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
+            o.WriteLine("<table border=\"0\" width=\"100%\" >");
+//            o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
             o.WriteLine("<tbody>");
             o.WriteLine("<tr  bgcolor=\"{0}\">", (tas.m_createdThroughTabulization ? "#379CEE" : "#FF8f00"));
             o.WriteLine("<td height=\"35\" colspan=\"3\">");

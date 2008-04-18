@@ -554,7 +554,8 @@ namespace tinyAsn1
         public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas, List<IConstraint> additonalConstraints)
         {
             o.WriteLine("<a name=\"{0}\"></a>", "ICD_" + tas.m_name.Replace("-", "_"));
-            o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
+            o.WriteLine("<table border=\"0\" width=\"100%\" >");
+//            o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
             o.WriteLine("<tbody>");
             o.WriteLine("<tr  bgcolor=\"{0}\">", (tas.m_createdThroughTabulization ? "#379CEE" : "#FF8f00"));
             o.WriteLine("<td height=\"35\" colspan=\"3\">");
@@ -586,15 +587,27 @@ namespace tinyAsn1
             o.WriteLine("<td class=\"hrMax\">Max Length (bits)</td>");
             o.WriteLine("</tr>");
 
-            int index = 0;
+
+            int index = 1;
+            int chFldNo=1;
+            if (IsPERExtensible())
+            {
+                PrintChoiceExtBitHtml(o, index, chFldNo);
+                chFldNo++;
+                index++;
+            }
+                
+
             if (m_children.Count > 1)
             {
-                PrintChoiceIndexHtml(o, lev + 1);
-                index = 1;
+                PrintChoiceIndexHtml(o, lev + 1, index, chFldNo);
+                chFldNo++;
+                index++;
             }
             foreach (ChoiceChild ch in m_children.Values)
             {
-                ch.PrintHtml(o, lev + 1, ++index);
+                ch.PrintHtml(o, lev + 1, index, chFldNo);
+                index++;
             }
 
             o.WriteLine("</tbody>");
@@ -602,23 +615,40 @@ namespace tinyAsn1
 //            o.WriteLine("</a>");
         }
 
-        private void PrintChoiceIndexHtml(StreamWriterLevel o, int p)
+        private void PrintChoiceExtBitHtml(StreamWriterLevel o, int index, int fieldNo)
         {
             string cssClass = "OddRow";
-            int nBits = PER.GetNumberOfBitsForNonNegativeInteger((ulong)(m_children.Count-1));
-            if (IsPERExtensible())
-                nBits++;
 
-            string commentFld = "Special field used by PER to indicate which choice alternative is present.<br/><ul>";
+            o.WriteLine("<tr class=\"" + cssClass + "\">");
+            o.WriteLine("<td class=\"no\">{0}</td>", fieldNo);
+            o.WriteLine("<td class=\"field\">Extension bit</td>");
+            o.WriteLine("<td class=\"comment\">{0}</td>", "If set, an extension, i.e. an unknown to this grammar alternative, is present");
+            o.WriteLine("<td class=\"type\">{0}</td>", "Bit");
+
+            o.WriteLine("<td class=\"constraint\">{0}</td>", o.Constraint("N.A."));
+            o.WriteLine("<td class=\"min\">{0}</td>", 1);
+            o.WriteLine("<td class=\"max\">{0}</td>", 1);
+            o.WriteLine("</tr>");
+        }
+
+        private void PrintChoiceIndexHtml(StreamWriterLevel o, int p, int index, int fieldNo)
+        {
+            string cssClass = "OddRow";
+            if (index % 2 == 0)
+                cssClass = "EvenRow";
+
+            int nBits = PER.GetNumberOfBitsForNonNegativeInteger((ulong)(m_children.Count-1));
+
+            string commentFld = "Special field used by PER to indicate which choice alternative is present.<br/><ul type=\"square\">";
 
             for (int i=0; i<m_children.Values.Count; i++)
             {
-                commentFld += string.Format("<li>{0} &#8658 {1}</li>", i, m_children.Values[i].m_childVarName);
+                commentFld += string.Format("<li>{0} &#8658 <font  color=\"#5F9EA0\" >{1}</font></li>", i, m_children.Values[i].m_childVarName);
             }
             commentFld += "</ul>";
 
             o.WriteLine("<tr class=\"" + cssClass + "\">");
-            o.WriteLine("<td class=\"no\">1</td>");
+            o.WriteLine("<td class=\"no\">{0}</td>", fieldNo);
             o.WriteLine("<td class=\"field\">ChoiceIndex</td>");
             o.WriteLine("<td class=\"comment\">{0}</td>", commentFld);
             o.WriteLine("<td class=\"type\">{0}</td>", "unsigned int");
@@ -952,15 +982,21 @@ namespace tinyAsn1
             return m_childVarName==other.m_childVarName && m_type.Compatible(other.m_type);
         }
 
-        internal void PrintHtml(StreamWriterLevel o, int p, int index)
+        internal void PrintHtml(StreamWriterLevel o, int p, int index, int fieldNo)
         {
+            IInternalContentsInHtml intCont = m_type as IInternalContentsInHtml;
+
+
             string cssClass = "OddRow";
             if (index % 2 == 0)
                 cssClass = "EvenRow";
             o.WriteLine("<tr class=\"" + cssClass + "\">");
-            o.WriteLine("<td class=\"no\">{0}</td>", 2);
+            o.WriteLine("<td class=\"no\">{0}</td>", fieldNo);
             o.WriteLine("<td class=\"field\">{0}</td>", m_childVarName);
-            o.WriteLine("<td class=\"comment\">{0}</td>", o.BR(m_comments));
+            if (intCont == null)
+                o.WriteLine("<td class=\"comment\">{0}</td>", o.BR(m_comments));
+            else
+                o.WriteLine("<td class=\"comment\">{0}</td>", o.BR(m_comments) + intCont.InternalContentsInHtml(m_type.m_constraints));
             if (m_type is ReferenceType)
                 o.WriteLine("<td class=\"type\"> <a href=\"#ICD_{0}\">{1}</a></td>", m_type.Name.Replace("-", "_"), m_type.Name);
             else
