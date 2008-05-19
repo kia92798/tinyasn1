@@ -7,8 +7,8 @@
     <ProjectGuid>{699A8418-D632-4C0C-9A1E-1938F6313F31}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>asn1cc</RootNamespace>
-    <AssemblyName>asn1cc</AssemblyName>
+    <RootNamespace>asn1scc</RootNamespace>
+    <AssemblyName>asn1scc</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,33 +30,64 @@
   <ItemGroup>
     <Reference Include="antlr.runtime, Version=2.7.7.1, Culture=neutral, PublicKeyToken=d7701e059243744f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\antrl\antlr.runtime.dll</HintPath>
+      <HintPath>..\AntrlParser\antrl\antlr.runtime.dll</HintPath>
     </Reference>
     <Reference Include="Antlr3.Runtime, Version=0.3.0.37313, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\antrl\Antlr3.Runtime.dll</HintPath>
+      <HintPath>..\AntrlParser\antrl\Antlr3.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Antlr3.Utility, Version=0.1.0.37314, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\antrl\Antlr3.Utility.dll</HintPath>
+      <HintPath>..\AntrlParser\antrl\Antlr3.Utility.dll</HintPath>
     </Reference>
     <Reference Include="StringTemplate, Version=3.0.1.21733, Culture=neutral, PublicKeyToken=beee492b52c41e85, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\antrl\StringTemplate.dll</HintPath>
+      <HintPath>..\AntrlParser\antrl\StringTemplate.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CBackend.cs" />
+    <Compile Include="Installer1.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Installer1.Designer.cs">
+      <DependentUpon>Installer1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\tinyAsn1\tinyAsn1.csproj">
       <Project>{AA87CFEC-3291-4F26-8ACC-3FDD380805D5}</Project>
       <Name>tinyAsn1</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\asn1crt.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\real.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\asn1crt.c" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
