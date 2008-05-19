@@ -35,7 +35,10 @@ namespace autoICD
         static int Main2(string[] args)
         {
             List<string> inputFiles = new List<string>();
-            Asn1CompilerInvokation compInv = Asn1CompilerInvokation.Instance;
+
+
+            ICDBackend compInv = new ICDBackend();
+
 
             bool debug = false;
             bool encodeVars = false;
@@ -48,12 +51,33 @@ namespace autoICD
                 {
                     if (args[i] == "-debug")
                         debug = true;
-                    else if (args[i] == "-enc")
+                    else if (args[i] == "-encodeVariables")
                         encodeVars = true;
                     else if (args[i] == "-icd")
                         genOutput = true;
                     else if (args[i] == "-useSpecialComments")
                         Asn1CompilerInvokation.UseSpecialComments = true;
+                    else if (args[i] == "-displayTypesAsAppearInAsn1Grammar")
+                        Asn1CompilerInvokation.m_FirstTopLevel = false;
+                    else if (args[i] == "-wordSize")
+                    {
+                        try
+                        {
+                            i++;
+                            Config.IntegerSize = int.Parse(args[i]);
+                        }
+                        catch (FormatException)
+                        {
+                            Console.Error.WriteLine("Error in argument -wordSize: {0} is not a number", args[i]);
+                            return Usage();
+                        }
+                        catch (Exception )
+                        {
+                            Console.Error.WriteLine("Error in argument -wordSize: No value specified");
+                            return Usage();
+                        }
+                        
+                    }
                     else if (args[i] == "-o")
                     {
                         try
@@ -99,6 +123,8 @@ namespace autoICD
             }
 
             //Create Syntax Tree
+
+
             try
             {
                 compInv.CreateASTs(inputFiles);
@@ -112,7 +138,6 @@ namespace autoICD
                 Console.Error.WriteLine(ex.Message);
                 return 2;
             }
-
             // Modify Syntax Tree and make Semantic checks
 
             try
@@ -149,14 +174,18 @@ namespace autoICD
         {
             Console.Error.WriteLine();
             Console.Error.WriteLine("Automatic ICD Generator");
-            Console.Error.WriteLine("Current Version is: 0.94");
+            Console.Error.WriteLine("Current Version is: 0.95");
             Console.Error.WriteLine("Usage:");
             Console.Error.WriteLine();
-            Console.Error.WriteLine("autoICD [-o fileName.html] [-debug] [-encodeVariables] [-icd] [-useSpecialComments] file1.asn1, file2.asn1, ..., fileN.asn1 ");
+            Console.Error.WriteLine("autoICD [-o fileName.html] [-wordSize N] [-debug] [-encodeVariables] [-icd] [-useSpecialComments] file1.asn1, file2.asn1, ..., fileN.asn1 ");
             Console.Error.WriteLine();
             Console.Error.WriteLine("\t -o fileName.html\tthe generated ICD file name.");
             Console.Error.WriteLine("\t\t\t\tIf omitted, the name of the generated ICD will");
             Console.Error.WriteLine("\t\t\t\tbe file1.html.");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("\t -wordSize N\t\tthe word size of the target machine in bytes.");
+            Console.Error.WriteLine("\t\t\t\tPossible values are 2,4 and 8");
+            Console.Error.WriteLine("\t\t\t\tIf omitted, N is equal to 8");
             Console.Error.WriteLine();
             Console.Error.WriteLine("\t -debug\t\t\tre-prints the AST using ASN.1.");
             Console.Error.WriteLine("\t\t\t\tUseful only for debug purposes.");
@@ -170,6 +199,10 @@ namespace autoICD
             Console.Error.WriteLine("\t -useSpecialComments\tOnly comments starting with --@ will be");
             Console.Error.WriteLine("\t\t\t\tcopied to the ICD tables.");
             Console.Error.WriteLine();
+            Console.Error.WriteLine("\t -displayTypesAsAppearInAsn1Grammar");
+            Console.Error.WriteLine("\t\t\t\tDisplay types with the order that appear in the");
+            Console.Error.WriteLine("\t\t\t\tASN.1 grammar. If not set (default), top level");
+            Console.Error.WriteLine("\t\t\t\ttypes (i.e. PDUs) appear first");
             Console.Error.WriteLine("Example:");
             Console.Error.WriteLine("\tautoICD -icd MyFile.asn1");
             return 4;

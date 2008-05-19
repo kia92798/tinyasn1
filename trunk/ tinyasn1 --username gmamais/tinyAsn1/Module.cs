@@ -123,7 +123,7 @@ namespace tinyAsn1
             if (tree.Type != asn1Parser.MODULE_DEF)
                 throw new Exception("MODULE_DEF");
 
-            curModule = new Module();
+            curModule = Asn1CompilerInvokation.Instance.Factory.CreateModule();
             curModule.tree = tree;
             curModule.m_file = file;
 
@@ -370,45 +370,8 @@ namespace tinyAsn1
             }
         }
 
-        public void PrintHtml(StreamWriterLevel wr, int p)
-        {
-            wr.WriteLine("<div style=\"width: 100%\">");
-            wr.WriteLine(string.Format("<h2 >Module : {0}</h2>", m_moduleID));
-            wr.WriteLine("<font face=\"Verdana\" color=\"DimGray\">");
-            wr.WriteLine(wr.BR(m_comments));
-            wr.WriteLine("</font>");
-            foreach (TypeAssigment tas in m_typeAssigments.Values)
-                tas.PrintHtml(wr, p + 1);
-            wr.WriteLine("</div>");
-        }
 
-        public void Tabularize()
-        {
-            int cnt = m_typeAssigments.Values.Count;
-            for (int i=0;i < cnt;i++ ) {
-                TypeAssigment tas = m_typeAssigments.Values[i];
-                tas.m_type.Tabularize(tas.m_name);
-            }
-            //foreach (TypeAssigment tas in m_typeAssigments.Values)
-            //    tas.m_type.Tabularize(tas.m_name);
-        }
 
-        public TypeAssigment CreateNewTypeAssigment(string name, Asn1Type asn1Type, List<string> commenst)
-        {
-            string newName = name[0].ToString().ToUpper() + name.Substring(1,name.Length-1);
-            int i=0;
-            while(m_typeAssigments.ContainsKey(newName)) {
-                i++;
-                newName += i.ToString();
-            }
-            TypeAssigment ret = new TypeAssigment();
-            ret.m_name = newName;
-            ret.m_type = asn1Type;
-            ret.m_comments = commenst;
-            m_typeAssigments.Add(newName, ret);
-            ret.m_createdThroughTabulization = true;
-            return ret;
-        }
 
 
     }
@@ -425,7 +388,7 @@ namespace tinyAsn1
         //^(IMPORTS_FROM_MODULE modulereference typereference* valuereference*  )
         static public ImportedModule CreateFromAntlrAst(ITree tree, Module parent)
         {
-            ImportedModule ret = new ImportedModule();
+            ImportedModule ret = Asn1CompilerInvokation.Instance.Factory.CreateImportedModule();
             ret.m_parentModule = parent;
             ret.tree = tree;
 
@@ -474,7 +437,7 @@ namespace tinyAsn1
         //^(VAL_ASSIG valuereference type value)
         static public ValueAssigment CreateFromAntlrAst(ITree tree)
         {
-            ValueAssigment ret = new ValueAssigment();
+            ValueAssigment ret = Asn1CompilerInvokation.Instance.Factory.CreateValueAssigment();
             ret.m_name = tree.GetChild(0).Text;
             ret.m_type = Asn1Type.CreateFromAntlrAst(tree.GetChild(1));
             ret.m_value = Asn1Value.CreateFromAntlrAst(tree.GetChild(2));
@@ -512,13 +475,19 @@ namespace tinyAsn1
         }
         internal void PrintC(StreamWriterLevel c)
         {
-            c.Write("{0} {1} = ", C.ID(m_type.Name), C.ID(m_name));
+            m_type.PrintHTypeDeclaration(m_type.PEREffectiveConstraint, c, "", "", 0);
+
+            c.Write(" {0} = ",  C.ID(m_name));
+//            c.Write("{0} {1} = ", C.ID(m_type.Name), C.ID(m_name));
             m_value.PrintC(c, 0);
             c.WriteLine(";");
         }
         public void PrintExternDeclaration(StreamWriterLevel h)
         {
-            h.WriteLine("extern {0} {1};", C.ID(m_type.Name), C.ID(m_name));
+//            h.WriteLine("extern {0} {1};", C.ID(m_type.Name), C.ID(m_name));
+            h.Write("extern ");
+            m_type.PrintHTypeDeclaration(m_type.PEREffectiveConstraint, h, "", "", 0);
+            h.WriteLine(" {0};", C.ID(m_name));
         }
     }
 
@@ -535,7 +504,7 @@ namespace tinyAsn1
         static public TypeAssigment CreateFromAntlrAst(ITree tree, Module module)
         {
 
-            TypeAssigment ret = new TypeAssigment();
+            TypeAssigment ret = Asn1CompilerInvokation.Instance.Factory.CreateTypeAssigment();
             ret.antlrNode = tree;
             ret.m_module = module;
             ret.m_name = tree.GetChild(0).Text;
@@ -561,13 +530,6 @@ namespace tinyAsn1
         }
 
 
-        public void PrintHtml(StreamWriterLevel wr, int p)
-        {
-//            wr.WriteLine("        <div style=\"width: 100%; float:left\" >");
-            m_type.PrintHtml(m_type.PEREffectiveConstraint, wr, p, m_comments, this, null);
-//            wr.WriteLine("        </div>");
-            wr.WriteLine("&nbsp;<br/>");
-        }
 
         internal void PrintH(StreamWriterLevel h, string uniqueID)
         {

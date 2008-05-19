@@ -24,7 +24,7 @@ namespace tinyAsn1
         public static IntegerRange UncostraintInteger {
             get
             {
-                IntegerRange ret = new IntegerRange();
+                IntegerRange ret = Asn1CompilerInvokation.Instance.Factory.CreateIntegerRange();
                 ret.m_minIsInfinite = true;
                 ret.m_maxIsInfinite = true;
                 return ret;
@@ -34,7 +34,7 @@ namespace tinyAsn1
         {
             get
             {
-                IntegerRange ret = new IntegerRange();
+                IntegerRange ret = Asn1CompilerInvokation.Instance.Factory.CreateIntegerRange();
                 ret.m_minIsInfinite = false;
                 ret.m_minIsIncluded = true;
                 ret.m_min = 0;
@@ -80,7 +80,7 @@ namespace tinyAsn1
 
         public IntegerRange Clone()
         {
-            IntegerRange c = new IntegerRange();
+            IntegerRange c = Asn1CompilerInvokation.Instance.Factory.CreateIntegerRange();
             c.m_max = m_max;
             c.m_maxIsIncluded = m_maxIsIncluded;
             c.m_maxIsInfinite = m_maxIsInfinite;
@@ -111,7 +111,7 @@ namespace tinyAsn1
 
         public static IntegerRange Union(IntegerRange a, IntegerRange b)
         {
-            IntegerRange c = new IntegerRange();
+            IntegerRange c = Asn1CompilerInvokation.Instance.Factory.CreateIntegerRange();
 
             if (a.m_minIsInfinite || b.m_minIsInfinite)
             {
@@ -158,7 +158,7 @@ namespace tinyAsn1
 
         public static IntegerRange Intersection(IntegerRange a, IntegerRange b)
         {
-            IntegerRange c = new IntegerRange();
+            IntegerRange c = Asn1CompilerInvokation.Instance.Factory.CreateIntegerRange();
 
             if (a.m_minIsInfinite && b.m_minIsInfinite)
             {
@@ -289,7 +289,7 @@ namespace tinyAsn1
         {
             get
             {
-                PERIntegerEffectiveConstraint ret = new PERIntegerEffectiveConstraint();
+                PERIntegerEffectiveConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreatePERIntegerEffectiveConstraint();
                 ret.m_rootRange = IntegerRange.UncostraintInteger;
                 return ret;
             }
@@ -299,7 +299,7 @@ namespace tinyAsn1
         {
             get
             {
-                PERIntegerEffectiveConstraint ret = new PERIntegerEffectiveConstraint();
+                PERIntegerEffectiveConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreatePERIntegerEffectiveConstraint();
                 ret.m_rootRange = IntegerRange.UncostraintPosInteger;
 
                 return ret;
@@ -308,7 +308,7 @@ namespace tinyAsn1
 
         public static PERIntegerEffectiveConstraint Union(PERIntegerEffectiveConstraint a, PERIntegerEffectiveConstraint b)
         {
-            PERIntegerEffectiveConstraint c = new PERIntegerEffectiveConstraint();
+            PERIntegerEffectiveConstraint c = Asn1CompilerInvokation.Instance.Factory.CreatePERIntegerEffectiveConstraint();
             c.m_rootRange = IntegerRange.Union(a.m_rootRange, b.m_rootRange);
 
             c.m_isExtended = a.m_isExtended || b.m_isExtended;
@@ -326,7 +326,7 @@ namespace tinyAsn1
         
         public static PERIntegerEffectiveConstraint Intersection(PERIntegerEffectiveConstraint a, PERIntegerEffectiveConstraint b)
         {
-            PERIntegerEffectiveConstraint c = new PERIntegerEffectiveConstraint();
+            PERIntegerEffectiveConstraint c = Asn1CompilerInvokation.Instance.Factory.CreatePERIntegerEffectiveConstraint();
             c.m_rootRange = IntegerRange.Intersection(a.m_rootRange, b.m_rootRange);
 
             c.m_isExtended = a.m_isExtended || b.m_isExtended;
@@ -399,15 +399,15 @@ namespace tinyAsn1
         }
         public static PERSizeEffectiveConstraint Full
         {
-            get { return new PERSizeEffectiveConstraint(); }
+            get { return Asn1CompilerInvokation.Instance.Factory.CreatePERSizeEffectiveConstraint(); }
         }
 
         public static PERSizeEffectiveConstraint Empty
         {
             get {
-                PERSizeEffectiveConstraint ret = new PERSizeEffectiveConstraint();
-                ret.m_size = new PERIntegerEffectiveConstraint();
-                ret.m_size.m_rootRange = new IntegerRange();
+                PERSizeEffectiveConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreatePERSizeEffectiveConstraint();
+                ret.m_size = Asn1CompilerInvokation.Instance.Factory.CreatePERIntegerEffectiveConstraint();
+                ret.m_size.m_rootRange = Asn1CompilerInvokation.Instance.Factory.CreateIntegerRange();
                 return ret; 
             }
         }
@@ -426,7 +426,7 @@ namespace tinyAsn1
 
         public static PERSizeEffectiveConstraint Union(PERSizeEffectiveConstraint a, PERSizeEffectiveConstraint b)
         {
-            PERSizeEffectiveConstraint c = new PERSizeEffectiveConstraint();
+            PERSizeEffectiveConstraint c = Asn1CompilerInvokation.Instance.Factory.CreatePERSizeEffectiveConstraint();
 
             c.m_size = PERIntegerEffectiveConstraint.Union(a.m_size, b.m_size);
 
@@ -435,7 +435,7 @@ namespace tinyAsn1
 
         public static PERSizeEffectiveConstraint Intersection(PERSizeEffectiveConstraint a, PERSizeEffectiveConstraint b)
         {
-            PERSizeEffectiveConstraint c = new PERSizeEffectiveConstraint();
+            PERSizeEffectiveConstraint c = Asn1CompilerInvokation.Instance.Factory.CreatePERSizeEffectiveConstraint();
 
             c.m_size = PERIntegerEffectiveConstraint.Intersection(a.m_size, b.m_size);
 
@@ -486,7 +486,7 @@ namespace tinyAsn1
     }
 
 
-    public class CharSet
+    public class CharSet /* no need to be abstract*/
     {
         public List<Char> m_set = new List<char>();
 
@@ -612,7 +612,7 @@ namespace tinyAsn1
 
         public static new PERAlphabetAndSizeEffectiveConstraint Full(Asn1Type type)
         {
-            PERAlphabetAndSizeEffectiveConstraint ret = new PERAlphabetAndSizeEffectiveConstraint();
+            PERAlphabetAndSizeEffectiveConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreatePERAlphabetAndSizeEffectiveConstraint();
 
             ret.m_size = PERIntegerEffectiveConstraint.UncostraintPosInteger;
             ret.m_from = null;
@@ -624,9 +624,9 @@ namespace tinyAsn1
         {
             get
             {
-                PERAlphabetAndSizeEffectiveConstraint ret = new PERAlphabetAndSizeEffectiveConstraint();
-                ret.m_size = new PERIntegerEffectiveConstraint();
-                ret.m_size.m_rootRange = new IntegerRange();
+                PERAlphabetAndSizeEffectiveConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreatePERAlphabetAndSizeEffectiveConstraint();
+                ret.m_size = Asn1CompilerInvokation.Instance.Factory.CreatePERIntegerEffectiveConstraint();
+                ret.m_size.m_rootRange = Asn1CompilerInvokation.Instance.Factory.CreateIntegerRange();
                 ret.m_from = CharSet.GetEmptySet();
                 return ret;
             }
@@ -644,7 +644,7 @@ namespace tinyAsn1
 
         public static PERAlphabetAndSizeEffectiveConstraint Union(PERAlphabetAndSizeEffectiveConstraint a, PERAlphabetAndSizeEffectiveConstraint b)
         {
-            PERAlphabetAndSizeEffectiveConstraint c = new PERAlphabetAndSizeEffectiveConstraint();
+            PERAlphabetAndSizeEffectiveConstraint c = Asn1CompilerInvokation.Instance.Factory.CreatePERAlphabetAndSizeEffectiveConstraint();
             if (a == null || b==null)
                 return null;
 
@@ -661,7 +661,7 @@ namespace tinyAsn1
 
         public static PERAlphabetAndSizeEffectiveConstraint Intersection(PERAlphabetAndSizeEffectiveConstraint a, PERAlphabetAndSizeEffectiveConstraint b)
         {
-            PERAlphabetAndSizeEffectiveConstraint c = new PERAlphabetAndSizeEffectiveConstraint();
+            PERAlphabetAndSizeEffectiveConstraint c = Asn1CompilerInvokation.Instance.Factory.CreatePERAlphabetAndSizeEffectiveConstraint();
             if (a == null)
                 return b;
             if (b == null)
@@ -739,7 +739,7 @@ namespace tinyAsn1
 
 
  
-    public class PER
+    public class PER /* no need to be abstract*/
     {
 
         //List<bool> represents a stream of bits. [0] is the most significant bit

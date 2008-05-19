@@ -17,7 +17,6 @@ namespace asn1scc
     
     class Program
     {
-
         static int Main(string[] args)
         {
             if (System.Diagnostics.Debugger.IsAttached)
@@ -146,6 +145,9 @@ namespace asn1scc
             try
             {
                 compInv.printC();
+                File.WriteAllText(Asn1CompilerInvokation.m_outDirectory + "asn1crt.h", Properties.Resources.asn1crt);
+                File.WriteAllText(Asn1CompilerInvokation.m_outDirectory + "asn1crt.c", Properties.Resources.asn1crt1);
+                File.WriteAllText(Asn1CompilerInvokation.m_outDirectory + "real.c", Properties.Resources.real);
             }
             catch (SemanticErrorException ex)
             {
@@ -160,7 +162,7 @@ namespace asn1scc
         static int Usage()
         {
             Console.Error.WriteLine();
-            Console.Error.WriteLine("ASN.1 Certified compiler");
+            Console.Error.WriteLine("ASN.1 Space Certified Compiler");
             Console.Error.WriteLine("Current Version is: 0.93");
             Console.Error.WriteLine("Usage:");
             Console.Error.WriteLine();

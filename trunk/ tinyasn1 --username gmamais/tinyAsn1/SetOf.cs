@@ -17,13 +17,13 @@ namespace tinyAsn1
         {
             get
             {
-                return new Tag(Tag.TagClass.UNIVERSAL, 17, TaggingMode.EXPLICIT, this);
+                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 17, TaggingMode.EXPLICIT, this);
             }
         }
 
         static public new SetOfType CreateFromAntlrAst(ITree tree)
         {
-            SetOfType ret = new SetOfType();
+            SetOfType ret = Asn1CompilerInvokation.Instance.Factory.CreateSetOfType();
             for (int i = 0; i < tree.ChildCount; i++)
             {
                 ITree child = tree.GetChild(i);
@@ -72,7 +72,7 @@ namespace tinyAsn1
                 case asn1Parser.VALUE_LIST:
                 case asn1Parser.OBJECT_ID_VALUE: //for catching case {valref} or {23}
                     if (sqVal == null)
-                        return new SetOfValue(val.antlrNode, m_module, this);
+                        return Asn1CompilerInvokation.Instance.Factory.CreateSetOfValue(val.antlrNode, m_module, this);
                     else
                     {
                         sqVal.FixChildrenVars();
@@ -89,7 +89,7 @@ namespace tinyAsn1
                                 if (tmp.IsResolved())
                                 {
                                     if (tmp.Type.GetFinalType() == this)
-                                        return new SetOfValue(tmp as SetOfValue, val.antlrNode.GetChild(0));
+                                        return Asn1CompilerInvokation.Instance.Factory.CreateSetOfValue(tmp as SetOfValue, val.antlrNode.GetChild(0));
                                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
                                 }
                                 return val; // not yet fully resolved, wait for next round

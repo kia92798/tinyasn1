@@ -7,7 +7,7 @@ namespace tinyAsn1
 {
     // The difference with the normal dictionary is that
     // the Values property retains order (as inserted)
-    public class OrderedDictionary<TKey, TValue> 
+    public class OrderedDictionary<TKey, TValue>    /* util class, no need to be abstract*/
     {
         Dictionary<TKey, TValue> m_keyval = new Dictionary<TKey, TValue>();
         List<TValue> m_values = new List<TValue>();
@@ -62,7 +62,7 @@ namespace tinyAsn1
     }
 
 
-    public class StreamWriterLevel : StreamWriter
+    public class StreamWriterLevel : StreamWriter /* util class, no need to be abstract*/
     {
         public StreamWriterLevel(string fileName) : base(fileName) { }
         public void P(int level)
@@ -70,6 +70,8 @@ namespace tinyAsn1
             for (int i = 0; i < level; i++)
                 Write("    ");
         }
+
+        
         public string BR(List<string> lines)
         {
             string ret = "";
@@ -134,7 +136,7 @@ namespace tinyAsn1
         }
     }
 
-    public class SemanticTreeNode : ITree
+    public class SemanticTreeNode : ITree /* util class, no need to be abstract*/
     {
         List<ITree> children = new List<ITree>();
 
@@ -233,7 +235,17 @@ namespace tinyAsn1
     public static class Config
     {
         private static int m_integerSize = 8;
-        public static int IntegerSize { get { return m_integerSize; } }
+        public static int IntegerSize 
+        { 
+            get { return m_integerSize; }
+            set
+            {
+                if (value == 2 || value == 4 || value == 8)
+                    m_integerSize = value;
+                else
+                    throw new SemanticErrorException("Word size must be 2, 4 or 8");
+            }
+        }
         private static int m_MaxObjectIdentifierSize = 200;
         public static int MaxObjectIdentifierSize { get { return m_MaxObjectIdentifierSize; } }
         public static Int64 MAXINT
@@ -271,7 +283,7 @@ namespace tinyAsn1
         }
     }
 
-    public class SemanticErrorException : Exception
+    public class SemanticErrorException : Exception /* util class, no need to be abstract*/
     {
         public SemanticErrorException(string ErrMsg)
             : base(ErrMsg)
@@ -279,11 +291,11 @@ namespace tinyAsn1
         }
     }
 
-    public class AbstractMethodCalledException : Exception
+    public class AbstractMethodCalledException : Exception /* util class, no need to be abstract*/
     {
     }
 
-    public class ErrorReporter
+    public class ErrorReporter /* util class, no need to be abstract*/
     {
         public static void SemanticError(string inputFileName, int line, string msg, params object[] args)
         {
@@ -292,7 +304,7 @@ namespace tinyAsn1
     }
 
     public delegate void OnAntrlNode(ITree root);
-    public class AntlrTreeVisitor
+    public class AntlrTreeVisitor /* util class, no need to be abstract*/
     {
         public void visit(ITree root, int tokenID, OnAntrlNode callBack)
         {
@@ -334,7 +346,7 @@ namespace tinyAsn1
         }
     }
 
-    static class C
+    static class C 
     {
         public static string ID(string str)
         {
@@ -381,7 +393,7 @@ namespace tinyAsn1
 #endif
     }
 
-    public class CLocalVariable
+    internal class CLocalVariable 
     {
         public string varName = "";
         public string type = "";

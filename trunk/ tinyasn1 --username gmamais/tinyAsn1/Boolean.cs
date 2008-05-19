@@ -17,7 +17,7 @@ namespace tinyAsn1
         {
             get
             {
-                return new Tag(Tag.TagClass.UNIVERSAL, 1, TaggingMode.EXPLICIT, this);
+                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 1, TaggingMode.EXPLICIT, this);
             }
         }
 
@@ -28,7 +28,7 @@ namespace tinyAsn1
             {
                 case asn1Parser.TRUE:
                 case asn1Parser.FALSE:
-                    return new BooleanValue(val.antlrNode, m_module, this);
+                    return Asn1CompilerInvokation.Instance.Factory.CreateBooleanValue(val.antlrNode, m_module, this);
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
                     if (m_module.isValueDeclared(referenceId))
@@ -37,7 +37,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.BOOLEAN:
-                                return new BooleanValue(tmp as BooleanValue, val.antlrNode.GetChild(0));
+                                return Asn1CompilerInvokation.Instance.Factory.CreateBooleanValue(tmp as BooleanValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
