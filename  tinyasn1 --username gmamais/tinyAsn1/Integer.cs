@@ -23,13 +23,13 @@ namespace tinyAsn1
         {
             get
             {
-                return new Tag(Tag.TagClass.UNIVERSAL, 2, TaggingMode.EXPLICIT, this);
+                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 2, TaggingMode.EXPLICIT, this);
             }
         }
 
         static public new IntegerType CreateFromAntlrAst(ITree tree)
         {
-            IntegerType ret = new IntegerType();
+            IntegerType ret = Asn1CompilerInvokation.Instance.Factory.CreateIntegerType();
             for (int i = 0; i < tree.ChildCount; i++)
             {
                 ITree child = tree.GetChild(i);
@@ -63,7 +63,7 @@ namespace tinyAsn1
             switch (val.antlrNode.Type)
             {
                 case asn1Parser.INT:
-                    return new IntegerValue(val.antlrNode, m_module, this);
+                    return Asn1CompilerInvokation.Instance.Factory.CreateIntegerValue(val.antlrNode, m_module, this);
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
                     if (m_module.isValueDeclared(referenceId))
@@ -72,7 +72,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.INT:
-                                return new IntegerValue(tmp as IntegerValue, val.antlrNode.GetChild(0));
+                                return Asn1CompilerInvokation.Instance.Factory.CreateIntegerValue(tmp as IntegerValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 return val;
                             default:
@@ -82,7 +82,7 @@ namespace tinyAsn1
                     else if (this.isIdentifierDeclared(referenceId))
                     {
                         if (this.isIdentifierProcessed(referenceId))
-                            return new IntegerValue(m_namedValues[referenceId], m_module, val.antlrNode, this);
+                            return Asn1CompilerInvokation.Instance.Factory.CreateIntegerValue(m_namedValues[referenceId], m_module, val.antlrNode, this);
                         return val; //else wait for next round
                     }
                     else
@@ -234,7 +234,7 @@ namespace tinyAsn1
             {
                 if (m_perEffectiveConstraint != null)
                     return m_perEffectiveConstraint;
-                m_perEffectiveConstraint = new PERIntegerEffectiveConstraint();
+                m_perEffectiveConstraint = Asn1CompilerInvokation.Instance.Factory.CreatePERIntegerEffectiveConstraint();
                 m_perEffectiveConstraint = (PERIntegerEffectiveConstraint)m_perEffectiveConstraint.Compute(m_constraints, this);
                 return m_perEffectiveConstraint;
             }
@@ -268,6 +268,20 @@ namespace tinyAsn1
 
             return 16;
         }
+
+        public override string MaxBitsInPER_Explained
+        {
+            get
+            {
+                if (MaxBitsInPER == (Config.IntegerSize + 1) * 8)
+                {
+                    Asn1CompilerInvokation.m_HtmlIntegerSizeMustBeExplained = true;
+                    return "<a href=\"#INT_SIZE_EXPLAINED123\"><span style=\"vertical-align: super\">why?</span></a>";
+                }
+                return base.MaxBitsInPER_Explained;
+            }
+        }
+
 
         public override bool IsOctetAligned(PEREffectiveConstraint cns)
         {

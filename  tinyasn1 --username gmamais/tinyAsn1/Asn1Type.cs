@@ -6,14 +6,17 @@ using Antlr.Runtime.Tree;
 namespace tinyAsn1
 {
 
-    public partial class Asn1Type
+
+
+    public abstract partial class Asn1Type
     {
 //public and internal members
-        internal ITree antlrNode;
+        public ITree antlrNode;
         public Module m_module;
         public Tag m_tag;
         public List<ITree> m_AntlrConstraints = new List<ITree>();
         public List<IConstraint> m_constraints = new List<IConstraint>();
+
 
 
         public virtual IEnumerable<T> GetMySelfAndAnyChildren<T>() where T : Asn1Type 
@@ -87,7 +90,7 @@ namespace tinyAsn1
             //(TYPE_TAG (UNIVERSAL | APPLICATION | PRIVATE)? INT ( IMPLICIT | EXPLICIT)?)
             static public Tag CreateFromAntlrAst(ITree tree)
             {
-                Tag ret = new Tag();
+                Tag ret = Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag();
                 for (int i = 0; i < tree.ChildCount; i++)
                 {
                     ITree child = tree.GetChild(i);
@@ -129,7 +132,7 @@ namespace tinyAsn1
 
                 if (valReference != null)
                 {
-                    IntegerType dummy = new IntegerType();
+                    IntegerType dummy = Asn1CompilerInvokation.Instance.Factory.CreateIntegerType();
                     dummy.m_module = m_type.m_module;
                     valReference = dummy.ResolveVariable(valReference);
                     if (valReference.IsResolved())
@@ -240,13 +243,13 @@ namespace tinyAsn1
                         tag = Tag.CreateFromAntlrAst(child);
                         break;
                     case asn1Parser.NULL:
-                        ret = new NullType();
+                        ret = Asn1CompilerInvokation.Instance.Factory.CreateNullType();
                         break;
                     case asn1Parser.BIT_STRING_TYPE:
                         ret = BitStringType.CreateFromAntlrAst(child);
                         break;
                     case asn1Parser.BOOLEAN:
-                        ret = new BooleanType();
+                        ret = Asn1CompilerInvokation.Instance.Factory.CreateBooleanType();
                         break;
                     case asn1Parser.ENUMERATED_TYPE:
                         ret = EnumeratedType.CreateFromAntlrAst(child);
@@ -255,7 +258,7 @@ namespace tinyAsn1
                         ret = IntegerType.CreateFromAntlrAst(child);
                         break;
                     case asn1Parser.REAL:
-                        ret = new RealType();
+                        ret = Asn1CompilerInvokation.Instance.Factory.CreateRealType();
                         break;
                     case asn1Parser.CHOICE_TYPE:
                         ret = ChoiceType.CreateFromAntlrAst(child);
@@ -281,19 +284,19 @@ namespace tinyAsn1
                     case asn1Parser.RELATIVE_OID:
                         throw new SemanticErrorException("Error line: " + child.Line + ", col: " + child.CharPositionInLine + ". RELATIVE-OID are not supported. Use OBJECT IDENTIFIER instead");
                     case asn1Parser.OCTECT_STING:
-                        ret = new OctetStringType();
+                        ret = Asn1CompilerInvokation.Instance.Factory.CreateOctetStringType();
                         break;
                     case asn1Parser.IA5String:
-                        ret = new IA5StringType();
+                        ret = Asn1CompilerInvokation.Instance.Factory.CreateIA5StringType();
                         break;
                     case asn1Parser.NumericString:
-                        ret = new NumericStringType();
+                        ret = Asn1CompilerInvokation.Instance.Factory.CreateNumericStringType();
                         break;
                     case asn1Parser.UTCTime:
-                        ret = new UTCTimeType();
+                        ret = Asn1CompilerInvokation.Instance.Factory.CreateUTCTimeTypeType();
                         break;
                     case asn1Parser.GeneralizedTime:
-                        ret = new GeneralizedTimeType();
+                        ret = Asn1CompilerInvokation.Instance.Factory.CreateGeneralizedTimeType();
                         break;
                     case asn1Parser.PrintableString:
                     case asn1Parser.VisibleString:
@@ -304,7 +307,7 @@ namespace tinyAsn1
                     case asn1Parser.UniversalString:
                     case asn1Parser.BMPString:
                     case asn1Parser.UTF8String:
-                        ret = new IA5StringType();
+                        ret = Asn1CompilerInvokation.Instance.Factory.CreateIA5StringType();
                         break;
 
                     //                            throw new SemanticErrorException("Error line: " + child.Line + ", col: " + child.CharPositionInLine + ". "+child.Text+" is currently not supported.");
@@ -337,7 +340,7 @@ namespace tinyAsn1
         {
             get
             {
-                TagSequence ret = new TagSequence();
+                TagSequence ret = Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTagSequence();
 
                 if (m_tag != null)
                 {
@@ -731,61 +734,8 @@ namespace tinyAsn1
         }
 
 
-//Backend functions
-        public virtual void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas, List<IConstraint> additonalConstraints)
-        {
-            o.WriteLine("<a name=\"{0}\"></a>", "ICD_" + tas.m_name.Replace("-", "_"));
-            o.WriteLine("<table border=\"0\" width=\"100%\" >");
-//            o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
-            o.WriteLine("<tbody>");
 
-            o.WriteLine("<tr  bgcolor=\"{0}\">", (tas.m_createdThroughTabulization ? "#379CEE" : "#FF8f00"));
-            o.WriteLine("<td height=\"35\" colspan=\"2\"  >");
-            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"4\">{0}</font><font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">({1}) </font>", tas.m_name, Name);
-            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\"><a href=\"#{0}\">ASN.1</a></font>", "ASN1_" + tas.m_name.Replace("-", "_"));
-            o.WriteLine("</td>");
-
-            o.WriteLine("<td height=\"35\" align=\"center\">");
-            o.WriteLine("    <font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">min = {0} bytes</font>", (MinBytesInPER == -1 ? "&#8734" : MinBytesInPER.ToString()));
-            o.WriteLine("</td>");
-
-            o.WriteLine("<td height=\"35\" align=\"center\">");
-            o.WriteLine("    <font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">max = {0} bytes</font>", (MaxBytesInPER == -1 ? "&#8734" : MaxBytesInPER.ToString()));
-            o.WriteLine("</td>");
-            o.WriteLine("</tr>");
-
-            IInternalContentsInHtml pThis = this as IInternalContentsInHtml;
-            string tmp = string.Empty;
-            if (pThis!=null)
-                tmp = pThis.InternalContentsInHtml(additonalConstraints);
-            if (comment.Count > 0 || tmp.Length>0)
-            {
-                o.WriteLine("<tr class=\"CommentRow\">");
-                o.WriteLine("<td class=\"comment2\" colspan=\"4\">" + o.BR(comment) + tmp + "</td>");
-                o.WriteLine("</tr>");
-            }
-
-            o.WriteLine("<tr class=\"headerRow\">");
-            o.WriteLine("<td class=\"hrconstraint2\" colspan=\"2\">Constraints</td>");
-            o.WriteLine("<td class=\"hrMin2\">Min Length (bits)</td>");
-            o.WriteLine("<td class=\"hrMax2\">Max Length (bits)</td>");
-            o.WriteLine("</tr>");
-
-
-
-            o.WriteLine("<tr class=\"OddRow\">");
-            o.WriteLine("    <td class=\"constraint\" colspan=\"2\">{0}</td>", o.Constraint(Constraints + BaseConstraint.AsString(additonalConstraints)));
-            o.WriteLine("    <td class=\"min\" >{0}</td>", MinBitsInPER);
-            o.WriteLine("    <td class=\"max\" >{0}</td>", MaxBitsInPER);
-            o.WriteLine("</tr>");
-
-
-            o.WriteLine("</tbody>");
-            o.WriteLine("</table>");
-//            o.WriteLine("</a>");
-
-        }
-
+        public virtual string MaxBitsInPER_Explained { get { return string.Empty; } }
 
 
         /// <summary>
@@ -796,12 +746,6 @@ namespace tinyAsn1
             get { return false; }
         }
 
-        /// <summary>
-        /// Must be overriden in Contstucted types
-        /// </summary>
-        public virtual void Tabularize(string tasName)
-        {
-        }
 
         internal virtual void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
@@ -813,6 +757,10 @@ namespace tinyAsn1
             return true;
         }
 
+        public virtual bool ContainsTypeAssigment(string typeAssigment)
+        {
+            return false;
+        }
 
         internal virtual List<string> TypesIDepend()
         {
@@ -930,9 +878,9 @@ namespace tinyAsn1
         string InternalContentsInHtml(List<IConstraint> additionalConstraints);
     }
 
- 
 
-  
+
+
     public partial class Asn1Value : IComparable
     {
         internal ITree antlrNode;

@@ -22,7 +22,7 @@ namespace tinyAsn1
         {
             get
             {
-                return new Tag(Tag.TagClass.UNIVERSAL, 22, TaggingMode.EXPLICIT, this);
+                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 22, TaggingMode.EXPLICIT, this);
             }
         }
 
@@ -33,7 +33,7 @@ namespace tinyAsn1
             {
                 case asn1Parser.StringLiteral:
                 case asn1Parser.VALUE_LIST:
-                    return new IA5StringValue(val.antlrNode, m_module, this);
+                    return Asn1CompilerInvokation.Instance.Factory.CreateIA5StringValue(val.antlrNode, m_module, this);
 
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
@@ -43,7 +43,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.IA5String:
-                                return new IA5StringValue(tmp as IA5StringValue, val.antlrNode.GetChild(0));
+                                return Asn1CompilerInvokation.Instance.Factory.CreateIA5StringValue(tmp as IA5StringValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
@@ -107,7 +107,7 @@ namespace tinyAsn1
 
         public virtual IA5StringType CreateForPA(Module mod, ITree antrl)
         {
-            IA5StringType ret = new IA5StringType();
+            IA5StringType ret = Asn1CompilerInvokation.Instance.Factory.CreateIA5StringType();
             ret.m_IamUsedInPermittedAlphabet = true;
             ret.m_module = mod;
             ret.antlrNode = antrl;
@@ -162,7 +162,7 @@ namespace tinyAsn1
             {
                 if (m_perEffectiveConstraint != null)
                     return m_perEffectiveConstraint;
-                m_perEffectiveConstraint = new PERAlphabetAndSizeEffectiveConstraint();
+                m_perEffectiveConstraint = Asn1CompilerInvokation.Instance.Factory.CreatePERAlphabetAndSizeEffectiveConstraint();
                 m_perEffectiveConstraint = (PERAlphabetAndSizeEffectiveConstraint)m_perEffectiveConstraint.Compute(m_constraints, this);
                 return m_perEffectiveConstraint;
             }
@@ -184,20 +184,16 @@ namespace tinyAsn1
         }
 
 
-        protected override long minItemBitsInPER(PEREffectiveConstraint cns)
+        public override long minItemBitsInPER(PEREffectiveConstraint cns)
         {
             PERAlphabetAndSizeEffectiveConstraint cn = (PERAlphabetAndSizeEffectiveConstraint)cns;
             return BitsPerSingleChar(cn.m_from);
         }
-        protected override long maxItemBitsInPER(PEREffectiveConstraint cns)
+        public override long maxItemBitsInPER(PEREffectiveConstraint cns)
         {
             return minItemBitsInPER(cns);
         }
-        protected override string TypeName
-        {
-            get { return "ASCII CHARACTER"; }
-        }
-        protected override string ItemConstraint(PEREffectiveConstraint cns)
+        public override string ItemConstraint(PEREffectiveConstraint cns)
         {
             PERAlphabetAndSizeEffectiveConstraint cn = (PERAlphabetAndSizeEffectiveConstraint)cns;
             if (cn.m_from!=null)
@@ -390,7 +386,7 @@ namespace tinyAsn1
         {
             get
             {
-                return new Tag(Tag.TagClass.UNIVERSAL, 18, TaggingMode.EXPLICIT, this);
+                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 18, TaggingMode.EXPLICIT, this);
             }
         }
 
@@ -400,7 +396,7 @@ namespace tinyAsn1
             switch (val.antlrNode.Type)
             {
                 case asn1Parser.StringLiteral:
-                    return new NumericStringValue(val.antlrNode, m_module, this);
+                    return Asn1CompilerInvokation.Instance.Factory.CreateNumericStringValue(val.antlrNode, m_module, this);
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
                     if (m_module.isValueDeclared(referenceId))
@@ -409,7 +405,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.NumericString:
-                                return new NumericStringValue(tmp as NumericStringValue, val.antlrNode.GetChild(0));
+                                return Asn1CompilerInvokation.Instance.Factory.CreateNumericStringValue(tmp as NumericStringValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
@@ -426,7 +422,7 @@ namespace tinyAsn1
         }
         public override IA5StringType CreateForPA(Module mod, ITree antrl)
         {
-            NumericStringType ret = new NumericStringType();
+            NumericStringType ret = Asn1CompilerInvokation.Instance.Factory.CreateNumericStringType();
             ret.IamUsedInPermittedAlphabet = true;
             ret.m_module = mod;
             ret.antlrNode = antrl;
@@ -441,10 +437,6 @@ namespace tinyAsn1
         public override char[] AllowedCharSet
         {
             get { return m_allowedCharSet; }
-        }
-        protected override string TypeName
-        {
-            get { return "NUMERIC CHARACTER"; }
         }
 //        protected override string EncodingCFunctionName { get { return "BitStream_EncodeNumericString"; } }
     }

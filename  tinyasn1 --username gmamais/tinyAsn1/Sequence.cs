@@ -18,13 +18,13 @@ namespace tinyAsn1
         {
             get
             {
-                return new Tag(Tag.TagClass.UNIVERSAL, 16, TaggingMode.EXPLICIT, this);
+                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 16, TaggingMode.EXPLICIT, this);
             }
         }
 
         static public new SequenceType CreateFromAntlrAst(ITree tree)
         {
-            SequenceType ret = new SequenceType();
+            SequenceType ret = Asn1CompilerInvokation.Instance.Factory.CreateSequenceType();
             if (tree.ChildCount>0)
                 SequenceOrSetType.CreateFromAntlrAst(ret, tree.GetChild(0));
             return ret;

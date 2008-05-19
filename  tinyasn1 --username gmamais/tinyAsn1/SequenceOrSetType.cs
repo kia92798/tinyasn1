@@ -7,7 +7,7 @@ using MB = System.Reflection.MethodBase;
 
 namespace tinyAsn1
 {
-    public partial class SequenceOrSetType : Asn1Type
+    public abstract partial class SequenceOrSetType : Asn1Type
     {
         public OrderedDictionary<string, Child> m_children = new OrderedDictionary<string, Child>();
         public bool m_extMarkPresent = false;
@@ -88,7 +88,7 @@ namespace tinyAsn1
             //^(SEQUENCE_ITEM identifier type (OPTIONAL|DEFAULT)? value?)
             static public Child CreateFromAntlrAst(ITree tree, int? version, bool extended)
             {
-                Child ret = new Child();
+                Child ret = Asn1CompilerInvokation.Instance.Factory.CreateSequenceOrSetChildType();
                 ret.m_version = version;
                 ret.m_extended = extended;
                 ret.antlrNode = tree;
@@ -187,12 +187,12 @@ namespace tinyAsn1
                 o.WriteLine("<td class=\"constraint\">{0}</td>", o.Constraint(m_type.Constraints));
                 
                 o.WriteLine("<td class=\"min\">{0}</td>",(m_type.MinBitsInPER==-1?"&#8734":m_type.MinBitsInPER.ToString()));
-                o.WriteLine("<td class=\"max\">{0}</td>", (m_type.MaxBitsInPER == -1 ? "&#8734" : m_type.MaxBitsInPER.ToString()));
+                o.WriteLine("<td class=\"max\">{0}{1}</td>", (m_type.MaxBitsInPER == -1 ? "&#8734" : m_type.MaxBitsInPER.ToString()), m_type.MaxBitsInPER_Explained);
                 o.WriteLine("</tr>");
             }
         }
         
-        class ComponentChild : Child
+        private class ComponentChild : Child
         {
             static new public ComponentChild CreateFromAntlrAst(ITree tree, int? version, bool extended)
             {
@@ -238,7 +238,7 @@ namespace tinyAsn1
             }
         }
 
-        
+
 
         static public SequenceOrSetType CreateFromAntlrAst(SequenceOrSetType ret, ITree tree)
         {
@@ -394,7 +394,7 @@ namespace tinyAsn1
                             throw new SemanticErrorException("Error line: " + compChild.m_type.antlrNode.Line + ". " + compChild.m_type.Name + " can not be expanded. Duplicate child name(" + otherChild.m_childVarName + ")");
                         if (otherChild.m_extended)
                             continue;
-                        Child childCopy = new Child(otherChild);
+                        Child childCopy = Asn1CompilerInvokation.Instance.Factory.CreateSequenceOrSetChildType(otherChild);
                         childCopy.m_version = compChild.m_version;
                         childCopy.m_extended = compChild.m_extended;
                         newChildren.Add(childCopy.m_childVarName, childCopy);
@@ -431,7 +431,7 @@ namespace tinyAsn1
                 if (m_AutomaticTaggingTransformationCanBeApplied)
                 {
 
-                    ch.m_type.m_tag = new Tag();
+                    ch.m_type.m_tag = Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag();
                     ch.m_type.m_tag.m_class = Tag.TagClass.CONTEXT_SPECIFIC;
                     ch.m_type.m_tag.m_tag = curTag;
                     ch.m_type.m_tag.m_type = ch.m_type;
@@ -459,9 +459,9 @@ namespace tinyAsn1
                 case asn1Parser.OBJECT_ID_VALUE:    // for catching cases {id id2} or {id 4}
                     if (sqVal == null)
                         if (this is SequenceType)
-                            return new SequenceOrSetValue(val.antlrNode, m_module, this, true);
+                            return Asn1CompilerInvokation.Instance.Factory.CreateSequenceOrSetValue(val.antlrNode, m_module, this); //,true
                         else
-                            return new SequenceOrSetValue(val.antlrNode, m_module, this, false);
+                            return Asn1CompilerInvokation.Instance.Factory.CreateSequenceOrSetValue(val.antlrNode, m_module, this); //, false
                     else
                     {
                         sqVal.FixChildrenVars();
@@ -478,7 +478,7 @@ namespace tinyAsn1
                                 if (tmp.IsResolved())
                                 {
                                     if (tmp.Type.GetFinalType() == this)
-                                        return new SequenceOrSetValue(tmp as SequenceOrSetValue, val.antlrNode.GetChild(0));
+                                        return Asn1CompilerInvokation.Instance.Factory.CreateSequenceOrSetValue(tmp as SequenceOrSetValue, val.antlrNode.GetChild(0));
                                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
                                 }
                                 return val; // not yet fully resolved, wait for next round
@@ -753,114 +753,12 @@ namespace tinyAsn1
         }
 
 
-        public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas, List<IConstraint> additonalConstraints)
-        {
-            o.WriteLine("<a name=\"{0}\"></a>", "ICD_" + tas.m_name.Replace("-", "_"));
-            o.WriteLine("<table border=\"0\" width=\"100%\" >");
-//            o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
-            o.WriteLine("<tbody>");
-            o.WriteLine("<tr  bgcolor=\"{0}\">", (tas.m_createdThroughTabulization ? "#379CEE" : "#FF8f00"));
-            o.WriteLine("<td height=\"35\" colspan=\"4\">");
-            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"4\">{0}</font><font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">({1}) </font>", tas.m_name, Name);
-            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\"><a href=\"#{0}\">ASN.1</a></font>", "ASN1_" + tas.m_name.Replace("-", "_"));
-            o.WriteLine("</td>");
-            o.WriteLine("<td height=\"35\" colspan=\"2\"  align=\"center\">");
-            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">min = {0} bytes</font>", (MinBytesInPER == -1 ? "&#8734" : MinBytesInPER.ToString()));
-            o.WriteLine("</td>");
-            o.WriteLine("<td height=\"35\" colspan=\"2\" align=\"center\">");
-            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">max = {0} bytes</font>", (MaxBytesInPER == -1 ? "&#8734" : MaxBytesInPER.ToString()));
-            o.WriteLine("</td>");
-            o.WriteLine("</tr>");
-
-            if (comment.Count > 0)
-            {
-                o.WriteLine("<tr class=\"CommentRow\">");
-                o.WriteLine("<td class=\"comment\" colspan=\"8\">" + o.BR(comment) + "</td>");
-                o.WriteLine("</tr>");
-            }
-
-            o.WriteLine("<tr class=\"headerRow\">");
-            o.WriteLine("<td class=\"hrNo\">No</td>");
-            o.WriteLine("<td class=\"hrField\">Field</td>");
-            o.WriteLine("<td class=\"hrComment\">Comment</td>");
-            o.WriteLine("<td class=\"hrOptional\">Optional</td>");
-
-            o.WriteLine("<td class=\"hrType\">Type</td>");
-            o.WriteLine("<td class=\"hrconstraint\">Constraint</td>");
-            o.WriteLine("<td class=\"hrMin\">Min Length (bits)</td>");
-            o.WriteLine("<td class=\"hrMax\">Max Length (bits)</td>");
-            o.WriteLine("</tr>");
-
-            int index=0;
-            if (PreambleLength > 0)
-            {
-                PrintPreambleHtml(o, lev + 1);
-                index = 1;
-            }
-            foreach (Child ch in m_children.Values)
-            {
-                ch.PrintHtml(o, lev + 1, ++index);
-            }
-            o.WriteLine("</tbody>");
-            o.WriteLine("</table>");
-//            o.WriteLine("</a>");
-        }
-        public void PrintPreambleHtml(StreamWriterLevel o, int p)
-        {
-            string comment = "Special field used by PER to indicate the presence/absence of optional and default fields.";
-            if (IsPERExtensible())
-                comment = "Special field used by PER to (a) mark the presense of extension(s) and (b) to indicate the presence/absence of optional and default fields.";
-            List<Child> tmp = new List<Child>();
-            foreach (Child ch in m_children.Values)
-            {
-                if (ch.m_optional || ch.m_defaultValue != null)
-                    tmp.Add(ch);
-            }
-            if (tmp.Count > 0 || IsPERExtensible())
-            {
-                comment += "<br/><ul type=\"square\">";
-                int bitStart = 0;
-                if (IsPERExtensible())
-                {
-                    comment += string.Format("<li>bit0 == 1 &#8658 extension(s) is present");
-                    bitStart++;
-                }
-                for (int i = 0; i < tmp.Count; i++)
-                    comment += string.Format("<li>bit{0} == 1 &#8658 <font  color=\"#5F9EA0\" >{1}</font> is present</li>", i + bitStart, tmp[i].m_childVarName);
-                comment += "</ul>";
-            }
-            string cssClass = "OddRow";
-            o.WriteLine("<tr class=\"" + cssClass + "\">");
-            o.WriteLine("<td class=\"no\">1</td>");
-            o.WriteLine("<td class=\"field\">Preamble</td>");
-            o.WriteLine("<td class=\"comment\">{0}</td>", comment);
-            o.WriteLine("<td class=\"optional\">No</td>");
-            o.WriteLine("<td class=\"type\">{0}</td>", "Bit mask");
-
-            o.WriteLine("<td class=\"constraint\">{0}</td>", o.Constraint("N.A."));
-            o.WriteLine("<td class=\"min\">{0}</td>", PreambleLength);
-            o.WriteLine("<td class=\"max\">{0}</td>", PreambleLength);
-            o.WriteLine("</tr>");
-        }
 
         public override bool Constructed
         {
             get { return true; }
         }
 
-        public override void Tabularize(string tasName)
-        {
-            foreach(Child ch in m_children.Values) 
-            {
-                ch.m_type.Tabularize(tasName);
-                if (ch.m_type.Constructed)
-                {
-                    TypeAssigment newTas = m_module.CreateNewTypeAssigment(ch.m_childVarName, ch.m_type, ch.m_comments);
-                    ch.m_type = ReferenceType.CreateByName(newTas);
-                }
-
-            }
-        }
         internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
             h.WriteLine("struct {");
@@ -901,6 +799,15 @@ namespace tinyAsn1
                     return false;
             return true;
         }
+
+        public override bool ContainsTypeAssigment(string typeAssigment)
+        {
+            foreach (Child ch in m_children.Values)
+                if (ch.m_type.ContainsTypeAssigment(typeAssigment))
+                    return true;
+            return false;
+        }
+
 
         internal override List<string> TypesIDepend()
         {
@@ -1168,7 +1075,7 @@ namespace tinyAsn1
             m_children = o.m_children;
         }
 
-        public SequenceOrSetValue(ITree antlrNode, Module module, Asn1Type type, bool checkChildrenOrder)
+        public SequenceOrSetValue(ITree antlrNode, Module module, Asn1Type type)
         {
             m_TypeID = Asn1Value.TypeID.SEQUENCE_OR_SET;
             this.antlrNode = antlrNode;
@@ -1252,10 +1159,10 @@ namespace tinyAsn1
                     throw new SemanticErrorException("Error in line :" + antlrNode.Line + ". Mandatory child '" + typeChildName + "' missing");
             }
 
-            if (checkChildrenOrder)
-            {
-                //to be implemented
-            }
+            //if (checkChildrenOrder)
+            //{
+            //    //to be implemented
+            //}
 
         }
 
@@ -1450,5 +1357,7 @@ namespace tinyAsn1
             c.Write("}");
         }
     }
+
+
 
 }

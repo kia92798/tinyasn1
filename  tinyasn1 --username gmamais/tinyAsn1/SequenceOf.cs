@@ -17,7 +17,7 @@ namespace tinyAsn1
         {
             get
             {
-                return new Tag(Tag.TagClass.UNIVERSAL, 16, TaggingMode.EXPLICIT, this);
+                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 16, TaggingMode.EXPLICIT, this);
             }
         }
 
@@ -25,7 +25,7 @@ namespace tinyAsn1
         static public new SequenceOfType CreateFromAntlrAst(ITree tree)
         {
 
-            SequenceOfType ret = new SequenceOfType();
+            SequenceOfType ret = Asn1CompilerInvokation.Instance.Factory.CreateSequenceOfType();
             for (int i = 0; i < tree.ChildCount; i++)
             {
                 ITree child = tree.GetChild(i);
@@ -77,7 +77,7 @@ namespace tinyAsn1
                 case asn1Parser.VALUE_LIST:
                 case asn1Parser.OBJECT_ID_VALUE:    //for catching case {valref} or {23}
                     if (sqVal == null)
-                        return new SequenceOfValue(val.antlrNode, m_module, this);
+                        return Asn1CompilerInvokation.Instance.Factory.CreateSequenceOfValue(val.antlrNode, m_module, this);
                     else
                     {
                         sqVal.FixChildrenVars();
@@ -94,7 +94,7 @@ namespace tinyAsn1
                                 if (tmp.IsResolved())
                                 {
                                     if (tmp.Type.GetFinalType() == this)
-                                        return new SequenceOfValue(tmp as SequenceOfValue, val.antlrNode.GetChild(0));
+                                        return Asn1CompilerInvokation.Instance.Factory.CreateSequenceOfValue(tmp as SequenceOfValue, val.antlrNode.GetChild(0));
                                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
                                 }
                                 return val; // not yet fully resolved, wait for next round

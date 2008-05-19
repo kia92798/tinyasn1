@@ -18,14 +18,15 @@ namespace tinyAsn1
         {
             get
             {
-                return new Tag(Tag.TagClass.UNIVERSAL, 6, TaggingMode.EXPLICIT, this);
+                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 6, TaggingMode.EXPLICIT, this);
             }
         }
 
         static public new ObjectIdentifier CreateFromAntlrAst(ITree tree)
         {
-            return new ObjectIdentifier();
+            return Asn1CompilerInvokation.Instance.Factory.CreateObjectIdentifierType();
         }
+        
         internal override Asn1Value ResolveVariable(Asn1Value val)
         {
             string referenceId = "";
@@ -34,7 +35,7 @@ namespace tinyAsn1
             {
                 case asn1Parser.OBJECT_ID_VALUE:
                     if (obVal == null)
-                        return new ObjectIdentifierValue(val.antlrNode, m_module, this);
+                        return Asn1CompilerInvokation.Instance.Factory.CreateObjectIdentifierValue(val.antlrNode, m_module, this);
                     else
                     {
                         obVal.FixChildrenVars();
@@ -51,7 +52,7 @@ namespace tinyAsn1
                                 if (tmp.IsResolved())
                                 {
                                     if (tmp.Type.GetFinalType() == this)
-                                        return new ObjectIdentifierValue(tmp as ObjectIdentifierValue, val.antlrNode.GetChild(0));
+                                        return Asn1CompilerInvokation.Instance.Factory.CreateObjectIdentifierValue(tmp as ObjectIdentifierValue, val.antlrNode.GetChild(0));
                                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
                                 }
                                 return val; // not yet fully resolved, wait for next round
@@ -134,7 +135,7 @@ namespace tinyAsn1
 
             static public ObjectIdentifierComponent CreateFromAntlrAst(ITree tree)
             {
-                ObjectIdentifierComponent ret = new ObjectIdentifierComponent();
+                ObjectIdentifierComponent ret = Asn1CompilerInvokation.Instance.Factory.CreateObjectIdentifierValueObjectIdentifierComponent();
                 switch (tree.Type)
                 {
                     case asn1Parser.OBJ_LST_ITEM1:
@@ -258,9 +259,9 @@ namespace tinyAsn1
                 throw new SemanticErrorException("Error in line: " + tr1.Line + ", col:" + tr1.CharPositionInLine + ". Identifier: " + id1 + "does not resolve to INTEGER or RELATIVE-OID");
             }
 
-            static class YellowIDs
+            static class YellowIDs  /* is static --> abstract*/
             {
-                class ID
+                class ID            /* not need to be abstract*/
                 {
                     public int value;
                     public int level;

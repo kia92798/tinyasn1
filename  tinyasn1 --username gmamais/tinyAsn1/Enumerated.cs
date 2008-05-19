@@ -49,14 +49,14 @@ namespace tinyAsn1
         {
             get
             {
-                return new Tag(Tag.TagClass.UNIVERSAL, 10, TaggingMode.EXPLICIT, this);
+                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 10, TaggingMode.EXPLICIT, this);
             }
         }
 
         //^(ENUMERATED_TYPE enumeratedTypeItems ('...' exceptionSpec? enumeratedTypeItems?) ?)
         static public new EnumeratedType CreateFromAntlrAst(ITree tree)
         {
-            EnumeratedType ret = new EnumeratedType();
+            EnumeratedType ret = Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedType();
             for (int i = 0; i < tree.ChildCount; i++)
             {
                 ITree child = tree.GetChild(i);
@@ -111,7 +111,7 @@ namespace tinyAsn1
                         if (this.isIdentifierProcessed(referenceId))
                         {
                             if (m_enumValues[referenceId].m_valCalculated)
-                                return new EnumeratedValue(m_enumValues[referenceId].m_value, referenceId,
+                                return Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedValue(m_enumValues[referenceId].m_value, referenceId,
                                     val.antlrNode, m_module, this);
                             else
                                 return val; //leave for a next pass where value will have been calculated
@@ -126,7 +126,7 @@ namespace tinyAsn1
                             return val; // not yet resolved. Wait for next round
                         if (tmp.Type.GetFinalType() == this)
                         {
-                            return new EnumeratedValue(tmp as EnumeratedValue, val.antlrNode.GetChild(0));
+                            return Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedValue(tmp as EnumeratedValue, val.antlrNode.GetChild(0));
 
                         }
                         else
@@ -194,12 +194,12 @@ namespace tinyAsn1
                         " containts more than once the identifier " + ni.m_id);
                 if (ni.m_valueAsInt != null)
                 {
-                    m_enumValues.Add(ni.m_id, new EnumeratedType.Item(ni.m_id, ni.m_valueAsInt.Value, ni.m_extended));
+                    m_enumValues.Add(ni.m_id, Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedTypeItem(ni.m_id, ni.m_valueAsInt.Value, ni.m_extended));
                     toBeRemoved.Add(ni);
                 }
                 else if (ni.m_valueAsReference == "")
                 {
-                    m_enumValues.Add(ni.m_id, new EnumeratedType.Item(ni.m_id, ni.m_extended));
+                    m_enumValues.Add(ni.m_id, Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedTypeItem(ni.m_id, ni.m_extended));
                     toBeRemoved.Add(ni);
                 }
                 else
@@ -213,7 +213,7 @@ namespace tinyAsn1
                             continue;
                         if (tmpVal.m_TypeID == Asn1Value.TypeID.INT)
                         {
-                            m_enumValues.Add(ni.m_id, new EnumeratedType.Item(ni.m_id, ((IntegerValue)tmpVal).Value, ni.m_extended));
+                            m_enumValues.Add(ni.m_id, Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedTypeItem(ni.m_id, ((IntegerValue)tmpVal).Value, ni.m_extended));
                             toBeRemoved.Add(ni);
                         }
                         else
@@ -388,7 +388,7 @@ namespace tinyAsn1
             List<Item> tmpList = new List<Item>();
             foreach (Item it in m_enumValues.Values)
             {
-                EnumeratedValue val = new EnumeratedValue(it.m_value, it.m_id, null, m_module, this);
+                EnumeratedValue val = Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedValue(it.m_value, it.m_id, null, m_module, this);
                 if (isValueAllowed(val, additionalConstraints))
                     tmpList.Add(it);
             }
@@ -510,7 +510,7 @@ namespace tinyAsn1
 
     }
 
-   
+
 
 
     public partial class EnumeratedValue : Asn1Value

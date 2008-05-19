@@ -9,9 +9,10 @@ namespace tinyAsn1
 
     /// <summary>
     /// This class is uded ny enumerated, integer and bit strings for their children
+    /// This class is not exposed to outside world 
     /// </summary>
 
-    public partial class NumberedItem
+    internal /* not need to be abstract */partial class NumberedItem
     {
         public string m_id = "";
         public string m_valueAsReference = "";

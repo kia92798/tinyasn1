@@ -16,7 +16,7 @@ namespace tinyAsn1
 
         static public new ReferenceType CreateFromAntlrAst(ITree tree)
         {
-            ReferenceType ret = new ReferenceType();
+            ReferenceType ret = Asn1CompilerInvokation.Instance.Factory.CreateReferenceType();
             if (tree.ChildCount == 1)
                 ret.m_referencedTypeName = tree.GetChild(0).Text;
             else if (tree.ChildCount == 2)
@@ -99,7 +99,7 @@ namespace tinyAsn1
         {
             get
             {
-                TagSequence ret = new TagSequence();
+                TagSequence ret = Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTagSequence();
                 Asn1Type type = this;
                 bool implicitTagging = false;
                 while (type != null)
@@ -304,13 +304,9 @@ namespace tinyAsn1
         }
 
 
-        public override void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas, List<IConstraint> additonalConstraints)
-        {
-            Type.PrintHtml(cns, o, lev, comment, tas, m_constraints);
-        }
         public static ReferenceType CreateByName(TypeAssigment newTas)
         {
-            ReferenceType ret = new ReferenceType();
+            ReferenceType ret = Asn1CompilerInvokation.Instance.Factory.CreateReferenceType();
             ret.m_referencedTypeName = newTas.m_name;
             ret.m_module = newTas.m_type.m_module;
             ret.antlrNode = newTas.m_type.antlrNode;
@@ -330,6 +326,35 @@ namespace tinyAsn1
                     return true;
             }
             return false;
+        }
+
+
+        public override bool ContainsTypeAssigment(string typeAssigment)
+        {
+            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return true;
+
+            bool ret = _ContainsTypeAssigment(typeAssigment);
+
+            
+
+            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            return ret;
+        }
+
+
+        bool _ContainsTypeAssigment(string typeAssigment)
+        {
+            ReferenceType cur = this as ReferenceType;
+            
+            while (cur != null)
+            {
+                if (cur.m_referencedTypeName == typeAssigment)
+                    return true;
+
+                cur = cur.ParentType as ReferenceType;
+            }
+            return Type.ContainsTypeAssigment(typeAssigment);
         }
 
         internal override List<string> TypesIDepend()
@@ -366,7 +391,7 @@ namespace tinyAsn1
             string conConstraints = "";
             while (cur != null)
             {
-                nCount = cur.m_constraints.Count;
+                nCount += cur.m_constraints.Count;
                 conConstraints += cur.Constraints;
                 cur = cur.ParentType;
             }
@@ -395,6 +420,11 @@ namespace tinyAsn1
             
         }
 
+        internal override void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+            Type.VarsNeededForEncode(cns, arrayDepth, existingVars);
+        }
+
         internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
             if (m_constraints.Count == 0)
@@ -410,6 +440,11 @@ namespace tinyAsn1
                 Type.PrintCEncode(cns, c, errorCode, varName, lev);
             }
 
+        }
+
+        internal override void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+            Type.VarsNeededForDecode(cns, arrayDepth, existingVars);
         }
 
         internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)

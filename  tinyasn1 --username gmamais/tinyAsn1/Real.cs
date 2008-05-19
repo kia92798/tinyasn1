@@ -18,7 +18,7 @@ namespace tinyAsn1
         {
             get
             {
-                return new Tag(Tag.TagClass.UNIVERSAL, 9, TaggingMode.EXPLICIT, this);
+                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 9, TaggingMode.EXPLICIT, this);
             }
         }
 
@@ -31,10 +31,9 @@ namespace tinyAsn1
                 case asn1Parser.FloatingPointLiteral:
                 case asn1Parser.MINUS_INFINITY:
                 case asn1Parser.PLUS_INFINITY:
-                    return new RealValue(val.antlrNode, m_module, this);
-
                 case asn1Parser.NUMERIC_VALUE2: //e.g. {mantissa 2, base 10, exponent 0}
-                    return new RealValue(val.antlrNode, m_module, this, 0);
+                    return Asn1CompilerInvokation.Instance.Factory.CreateRealValue(val.antlrNode, m_module, this);
+
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
                     if (m_module.isValueDeclared(referenceId))
@@ -43,7 +42,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.REAL:
-                                return new RealValue(tmp as RealValue, val.antlrNode.GetChild(0));
+                                return Asn1CompilerInvokation.Instance.Factory.CreateRealValue(tmp as RealValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
@@ -105,9 +104,22 @@ namespace tinyAsn1
 
         public override long maxBitsInPER(PEREffectiveConstraint cns)
         {
-            // one byte header, 3 byte exponent, mantissa as big as harware supports
-            return (1 + 3 + Config.IntegerSize) * 8;
+            return uPerMaxSize;
         }
+
+        // one byte length + one byte header, 3 byte exponent, mantissa as big as harware supports
+        public static int uPerMaxSize { get { return (1 + 1 + 3 + Config.IntegerSize) * 8; } }
+
+
+        public override string MaxBitsInPER_Explained
+        {
+            get
+            {
+                Asn1CompilerInvokation.m_HtmlRealSizeMustBeExplained = true;
+                return "<a href=\"#REAL_SIZE_EXPLAINED123\"><span style=\"vertical-align: super\">why?</span></a>";
+            }
+        }
+
         internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
             h.Write("double");
@@ -157,7 +169,7 @@ namespace tinyAsn1
 
     public partial class RealValue : Asn1Value
     {
-        public class SqReal
+        internal class SqReal
         {
             public Int64 m_mantissa;
             public Int64 m_base;
@@ -244,38 +256,6 @@ namespace tinyAsn1
         }
 
 
-        public RealValue(ITree tree, Module module, Asn1Type type, int dummy)
-        {
-            m_TypeID = Asn1Value.TypeID.REAL;
-            m_module = module;
-            antlrNode = tree;
-            m_type = type;
-
-            int i = 0;
-            double mantissa;
-            double bas;
-            double exp;
-
-            try
-            {
-                mantissa = double.Parse(tree.GetChild(i).Text, NumberFormatInfo.InvariantInfo); i++;
-                bas = double.Parse(tree.GetChild(i).Text, NumberFormatInfo.InvariantInfo); i++;
-                exp = double.Parse(tree.GetChild(i).Text, NumberFormatInfo.InvariantInfo);
-            }
-            catch (OverflowException)
-            {
-                throw new SemanticErrorException("Error line:" + tree.GetChild(i).Line + " number('" + tree.GetChild(i) + "') is too large");
-            }
-
-            if (bas == 10 || bas == 2)
-                m_value = mantissa * Math.Pow(bas, exp);
-            else
-                throw new SemanticErrorException("Error line:" + tree.GetChild(1).Line + ", col:" + tree.GetChild(1).CharPositionInLine +
-                    " base must be 2 or 10");
-
-
-        }
-
         public RealValue(ITree tree, Module module, Asn1Type type)
         {
             m_TypeID = Asn1Value.TypeID.REAL;
@@ -283,27 +263,56 @@ namespace tinyAsn1
             antlrNode = tree;
             m_type = type;
 
-            switch (tree.Type)
+            if (tree.Type == asn1Parser.NUMERIC_VALUE2)
             {
-                case asn1Parser.INT:
-                case asn1Parser.FloatingPointLiteral:
-                    try
-                    {
-                        m_value = double.Parse(tree.Text, NumberFormatInfo.InvariantInfo);
-                    }
-                    catch (OverflowException)
-                    {
-                        throw new SemanticErrorException("Error line:" + tree.Line + " value: " + tree.Text + " is too large");
-                    }
-                    break;
-                case asn1Parser.MINUS_INFINITY:
-                    m_value = double.NegativeInfinity;
-                    break;
-                case asn1Parser.PLUS_INFINITY:
-                    m_value = double.PositiveInfinity;
-                    break;
-                default:
-                    throw new Exception("Internal Error");
+
+                int i = 0;
+                double mantissa;
+                double bas;
+                double exp;
+
+                try
+                {
+                    mantissa = double.Parse(tree.GetChild(i).Text, NumberFormatInfo.InvariantInfo); i++;
+                    bas = double.Parse(tree.GetChild(i).Text, NumberFormatInfo.InvariantInfo); i++;
+                    exp = double.Parse(tree.GetChild(i).Text, NumberFormatInfo.InvariantInfo);
+                }
+                catch (OverflowException)
+                {
+                    throw new SemanticErrorException("Error line:" + tree.GetChild(i).Line + " number('" + tree.GetChild(i) + "') is too large");
+                }
+
+                if (bas == 10 || bas == 2)
+                    m_value = mantissa * Math.Pow(bas, exp);
+                else
+                    throw new SemanticErrorException("Error line:" + tree.GetChild(1).Line + ", col:" + tree.GetChild(1).CharPositionInLine +
+                        " base must be 2 or 10");
+            }
+            else
+            {
+
+                switch (tree.Type)
+                {
+                    case asn1Parser.INT:
+                    case asn1Parser.FloatingPointLiteral:
+                        try
+                        {
+                            m_value = double.Parse(tree.Text, NumberFormatInfo.InvariantInfo);
+                        }
+                        catch (OverflowException)
+                        {
+                            throw new SemanticErrorException("Error line:" + tree.Line + " value: " + tree.Text + " is too large");
+                        }
+                        break;
+                    case asn1Parser.MINUS_INFINITY:
+                        m_value = double.NegativeInfinity;
+                        break;
+                    case asn1Parser.PLUS_INFINITY:
+                        m_value = double.PositiveInfinity;
+                        break;
+                    default:
+                        throw new Exception("Internal Error");
+                }
             }
 
         }

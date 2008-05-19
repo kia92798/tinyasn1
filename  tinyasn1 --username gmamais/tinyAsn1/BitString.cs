@@ -19,13 +19,13 @@ namespace tinyAsn1
         {
             get
             {
-                return new Tag(Tag.TagClass.UNIVERSAL, 3, TaggingMode.EXPLICIT, this);
+                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 3, TaggingMode.EXPLICIT, this);
             }
         }
 
         static public new BitStringType CreateFromAntlrAst(ITree tree)
         {
-            BitStringType ret = new BitStringType();
+            BitStringType ret = Asn1CompilerInvokation.Instance.Factory.CreateBitStringType();
             for (int i = 0; i < tree.ChildCount; i++)
             {
                 ITree child = tree.GetChild(i);
@@ -103,7 +103,7 @@ namespace tinyAsn1
             {
                 case asn1Parser.BitStringLiteral:
                 case asn1Parser.OctectStringLiteral:
-                    return new BitStringValue(val.antlrNode, m_module, this);
+                    return Asn1CompilerInvokation.Instance.Factory.CreateBitStringValue(val.antlrNode, m_module, this);
 
                 case asn1Parser.OBJECT_ID_VALUE: // There is case { id } that the parser thinks that this a OBJECT ID value
                     // although it should handled as VALUE_LIST
@@ -126,7 +126,7 @@ namespace tinyAsn1
 
                         List<Int64> ids = new List<Int64>();
                         ids.Add(m_namedBits[id]);
-                        return new BitStringValue(ids, val.antlrNode, m_module, this);
+                        return Asn1CompilerInvokation.Instance.Factory.CreateBitStringValue(ids, val.antlrNode, m_module, this);
                     }
 
 
@@ -154,7 +154,7 @@ namespace tinyAsn1
 
                             ids.Add(m_namedBits[id]);
                         }
-                        return new BitStringValue(ids, val.antlrNode, m_module, this);
+                        return Asn1CompilerInvokation.Instance.Factory.CreateBitStringValue(ids, val.antlrNode, m_module, this);
                     }
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
@@ -164,7 +164,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.BIT_STRING:
-                                return new BitStringValue(tmp as BitStringValue, val.antlrNode.GetChild(0));
+                                return Asn1CompilerInvokation.Instance.Factory.CreateBitStringValue(tmp as BitStringValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
@@ -239,7 +239,7 @@ namespace tinyAsn1
             {
                 if (m_perEffectiveConstraint != null)
                     return m_perEffectiveConstraint;
-                m_perEffectiveConstraint = new PERSizeEffectiveConstraint();
+                m_perEffectiveConstraint = Asn1CompilerInvokation.Instance.Factory.CreatePERSizeEffectiveConstraint();
                 m_perEffectiveConstraint = (PERSizeEffectiveConstraint)m_perEffectiveConstraint.Compute(m_constraints, this);
                 return m_perEffectiveConstraint;
             }
@@ -296,19 +296,15 @@ namespace tinyAsn1
             return cn.m_size.m_rootRange.m_max + (cn.m_size.m_rootRange.m_max / 0x10000 + 3) * 8;
         }*/
 
-        protected override long minItemBitsInPER(PEREffectiveConstraint cns)
+        public override long minItemBitsInPER(PEREffectiveConstraint cns)
         {
             return 1;
         }
-        protected override long maxItemBitsInPER(PEREffectiveConstraint cns)
+        public override long maxItemBitsInPER(PEREffectiveConstraint cns)
         {
             return 1;
         }
-        protected override string TypeName
-        {
-            get { return "BIT"; }
-        }
-        protected override string ItemConstraint(PEREffectiveConstraint cns)
+        public override string ItemConstraint(PEREffectiveConstraint cns)
         {
             return "";
         }
@@ -688,7 +684,7 @@ namespace tinyAsn1
             c.WriteLine("{");
             lev++;
 
-            List<byte> val = OctectStringValue.ConvertToOctetArray(this);
+            List<byte> val = OctetStringValue.ConvertToOctetArray(this);
 
             int cnt = val.Count;
 

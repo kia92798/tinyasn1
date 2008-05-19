@@ -15,6 +15,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testApp", "testApp\testApp.
 		{6094FC85-8CE9-4716-9255-41C428F3B9EA} = {6094FC85-8CE9-4716-9255-41C428F3B9EA}
 	EndProjectSection
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "asn1scc_setup", "asn1scc_setup\asn1scc_setup.vdproj", "{312E09DA-701E-4E97-B6A8-2C3FDFF02113}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntrlParser", "AntrlParser\AntrlParser.csproj", "{029A06B3-D105-43EE-847B-30456C9F1F48}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +79,22 @@ Global
 		{917B3178-E212-409A-A1F6-3A60971D98F2}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{917B3178-E212-409A-A1F6-3A60971D98F2}.Release|Win32.ActiveCfg = Release|Win32
 		{917B3178-E212-409A-A1F6-3A60971D98F2}.Release|Win32.Build.0 = Release|Win32
+		{312E09DA-701E-4E97-B6A8-2C3FDFF02113}.Debug|Any CPU.ActiveCfg = Debug
+		{312E09DA-701E-4E97-B6A8-2C3FDFF02113}.Debug|Mixed Platforms.ActiveCfg = Debug
+		{312E09DA-701E-4E97-B6A8-2C3FDFF02113}.Debug|Win32.ActiveCfg = Debug
+		{312E09DA-701E-4E97-B6A8-2C3FDFF02113}.Release|Any CPU.ActiveCfg = Release
+		{312E09DA-701E-4E97-B6A8-2C3FDFF02113}.Release|Mixed Platforms.ActiveCfg = Release
+		{312E09DA-701E-4E97-B6A8-2C3FDFF02113}.Release|Win32.ActiveCfg = Release
+		{029A06B3-D105-43EE-847B-30456C9F1F48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{029A06B3-D105-43EE-847B-30456C9F1F48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{029A06B3-D105-43EE-847B-30456C9F1F48}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{029A06B3-D105-43EE-847B-30456C9F1F48}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{029A06B3-D105-43EE-847B-30456C9F1F48}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{029A06B3-D105-43EE-847B-30456C9F1F48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{029A06B3-D105-43EE-847B-30456C9F1F48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{029A06B3-D105-43EE-847B-30456C9F1F48}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{029A06B3-D105-43EE-847B-30456C9F1F48}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{029A06B3-D105-43EE-847B-30456C9F1F48}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -17,7 +17,7 @@ namespace tinyAsn1
         {
             get
             {
-                return new Tag(Tag.TagClass.UNIVERSAL, 4, TaggingMode.EXPLICIT, this);
+                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 4, TaggingMode.EXPLICIT, this);
             }
         }
 
@@ -28,7 +28,7 @@ namespace tinyAsn1
             {
                 case asn1Parser.BitStringLiteral:
                 case asn1Parser.OctectStringLiteral:
-                    return new OctectStringValue(val.antlrNode, m_module, this);
+                    return Asn1CompilerInvokation.Instance.Factory.CreateOctetStringValue(val.antlrNode, m_module, this);
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
                     if (m_module.isValueDeclared(referenceId))
@@ -37,7 +37,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.OCTECT_STRING:
-                                return new OctectStringValue(tmp as OctectStringValue, val.antlrNode.GetChild(0));
+                                return Asn1CompilerInvokation.Instance.Factory.CreateOctetStringValue(tmp as OctetStringValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
@@ -84,7 +84,7 @@ namespace tinyAsn1
             {
                 if (m_perEffectiveConstraint != null)
                     return m_perEffectiveConstraint;
-                m_perEffectiveConstraint = new PERSizeEffectiveConstraint();
+                m_perEffectiveConstraint = Asn1CompilerInvokation.Instance.Factory.CreatePERSizeEffectiveConstraint();
                 m_perEffectiveConstraint = (PERSizeEffectiveConstraint)m_perEffectiveConstraint.Compute(m_constraints, this);
                 return m_perEffectiveConstraint;
             }
@@ -192,19 +192,15 @@ namespace tinyAsn1
             return cn.m_size.m_rootRange.m_max * 8 + (cn.m_size.m_rootRange.m_max / 0x10000 + 3) * 8;
         }*/
 
-        protected override long minItemBitsInPER(PEREffectiveConstraint cns)
+        public override long minItemBitsInPER(PEREffectiveConstraint cns)
         {
             return 8;
         }
-        protected override long maxItemBitsInPER(PEREffectiveConstraint cns)
+        public override long maxItemBitsInPER(PEREffectiveConstraint cns)
         {
             return 8;
         }
-        protected override string TypeName
-        {
-            get { return "OCTET"; }
-        }
-        protected override string ItemConstraint(PEREffectiveConstraint cns)
+        public override string ItemConstraint(PEREffectiveConstraint cns)
         {
             return "";
         }
@@ -272,10 +268,10 @@ namespace tinyAsn1
     }
 
 
-    public partial class OctectStringValue : Asn1Value, ISize
+    public partial class OctetStringValue : Asn1Value, ISize
     {
         static Dictionary<string, byte> lookup = new Dictionary<string, byte>();
-        static OctectStringValue()
+        static OctetStringValue()
         {
             lookup.Add("0000", 0x0);
             lookup.Add("0001", 0x1);
@@ -355,14 +351,14 @@ namespace tinyAsn1
             return ret;
         }
 
-        public OctectStringValue(ITree tree, Module mod, Asn1Type type)
+        public OctetStringValue(ITree tree, Module mod, Asn1Type type)
         {
             m_TypeID = Asn1Value.TypeID.OCTECT_STRING;
             m_module = mod;
             antlrNode = tree;
             m_type = type;
 
-            BitStringValue tmp = new BitStringValue(tree, mod, type);
+            BitStringValue tmp = Asn1CompilerInvokation.Instance.Factory.CreateBitStringValue(tree, mod, type);
 /*            string bitString = tmp.Value;
             int nBitsToInsert = 0;
             if (bitString.Length % 4 > 0)
@@ -396,7 +392,7 @@ namespace tinyAsn1
         }
 
 
-        public OctectStringValue(OctectStringValue o, ITree antlr)
+        public OctetStringValue(OctetStringValue o, ITree antlr)
         {
             m_TypeID = Asn1Value.TypeID.OCTECT_STRING;
             m_module = o.m_module;
@@ -407,7 +403,7 @@ namespace tinyAsn1
         }
         public override bool Equals(object obj)
         {
-            OctectStringValue oth = obj as OctectStringValue;
+            OctetStringValue oth = obj as OctetStringValue;
             if (oth == null)
                 return false;
             return oth.m_value == m_value;

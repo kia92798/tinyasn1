@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("asn1cc")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("asn1scc")]
+[assembly: AssemblyDescription("Asn1 Space Certified Compiler")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("asn1cc")]
+[assembly: AssemblyCompany("Semantix SA")]
+[assembly: AssemblyProduct("asn1scc")]
 [assembly: AssemblyCopyright("Copyright ©  2008")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -29,5 +29,5 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("0.93.*")]
+[assembly: AssemblyFileVersion("0.93.0.0")]
