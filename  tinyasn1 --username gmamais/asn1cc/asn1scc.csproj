@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CBackend.cs" />
+    <Compile Include="CSSType.cs" />
     <Compile Include="Installer1.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -66,8 +67,18 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SCCArray.cs" />
+    <Compile Include="SCCChoiceType.cs" />
+    <Compile Include="SCCFile.cs" />
+    <Compile Include="SCCModule.cs" />
+    <Compile Include="SCCSingleTypes.cs" />
+    <Compile Include="SequenceOrSetType.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AntrlParser\AntrlParser.csproj">
+      <Project>{029A06B3-D105-43EE-847B-30456C9F1F48}</Project>
+      <Name>AntrlParser</Name>
+    </ProjectReference>
     <ProjectReference Include="..\tinyAsn1\tinyAsn1.csproj">
       <Project>{AA87CFEC-3291-4F26-8ACC-3FDD380805D5}</Project>
       <Name>tinyAsn1</Name>

@@ -410,63 +410,7 @@ namespace tinyAsn1
         }
 
 
-        internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
-        {
-            h.WriteLine("enum {");
-//            h.WriteLine("enum {0} {{", typeName);
-            int i = 0;
-            foreach (Item it in m_enumValues.Values)
-            {
-                h.P(lev + 1);
-                h.Write("{0} = {1}", it.CID, it.m_value);
-                if (i < m_enumValues.Values.Count - 1)
-                    h.WriteLine(",");
-                else
-                    h.WriteLine();
-                i++;
-            }
 
-            h.P(lev);
-            h.Write("}");
-        }
-
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
-        {
-            bool topLevel = !varName.Contains("->");
-            EnumeratedValue v = defauleVal as EnumeratedValue;
-            string defVal = m_enumValues.Values[0].CID;
-            if (v != null)
-                defVal = m_enumValues[v.ID].CID;
-            h.P(lev);
-            if (topLevel)
-                h.WriteLine("*{0} = {1};", varName, defVal);
-            else
-                h.WriteLine("{0} = {1};", varName, defVal);
-
-        }
-
-        internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
-        {
-            string varName2 = varName;
-            if (!varName.Contains("->"))
-                varName2 = "*" + varName;
-
-            c.P(lev);
-            c.WriteLine("switch({0})", varName2);
-            c.P(lev); c.WriteLine("{");
-            int index = 0;
-            foreach (Item it in m_enumValues.Values)
-            {
-                c.P(lev); c.WriteLine("case {0}:", it.CID);
-                c.P(lev + 1);
-                c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, {0}, {1}, {2});", index, 0, RootItemsCount-1);
-                c.P(lev + 1);
-                c.WriteLine("break;");
-                index++;
-            }
-            c.P(lev); c.WriteLine("}");
-
-        }
 
         internal override void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {

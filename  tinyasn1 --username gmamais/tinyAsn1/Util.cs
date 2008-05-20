@@ -346,7 +346,7 @@ namespace tinyAsn1
         }
     }
 
-    static class C 
+    public static class C 
     {
         public static string ID(string str)
         {
@@ -393,7 +393,11 @@ namespace tinyAsn1
 #endif
     }
 
-    internal class CLocalVariable 
+
+    /// <summary>
+    /// To be moved to CBackend
+    /// </summary>
+    public class CLocalVariable
     {
         public string varName = "";
         public string type = "";

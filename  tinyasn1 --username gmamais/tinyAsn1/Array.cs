@@ -142,123 +142,8 @@ namespace tinyAsn1
             return -1;
         }
 
-        internal override void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
-        {
-            string var = "i" + arrayDepth.ToString();
-            if (!existingVars.ContainsKey(var))
-            {
-                existingVars.Add(var, new CLocalVariable(var, "int", 0, "0"));
-            }
-            if (maxItems(cns) > 0x10000)
-            {
-                var = "nCount" + arrayDepth.ToString();
-                if (!existingVars.ContainsKey(var))
-                    existingVars.Add(var, new CLocalVariable(var, "asn1SccSint", 0, "0"));
-                var = "curBlockSize" + arrayDepth.ToString();
-                if (!existingVars.ContainsKey(var))
-                    existingVars.Add(var, new CLocalVariable(var, "asn1SccSint", 0, "0"));
-                var = "curItem" + arrayDepth.ToString();
-                if (!existingVars.ContainsKey(var))
-                    existingVars.Add(var, new CLocalVariable(var, "asn1SccSint", 0, "0"));
-            }
-        }
-        internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
-        {
-            long min = minItems(cns);
-            long max = maxItems(cns);
-            string i = "i" + (CLocalVariable.GetArrayIndex(varName) + 1);
-            string nCount = "nCount" + (CLocalVariable.GetArrayIndex(varName) + 1);
-            string curBlockSize = "curBlockSize" + (CLocalVariable.GetArrayIndex(varName) + 1);
-            string curItem = "curItem" + (CLocalVariable.GetArrayIndex(varName) + 1);
 
-            string prefix = "";
-            bool topLevel = !varName.Contains("->");
 
-            if (topLevel)
-                prefix = varName + "->";
-            else
-                prefix = varName + ".";
-            if (max < 0x10000)
-            {
-                if (min != max)
-                {
-                    c.P(lev);
-                    c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, {0}nCount, {1}, {2});", prefix, min, max);
-                }
-                else 
-                {
-                    c.P(lev); c.WriteLine("/* No need to encode length (it is fixed size ({0})*/", min);
-                }
-
-                c.P(lev); c.WriteLine("for({0}=0;{0}<{1}nCount;{0}++)", i, prefix);
-                c.P(lev); c.WriteLine("{");
-                PrintCEncodeItem(cns, c, errorCode + "_elem", prefix + "arr[" + i + "]", lev + 1);
-                c.P(lev); c.WriteLine("}");
-            }
-            else
-            {
-                PrintCEncodeFragmentation(cns, c, errorCode, varName, lev, 
-                    string.Format(nCount+" = {0}nCount;", prefix), "arr", max,i,prefix,
-                    nCount, curBlockSize, curItem);
-            }
-        }
-
-        protected virtual void PrintCEncodeFragmentation(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev,
-            string nCountInit, string arrName, long max, string i, string prefix, string nCount, string curBlockSize, string curItem)
-        {
-
-            c.P(lev); c.WriteLine("/* Fragmentation required since {0} is grater than 64K*/", max);
-
-            c.P(lev); c.WriteLine(nCountInit);
-            c.P(lev); c.WriteLine("{0} = 0;", curBlockSize);
-            c.P(lev); c.WriteLine("{0} = 0;", curItem);
-            c.P(lev); c.WriteLine("while ({0} >= 0x4000)", nCount);
-            c.P(lev++); c.WriteLine("{");
-            c.P(lev); c.WriteLine("if ({0} >= 0x10000)", nCount);
-            c.P(lev++); c.WriteLine("{");
-            c.P(lev); c.WriteLine("{0} = 0x10000;", curBlockSize);
-            c.P(lev); c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, 0xC4, 0, 0xFF);");
-            c.P(--lev); c.WriteLine("}");
-            c.P(lev); c.WriteLine("else if ({0} >= 0xC000)", nCount);
-            c.P(lev++); c.WriteLine("{");
-            c.P(lev); c.WriteLine("{0} = 0xC000;", curBlockSize);
-            c.P(lev); c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, 0xC3, 0, 0xFF);");
-            c.P(--lev); c.WriteLine("}");
-            c.P(lev); c.WriteLine("else if ({0} >= 0x8000)", nCount);
-            c.P(lev++); c.WriteLine("{");
-            c.P(lev); c.WriteLine("{0} = 0x8000;", curBlockSize);
-            c.P(lev); c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, 0xC2, 0, 0xFF);");
-            c.P(--lev); c.WriteLine("}");
-            c.P(lev); c.WriteLine("else");
-            c.P(lev++); c.WriteLine("{");
-            c.P(lev); c.WriteLine("{0} = 0x4000;", curBlockSize);
-            c.P(lev); c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, 0xC1, 0, 0xFF);");
-            c.P(--lev); c.WriteLine("}");
-
-            c.P(lev); c.WriteLine("for({0}={1}; {0} < {2} + {1}; {0}++)", i, curItem, curBlockSize);
-            c.P(lev); c.WriteLine("{");
-            PrintCEncodeItem(cns, c, errorCode + "_elem", prefix + arrName + "[" + i + "]", lev + 1);
-            c.P(lev); c.WriteLine("}");
-            c.P(lev); c.WriteLine("{0} += {1};", curItem, curBlockSize);
-            c.P(lev); c.WriteLine("{0} -= {1};", nCount, curBlockSize);
-            c.P(--lev); c.WriteLine("}");
-            c.P(lev); c.WriteLine("if ({0} <= 0x7F)", nCount);
-            c.P(lev + 1); c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, {0}, 0, 0xFF);", nCount);
-            c.P(lev); c.WriteLine("else");
-            c.P(lev++); c.WriteLine("{");
-            c.P(lev); c.WriteLine("BitStream_AppendBit(pBitStrm, 1);");
-            c.P(lev); c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, {0}, 0, 0x7FFF);", nCount);
-            c.P(--lev); c.WriteLine("}");
-            c.P(lev); c.WriteLine("for({0}={1}; {0} < {1} + {2}; {0}++)", i, curItem, nCount);
-            c.P(lev); c.WriteLine("{");
-            PrintCEncodeItem(cns, c, errorCode + "_elem", prefix + arrName+ "[" + i + "]", lev + 1);
-            c.P(lev); c.WriteLine("}");
-        }
-
-        protected virtual void PrintCEncodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
-        {
-            throw new AbstractMethodCalledException();
-        }
 
         internal override void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {
@@ -575,22 +460,6 @@ for({0}=0;{0}<{1};{0}++)
             return m_type.Constraints;
         }
 
-        internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
-        {
-            long min = minItems(cns);
-            long max = maxItems(cns);
-            h.WriteLine("struct {");
-//            h.WriteLine("struct {0} {{", typeName);
-//            if (min != max)
-            {
-                h.P(lev + 1);
-                h.WriteLine("long nCount;");
-            }
-            h.P(lev + 1); m_type.PrintHTypeDeclaration(m_type.PEREffectiveConstraint, h, typeName+"_arr"/*+varName*/, "arr", lev + 1);
-            h.WriteLine(" arr[{0}];", max);
-            h.P(lev);
-            h.Write("}");
-        }
                                
         internal override bool DependsOnlyOn(List<string> values)
         {
@@ -607,55 +476,7 @@ for({0}=0;{0}<{1};{0}++)
             return m_type.TypesIDepend();
         }
 
-        internal override void VarsNeededForPrintCInitialize(int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
-        {
-            string var = "i" + arrayDepth.ToString();
-            if (!existingVars.ContainsKey(var))
-            {
-                existingVars.Add(var, new CLocalVariable(var,"int",0,"0"));
-            }
-            m_type.VarsNeededForPrintCInitialize(arrayDepth + 1, existingVars);
-        }
 
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, 
-            Asn1Value defauleVal, StreamWriterLevel c, string typeName, string varName, int lev, int arrayDepth)
-        {
-            long min = minItems(cns);
-            long max = maxItems(cns);
-            string i = "i" + arrayDepth.ToString();
-            string prefix = "";
-            bool topLevel = !varName.Contains("->");
-            if (topLevel)
-                prefix = varName + "->";
-            else
-            {
-                prefix = varName + ".";
-                //c.WriteLine();
-                //c.P(lev);c.WriteLine("{");
-                //lev++;
-            }
-
-            //c.P(lev); c.WriteLine("int {0};", i);
-            c.P(lev); 
-            c.WriteLine("{0}nCount = 0;", prefix);
-            
-            c.P(lev); c.WriteLine("for({0}=0;{0}<{1};{0}++)", i, maxItems(cns));
-            c.P(lev); c.WriteLine("{");
-            m_type.PrintCInitialize(m_type.PEREffectiveConstraint, null, c,
-                typeName + "_arr", prefix + "arr[" + i + "]", lev + 1, arrayDepth+1);
-            c.P(lev); c.WriteLine("}");
-            //if (!topLevel)
-            //{
-            //    lev--;
-            //    c.P(lev); c.WriteLine("}");
-            //    c.WriteLine();
-            //}
-        }
-        internal override void PrintHConstraintConstant(StreamWriterLevel h, string name)
-        {
-            base.PrintHConstraintConstant(h, C.ID(name));
-            m_type.PrintHConstraintConstant(h, C.ID(name) + "_elem");
-        }
 /*
         internal override void PrintCIsConstraintValidAux(StreamWriterLevel c)
         {
@@ -664,51 +485,8 @@ for({0}=0;{0}<{1};{0}++)
         }
  */
 
-        internal override void VarsNeededForIsConstraintValid(int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
-        {
-            string var = "i" + arrayDepth.ToString();
-            if (!existingVars.ContainsKey(var))
-            {
-                existingVars.Add(var, new CLocalVariable(var, "int", 0, "0"));
-            }
-            m_type.VarsNeededForIsConstraintValid(arrayDepth + 1, existingVars);
-        }
 
-        internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev, int arrayDepth)
-        {
-            long min = minItems(cns);
-            long max = maxItems(cns);
-            string i = "i" + arrayDepth.ToString();
-            string prefix = "";
-            bool topLevel = !varName.Contains("->");
 
-            base.PrintCIsConstraintValid(cns, c, errorCode,typeName, varName, lev, arrayDepth);
-            
-            c.WriteLine();
-            if (topLevel)
-                prefix = varName + "->";
-            else
-            {
-                prefix = varName + ".";
-            }
-
-            c.P(lev); c.WriteLine("for({0}=0;{0}<{1}nCount;{0}++)", i, prefix);
-            c.P(lev); c.WriteLine("{");
-            m_type.PrintCIsConstraintValid(m_type.PEREffectiveConstraint, c, errorCode + "_elem",
-                typeName + "_arr", prefix + "arr[" + i + "]", lev + 1, arrayDepth+1);
-            c.P(lev); c.WriteLine("}");
-        }
-
-        internal override void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
-        {
-/*            string var = "i" + arrayDepth.ToString();
-            if (!existingVars.ContainsKey(var))
-            {
-                existingVars.Add(var, new CLocalVariable(var, "int", 0, "0"));
-            }*/
-            base.VarsNeededForEncode(cns, arrayDepth, existingVars);
-            m_type.VarsNeededForEncode(m_type.PEREffectiveConstraint, arrayDepth + 1, existingVars);
-        }
         
         //internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         //{
@@ -739,11 +517,6 @@ for({0}=0;{0}<{1};{0}++)
         //    c.P(lev); c.WriteLine("}");
         //}
 
-        protected override void PrintCEncodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
-        {
-            c.P(lev); c.WriteLine("/*Encode childlen : ({0})*/", m_type.Name);
-            m_type.PrintCEncode(m_type.PEREffectiveConstraint, c, errorCode , varName, lev);
-        }
 
         internal override void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {
