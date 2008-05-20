@@ -78,25 +78,7 @@ namespace tinyAsn1
         {
             return 0;
         }
-        internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
-        {
-            h.Write("NullType ");
-        }
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defaultVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
-        {
-            bool topLevel = !varName.Contains("->");
-            h.P(lev);
-            if (topLevel)
-                h.WriteLine("*{0} = 0;", varName);
-            else
-                h.WriteLine("{0} = 0;", varName);
 
-        }
-
-        internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
-        {
-            c.P(lev); c.WriteLine("/* NULL type */");
-        }
 
         internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
         {

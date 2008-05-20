@@ -313,10 +313,6 @@ namespace tinyAsn1
             return ret;
         }
 
-        internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
-        {
-            h.Write(Asn1CompilerInvokation.Instance.TypePrefix+ C.ID(m_referencedTypeName));
-        }
 
         internal override bool DependsOnlyOn(List<string> values)
         {
@@ -368,79 +364,9 @@ namespace tinyAsn1
             return ret;
         }
 
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
-        {
-            if (m_constraints.Count == 0)
-            {
-                h.P(lev);
-                if ((Type is IA5StringType) || !varName.Contains("->"))
-                    h.WriteLine("{0}_Initialize({1});", Asn1CompilerInvokation.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
-                else
-                    h.WriteLine("{0}_Initialize(&{1});", Asn1CompilerInvokation.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
-            }
-            else
-            {
-                Type.PrintCInitialize(cns, defauleVal, h, typeName, varName, lev, arrayDepth);
-            }
 
-        }
-        internal override void PrintHConstraintConstant(StreamWriterLevel h, string name)
-        {
-            Asn1Type cur = this;
-            int nCount = 0;
-            string conConstraints = "";
-            while (cur != null)
-            {
-                nCount += cur.m_constraints.Count;
-                conConstraints += cur.Constraints;
-                cur = cur.ParentType;
-            }
-            if (nCount>0)
-                h.WriteLine("#define ERR_{0}\t\t{1} /* {2} */", C.ID(name), Asn1CompilerInvokation.Instance.ConstraintErrorID++, conConstraints);
-        }
 
-        internal override void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev, int arrayDepth)
-        {
-            c.P(lev); c.Write("if ( !");
-            if ((Type is IA5StringType) || !varName.Contains("->"))
-                c.WriteLine("{0}_IsConstraintValid({1}, pErrCode) )", Asn1CompilerInvokation.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
-            else
-                c.WriteLine("{0}_IsConstraintValid(&{1}, pErrCode) )", Asn1CompilerInvokation.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
 
-            c.P(lev);
-            c.WriteLine("{");
-            //c.P(lev + 1);
-            //c.WriteLine("*pErrCode = ERR_{0};", C.ID(errorCode));
-            c.P(lev + 1);
-            c.WriteLine("return FALSE;");
-            c.P(lev);
-            c.WriteLine("}");
-
-            base.PrintCIsConstraintValid(cns, c, errorCode, typeName, varName, lev, arrayDepth);
-            
-        }
-
-        internal override void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
-        {
-            Type.VarsNeededForEncode(cns, arrayDepth, existingVars);
-        }
-
-        internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
-        {
-            if (m_constraints.Count == 0)
-            {
-                c.P(lev);
-                if ((Type is IA5StringType) || !varName.Contains("->"))
-                    c.WriteLine("{0}_Encode({1}, pBitStrm, pErrCode, FALSE);", Asn1CompilerInvokation.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
-                else
-                    c.WriteLine("{0}_Encode(&{1}, pBitStrm, pErrCode, FALSE);", Asn1CompilerInvokation.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
-            }
-            else
-            {
-                Type.PrintCEncode(cns, c, errorCode, varName, lev);
-            }
-
-        }
 
         internal override void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {

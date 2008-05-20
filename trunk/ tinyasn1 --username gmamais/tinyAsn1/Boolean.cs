@@ -79,33 +79,6 @@ namespace tinyAsn1
         {
             return 1;
         }
-        internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
-        {
-            h.Write("flag ");
-        }
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defaultVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
-        {
-            bool topLevel = !varName.Contains("->");
-            BooleanValue b = defaultVal as BooleanValue;
-            string defVal = "FALSE";
-            if (b != null && b.Value)
-                defVal = "TRUE";
-            h.P(lev);
-            if (topLevel)
-                h.WriteLine("*{0} = {1};", varName, defVal);
-            else
-                h.WriteLine("{0} = {1};", varName, defVal);
-
-        }
-        internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
-        {
-            bool topLevel = !varName.Contains("->");
-            c.P(lev);
-            if (topLevel)
-                c.WriteLine("BitStream_AppendBit(pBitStrm, *{0});", varName);
-            else
-                c.WriteLine("BitStream_AppendBit(pBitStrm, {0});", varName);
-        }
 
         internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
         {

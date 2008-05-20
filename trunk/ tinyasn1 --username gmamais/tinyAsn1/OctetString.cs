@@ -208,38 +208,8 @@ namespace tinyAsn1
 
 /* Print C backend */
 
-        internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
-        {
-            lev++;
-            long max = maxItems(cns);
-            h.WriteLine("struct {");
-            h.P(lev + 1);
-            h.WriteLine("long nCount;");
-            h.P(lev + 1); h.WriteLine("byte arr[{0}];", max);
-            h.P(lev);
-            h.Write("}");
-        }
 
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel c, string typeName, string varName, int lev, int arrayDepth)
-        {
-            long max = maxItems(cns);
-            string i = "i" + lev.ToString();
-            string prefix = "";
-            bool topLevel = !varName.Contains("->");
-            if (topLevel)
-                prefix = varName + "->";
-            else
-                prefix = varName + ".";
 
-            c.P(lev); c.WriteLine("{0}nCount = 0;", prefix);
-            c.P(lev); c.WriteLine("memset({0}arr,0x0,{1});", prefix, max);
-        }
-
-        protected override void PrintCEncodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
-        {
-            c.P(lev);
-            c.WriteLine("BitStream_AppendByte0(pBitStrm, {0});",varName);
-        }
         protected override void PrintCDecodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
         {
             c.P(lev);

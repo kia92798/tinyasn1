@@ -200,89 +200,8 @@ namespace tinyAsn1
                 return cn.m_from.ToString();
             return "";
         }
-        internal override void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
-        {
-            if (varName=="")
-                h.WriteLine("char {0}[{1}];", typeName, maxItems(cns) + 1);
-            else
-                h.WriteLine("char {0}[{1}];", varName, maxItems(cns) + 1);
-        }
-        internal override void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defaultVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
-        {
-            h.P(lev);
-            if (defaultVal!=null)
-                h.WriteLine("strcpy({0}, {1});", varName, defaultVal.ToString());
-            else
-                h.WriteLine("memset({0}, 0x0, {1});", varName, maxItems(cns) + 1);
-        }
 
-        internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
-        {
-            long min = minItems(cns);
-            long max = maxItems(cns);
-            string i = "i" + (CLocalVariable.GetArrayIndex(varName) + 1);
-            string prefix = varName;
-            string nCount = "nCount" + (CLocalVariable.GetArrayIndex(varName) + 1);
-            string curBlockSize = "curBlockSize" + (CLocalVariable.GetArrayIndex(varName) + 1);
-            string curItem = "curItem" + (CLocalVariable.GetArrayIndex(varName) + 1);
 
-            if (max < 0x10000)
-            {
-                if (min != max)
-                {
-                    c.P(lev);
-                    c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, strlen({0}), {1}, {2});", prefix, min, max);
-                }
-                else
-                {
-                    c.P(lev); c.WriteLine("/* No need to encode length (it is fixed size ({0})*/", min);
-                }
-                c.P(lev); c.WriteLine("for({0}=0;{0}<strlen({1});{0}++)", i, prefix);
-                c.P(lev); c.WriteLine("{");
-                PrintCEncodeItem(cns, c, errorCode + "_elem", prefix + "[" + i + "]", lev + 1);
-                c.P(lev); c.WriteLine("}");
-            }
-            else
-            {
-                PrintCEncodeFragmentation(cns, c, errorCode, varName, lev,
-                    string.Format(nCount+" = strlen({0});", prefix), "", max, i, prefix,nCount, curBlockSize, curItem);
-            }
-        }
-
-        protected override void PrintCEncodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
-        {
-            PERAlphabetAndSizeEffectiveConstraint cn = (PERAlphabetAndSizeEffectiveConstraint)cns;
-            CharSet perAlphaCon = cn.m_from;
-            int min = 0;
-            int max;
-            List<char> tmp = null;
-            if (perAlphaCon != null)
-                tmp = perAlphaCon.m_set;
-            else
-                tmp = new List<char>(AllowedCharSet);
-            max = tmp.Count - 1;
-            if (min == max)
-                return ;
-            c.P(lev);
-            c.Write("static byte allowedCharSet[] = {");
-            for (int i = 0; i < tmp.Count; i++)
-            {
-                c.Write("0x{0:X2}", Convert.ToByte(tmp[i]));
-                if (i == tmp.Count - 1)
-                    c.WriteLine("};");
-                else
-                    c.Write(",");
-                if ((i + 1) % 15 == 0)
-                {
-                    c.WriteLine();
-                    c.P(lev + 7);
-                }
-            }
-            c.P(lev);
-            c.WriteLine("int charIndex = GetCharIndex({0}, allowedCharSet,{1});", varName, tmp.Count);
-            c.P(lev);
-            c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, charIndex, {0}, {1});", 0, tmp.Count-1);
-        }
 
         internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
         {

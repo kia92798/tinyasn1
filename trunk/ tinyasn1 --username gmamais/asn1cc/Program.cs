@@ -37,7 +37,7 @@ namespace asn1scc
         static int Main2(string[] args)
         {
             List<string> inputFiles = new List<string>();
-            Asn1CompilerInvokation compInv = Asn1CompilerInvokation.Instance;
+            SCCBackend compInv = new SCCBackend();
 
             bool debug = false;
 

@@ -747,10 +747,6 @@ namespace tinyAsn1
         }
 
 
-        internal virtual void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
-        {
-            throw new Exception("Abstract method called");
-        }
 
         internal virtual bool DependsOnlyOn(List<string> values)
         {
@@ -768,9 +764,6 @@ namespace tinyAsn1
         }
 
 
-        internal virtual void VarsNeededForPrintCInitialize(int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
-        {
-        }
 
         /// <summary>
         /// Initialize type. If there is a default value (i.e. as child of a sequence, or set), this value is used for 
@@ -781,16 +774,12 @@ namespace tinyAsn1
         /// <param name="typeName"></param>
         /// <param name="varName"></param>
         /// <param name="lev"></param>
-        internal virtual void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
+        internal virtual void PrintCInitializeLLL(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
         {
+#warning "To be deleted !!!"
             throw new Exception("Abstract method called");
         }
 
-        internal virtual void PrintHConstraintConstant(StreamWriterLevel h, string name)
-        {
-            if (m_constraints.Count>0)
-                h.WriteLine("#define ERR_{0}\t\t{1} /* {2} */", C.ID(name), Asn1CompilerInvokation.Instance.ConstraintErrorID++, Constraints);
-        }
 /*
  
         internal virtual void PrintCIsConstraintValidAux(StreamWriterLevel c)
@@ -805,47 +794,9 @@ namespace tinyAsn1
         }
 */
 
-        internal virtual void VarsNeededForIsConstraintValid(int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
-        {
-        }
 
 
-        internal virtual void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev, int arrayDepth)
-        {
-            string varName2 = varName;
-            if (!varName.Contains("->"))
-                varName2 = "*" + varName;
 
-            if (m_constraints.Count > 0)
-            {
-                c.P(lev); c.Write("if ( !(");
-                for (int i = 0; i < m_constraints.Count; i++)
-                {
-                    string ret = m_constraints[i].PrintCIsConstraintValid(c, varName2, lev);
-                    c.Write(ret);
-                    if (i != m_constraints.Count - 1)
-                        c.Write(" && ");
-                }
-                c.WriteLine(") ) {");
-                c.P(lev + 1);
-                c.WriteLine("*pErrCode = ERR_{0};", C.ID(errorCode));
-                c.P(lev + 1);
-                c.WriteLine("return FALSE;");
-                c.P(lev);
-                c.WriteLine("}");
-            }
-
-        }
-        internal virtual void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
-        {
-        }
-
-        internal virtual void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
-        {
-//            throw new Exception("Abstract method called");
-            c.P(lev);
-            c.WriteLine("assert(0);");
-        }
 
         internal virtual void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {

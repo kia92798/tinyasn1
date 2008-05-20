@@ -387,188 +387,11 @@ namespace tinyAsn1
 
         }
 
-
-
-
-        /// <summary>
-        /// It checks that
-        /// * All strings, SEQUENCE OFs, SETs etc have SIZE constraint and that MAX is bounded
-        /// 
-        /// </summary>
-        private void CheckStrictConstraintsNeededForAsn1cc()
-        {
-            foreach(Asn1File f in m_files)
-                foreach (Module m in f.m_modules)
-                {
-                    foreach (SizeableType st in m.GetTypes<SizeableType>())
-                    {
-                        PERSizeEffectiveConstraint sz = st.PEREffectiveConstraint as PERSizeEffectiveConstraint;
-                        if (sz == null)
-                            ErrorReporter.SemanticError(f.m_fileName, st.antlrNode.Line, "This type({0}) must have a non extensible size constraint", st.Name);
-                        if (sz.Extensible || sz.m_size.m_isExtended)
-                            ErrorReporter.SemanticError(f.m_fileName, st.antlrNode.Line, "This type({0}) must have a non extensible size constraint", st.Name);
-                        if (sz.m_size.m_rootRange.m_maxIsInfinite)
-                            ErrorReporter.SemanticError(f.m_fileName, st.antlrNode.Line, "This type({0}) must have a non extensible size constraint with finite upper value", st.Name);
-                    }
-                    foreach (SequenceOrSetType sq in m.GetTypes<SequenceOrSetType>())
-                    {
-                        if (sq.IsPERExtensible())
-                            ErrorReporter.SemanticError(f.m_fileName, sq.antlrNode.Line, "This type({0}) cannot be extensible", sq.Name);
-                    }
-                    foreach (ChoiceType ch in m.GetTypes<ChoiceType>())
-                    {
-                        if (ch.IsPERExtensible())
-                            ErrorReporter.SemanticError(f.m_fileName, ch.antlrNode.Line, "This type({0}) cannot be extensible", ch.Name);
-                    }
-                    foreach (EnumeratedType en in GetTypes<EnumeratedType>())
-                    {
-                        if (en.IsPERExtensible())
-                            ErrorReporter.SemanticError(f.m_fileName, en.antlrNode.Line, "This type({0}) cannot be extensible", en.Name);
-                    }
-                }
-        }
-
-        private void EnsureUniqueEnumerated()
-        {
-            List<string> enumKeys = new List<string>();
-            List<string> doubleKeys = new List<string>();
-            while (true)
-            {
-                enumKeys.Clear();
-                foreach (EnumeratedType en in GetTypes<EnumeratedType>())
-                {
-                    List<string> path = new List<string>(en.UniquePath.Split('/'));
-                    foreach (EnumeratedType.Item item in en.m_enumValues.Values)
-                    {
-                        if (doubleKeys.Contains(item.CID))
-                        {
-                            for (int i = path.Count - 1; i >= 0; i--)
-                                if (!item.CID.Contains(path[i].Replace('-','_')))
-                                {
-                                    item.CID = path[i] + "_" + item.CID;
-                                    break;
-                                }
-                        }
-                        enumKeys.Add(item.CID);
-                    } 
-                }
-
-                foreach (ChoiceType ch in GetTypes<ChoiceType>())
-                {
-                    List<string> path = new List<string>(ch.UniquePath.Split('/'));
-                    if (doubleKeys.Contains(ch.CID_NONE))
-                    {
-                        for (int i = path.Count - 1; i >= 0; i--)
-                            if (!ch.CID_NONE.Contains(path[i].Replace('-', '_')))
-                            {
-                                ch.CID_NONE = path[i] + "_" + ch.CID_NONE;
-                                break;
-                            }
-                    }
-                    enumKeys.Add(ch.CID_NONE);
-                    foreach (ChoiceChild item in ch.m_children.Values)
-                    {
-                        if (doubleKeys.Contains(item.CID))
-                        {
-                            for (int i = path.Count - 1; i >= 0; i--)
-                                if (!item.CID.Contains(path[i].Replace('-', '_')))
-                                {
-                                    item.CID = path[i] + "_" + item.CID;
-                                    break;
-                                }
-                        }
-                        enumKeys.Add(item.CID);
-                    }
-                }
-
-
-                doubleKeys.Clear();
-                for (int i = 0; i < enumKeys.Count; i++)
-                {
-                    for (int j = i + 1; j < enumKeys.Count; j++)
-                    {
-                        if (enumKeys[i] == enumKeys[j] && !doubleKeys.Contains(enumKeys[i]))
-                            doubleKeys.Add(enumKeys[i]);
-                    }
-                }
-                if (doubleKeys.Count == 0)
-                    break;
-            }
-        }
-
-
-
-
-        
-        void CheckDependencies()
-        {
-            List<string> ret = new List<string>();
-            List<TypeAssigment> tmp = new List<TypeAssigment>();
-
-            foreach(Asn1File f in m_files)
-                foreach (Module m in f.m_modules)
-                    foreach (TypeAssigment t in m.m_typeAssigments.Values)
-                        tmp.Add(t);
-
-            while (tmp.Count > 0)
-            {
-                int lenBefore = tmp.Count;
-                foreach (Asn1File f in m_files)
-                {
-                    foreach (Module m in f.m_modules)
-                    {
-                        foreach (TypeAssigment t in m.m_typeAssigments.Values)
-                        {
-                            if (t.DependsOnlyOn(ret) && !ret.Contains(t.m_name))
-                            {
-                                ret.Add(t.m_name);
-                                tmp.Remove(t);
-                            }
-                        }
-                    }
-                }
-                if (lenBefore == tmp.Count)
-                {
-                    Console.Error.WriteLine("Cyclic dependencies detected");
-                    List<string> tmpstr = new List<string>();
-                    foreach (TypeAssigment t in tmp)
-                        tmpstr.Add(t.m_name);
-                    foreach (TypeAssigment t in tmp)
-                    {
-                        Console.Error.WriteLine("Type {0} depends on: ",t.m_name);
-                        List<string> dps = t.TypesIDepend();
-                        foreach (string l in dps)
-                            Console.Error.WriteLine("\t{0}", l);
-                    }
-                    throw new SemanticErrorException("Error: Asn1 grammar has cyclic dependencies");
-                }
-            }
-
-        }
-
-        public void printC()
-        {
-            CheckStrictConstraintsNeededForAsn1cc();
-            EnsureUniqueEnumerated();
-            foreach (Asn1File file in m_files)
-                file.printC();
-        }
-
         public void EncodeVars()
         {
             foreach (Asn1File file in m_files)
                 file.EncodeVars();
         }
-
-
-        internal string GetUniqueID(string p)
-        {
-            return p;
-        }
-
-        int _constraintErrorID = 1000;
-        public int ConstraintErrorID { get { return _constraintErrorID; } set { _constraintErrorID = value; } }
-
 
         private static Dictionary<string, int> functionPasses = new Dictionary<string, int>();
 
@@ -577,7 +400,7 @@ namespace tinyAsn1
             string curInstance = methodName + obj.GetHashCode().ToString();
             if (functionPasses.ContainsKey(curInstance))
                 return false;
-            
+
             functionPasses.Add(curInstance, 0);
             return true;
         }
@@ -594,11 +417,24 @@ namespace tinyAsn1
                 throw new Exception("Internal Error : Recursive Functions Set is NOT empty !");
         }
 
+
         /// <summary>
         /// When set to true (i.e. via an argument in the command line) only those comments starting
         /// with the special symbol @ are copied into the ICD 
         /// </summary>
         public static bool UseSpecialComments = false;
+
+
+
+        // These are C Backend Specific methods must be moved to C backend
+
+        public string GetUniqueID(string p)
+        {
+            return p;
+        }
+
+        int _constraintErrorID = 1000;
+        public int ConstraintErrorID { get { return _constraintErrorID; } set { _constraintErrorID = value; } }
 
     }
 
@@ -663,135 +499,6 @@ namespace tinyAsn1
             return true;
         }
 
-
-
-
-        internal List<TypeAssigment> GetTypesWithNoDepends()
-        {
-            
-            List<TypeAssigment> ret = new List<TypeAssigment>();
-            List<TypeAssigment> tmp = new List<TypeAssigment>();
-            List<string> retStr = new List<string>();
-
-            foreach (Module m in m_modules)
-            {
-                foreach (ImportedModule imp in m.m_imports)
-                    retStr.AddRange(imp.m_importedTypes);
-                foreach (TypeAssigment t in m.m_typeAssigments.Values)
-                    tmp.Add(t);
-            }
-
-            while (tmp.Count > 0)
-            {
-                int lenBefore = tmp.Count;
-                foreach (Module m in m_modules)
-                {
-                    foreach (TypeAssigment t in m.m_typeAssigments.Values)
-                    {
-                        if (t.DependsOnlyOn(retStr) && !ret.Contains(t))
-                        {
-                            ret.Add(t);
-                            tmp.Remove(t);
-                            retStr.Add(t.m_name);
-                        }
-                    }
-                }
-                if (lenBefore == tmp.Count)
-                {
-                    string err = string.Empty;
-                    foreach (TypeAssigment t in tmp)
-                        err += t.m_name + " ";
-
-                    throw new SemanticErrorException("Error: Asn1 grammar has cyclic dependencies: " + err);
-                }
-            }
-
-            return ret;
-        }
-
-
-        internal void printC()
-        {
-            string path = Asn1CompilerInvokation.m_outDirectory;
-            string fileName = Path.GetFileNameWithoutExtension(m_fileName);
-            if (path != "" && !path.EndsWith(Path.DirectorySeparatorChar.ToString()))
-                path += Path.DirectorySeparatorChar;
-
-            using (StreamWriterLevel c = new StreamWriterLevel(path + fileName + ".c"))
-            using (StreamWriterLevel h = new StreamWriterLevel(path + fileName + ".h"))
-            {
-                h.WriteLine("#ifndef _INC_{0}_H", C.ID(fileName).ToUpper());
-                h.WriteLine("#define _INC_{0}_H", C.ID(fileName).ToUpper());
-                h.WriteLine("/*");
-                h.WriteLine("Code automatically generated by asn1cc tool");
-                h.WriteLine("*/");
-                h.WriteLine();
-
-
-                foreach (Module m in m_modules)
-                {
-                    foreach (ImportedModule imp in m.m_imports)
-                    {
-                        Asn1File incf = null;
-                        foreach (Asn1File f in Asn1CompilerInvokation.Instance.m_files)
-                            foreach (Module exp in f.m_modules)
-                                if (exp.m_moduleID == imp.m_moduleID)
-                                    incf = f;
-                        h.WriteLine("#include \"{0}.h\"", Path.GetFileNameWithoutExtension(incf.m_fileName));
-                    }
-                }
-
-
-                h.WriteLine("#include \"asn1crt.h\"");
-                h.WriteLine();
-                h.WriteLine("#ifdef  __cplusplus");
-                h.WriteLine("extern \"C\" {");
-                h.WriteLine("#endif");
-                h.WriteLine();
-                List<TypeAssigment> tmp = GetTypesWithNoDepends();
-
-                foreach (TypeAssigment t in tmp)
-                {
-                    string uniqueID = Asn1CompilerInvokation.Instance.TypePrefix+ Asn1CompilerInvokation.Instance.GetUniqueID(C.ID(t.m_name));
-                    t.PrintH(h, uniqueID);
-                }
-
-                c.WriteLine();
-                foreach (Module m in m_modules)
-                    foreach (ValueAssigment v in m.m_valuesAssigments.Values)
-                        v.PrintExternDeclaration(h);
-
-
-                h.WriteLine("#ifdef  __cplusplus");
-                h.WriteLine("}");
-                h.WriteLine("#endif");
-                h.WriteLine();
-
-                h.WriteLine("#endif");
-
-
-                c.WriteLine("/*");
-                c.WriteLine("Code automatically generated by asn1cc tool");
-                c.WriteLine("*/");
-
-                c.WriteLine("#include <string.h>");
-//                c.WriteLine("#include <assert.h>");
-
-
-                c.WriteLine("#include \"{0}\"", fileName + ".h");
-                foreach (TypeAssigment t in tmp)
-                {
-                    string uniqueID = Asn1CompilerInvokation.Instance.TypePrefix + Asn1CompilerInvokation.Instance.GetUniqueID(C.ID(t.m_name));
-                    t.PrintC(c, uniqueID);
-                }
-
-                c.WriteLine();
-                foreach (Module m in m_modules)
-                    foreach (ValueAssigment v in m.m_valuesAssigments.Values)
-                        v.PrintC(c);
-
-            }
-        }
     }
 
 
