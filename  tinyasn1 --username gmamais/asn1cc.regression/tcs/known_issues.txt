@@ -1,4 +1,4 @@
 01-int/017.asn1 --> it seems to be an oss bug since for a int which is larger than 32bit generates a four byte encoding
 01-int/020.asn1 --> it seems to be an oss bug since for a int which is larger than 32bit generates a four byte encoding
 02-real/001.asn1 precision errors
-
+./05-struct/006.asn1 (due to DEFAULT)

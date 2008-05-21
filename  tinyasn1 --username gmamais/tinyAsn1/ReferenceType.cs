@@ -368,31 +368,6 @@ namespace tinyAsn1
 
 
 
-        internal override void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
-        {
-            Type.VarsNeededForDecode(cns, arrayDepth, existingVars);
-        }
 
-        internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
-        {
-            if (m_constraints.Count == 0)
-            {
-                c.P(lev);
-                if ((Type is IA5StringType) || !varName.Contains("->"))
-                    c.WriteLine("if ( !{0}_Decode({1}, pBitStrm, pErrCode) ) {{", Asn1CompilerInvokation.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
-                else
-                    c.WriteLine("if ( !{0}_Decode(&{1}, pBitStrm, pErrCode) ) {{", Asn1CompilerInvokation.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
-                c.P(lev + 1);
-                c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
-                c.P(lev + 1);
-                c.WriteLine("return FALSE;");
-                c.P(lev);
-                c.WriteLine("}");
-            }
-            else
-            {
-                Type.PrintCDecode(cns, c, varName, lev);
-            }
-        }
     }
 }

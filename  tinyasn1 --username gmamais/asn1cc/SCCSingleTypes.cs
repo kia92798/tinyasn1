@@ -49,8 +49,10 @@ namespace asn1scc
         {
             CSSType.PrintCIsConstraintValid(this, cns, c, errorCode, typeName, varName, lev, arrayDepth);
         }
-        public void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) { }
-
+        public void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) 
+        {
+            SCCSizeable.VarsNeededForEncode(this, cns, arrayDepth, existingVars);
+        }
         public void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
             long min = minItems(cns);
@@ -85,6 +87,53 @@ namespace asn1scc
                 c.WriteLine("BitStream_AppendBitsWithFragmentation(pBitStrm, {0}arr, {0}nCount);", prefix);
             }
         }
+        public void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+            SCCSizeable.VarsNeededForDecode(this, cns, arrayDepth, existingVars);
+        }
+        public void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            long min = minItems(cns);
+            long max = maxItems(cns);
+            string i = "i" + (CLocalVariable.GetArrayIndex(varName) + 1);
+            string prefix = "";
+            bool topLevel = !varName.Contains("->");
+            if (topLevel)
+                prefix = varName + "->";
+            else
+                prefix = varName + ".";
+
+            if (min != max)
+            {
+                c.P(lev);
+                c.WriteLine("if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nCount, {0}, {1})) {{", min, max);
+                c.P(lev + 1);
+                c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+                c.P(lev + 1);
+                c.WriteLine("return FALSE;");
+                c.P(lev);
+                c.WriteLine("}");
+                c.P(lev);
+                c.WriteLine("{0}nCount = (long)nCount;", prefix);
+
+            }
+            else
+            {
+                c.P(lev);
+                c.WriteLine("{0}nCount = {1};", prefix, max);
+            }
+
+            c.P(lev);
+            c.WriteLine("if (!BitStream_ReadBits(pBitStrm, {0}arr, {0}nCount)) {{", prefix);
+            c.P(lev + 1);
+            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+            c.P(lev + 1);
+            c.WriteLine("return FALSE;");
+            c.P(lev);
+            c.WriteLine("}");
+
+        }
+
     }
 
     public class SCCBooleanType : BooleanType, ISCCType
@@ -130,6 +179,23 @@ namespace asn1scc
                 c.WriteLine("BitStream_AppendBit(pBitStrm, *{0});", varName);
             else
                 c.WriteLine("BitStream_AppendBit(pBitStrm, {0});", varName);
+        }
+        public void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) { }
+        public void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            string var2 = varName;
+            if (varName.Contains("->"))
+                var2 = "&" + varName;
+
+            c.P(lev);
+            c.WriteLine("if (!BitStream_ReadBit(pBitStrm, {0})) {{ ", var2);
+            c.P(lev + 1);
+            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+            c.P(lev + 1);
+            c.WriteLine("return FALSE;");
+            c.P(lev);
+            c.WriteLine("}");
+
         }
     }
 
@@ -205,6 +271,44 @@ namespace asn1scc
             c.P(lev); c.WriteLine("}");
 
         }
+        public void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+            if (!existingVars.ContainsKey("enumIndex"))
+            {
+                existingVars.Add("enumIndex", new CLocalVariable("enumIndex", "asn1SccSint", 0, "0"));
+            }
+        }
+        public void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            string varName2 = varName;
+            if (!varName.Contains("->"))
+                varName2 = "*" + varName;
+
+            c.P(lev);
+            c.WriteLine("if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &enumIndex, {0}, {1})) {{", 0, RootItemsCount - 1);
+            c.P(lev + 1);
+            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+            c.P(lev + 1);
+            c.WriteLine("return FALSE;");
+            c.P(lev);
+            c.WriteLine("}");
+            c.P(lev);
+            c.WriteLine("switch(enumIndex)");
+            c.P(lev); c.WriteLine("{");
+            int index = 0;
+            foreach (Item it in m_enumValues.Values)
+            {
+                c.P(lev); c.WriteLine("case {0}:", index);
+                c.P(lev + 1);
+                c.WriteLine("{0} = {1};", varName2, it.CID);
+                c.P(lev + 1);
+                c.WriteLine("break;");
+                index++;
+            }
+
+
+            c.P(lev); c.WriteLine("}");
+        }
 
     }
 
@@ -272,7 +376,7 @@ namespace asn1scc
                         c.Write("if ");
                         for (int i = 0; i < m_constraints.Count; i++)
                         {
-                            string ret = m_constraints[i].PrintCIsRootConstraintValid(c, var, lev);
+                            string ret = ((ISCConstraint)m_constraints[i]).PrintCIsRootConstraintValid(var, lev);
                             c.Write(ret);
                             if (i != m_constraints.Count - 1)
                                 c.Write(" && ");
@@ -323,6 +427,94 @@ namespace asn1scc
                 c.WriteLine("BitStream_EncodeUnConstraintWholeNumber(pBitStrm, {0});", var);
             }
         }
+        public void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+            PERIntegerEffectiveConstraint cn = cns as PERIntegerEffectiveConstraint;
+            if (cns != null && cn.Extensible)
+            {
+                if (!existingVars.ContainsKey("extBit"))
+                {
+                    existingVars.Add("extBit", new CLocalVariable("extBit", "flag", 0, "FALSE"));
+                }
+            }
+        }
+        public void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            string var = varName;
+            if (varName.Contains("->"))
+                var = "&" + var;
+            PERIntegerEffectiveConstraint cn = cns as PERIntegerEffectiveConstraint;
+            if (cn == null) //unconstraint integer
+            {
+                c.P(lev);
+                c.WriteLine("if (!BitStream_DecodeUnConstraintWholeNumber(pBitStrm, {0})) {{", var);
+                c.P(lev + 1);
+                c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+                c.P(lev + 1);
+                c.WriteLine("return FALSE;");
+                c.P(lev);
+                c.WriteLine("}");
+            }
+            else
+            {
+                if (cn.Extensible)
+                {
+                    c.P(lev);
+                    c.WriteLine("if (!BitStream_ReadBit(pBitStrm, &extBit)) { /* read extension bit*/ ");
+                    c.P(lev + 1);
+                    c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+                    c.P(lev + 1);
+                    c.WriteLine("return FALSE;");
+                    c.P(lev);
+                    c.WriteLine("}");
+
+                    c.P(lev);
+                    c.WriteLine("if (extBit==0) { /* ext bit is zero ==> value is expecteted with root range*/");
+                    DecodeNormal(cn, c, var, lev + 1);
+                    c.P(lev); c.WriteLine("} else {");
+                    c.P(lev + 1);
+                    c.WriteLine("if (!BitStream_DecodeUnConstraintWholeNumber(pBitStrm, {0})) {{", var);
+                    c.P(lev + 2);
+                    c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+                    c.P(lev + 2);
+                    c.WriteLine("return FALSE;");
+                    c.P(lev + 1);
+                    c.WriteLine("}");
+                    c.P(lev);
+                    c.WriteLine("}");
+                }
+                else
+                    DecodeNormal(cn, c, var, lev);
+
+
+            }
+        }
+
+        private void DecodeNormal(PERIntegerEffectiveConstraint cn, StreamWriterLevel c, string var, int lev)
+        {
+            if (!cn.m_rootRange.m_minIsInfinite && !cn.m_rootRange.m_maxIsInfinite)
+            {
+                c.P(lev);
+                c.WriteLine("if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, {0}, {1}, {2})) {{", var, C.L(cn.m_rootRange.m_min), C.L(cn.m_rootRange.m_max));
+            }
+            else if (!cn.m_rootRange.m_minIsInfinite && cn.m_rootRange.m_maxIsInfinite)
+            {
+                c.P(lev);
+                c.WriteLine("if (!BitStream_DecodeSemiConstraintWholeNumber(pBitStrm, {0}, {1})) {{", var, C.L(cn.m_rootRange.m_min));
+            }
+            else
+            {
+                c.P(lev);
+                c.WriteLine("if (!BitStream_DecodeUnConstraintWholeNumber(pBitStrm, {0})) {{", var);
+            }
+            c.P(lev + 1);
+            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+            c.P(lev + 1);
+            c.WriteLine("return FALSE;");
+            c.P(lev);
+            c.WriteLine("}");
+        }
+    
     }
 
     public class SCCNullType : NullType, ISCCType
@@ -360,6 +552,11 @@ namespace asn1scc
         {
             c.P(lev); c.WriteLine("/* NULL type */");
         }
+        public void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) { }
+        public void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            c.P(lev); c.WriteLine("/* NULL type */");
+        }
     }
 
     public class SCCObjectIdentifier : ObjectIdentifier, ISCCType
@@ -390,6 +587,12 @@ namespace asn1scc
         }
         public void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) { }
         public void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
+        {
+#warning "Unimplemented method"
+            throw new Exception("Unimplemented !!!");
+        }
+        public void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) { }
+        public void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
         {
 #warning "Unimplemented method"
             throw new Exception("Unimplemented !!!");
@@ -432,12 +635,16 @@ namespace asn1scc
         }
         public void VarsNeededForIsConstraintValid(int lev, OrderedDictionary<string, CLocalVariable> existingVars)
         {
+
         }
         public void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev, int arrayDepth)
         {
             CSSType.PrintCIsConstraintValid(this, cns, c, errorCode, typeName, varName, lev, arrayDepth);
         }
-        public void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) { }
+        public void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) 
+        {
+            SCCSizeable.VarsNeededForEncode(this, cns, arrayDepth, existingVars);
+        }
         public void PrintCEncodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
             c.P(lev);
@@ -446,6 +653,25 @@ namespace asn1scc
         public void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
             SCCSizeable.PrintCEncode(this, cns, c, errorCode, varName, lev);
+        }
+        public void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) 
+        {
+            SCCSizeable.VarsNeededForDecode(this, cns, arrayDepth, existingVars);
+        }
+        public void PrintCDecodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            c.P(lev);
+            c.WriteLine("if ( !BitStream_ReadByte(pBitStrm, &{0}) ) {{", varName);
+            c.P(lev + 1);
+            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+            c.P(lev + 1);
+            c.WriteLine("return FALSE;");
+            c.P(lev);
+            c.WriteLine("}");
+        }
+        public void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            SCCSizeable.PrintCDecode(this, cns, c, varName, lev);
         }
     }
 
@@ -493,6 +719,21 @@ namespace asn1scc
 
             c.P(lev);
             c.WriteLine("BitStream_EncodeReal(pBitStrm, {0});", var);
+        }
+        public void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) {}
+        public void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            string var = varName;
+            if (varName.Contains("->"))
+                var = "&" + var;
+            c.P(lev);
+            c.WriteLine("if (!BitStream_DecodeReal(pBitStrm, {0})) {{", var);
+            c.P(lev + 1);
+            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+            c.P(lev + 1);
+            c.WriteLine("return FALSE;");
+            c.P(lev);
+            c.WriteLine("}");
         }
     }
 
@@ -579,6 +820,31 @@ namespace asn1scc
             }
 
         }
+        public void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+            ((ISCCType)Type).VarsNeededForDecode(cns, arrayDepth, existingVars);
+        }
+        public void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            if (m_constraints.Count == 0)
+            {
+                c.P(lev);
+                if ((Type is IA5StringType) || !varName.Contains("->"))
+                    c.WriteLine("if ( !{0}_Decode({1}, pBitStrm, pErrCode) ) {{", Asn1CompilerInvokation.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
+                else
+                    c.WriteLine("if ( !{0}_Decode(&{1}, pBitStrm, pErrCode) ) {{", Asn1CompilerInvokation.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
+                c.P(lev + 1);
+                c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+                c.P(lev + 1);
+                c.WriteLine("return FALSE;");
+                c.P(lev);
+                c.WriteLine("}");
+            }
+            else
+            {
+                ((ISCCType)Type).PrintCDecode(cns, c, varName, lev);
+            }
+        }
 
     }
 
@@ -643,7 +909,7 @@ namespace asn1scc
             if (perAlphaCon != null)
                 tmp = perAlphaCon.m_set;
             else
-                tmp = new List<char>(AllowedCharSet);
+                tmp = new List<char>(pThis.AllowedCharSet);
             max = tmp.Count - 1;
             if (min == max)
                 return;
@@ -666,6 +932,93 @@ namespace asn1scc
             c.WriteLine("int charIndex = GetCharIndex({0}, allowedCharSet,{1});", varName, tmp.Count);
             c.P(lev);
             c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, charIndex, {0}, {1});", 0, tmp.Count - 1);
+        }
+        public static void PrintCDecode(IA5StringType pThis, PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            long min = pThis.minItems(cns);
+            long max = pThis.maxItems(cns);
+            string i = "i" + (CLocalVariable.GetArrayIndex(varName) + 1);
+            string length = "length" + (CLocalVariable.GetArrayIndex(varName) + 1);
+            string curBlockSize = "curBlockSize" + (CLocalVariable.GetArrayIndex(varName) + 1);
+            //            string curItem = "curItem" + (CLocalVariable.GetArrayIndex(varName) + 1);
+            string nCount = "nCount" + (CLocalVariable.GetArrayIndex(varName) + 1);
+            string prefix = varName;
+
+            c.P(lev);
+            c.WriteLine("memset({0}, 0x0, {1});", varName, pThis.maxItems(cns) + 1);
+            if (max < 0x10000)
+            {
+                if (min != max)
+                {
+                    c.P(lev);
+                    c.WriteLine("if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nCount, {0}, {1})) {{", min, max);
+                    c.P(lev + 1);
+                    c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+                    c.P(lev + 1);
+                    c.WriteLine("return FALSE;");
+                    c.P(lev);
+                    c.WriteLine("}");
+
+                }
+                else
+                {
+                    c.P(lev);
+                    c.WriteLine("nCount = {0};", max);
+                }
+                c.P(lev); c.WriteLine("for({0}=0;{0}<nCount;{0}++)", i);
+                c.P(lev); c.WriteLine("{");
+                ((ISCCSizeable)pThis).PrintCDecodeItem(cns, c, prefix + "[" + i + "]", lev + 1);
+                c.P(lev); c.WriteLine("}");
+            }
+            else
+            {
+                SCCSizeable.PrintCDecodeFragmentation(pThis, cns, c, varName, lev,
+                        "", max, i, prefix, length, curBlockSize, nCount);
+            }
+
+        }
+        public static void PrintCDecodeItem(IA5StringType pThis, PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            PERAlphabetAndSizeEffectiveConstraint cn = (PERAlphabetAndSizeEffectiveConstraint)cns;
+            CharSet perAlphaCon = cn.m_from;
+            int min = 0;
+            int max;
+            List<char> tmp = null;
+            if (perAlphaCon != null)
+                tmp = perAlphaCon.m_set;
+            else
+                tmp = new List<char>(pThis.AllowedCharSet);
+            max = tmp.Count - 1;
+            if (min == max)
+                return;
+            c.P(lev);
+            c.Write("static byte allowedCharSet[] = {");
+            for (int i = 0; i < tmp.Count; i++)
+            {
+                c.Write("0x{0:X2}", Convert.ToByte(tmp[i]));
+                if (i == tmp.Count - 1)
+                    c.WriteLine("};");
+                else
+                    c.Write(",");
+                if ((i + 1) % 15 == 0)
+                {
+                    c.WriteLine();
+                    c.P(lev + 7);
+                }
+            }
+            c.P(lev);
+            c.WriteLine("asn1SccSint charIndex = 0;");
+            c.P(lev);
+            c.WriteLine("if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &charIndex, {0}, {1})) {{", 0, tmp.Count - 1);
+            c.P(lev + 1);
+            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+            c.P(lev + 1);
+            c.WriteLine("return FALSE;");
+            c.P(lev);
+            c.WriteLine("}");
+
+            c.P(lev);
+            c.WriteLine("{0} = allowedCharSet[charIndex];", varName);
         }
 
     }
@@ -696,7 +1049,10 @@ namespace asn1scc
         {
             CSSType.PrintCIsConstraintValid(this, cns, c, errorCode, typeName, varName, lev, arrayDepth);
         }
-        public void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) { }
+        public void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) 
+        {
+            SCCSizeable.VarsNeededForEncode(this, cns, arrayDepth, existingVars);
+        }
         public void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
             SCCStringBase.PrintCEncode(this, cns, c, errorCode, varName, lev);
@@ -704,6 +1060,18 @@ namespace asn1scc
         public void PrintCEncodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
             SCCStringBase.PrintCEncodeItem(this, cns, c, errorCode, varName, lev);
+        }
+        public void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+            SCCSizeable.VarsNeededForDecode(this, cns, arrayDepth, existingVars);
+        }
+        public void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            SCCStringBase.PrintCDecode(this, cns, c, varName, lev);
+        }
+        public void PrintCDecodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            SCCStringBase.PrintCDecodeItem(this, cns, c, varName, lev);
         }
     }
 
@@ -731,7 +1099,10 @@ namespace asn1scc
         {
             CSSType.PrintCIsConstraintValid(this, cns, c, errorCode, typeName, varName, lev, arrayDepth);
         }
-        public void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) { }
+        public void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) 
+        {
+            SCCSizeable.VarsNeededForEncode(this, cns, arrayDepth, existingVars);
+        }
         public void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
             SCCStringBase.PrintCEncode(this, cns, c, errorCode, varName, lev);
@@ -739,6 +1110,18 @@ namespace asn1scc
         public void PrintCEncodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
             SCCStringBase.PrintCEncodeItem(this, cns, c, errorCode, varName, lev);
+        }
+        public void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+            SCCSizeable.VarsNeededForDecode(this, cns, arrayDepth, existingVars);
+        }
+        public void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            SCCStringBase.PrintCDecode(this, cns, c, varName, lev);
+        }
+        public void PrintCDecodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            SCCStringBase.PrintCDecodeItem(this, cns, c, varName, lev);
         }
     }
 
@@ -766,7 +1149,10 @@ namespace asn1scc
         {
             CSSType.PrintCIsConstraintValid(this, cns, c, errorCode, typeName, varName, lev, arrayDepth);
         }
-        public void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) { }
+        public void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) 
+        {
+            SCCSizeable.VarsNeededForEncode(this, cns, arrayDepth, existingVars);
+        }
         public void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
             SCCStringBase.PrintCEncode(this, cns, c, errorCode, varName, lev);
@@ -774,6 +1160,18 @@ namespace asn1scc
         public void PrintCEncodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
             SCCStringBase.PrintCEncodeItem(this, cns, c, errorCode, varName, lev);
+        }
+        public void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+            SCCSizeable.VarsNeededForDecode(this, cns, arrayDepth, existingVars);
+        }
+        public void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            SCCStringBase.PrintCDecode(this, cns, c, varName, lev);
+        }
+        public void PrintCDecodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            SCCStringBase.PrintCDecodeItem(this, cns, c, varName, lev);
         }
     }
 
@@ -801,7 +1199,10 @@ namespace asn1scc
         {
             CSSType.PrintCIsConstraintValid(this, cns, c, errorCode, typeName, varName, lev, arrayDepth);
         }
-        public void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) { }
+        public void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) 
+        {
+            SCCSizeable.VarsNeededForEncode(this, cns, arrayDepth, existingVars);
+        }
         public void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
             SCCStringBase.PrintCEncode(this, cns, c, errorCode, varName, lev);
@@ -809,6 +1210,18 @@ namespace asn1scc
         public void PrintCEncodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
             SCCStringBase.PrintCEncodeItem(this, cns, c, errorCode, varName, lev);
+        }
+        public void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+            SCCSizeable.VarsNeededForDecode(this, cns, arrayDepth, existingVars);
+        }
+        public void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            SCCStringBase.PrintCDecode(this, cns, c, varName, lev);
+        }
+        public void PrintCDecodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            SCCStringBase.PrintCDecodeItem(this, cns, c, varName, lev);
         }
     }
 }

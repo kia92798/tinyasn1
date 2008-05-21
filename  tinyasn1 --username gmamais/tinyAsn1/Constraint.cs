@@ -77,9 +77,6 @@ namespace tinyAsn1
         PERSizeEffectiveConstraint PEREffectiveSizeConstraint { get;}
         PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint { get;}
 
-        string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev);
-        string PrintCIsRootConstraintValid(StreamWriterLevel c, string varName, int lev);
-        void PrintCIsConstraintValidAux(StreamWriterLevel c);
     }
 
     public abstract class BaseConstraint : IConstraint
@@ -206,26 +203,15 @@ namespace tinyAsn1
         {
             get { throw new Exception("The method or operation is not implemented."); }
         }
-        public virtual string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-        public virtual void PrintCIsConstraintValidAux(StreamWriterLevel c)
-        {
-        }
 
-        public virtual string PrintCIsRootConstraintValid(StreamWriterLevel c, string varName, int lev)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
     }
 
     public class RootConstraint : BaseConstraint
     {
-        IConstraint m_constr;
-        IConstraint m_extConstr;
-        ExceptionSpec m_exceptionSpec;
-        bool m_extended = false;
+        protected IConstraint m_constr;
+        protected IConstraint m_extConstr;
+        protected ExceptionSpec m_exceptionSpec;
+        protected bool m_extended = false;
 
         
         public static IConstraint Create(ITree tree, Asn1Type type)
@@ -352,22 +338,12 @@ namespace tinyAsn1
                 return ret;
             }
         }
-        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
-        {
-            if (m_extConstr == null)
-                return m_constr.PrintCIsConstraintValid(c, varName, lev);
-            return "(" + m_constr.PrintCIsConstraintValid(c, varName, lev) + "||" + m_extConstr.PrintCIsConstraintValid(c, varName, lev) + ")";
-        }
-        public override string PrintCIsRootConstraintValid(StreamWriterLevel c, string varName, int lev)
-        {
-            return m_constr.PrintCIsConstraintValid(c, varName, lev);
-        }
     }
     
     // Union, I
     public class UnionConstraint : BaseConstraint
     {
-        List<IConstraint> m_items;
+        protected List<IConstraint> m_items;
 
 
         public static UnionConstraint Create(ITree tree, Asn1Type type)
@@ -489,27 +465,12 @@ namespace tinyAsn1
                 return ret;
             }
         }
-        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
-        {
-            string ret;
-            if (m_items.Count == 1)
-                return m_items[0].PrintCIsConstraintValid(c, varName, lev);
-            ret = "(";
-            for (int i = 0; i < m_items.Count; i++)
-            {
-                ret += m_items[i].PrintCIsConstraintValid(c, varName, lev);
-                if (i != m_items.Count - 1)
-                    ret += " || ";
-            }
-            ret += ")";
-            return ret;
-        }
     }
 
     // Intersection, ^
     public class AndConstraint : BaseConstraint
     {
-        List<IConstraint> m_items;
+        protected List<IConstraint> m_items;
 
         public static AndConstraint Create(ITree tree, Asn1Type type)
         {
@@ -624,27 +585,12 @@ namespace tinyAsn1
                 return ret;
             }
         }
-        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
-        {
-            string ret;
-            if (m_items.Count == 1)
-                return m_items[0].PrintCIsConstraintValid(c, varName, lev);
-            ret = "(";
-            for (int i = 0; i < m_items.Count; i++)
-            {
-                ret += m_items[i].PrintCIsConstraintValid(c, varName, lev);
-                if (i != m_items.Count - 1)
-                    ret += " && ";
-            }
-            ret += ")";
-            return ret;
-        }
     }
 
     public class ExceptConstraint : BaseConstraint
     {
-        IConstraint m_c1;
-        IConstraint m_c2;
+        protected IConstraint m_c1;
+        protected IConstraint m_c2;
 
         public static ExceptConstraint Create(ITree tree, Asn1Type type)
         {
@@ -728,16 +674,12 @@ namespace tinyAsn1
             }
         }
 
-        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
-        {
-            return "(" + m_c1.PrintCIsConstraintValid(c, varName, lev) + " && !" + m_c2.PrintCIsConstraintValid(c, varName, lev) + ")";
-        }
     }
 
     // m_c1 is the Parent constraint
     public class AllExceptConstraint : BaseConstraint
     {
-        IConstraint m_c;
+        protected IConstraint m_c;
 
         public static AllExceptConstraint Create(ITree tree, Asn1Type type)
         {
@@ -803,10 +745,6 @@ namespace tinyAsn1
             {
                 return PERAlphabetAndSizeEffectiveConstraint.Full(m_type);
             }
-        }
-        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
-        {
-            return "!" + m_c.PrintCIsConstraintValid(c, varName, lev);
         }
     }
 
@@ -900,10 +838,6 @@ namespace tinyAsn1
             }
         }
 
-        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
-        {
-            return "(" + varName + " == " + m_val.ToStringC() + ")";
-        }
 
     }
 
@@ -924,14 +858,6 @@ namespace tinyAsn1
             return true;
         }
 
-        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
-        {
-            ICharacterString set = m_val as ICharacterString;
-            if (set == null)
-                throw new Exception("Internal Error");
-
-            return "strchr(\"" + set.Value + "\", " + varName + ")";
-        }
         public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
         {
             get
@@ -1151,35 +1077,6 @@ namespace tinyAsn1
                 ret += m_max.ToString();
             return ret;
         }
-        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
-        {
-            string ret="";
-            if (m_max!=null && m_min!=null)
-                ret = "(";
-            if (m_min != null)
-            {
-                ret += "(" + varName +">";
-                if (m_minValIsInluded)
-                    ret += "=";
-                ret += m_min.ToString() + ")";
-
-            }
-            if (m_max != null && m_min != null)
-                ret += " && ";
-
-            if (m_max != null)
-            {
-                ret += "(" + varName + "<";
-                if (m_maxValIsInluded)
-                    ret += "=";
-                ret += m_max.ToString() + ")";
-            }
-
-
-            if (m_max != null && m_min != null)
-                ret += ")";
-            return ret;
-        }
 
     }
 
@@ -1202,11 +1099,11 @@ namespace tinyAsn1
             }
             
         }
-        ICharacterString Lo
+        protected ICharacterString Lo
         {
             get { return (ICharacterString)m_min; }
         }
-        ICharacterString Hi
+        protected ICharacterString Hi
         {
             get { return (ICharacterString)m_max; }
         }
@@ -1257,44 +1154,6 @@ namespace tinyAsn1
             return true;
         }
 
-        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
-        {
-            if (m_min != null && Lo.Value.Length != 1)
-                return ""; // ignore constraint
-            if (m_max != null && Hi.Value.Length != 1)
-                return ""; // ignore constraint
-            if (m_min == null && m_max == null)  //(MIN..MAX)
-                return "";
-            string ret = "";
-            if (m_max != null && m_min != null)
-                ret = "(";
-
-            if (m_min != null)
-            {
-                ret += "(" + varName +">";
-                if (m_minValIsInluded)
-                    ret += "=";
-                ret += "'" + m_min.ToString().Replace("\"","") + "')";
-
-            }
-            if (m_max != null && m_min != null)
-                ret += " && ";
-
-            if (m_max != null)
-            {
-                ret += "(" + varName + "<";
-                if (m_maxValIsInluded)
-                    ret += "=";
-                ret += "'" + m_max.ToString().Replace("\"", "") + "')";
-            }
-
-
-            if (m_max != null && m_min != null)
-                ret += ")";
-            return ret;
-
-        
-        }
 
         public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
         {
@@ -1359,7 +1218,7 @@ namespace tinyAsn1
 
         }
 
-        DummyReferenceType sizeCon;
+        protected DummyReferenceType sizeCon;
 
 
         public static IConstraint Create(ITree tree, Asn1Type type)
@@ -1425,35 +1284,12 @@ namespace tinyAsn1
             }
         }
 
-        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
-        {
-            string varName2="";
-            if (m_type.GetFinalType() is IA5StringType)
-                varName2 = "strlen(" + varName.Replace("*", "") + ")";
-            else
-            {
-                if (varName.Contains("->"))
-                    varName2 = varName + ".nCount";
-                else
-                    varName2 = varName.Replace("*","") + "->nCount";
-                
-            }
-
-            string ret = "";
-            for (int i = 0; i < sizeCon.m_constraints.Count; i++)
-            {
-                ret += sizeCon.m_constraints[i].PrintCIsConstraintValid(c, varName2, lev);
-                if (i != sizeCon.m_constraints.Count-1)
-                    ret += " && ";
-            }
-            return ret;
-        }
 
     }
 
     public class PermittedAlphabetConstraint : BaseConstraint
     {
-        IA5StringType allowed_char_set;
+        protected IA5StringType allowed_char_set;
 
         internal static IConstraint Create(ITree tree, Asn1Type type)
         {
@@ -1535,42 +1371,6 @@ namespace tinyAsn1
             }
         }
 
-        static int nCount=0;
-        int AuxFunctionID;
-        public override void PrintCIsConstraintValidAux(StreamWriterLevel c)
-        {
-            nCount++;
-            AuxFunctionID = nCount;
-
-            c.WriteLine("flag CheckString{0}(const char* str)", AuxFunctionID);
-            c.WriteLine("{");
-            c.P(1); c.WriteLine("size_t i;");
-            c.P(1); c.WriteLine("size_t n = strlen(str);");
-            c.P(1);
-            c.WriteLine("for(i=0;i<n;i++)");
-            c.P(1); c.WriteLine("{");
-
-            c.P(2);
-            c.Write("if (!");
-            for (int i = 0; i < allowed_char_set.m_constraints.Count; i++)
-            {
-                c.Write(allowed_char_set.m_constraints[i].PrintCIsConstraintValid(c, "str[i]", 0));
-                if (i != allowed_char_set.m_constraints.Count - 1)
-                    c.Write(" && ");
-            }
-            c.WriteLine(")");
-            c.P(3);
-            c.WriteLine("return FALSE;");
-            c.P(1); c.WriteLine("}");
-
-            c.P(1); c.WriteLine("return TRUE;");
-            c.WriteLine("}");
-        }
-
-        public override string PrintCIsConstraintValid(StreamWriterLevel c, string varName, int lev)
-        {
-            return "CheckString" + AuxFunctionID.ToString()+"("+varName.Replace("*","")+")";
-        }
     }
 
     public class TypeInclusionConstraint : BaseConstraint

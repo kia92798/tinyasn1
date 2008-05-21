@@ -18,6 +18,8 @@ namespace asn1scc
         void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev, int arrayDepth);
         void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars);
         void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev);
+        void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars);
+        void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev);
     }
 
     public static class CSSType
@@ -39,7 +41,7 @@ namespace asn1scc
                 c.P(lev); c.Write("if ( !(");
                 for (int i = 0; i < pThis.m_constraints.Count; i++)
                 {
-                    string ret = pThis.m_constraints[i].PrintCIsConstraintValid(c, varName2, lev);
+                    string ret = ((ISCConstraint)pThis.m_constraints[i]).PrintCIsConstraintValid(varName2, lev);
                     c.Write(ret);
                     if (i != pThis.m_constraints.Count - 1)
                         c.Write(" && ");
