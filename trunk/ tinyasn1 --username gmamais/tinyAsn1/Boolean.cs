@@ -80,22 +80,6 @@ namespace tinyAsn1
             return 1;
         }
 
-        internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
-        {
-            string var2 = varName;
-            if (varName.Contains("->"))
-                var2 = "&" + varName;
-            
-            c.P(lev);
-            c.WriteLine("if (!BitStream_ReadBit(pBitStrm, {0})) {{ ",var2);
-            c.P(lev + 1);
-            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
-            c.P(lev + 1);
-            c.WriteLine("return FALSE;");
-            c.P(lev);
-            c.WriteLine("}");
-
-        }
     }
 
     public partial class BooleanValue : Asn1Value

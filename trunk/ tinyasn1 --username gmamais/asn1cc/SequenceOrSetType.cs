@@ -158,6 +158,100 @@ namespace asn1scc
             }
         }
 
+        public static void VarsNeededForDecode(SequenceOrSetType pThis, PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+
+            int nBitMaskLength = (int)Math.Ceiling(pThis.GetNumberOfOptionalOrDefaultFields() / 8.0);
+            if (nBitMaskLength > 0)
+            {
+                if (!existingVars.ContainsKey("bitMask"))
+                    existingVars.Add("bitMask", new CLocalVariable("bitMask", "byte", nBitMaskLength, ""));
+                else
+                {
+                    CLocalVariable lv = existingVars["bitMask"];
+                    if (lv.arrayLen < nBitMaskLength)
+                        lv.arrayLen = nBitMaskLength;
+                }
+            }
+
+            foreach (SequenceOrSetType.Child ch in pThis.m_children.Values)
+            {
+                ((ISCCType)ch.m_type).VarsNeededForDecode(ch.m_type.PEREffectiveConstraint, arrayDepth, existingVars);
+            }
+        }
+
+        public static void PrintCDecode(SequenceOrSetType pThis, PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            string varName2 = varName;
+            if (!varName.Contains("->"))
+                varName2 += "->";
+            else
+                varName2 += ".";
+
+            int nBitMaskLength = (int)Math.Ceiling(pThis.GetNumberOfOptionalOrDefaultFields() / 8.0);
+            //c.P(lev); c.WriteLine("{"); lev++;
+            c.P(lev);
+            if (nBitMaskLength > 0)
+            {
+                //c.WriteLine("byte bitMask[{0}];", nBitMaskLength);
+                //c.P(lev);
+                c.WriteLine("if (!BitStream_ReadBits(pBitStrm, bitMask, {0})) {{", pThis.GetNumberOfOptionalOrDefaultFields());
+                c.P(lev + 1);
+                c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+                c.P(lev + 1);
+                c.WriteLine("return FALSE;");
+                c.P(lev);
+                c.WriteLine("}");
+            }
+
+            int currentByte = 0;
+            int currentBit = 0;
+            foreach (SequenceOrSetType.Child ch in pThis.m_children.Values)
+            {
+                c.P(lev); c.WriteLine("/*Decode {0} ({1})*/", ch.m_childVarName, ch.m_type.Name);
+                if (ch.m_optional || ch.m_default)
+                {
+                    byte cb = 0x80;
+                    c.P(lev);
+                    c.WriteLine("{0}exist.{1} = 0;", varName2, C.ID(ch.m_childVarName));
+
+                    c.P(lev);
+                    c.WriteLine("if ((bitMask[{0}] & 0x{1:X2}) != 0 ) {{", currentByte, (cb >> currentBit));
+
+                    c.P(lev + 1);
+                    c.WriteLine("{0}exist.{1} = 1;", varName2, C.ID(ch.m_childVarName));
+
+
+                    ((ISCCType)ch.m_type).PrintCDecode(ch.m_type.PEREffectiveConstraint, c, varName2 + C.ID(ch.m_childVarName), lev + 1);
+                    c.P(lev); c.WriteLine("}");
+                    if (ch.m_defaultValue != null)
+                    {
+                        c.P(lev); c.WriteLine("else");
+                        c.P(lev); c.WriteLine("{");
+
+                        c.P(lev + 1);
+                        c.WriteLine("{0}exist.{1} = 1;", varName2, C.ID(ch.m_childVarName));
+
+                        ((ISCCType)ch.m_type).PrintCInitialize(ch.m_type.PEREffectiveConstraint, ch.m_defaultValue, c, "", varName2 + C.ID(ch.m_childVarName), lev + 1, CLocalVariable.GetArrayIndex(varName) + 1);
+                        c.P(lev); c.WriteLine("}");
+                    }
+
+
+                    currentBit++;
+                    if (currentBit == 8)
+                    {
+                        currentBit = 0;
+                        currentByte++;
+                    }
+                }
+                else
+                {
+                    ((ISCCType)ch.m_type).PrintCDecode(ch.m_type.PEREffectiveConstraint, c, varName2 + C.ID(ch.m_childVarName), lev);
+                }
+            }
+            //lev--; c.P(lev); c.WriteLine("}"); 
+        }
+
     }
 
 
@@ -202,6 +296,15 @@ namespace asn1scc
         {
             CSSSequenceOrSetType.PrintCEncode(this, cns, c, errorCode, varName, lev);
         }
+        public void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+            CSSSequenceOrSetType.VarsNeededForDecode(this, cns, arrayDepth, existingVars);
+        }
+        public void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            CSSSequenceOrSetType.PrintCDecode(this, cns, c, varName, lev);
+        }
+
     }
 
     public class SCCSetType : SetType, ISCCType
@@ -237,6 +340,14 @@ namespace asn1scc
         public void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
             CSSSequenceOrSetType.PrintCEncode(this, cns, c, errorCode, varName, lev);
+        }
+        public void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
+        {
+            CSSSequenceOrSetType.VarsNeededForDecode(this, cns, arrayDepth, existingVars);
+        }
+        public void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
+        {
+            CSSSequenceOrSetType.PrintCDecode(this, cns, c, varName, lev);
         }
     }
 

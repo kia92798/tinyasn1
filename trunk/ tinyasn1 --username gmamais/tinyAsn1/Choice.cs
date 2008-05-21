@@ -585,61 +585,7 @@ namespace tinyAsn1
 
 
 
-        internal override void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
-        {
-            if (!existingVars.ContainsKey("nChoiceIndex"))
-                existingVars.Add("nChoiceIndex", new CLocalVariable("nChoiceIndex", "asn1SccSint", 0, "0"));
-            foreach (ChoiceChild ch in m_children.Values)
-            {
-                ch.m_type.VarsNeededForDecode(ch.m_type.PEREffectiveConstraint, arrayDepth, existingVars);
-            }
-        }
 
-        internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
-        {
-            string varName2 = varName;
-            if (!varName.Contains("->"))
-                varName2 += "->";
-            else
-                varName2 += ".";
-
-            int largestIndex = -1;
-            foreach (string v in m_children.Keys)
-            {
-                if (m_children[v].m_extended)
-                    continue;
-                largestIndex++;
-            }
-
-            
-            c.P(lev);
-            c.WriteLine("if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nChoiceIndex, {0}, {1})) {{", 0, largestIndex);
-            c.P(lev + 1);
-            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
-            c.P(lev + 1);
-            c.WriteLine("return FALSE;");
-            c.P(lev);
-            c.WriteLine("}");
-            c.P(lev);
-            c.WriteLine("switch(nChoiceIndex)");
-            c.P(lev); c.WriteLine("{");
-            int choiceIndex = 0;
-            foreach (ChoiceChild ch in m_children.Values)
-            {
-                c.P(lev); c.WriteLine("case {0}:", choiceIndex);
-                ch.m_type.PrintCDecode(ch.m_type.PEREffectiveConstraint, c, 
-                    varName2 + "u." + C.ID(ch.m_childVarName), lev + 1);
-
-
-                c.P(lev + 1);
-                c.WriteLine("{0}kind = {1};", varName2, ch.CID);
-                c.P(lev + 1);
-                c.WriteLine("break;");
-                choiceIndex++;
-            }
-            c.P(lev); c.WriteLine("}");
-
-        }
 
     }
 
@@ -836,19 +782,6 @@ namespace tinyAsn1
             
 
             return ret;
-        }
-        internal override void PrintC(StreamWriterLevel c, int lev)
-        {
-            c.WriteLine("{");
-            c.P(lev + 1);
-            c.WriteLine(".kind = {0},", ChoiceType.m_children[m_alternativeName].CID);
-            c.P(lev + 1);
-            c.Write(".u = {{ .{0}=", ChoiceType.m_children[m_alternativeName].CID.Replace("_PRESENT", ""));
-            m_value.PrintC(c, lev + 1);
-            
-            c.WriteLine();
-            c.P(lev);
-            c.Write("} }");
         }
     }
 

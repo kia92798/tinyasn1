@@ -69,7 +69,7 @@ namespace asn1scc
                 {
                     for (int i = 0; i < t.m_constraints.Count; i++)
                     {
-                        t.m_constraints[i].PrintCIsConstraintValidAux(c);
+                        ((ISCConstraint)t.m_constraints[i]).PrintCIsConstraintValidAux(c);
                     }
                 }
 
@@ -101,9 +101,9 @@ namespace asn1scc
             c.WriteLine("flag {0}_Decode({0}{1} pVal, BitStream* pBitStrm, int* pErrCode)", uniqueID, star);
             c.WriteLine("{");
             localVars.Clear();
-            m_type.VarsNeededForDecode(m_type.PEREffectiveConstraint, 1, localVars);
+            ((ISCCType)m_type).VarsNeededForDecode(m_type.PEREffectiveConstraint, 1, localVars);
             CLocalVariable.Print(c, localVars);
-            m_type.PrintCDecode(m_type.PEREffectiveConstraint, c, "pVal", 1);
+            ((ISCCType)m_type).PrintCDecode(m_type.PEREffectiveConstraint, c, "pVal", 1);
             c.P(1); c.WriteLine("return TRUE;");
             c.WriteLine("}");
             c.WriteLine();
@@ -134,7 +134,7 @@ namespace asn1scc
 
             c.Write(" {0} = ", C.ID(m_name));
             //            c.Write("{0} {1} = ", C.ID(m_type.Name), C.ID(m_name));
-            m_value.PrintC(c, 0);
+            ((ISCCVariable)m_value).PrintC(c, 0);
             c.WriteLine(";");
         }
         public void PrintExternDeclaration(StreamWriterLevel h)

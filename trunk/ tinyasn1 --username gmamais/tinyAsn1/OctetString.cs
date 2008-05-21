@@ -210,17 +210,6 @@ namespace tinyAsn1
 
 
 
-        protected override void PrintCDecodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
-        {
-            c.P(lev);
-            c.WriteLine("if ( !BitStream_ReadByte(pBitStrm, &{0}) ) {{", varName);
-            c.P(lev + 1);
-            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
-            c.P(lev + 1);
-            c.WriteLine("return FALSE;");
-            c.P(lev);
-            c.WriteLine("}");
-        }
 /*
         internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
@@ -504,32 +493,6 @@ namespace tinyAsn1
             return ret;
         }
 
-        internal override void PrintC(StreamWriterLevel c, int lev)
-        {
-            c.WriteLine("{");
-            lev++;
-
-            
-            int cnt = Value.Count;
-
-            c.P(lev); c.WriteLine("{0},",cnt);
-
-            c.P(lev); c.WriteLine("{");
-            for (int i = 0; i < cnt; i++)
-            {
-                c.P(lev + 1);
-                c.Write("0x{0:X2}",Value[i]);
-                if (i != cnt - 1)
-                    c.WriteLine(",");
-                else
-                    c.WriteLine();
-            }
-            c.P(lev); c.WriteLine("}");
-
-            lev--;
-            c.P(lev);
-            c.Write("}");
-        }
 
     }
 

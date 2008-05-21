@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CBackend.cs" />
+    <Compile Include="Constraint.cs" />
     <Compile Include="CSSType.cs" />
     <Compile Include="Installer1.cs">
       <SubType>Component</SubType>
@@ -73,6 +74,7 @@
     <Compile Include="SCCModule.cs" />
     <Compile Include="SCCSingleTypes.cs" />
     <Compile Include="SequenceOrSetType.cs" />
+    <Compile Include="Variables.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntrlParser\AntrlParser.csproj">

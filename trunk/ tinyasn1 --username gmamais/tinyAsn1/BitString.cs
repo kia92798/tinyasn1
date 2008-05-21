@@ -340,48 +340,6 @@ namespace tinyAsn1
 
 
         
-        internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
-        {
-            long min = minItems(cns);
-            long max = maxItems(cns);
-            string i = "i" + (CLocalVariable.GetArrayIndex(varName) + 1);
-            string prefix = "";
-            bool topLevel = !varName.Contains("->");
-            if (topLevel)
-                prefix = varName + "->";
-            else
-                prefix = varName + ".";
-
-            if (min != max)
-            {
-                c.P(lev);
-                c.WriteLine("if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &nCount, {0}, {1})) {{", min, max);
-                c.P(lev + 1);
-                c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
-                c.P(lev + 1);
-                c.WriteLine("return FALSE;");
-                c.P(lev);
-                c.WriteLine("}");
-                c.P(lev);
-                c.WriteLine("{0}nCount = (long)nCount;", prefix);
-
-            }
-            else
-            {
-                c.P(lev);
-                c.WriteLine("{0}nCount = {1};", prefix, max);
-            }
-
-            c.P(lev);
-            c.WriteLine("if (!BitStream_ReadBits(pBitStrm, {0}arr, {0}nCount)) {{", prefix);
-            c.P(lev + 1);
-            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
-            c.P(lev + 1);
-            c.WriteLine("return FALSE;");
-            c.P(lev);
-            c.WriteLine("}");
-
-        }
 
     
     }
@@ -620,33 +578,6 @@ namespace tinyAsn1
             return ret;
         }
 
-        internal override void PrintC(StreamWriterLevel c, int lev)
-        {
-            c.WriteLine("{");
-            lev++;
-
-            List<byte> val = OctetStringValue.ConvertToOctetArray(this);
-
-            int cnt = val.Count;
-
-            c.P(lev); c.WriteLine("{0},", cnt);
-
-            c.P(lev); c.WriteLine("{");
-            for (int i = 0; i < cnt; i++)
-            {
-                c.P(lev + 1);
-                c.Write("0x{0:X2}", val[i]);
-                if (i != cnt - 1)
-                    c.WriteLine(",");
-                else
-                    c.WriteLine();
-            }
-            c.P(lev); c.WriteLine("}");
-
-            lev--;
-            c.P(lev);
-            c.Write("}");
-        }
 
     }
 

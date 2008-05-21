@@ -122,20 +122,6 @@ namespace tinyAsn1
 
 
 
-        internal override void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
-        {
-            string var = varName;
-            if (varName.Contains("->"))
-                var = "&" + var;
-            c.P(lev);
-            c.WriteLine("if (!BitStream_DecodeReal(pBitStrm, {0})) {{", var);
-            c.P(lev + 1);
-            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
-            c.P(lev + 1);
-            c.WriteLine("return FALSE;");
-            c.P(lev);
-            c.WriteLine("}");
-        }
 
     }
 

@@ -765,20 +765,6 @@ namespace tinyAsn1
 
 
 
-        /// <summary>
-        /// Initialize type. If there is a default value (i.e. as child of a sequence, or set), this value is used for 
-        /// initialization. Otherwise set to 0, or 0.0 or memset(0x0)
-        /// </summary>
-        /// <param name="cns"></param>
-        /// <param name="h"></param>
-        /// <param name="typeName"></param>
-        /// <param name="varName"></param>
-        /// <param name="lev"></param>
-        internal virtual void PrintCInitializeLLL(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
-        {
-#warning "To be deleted !!!"
-            throw new Exception("Abstract method called");
-        }
 
 /*
  
@@ -798,16 +784,6 @@ namespace tinyAsn1
 
 
 
-        internal virtual void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
-        {
-
-        }
-        internal virtual void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
-        {
-            //            throw new Exception("Abstract method called");
-            c.P(lev);
-            c.WriteLine("assert(0);");
-        }
 
 
     }
@@ -935,10 +911,6 @@ namespace tinyAsn1
             return bufer;
         }
 
-        internal virtual void PrintC(StreamWriterLevel c, int lev)
-        {
-            c.Write(ToStringC());
-        }
 
         public virtual string ToStringC()
         {
