@@ -41,16 +41,16 @@ namespace autoICD
             wr.WriteLine(wr.BR(m_comments));
             wr.WriteLine("</font>");
 
-            List<TypeAssigment> topLevel = GetTopLevelTypes();
+            List<TypeAssigment> topLevelPDUs = GetTopLevelTypes();
 
-            if (Asn1CompilerInvokation.m_FirstTopLevel)
+            if (!Asn1CompilerInvokation.displayTypesAsAppearInAsn1Grammar)
             {
-                foreach (ICDTypeAssigment tas in topLevel)
+                foreach (ICDTypeAssigment tas in topLevelPDUs)
                     tas.PrintHtml(wr, p + 1);
             }
 
             foreach (ICDTypeAssigment tas in m_typeAssigments.Values)
-                if (!topLevel.Contains(tas))
+                if (!topLevelPDUs.Contains(tas))
                     tas.PrintHtml(wr, p + 1);
 
             wr.WriteLine("</div>");

@@ -18,6 +18,8 @@ namespace tinyAsn1
         public string m_valueAsReference = "";
         public Int64? m_valueAsInt;
         public bool m_extended = false;
+        public ITree antlrNode;
+
 /*
         public Object Value
         {
@@ -35,6 +37,7 @@ namespace tinyAsn1
         static public NumberedItem CreateFromAntlrAst(ITree tree)
         {
             NumberedItem ret = new NumberedItem();
+            ret.antlrNode = tree;
             ret.m_id = tree.GetChild(0).Text;
             for (int i = 1; i < tree.ChildCount; i++)
             {

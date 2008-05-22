@@ -58,7 +58,7 @@ namespace autoICD
                     else if (args[i] == "-useSpecialComments")
                         Asn1CompilerInvokation.UseSpecialComments = true;
                     else if (args[i] == "-displayTypesAsAppearInAsn1Grammar")
-                        Asn1CompilerInvokation.m_FirstTopLevel = false;
+                        Asn1CompilerInvokation.displayTypesAsAppearInAsn1Grammar = true;
                     else if (args[i] == "-wordSize")
                     {
                         try
