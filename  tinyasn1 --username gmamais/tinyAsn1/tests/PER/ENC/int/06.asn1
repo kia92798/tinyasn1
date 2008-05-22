@@ -1,0 +1,18 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+	MyEnum ::= ENUMERATED {
+			one,two, three, four, five,six,..., seven, eight, nine,ten
+		}
+
+	myVar1 MyEnum ::= one
+	myVar2 MyEnum ::= two
+	myVar3 MyEnum ::= three
+	myVar4 MyEnum ::= four
+	myVar5 MyEnum ::= five
+	myVar6 MyEnum ::= six
+	myVar7 MyEnum ::= seven
+	myVar8 MyEnum ::= eight
+	myVar9 MyEnum ::= nine
+	myVar10 MyEnum ::= ten
+
+END

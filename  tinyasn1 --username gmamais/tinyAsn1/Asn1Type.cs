@@ -17,8 +17,6 @@ namespace tinyAsn1
         public List<ITree> m_AntlrConstraints = new List<ITree>();
         public List<IConstraint> m_constraints = new List<IConstraint>();
 
-
-
         public virtual IEnumerable<T> GetMySelfAndAnyChildren<T>() where T : Asn1Type 
         {
          
@@ -193,16 +191,6 @@ namespace tinyAsn1
 
                 return m_tags[0].Equals(o.m_tags[0]);
 
-/*
-                // old implementation: Two tag sequences are identical if every tag matches
-                if (m_tags.Count != o.m_tags.Count)
-                    return false;
-                for (int i = 0; i < m_tags.Count; i++)
-                    if (!m_tags[i].Equals(o.m_tags[i]))
-                        return false;
-
-                return true;
- */ 
             }
             public override int GetHashCode()
             {
@@ -765,27 +753,6 @@ namespace tinyAsn1
 
 
 
-
-/*
- 
-        internal virtual void PrintCIsConstraintValidAux(StreamWriterLevel c)
-        {
-            if (m_constraints.Count > 0)
-            {
-                for (int i = 0; i < m_constraints.Count; i++)
-                {
-                    m_constraints[i].PrintCIsConstraintValidAux(c);
-                }
-            }
-        }
-*/
-
-
-
-
-
-
-
     }
 
 
@@ -800,10 +767,6 @@ namespace tinyAsn1
         string Value { get;}
     }
 
-    public interface IInternalContentsInHtml
-    {
-        string InternalContentsInHtml(List<IConstraint> additionalConstraints);
-    }
 
 
 

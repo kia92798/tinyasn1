@@ -1,0 +1,17 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+
+	myIntA INTEGER(0..3) ::= 0
+	myIntAx INTEGER(0..3,...) ::= 0
+	myIntAx2 INTEGER(0..3,...,8..12) ::= 8
+
+	myIntB INTEGER(250..257) ::= 250
+	myIntBx INTEGER(250..257,...) ::= 250
+	myIntBx2 INTEGER(250..257,...,280|281) ::= 280
+
+	myIntC INTEGER(250..257) ::= 257
+	myIntCx INTEGER(250..257,...) ::= 257
+	myIntCx2 INTEGER(250..257,...,1000) ::= 1000
+
+
+END

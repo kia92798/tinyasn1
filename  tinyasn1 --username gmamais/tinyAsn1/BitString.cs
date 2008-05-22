@@ -6,7 +6,7 @@ using Antlr.Runtime;
 
 namespace tinyAsn1
 {
-    public partial class BitStringType : SizeableType, IInternalContentsInHtml
+    public partial class BitStringType : SizeableType
     {
         internal List<NumberedItem> m_namedBitsPriv = new List<NumberedItem>();
         public OrderedDictionary<string, Int64> m_namedBits = new OrderedDictionary<string, Int64>();
@@ -30,8 +30,6 @@ namespace tinyAsn1
             {
                 ITree child = tree.GetChild(i);
                 NumberedItem item = NumberedItem.CreateFromAntlrAst(child);
-                //                if (ret.m_namedBitsPriv.ContainsKey(item.m_id))
-                //                    throw new SemanticErrorException(item.m_id + " has alrady been defined. Line: " + child.Line);
 
                 ret.m_namedBitsPriv.Add(item);
             }
@@ -245,56 +243,6 @@ namespace tinyAsn1
             }
         }
 
-        /*public override long minBitsInPER(PEREffectiveConstraint cns)
-        {
-            PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
-            int extBit = 0;
-            if (cn.Extensible)
-                extBit++;
-
-            if (cn == null)
-                return extBit + 8;
-
-            if (!cn.m_size.m_rootRange.m_maxIsInfinite)
-            {
-                if (cn.m_size.m_rootRange.m_max < 0x10000 &&
-                    cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
-                    return extBit + cn.m_size.m_rootRange.m_min;
-
-                if (cn.m_size.m_rootRange.m_max < 0x10000)
-                    return extBit + cn.m_size.m_rootRange.m_min + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
-            }
-
-
-            if (cn.m_size.m_rootRange.m_min <= 0x7F)
-                return extBit + cn.m_size.m_rootRange.m_min + 8;
-            if (cn.m_size.m_rootRange.m_min <= 0x3FFF)
-                return extBit + cn.m_size.m_rootRange.m_min + 16;
-
-
-            return extBit + cn.m_size.m_rootRange.m_min + (cn.m_size.m_rootRange.m_min / 0x10000 + 3) * 8;
-        }
-
-        public override long maxBitsInPER(PEREffectiveConstraint cns)
-        {
-            PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
-
-            if (cn == null)
-                return -1;
-            if (cn.Extensible)
-                return -1;
-            if (cn.m_size.m_rootRange.m_maxIsInfinite)
-                return -1;
-
-            if (cn.m_size.m_rootRange.m_max < 0x10000 &&
-                cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
-                return cn.m_size.m_rootRange.m_max;
-
-            if (cn.m_size.m_rootRange.m_max < 0x10000)
-                return cn.m_size.m_rootRange.m_max + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
-
-            return cn.m_size.m_rootRange.m_max + (cn.m_size.m_rootRange.m_max / 0x10000 + 3) * 8;
-        }*/
 
         public override long minItemBitsInPER(PEREffectiveConstraint cns)
         {
@@ -310,36 +258,8 @@ namespace tinyAsn1
         }
 
 
-        public string InternalContentsInHtml(List<IConstraint> additionalConstraints)
-        {
-            string ret = string.Empty;
-            int cnt = m_namedBits.Count;
-            if (cnt > 0)
-            {
-                ret = "Bit strings's special values:<br/>";
-                ret += "<ul type=\"square\">";
-                for (int i = 0; i < cnt; i++)
-                {
-                    string namedBit = m_namedBits.Keys[i];
-                    long val = m_namedBits.Values[i];
-                    ret += string.Format("<li><font  color=\"#5F9EA0\" >{0}</font>({1})</li>", namedBit, val);
-                    //if (i < cnt - 1)
-                    //    ret += ", ";
-                    //if (i % 3 == 2)
-                    //    ret += "<br/>";
-                }
-                ret += "</ul>";
-            }
-            return ret;
-        }
 
 
-        /* Print C backend */
-
-
-
-
-        
 
     
     }

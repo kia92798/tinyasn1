@@ -7,7 +7,7 @@ using Antlr.Runtime;
 namespace tinyAsn1
 {
 
-    public partial class EnumeratedType : Asn1Type, IInternalContentsInHtml
+    public partial class EnumeratedType : Asn1Type
     {
         internal List<NumberedItem> m_enumValuesPriv = new List<NumberedItem>();
         public OrderedDictionary<string, Item> m_enumValues = new OrderedDictionary<string, Item>();
@@ -382,32 +382,6 @@ namespace tinyAsn1
 
 
 
-        public string InternalContentsInHtml(List<IConstraint> additionalConstraints)
-        {
-            string ret = "Enumeration's values:<br/>";
-            List<Item> tmpList = new List<Item>();
-            foreach (Item it in m_enumValues.Values)
-            {
-                EnumeratedValue val = Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedValue(it.m_value, it.m_id, null, m_module, this);
-                if (isValueAllowed(val, additionalConstraints))
-                    tmpList.Add(it);
-            }
-
-            int cnt = tmpList.Count;
-            ret += "<ul type=\"square\">";
-            for (int i = 0; i < cnt; i++ )
-            {
-                Item it = tmpList[i];
-                ret += string.Format("<li><font  color=\"#5F9EA0\" >{0}</font>({1})</li>", it.m_id, it.m_value);
-                //if (i < cnt - 1)
-                //    ret += ", ";
-                //if (i % 3 == 2)
-                //    ret += "<br/>";
-            }
-            ret += "</ul>";
-            //            ret += "</pre>";
-            return ret;
-        }
 
 
 
