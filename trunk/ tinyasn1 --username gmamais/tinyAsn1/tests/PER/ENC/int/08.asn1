@@ -1,0 +1,11 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+	MyRe ::= REAL
+
+	a1 MyRe ::= {mantissa 5, base 2, exponent 1}
+
+	a2 MyRe ::= 1.1
+
+
+
+END

@@ -1,0 +1,17 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+	MySQ ::= 	SEQUENCE {
+			name IA5String (SIZE(1..10)) (FROM ("A".."Z")) OPTIONAL,
+			lastName IA5String (SIZE(1..10)) (FROM ("A".."Z")),
+			aFM	NumericString (SIZE(9)) (FROM("0".."9")),
+			deg	SEQUENCE (SIZE(1..5)) OF INTEGER (1..8)
+
+			}
+
+	a MySQ ::= { name "GEORGE",
+			lastName "MAMAIS",
+			aFM	"059461880",
+			deg { 1, 4, 4}
+			}
+
+END

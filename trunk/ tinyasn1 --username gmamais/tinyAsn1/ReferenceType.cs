@@ -7,7 +7,7 @@ using MB = System.Reflection.MethodBase;
 
 namespace tinyAsn1
 {
-    public partial class ReferenceType : Asn1Type, IInternalContentsInHtml
+    public partial class ReferenceType : Asn1Type 
     {
         public string m_referencedTypeName = "";
         public string m_referencedModName = "";
@@ -285,23 +285,6 @@ namespace tinyAsn1
             return Type.maxBitsInPER(cns);
         }
 
-        public string InternalContentsInHtml(List<IConstraint> additionalConstraints)
-        {
-            string ret = string.Empty;
-            IInternalContentsInHtml g = Type as IInternalContentsInHtml;
-            if (g != null)
-            {
-                List<IConstraint> replica = new List<IConstraint>(additionalConstraints);
-                Asn1Type cur = this;
-                while (cur != g)
-                {
-                    replica.AddRange(cur.m_constraints);
-                    cur = cur.ParentType;
-                }
-                return g.InternalContentsInHtml(replica);
-            }
-            return ret;
-        }
 
 
         public static ReferenceType CreateByName(TypeAssigment newTas)

@@ -158,38 +158,6 @@ namespace tinyAsn1
                 return ret;
             }
 
-            public void PrintHtml(StreamWriterLevel o, int p, int index)
-            {
-                IInternalContentsInHtml intCont = m_type as IInternalContentsInHtml;
-
-                string cssClass = "OddRow";
-                if (index%2==0)
-                    cssClass="EvenRow";
-                o.WriteLine("<tr class=\""+cssClass+"\">");
-                o.WriteLine("<td class=\"no\">{0}</td>",index);
-                o.WriteLine("<td class=\"field\">{0}</td>",m_childVarName);
-                if (intCont == null)
-                    o.WriteLine("<td class=\"comment\">{0}</td>", o.BR(m_comments));
-                else
-                    o.WriteLine("<td class=\"comment\">{0}</td>", o.BR(m_comments)+intCont.InternalContentsInHtml(m_type.m_constraints));
-                if (m_optional)
-                    o.WriteLine("<td class=\"optional\">Yes</td>");
-                else if (m_default)
-                    o.WriteLine("<td class=\"optional\">Def</td>");
-                else
-                    o.WriteLine("<td class=\"optional\">No</td>");
-
-                if (m_type is ReferenceType)
-                    o.WriteLine("<td class=\"type\"> <a href=\"#ICD_{0}\">{1}</a></td>",m_type.Name.Replace("-","_"),m_type.Name);
-                else
-                    o.WriteLine("<td class=\"type\">{0}</td>",m_type.Name);
-
-                o.WriteLine("<td class=\"constraint\">{0}</td>", o.Constraint(m_type.Constraints));
-                
-                o.WriteLine("<td class=\"min\">{0}</td>",(m_type.MinBitsInPER==-1?"&#8734":m_type.MinBitsInPER.ToString()));
-                o.WriteLine("<td class=\"max\">{0}{1}</td>", (m_type.MaxBitsInPER == -1 ? "&#8734" : m_type.MaxBitsInPER.ToString()), m_type.MaxBitsInPER_Explained);
-                o.WriteLine("</tr>");
-            }
         }
         
         private class ComponentChild : Child
@@ -798,14 +766,7 @@ namespace tinyAsn1
 
 
 
-/*        
-        internal override void PrintCIsConstraintValidAux(StreamWriterLevel c)
-        {
-            base.PrintCIsConstraintValidAux(c);
-            foreach (Child ch in m_children.Values)
-                ch.m_type.PrintCIsConstraintValidAux(c);
-        }
-*/
+
 
 
 

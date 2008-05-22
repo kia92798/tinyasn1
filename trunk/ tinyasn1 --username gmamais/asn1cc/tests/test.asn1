@@ -1,0 +1,59 @@
+CAR-PARTS DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+	--CAR DEFINITION
+	Vehicle ::= SEQUENCE {
+		--Provides information about the engine's power, fuel consumption etc 
+		engine	Engine,
+		
+		--Cars have 4 wheels while motorbikes have 2 or 3
+		wheels	SEQUENCE (SIZE (2..4)) OF Wheel,
+		
+		--Car's color. Default value is red
+		color	ENUMERATED {
+					red, green, blue, black
+					}	DEFAULT	red,
+		--Car's unique serial number					
+		serialNumber	IA5String(SIZE(10))	DEFAULT "0000000000",
+		--This is an internal composite type.
+		--Extra equipment
+		extraEquipment CHOICE {
+			sport	SportEquipment,
+			classic ClassicEquipment
+		}
+	}
+	
+	--Defines car's engine
+	Engine ::= SEQUENCE {
+		--Upper limit goes for Bugatti Veyron
+		horsePower	INTEGER(0..1001),
+		--Fuel consumption is given in litres per 100Km
+		fuelConsumption	REAL,
+		--Unit's are gr/Km
+		co2Emissions	INTEGER(0..300)
+	}
+	
+	--Wheel definition
+	Wheel ::= SEQUENCE {
+		--Units are centimeters
+		radius	INTEGER(5..40),
+		--Units are centimeters
+		tread	INTEGER(2..25)
+		
+	}
+	
+	--Sport Equipment
+	SportEquipment ::= SEQUENCE {
+		aircondition	BOOLEAN,
+		leatherSofas	BOOLEAN,
+		xenonLights		BOOLEAN
+	}
+
+	--Classic Equipment
+	ClassicEquipment ::= SEQUENCE {
+		aircondition	BOOLEAN,
+		leatherSofas	BOOLEAN
+	}
+	
+	DayProduction ::= SEQUENCE (SIZE(500)) OF Vehicle
+	
+END

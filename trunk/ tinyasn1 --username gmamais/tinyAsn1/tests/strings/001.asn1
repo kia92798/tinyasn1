@@ -1,0 +1,23 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+	
+	
+	MyStr ::= IA5String 
+
+	nl MyStr ::= {0,10}
+	cr MyStr ::= {0,13}
+
+	sentence MyStr ::= {"This is the first line",cr,nl,"This is the second line"}
+	sentence2 MyStr ::= {"This is the first line",{0,13},{0,10},"This is the second line"}
+
+ 	sentence3 MyStr ::= {sentence,cr,nl,cr,nl, {"This is the first line",{0,13},{0,10},"This is the second line"}}
+
+	myStr2 MyStr ::= sentence 
+
+	MITSOS ::= SEQUENCE {
+		a  MyStr	DEFAULT "Thanassis",
+		b  IA5String DEFAULT myStr2,
+		c  IA5String DEFAULT "This is string contains a ""string"""
+	}
+	
+	
+END

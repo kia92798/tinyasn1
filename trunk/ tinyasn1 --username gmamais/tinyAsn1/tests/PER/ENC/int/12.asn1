@@ -1,0 +1,7 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+	MySQ ::= 	NumericString (SIZE(1))
+
+	a MySQ ::= "9"
+
+END
