@@ -22,6 +22,8 @@ namespace tinyAsn1
             public Int64 m_value;
             public bool m_isExtended = false;
             internal bool m_valCalculated = false;
+            public List<string> m_comments = new List<string>();
+            public ITree antlrNode;
 
             string _cid = null;
             public string CID
@@ -57,6 +59,7 @@ namespace tinyAsn1
         static public new EnumeratedType CreateFromAntlrAst(ITree tree)
         {
             EnumeratedType ret = Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedType();
+            
             for (int i = 0; i < tree.ChildCount; i++)
             {
                 ITree child = tree.GetChild(i);
@@ -184,6 +187,7 @@ namespace tinyAsn1
         }
         public override void DoSemanticAnalysis()
         {
+            EnumeratedType.Item curItem = null;
             base.DoSemanticAnalysis();
 
             List<NumberedItem> toBeRemoved = new List<NumberedItem>();
@@ -194,12 +198,16 @@ namespace tinyAsn1
                         " containts more than once the identifier " + ni.m_id);
                 if (ni.m_valueAsInt != null)
                 {
-                    m_enumValues.Add(ni.m_id, Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedTypeItem(ni.m_id, ni.m_valueAsInt.Value, ni.m_extended));
+                    curItem = Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedTypeItem(ni.m_id, ni.m_valueAsInt.Value, ni.m_extended);
+                    curItem.antlrNode = ni.antlrNode;
+                    m_enumValues.Add(ni.m_id, curItem);
                     toBeRemoved.Add(ni);
                 }
                 else if (ni.m_valueAsReference == "")
                 {
-                    m_enumValues.Add(ni.m_id, Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedTypeItem(ni.m_id, ni.m_extended));
+                    curItem = Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedTypeItem(ni.m_id, ni.m_extended);
+                    curItem.antlrNode = ni.antlrNode;
+                    m_enumValues.Add(ni.m_id, curItem);
                     toBeRemoved.Add(ni);
                 }
                 else
@@ -213,7 +221,9 @@ namespace tinyAsn1
                             continue;
                         if (tmpVal.m_TypeID == Asn1Value.TypeID.INT)
                         {
-                            m_enumValues.Add(ni.m_id, Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedTypeItem(ni.m_id, ((IntegerValue)tmpVal).Value, ni.m_extended));
+                            curItem = Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedTypeItem(ni.m_id, ((IntegerValue)tmpVal).Value, ni.m_extended);
+                            curItem.antlrNode = ni.antlrNode;
+                            m_enumValues.Add(ni.m_id, curItem);
                             toBeRemoved.Add(ni);
                         }
                         else

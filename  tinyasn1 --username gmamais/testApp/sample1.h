@@ -56,6 +56,7 @@ flag MyTestPDU_Encode(MyTestPDU* val, BitStream* pBitStrm, int* pErrCode, flag b
 flag MyTestPDU_Decode(MyTestPDU* val, BitStream* pBitStrm, int* pErrCode);
 
 
+/* testPDU MyTestPDU ::= {int1 10, int2 200, enm one, buf '00112233445566778899'H, gg {int1 10, int2 200, enm one, buf '00112233445566778899'H }} */
 typedef asn1SccSint  MyInt;
 
 #define MyInt_REQUIRED_BYTES_FOR_ENCODING		9
@@ -67,7 +68,6 @@ flag MyInt_Encode(MyInt* val, BitStream* pBitStrm, int* pErrCode, flag bCheckCon
 flag MyInt_Decode(MyInt* val, BitStream* pBitStrm, int* pErrCode);
 
 
-extern MyTestPDU testPDU;
 #ifdef  __cplusplus
 }
 #endif

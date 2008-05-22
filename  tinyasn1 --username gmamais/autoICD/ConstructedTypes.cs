@@ -455,10 +455,14 @@ namespace autoICD
 
             PrintSizeLengthHtml(pThis, cns, o, lev + 1, BaseConstraint.AsString(additonalConstraints));
             PrintItemHtml(pThis, cns, o, 1);
-            o.WriteLine("<tr class=\"CommentRow\">");
-            o.WriteLine("<td class=\"threeDots\" colspan=\"7\"> <p>. . .</p> </td>");
-            o.WriteLine("</tr>");
-            PrintItemHtml(pThis, cns, o, pThis.maxItems(cns));
+            if (pThis.maxItems(cns) > 2)
+            {
+                o.WriteLine("<tr class=\"CommentRow\">");
+                o.WriteLine("<td class=\"threeDots\" colspan=\"7\"> <p>. . .</p> </td>");
+                o.WriteLine("</tr>");
+            }
+            if (pThis.maxItems(cns) >= 2)
+                PrintItemHtml(pThis, cns, o, pThis.maxItems(cns));
 
             o.WriteLine("</tbody>");
             o.WriteLine("</table>");

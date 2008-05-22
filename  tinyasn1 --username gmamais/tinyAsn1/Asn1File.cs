@@ -19,7 +19,7 @@ namespace tinyAsn1
         public static bool m_HtmlIntegerSizeMustBeExplained = false;
         public static bool m_HtmlRealSizeMustBeExplained = false;
         public static bool m_HtmlLengthSizeMustBeExplained = false;
-        public static bool m_FirstTopLevel = true;
+        public static bool displayTypesAsAppearInAsn1Grammar = false;
 
         public static string _m_outDirectory = Environment.CurrentDirectory;
         public static string m_outDirectory
@@ -345,6 +345,9 @@ namespace tinyAsn1
         {
             List<IToken> alreadyTakenComments = new List<IToken>();
 
+
+
+
             foreach (Asn1File f in m_files)
                 foreach (Module m in f.m_modules)
                     FixComment(f.m_tokes, alreadyTakenComments, -1,
@@ -365,12 +368,26 @@ namespace tinyAsn1
                             FixComment(f.m_tokes, alreadyTakenComments, f.m_tokes[ch.antlrNode.TokenStopIndex].Line,
                                 ch.antlrNode.TokenStartIndex - 1, ch.antlrNode.TokenStopIndex + 2, ch.m_comments);
 
+
+
+
+
             foreach (Asn1File f in m_files)
                 foreach (Module m in f.m_modules)
                     foreach (ChoiceType sq in m.GetTypes<ChoiceType>())
                         foreach (ChoiceChild ch in sq.m_children.Values)
                             FixComment(f.m_tokes, alreadyTakenComments, f.m_tokes[ch.antlrNode.TokenStopIndex].Line,
                                 ch.antlrNode.TokenStartIndex - 1, ch.antlrNode.TokenStopIndex + 2, ch.m_comments);
+
+            
+            foreach (Asn1File f in m_files)
+                foreach (Module m in f.m_modules)
+                    foreach(EnumeratedType en in m.GetTypes<EnumeratedType>())
+                        foreach(EnumeratedType.Item item in en.m_enumValues.Values)
+                            FixComment(f.m_tokes, alreadyTakenComments, f.m_tokes[item.antlrNode.TokenStopIndex].Line,
+                                item.antlrNode.TokenStartIndex - 1, item.antlrNode.TokenStopIndex + 2, item.m_comments);
+
+
 
         }
 
