@@ -11,7 +11,7 @@ namespace asn1scc
 
 
 
-    public class SCCBackend : Asn1CompilerInvokation
+    public class SCCBackend : DefaultBackend
     {
         SCCBackendFactory _factory = new SCCBackendFactory();
         public override IAsn1AbstractFactory Factory
@@ -547,6 +547,53 @@ namespace asn1scc
 
     }
 
+
+
+    /// <summary>
+    /// To be moved to CBackend
+    /// </summary>
+    public class CLocalVariable
+    {
+        public string varName = "";
+        public string type = "";
+        public int arrayLen = 0;
+        public string initVal = "";
+        public CLocalVariable(string VarName, string Type, int ArrayLen, string InitVal)
+        {
+            varName = VarName;
+            type = Type;
+            arrayLen = ArrayLen;
+            initVal = InitVal;
+        }
+        public static void Print(StreamWriterLevel c, OrderedDictionary<string, CLocalVariable> vars)
+        {
+            foreach (CLocalVariable v in vars.Values)
+            {
+                c.P(1);
+                if (v.arrayLen == 0)
+                {
+                    c.WriteLine("{0} {1} = {2};", v.type, v.varName, v.initVal);
+                }
+                else
+                {
+                    c.WriteLine("{0} {1}[{2}];", v.type, v.varName, v.arrayLen);
+                }
+            }
+            if (vars.Count > 0)
+                c.WriteLine();
+        }
+
+        public static int GetArrayIndex(string varName)
+        {
+            int ret = 0;
+            foreach (char ch in varName.ToCharArray())
+                if (ch == '[')
+                    ret++;
+            return ret;
+
+        }
+
+    }
 
 
 }

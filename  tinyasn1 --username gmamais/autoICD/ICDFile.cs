@@ -1,3 +1,16 @@
+/**=============================================================================
+Definition of ICDBackendFactory, ICDBackend and ICDFile classes used
+in autoICD project  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD application.
+See these sources for detailed information regarding the
+autoICD application.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +21,11 @@ using System.IO;
 
 namespace autoICD
 {
-
+    /// <summary>
+    /// ICD factory. The class extends base class DefaultAsn1Factory and
+    /// overrides only those methods needed to instantiate the new types
+    /// define in the ICD backend
+    /// </summary>
     public class ICDBackendFactory : DefaultAsn1Factory
     {
         public override Asn1File CreateAsn1File()
@@ -135,8 +152,10 @@ namespace autoICD
 
 
 
-
-    public class ICDBackend : Asn1CompilerInvokation
+    /// <summary>
+    /// The ICD backend. It mainly adds a new method PrintHtml
+    /// </summary>
+    public class ICDBackend : DefaultBackend
     {
         ICDBackendFactory _factory = new ICDBackendFactory();
         public override IAsn1AbstractFactory Factory
@@ -273,14 +292,7 @@ namespace autoICD
             wr.WriteLine("</div>");
             wr.WriteLine("    </div>");
         }
-        /*
-         
-         */
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         string getAsn1InHtml()
         {
             List<string> tas = new List<string>();

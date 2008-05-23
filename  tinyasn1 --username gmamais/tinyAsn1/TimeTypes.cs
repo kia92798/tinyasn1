@@ -1,3 +1,16 @@
+/**=============================================================================
+Definition of GeneralizedTimeType, UTCTimeType, GeneralizedTimeValue and UTCTimeValue  class
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,6 +19,9 @@ using Antlr.Runtime;
 
 namespace tinyAsn1
 {
+    /// <summary>
+    /// Class representing the GeneralizedTime type
+    /// </summary>
     public partial class GeneralizedTimeType : IA5StringType
     {
         public override string Name
@@ -17,7 +33,7 @@ namespace tinyAsn1
         {
             get
             {
-                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 24, TaggingMode.EXPLICIT, this);
+                return DefaultBackend.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 24, TaggingMode.EXPLICIT, this);
             }
         }
 
@@ -27,7 +43,7 @@ namespace tinyAsn1
             switch (val.antlrNode.Type)
             {
                 case asn1Parser.StringLiteral:
-                    return Asn1CompilerInvokation.Instance.Factory.CreateGeneralizedTimeValue(val.antlrNode, m_module, this);
+                    return DefaultBackend.Instance.Factory.CreateGeneralizedTimeValue(val.antlrNode, m_module, this);
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
                     if (m_module.isValueDeclared(referenceId))
@@ -36,7 +52,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.GeneralizedTime:
-                                return Asn1CompilerInvokation.Instance.Factory.CreateGeneralizedTimeValue(tmp as GeneralizedTimeValue, val.antlrNode.GetChild(0));
+                                return DefaultBackend.Instance.Factory.CreateGeneralizedTimeValue(tmp as GeneralizedTimeValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
@@ -57,6 +73,9 @@ namespace tinyAsn1
         }
     }
 
+    /// <summary>
+    /// Class representing the UTCTime type
+    /// </summary>
     public partial class UTCTimeType : IA5StringType
     {
         public override string Name
@@ -68,7 +87,7 @@ namespace tinyAsn1
         {
             get
             {
-                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 23, TaggingMode.EXPLICIT, this);
+                return DefaultBackend.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 23, TaggingMode.EXPLICIT, this);
             }
         }
 
@@ -78,7 +97,7 @@ namespace tinyAsn1
             switch (val.antlrNode.Type)
             {
                 case asn1Parser.StringLiteral:
-                    return Asn1CompilerInvokation.Instance.Factory.CreateUTCTimeValueValue(val.antlrNode, m_module, this);
+                    return DefaultBackend.Instance.Factory.CreateUTCTimeValueValue(val.antlrNode, m_module, this);
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
                     if (m_module.isValueDeclared(referenceId))
@@ -87,7 +106,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.UTCTime:
-                                return Asn1CompilerInvokation.Instance.Factory.CreateUTCTimeValueValue(tmp as UTCTimeValue, val.antlrNode.GetChild(0));
+                                return DefaultBackend.Instance.Factory.CreateUTCTimeValueValue(tmp as UTCTimeValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
@@ -108,6 +127,9 @@ namespace tinyAsn1
         }
     }
 
+    /// <summary>
+    /// Class representing the GeneralizedTime value
+    /// </summary>
     public partial class GeneralizedTimeValue : IA5StringValue
     {
         static Char[] AllowedCharSet = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', 'Z', '.', ',' };
@@ -130,6 +152,9 @@ namespace tinyAsn1
         }
     }
 
+    /// <summary>
+    /// Class representing the UTCTime value
+    /// </summary>
     public partial class UTCTimeValue : IA5StringValue
     {
         static Char[] AllowedCharSet = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', 'Z' };

@@ -1,3 +1,17 @@
+/**=============================================================================
+Definition of Module, ImportedModule, ValueAssigment and TypeAssigment classes
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,19 +28,30 @@ namespace tinyAsn1
         AUTOMATIC
     }
 
+    /// <summary>
+    /// Represents the ASN.1 module
+    /// </summary>
     public partial class Module
     {
+        // module name
         public string m_moduleID = "";
+        //tagging mode
         public TaggingMode m_taggingMode = TaggingMode.EXPLICIT;     // clause 12.2
+        // extensibility implied
         public bool m_extensibilityImplied = false;
+        // the file where this module bolongs to
         public Asn1File m_file = null;
+        // comments associated with this module
         public List<string> m_comments = new List<string>();
-
+        // list of all exported types
         public List<string> m_exportedTypes = new List<string>();
+        // list of all exported variables
         public List<string> m_exportedVariables = new List<string>();
+        // list of imported modules
         public List<ImportedModule> m_imports = new List<ImportedModule>();
-
+        // list of all type assigments defined in this module
         public OrderedDictionary<string, TypeAssigment> m_typeAssigments = new OrderedDictionary<string, TypeAssigment>();
+        // list of all variables assigments defined in this module
         public OrderedDictionary<string, ValueAssigment> m_valuesAssigments = new OrderedDictionary<string, ValueAssigment>();
 
         public Asn1Value GetValue(string valueName)
@@ -39,7 +64,7 @@ namespace tinyAsn1
             {
                 if (im.m_importedVariables.Contains(valueName))
                 {
-                    Module otherModule = Asn1CompilerInvokation.Instance.GetModuleByName(im.m_moduleID);
+                    Module otherModule = DefaultBackend.Instance.GetModuleByName(im.m_moduleID);
                     return otherModule.GetValue(valueName);
                 }
             }
@@ -99,13 +124,12 @@ namespace tinyAsn1
             foreach (ImportedModule im in m_imports)
                 if (im.m_importedTypes.Contains(typeName))
                 {
-                    Module otherMode = Asn1CompilerInvokation.Instance.GetModuleByName(im.m_moduleID);
+                    Module otherMode = DefaultBackend.Instance.GetModuleByName(im.m_moduleID);
                     return otherMode.GetTypeByName(typeName);
                 }
             throw new SemanticErrorException("Error: '" + typeName + "' is undefined");
         }
 
-        //        public OrderedDictionary<string, ValueSetAssigment> m_valueSetsAssigments = new OrderedDictionary<string, ValueSetAssigment>();
 
         internal Dictionary<string, Int64> m_resolvedIntegerVars = new Dictionary<string, Int64>();
 
@@ -123,7 +147,7 @@ namespace tinyAsn1
             if (tree.Type != asn1Parser.MODULE_DEF)
                 throw new Exception("MODULE_DEF");
 
-            curModule = Asn1CompilerInvokation.Instance.Factory.CreateModule();
+            curModule = DefaultBackend.Instance.Factory.CreateModule();
             curModule.tree = tree;
             curModule.m_file = file;
 
@@ -171,12 +195,6 @@ namespace tinyAsn1
                             throw new SemanticErrorException(valAssig.m_name + " has alrady been defined or imported. Line: " + child.Line);
                         curModule.m_valuesAssigments.Add(valAssig.m_name, valAssig);
                         break;
-                    /*                    case asn1Parser.VAL_SET_ASSIG:
-                                            ValueSetAssigment valSetAssig = ValueSetAssigment.CreateFromAntlrAst(child);
-                                            if (curModule.m_valueSetsAssigments.ContainsKey(valSetAssig.m_typeReference))
-                                                throw new SemanticErrorException(valSetAssig.m_typeReference + " has alrady been defined. Line: " + child.Line);
-                                            curModule.m_valueSetsAssigments.Add(valSetAssig.m_typeReference, valSetAssig);
-                                            break;*/
                     default:
                         throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
                 }
@@ -299,7 +317,7 @@ namespace tinyAsn1
 
         public void DoPhase1SemanticAnalysis()
         {
-            Asn1CompilerInvokation m_compInv = Asn1CompilerInvokation.Instance;
+            DefaultBackend m_compInv = DefaultBackend.Instance;
             // Make sure that all imported types are defined in the reference module
             foreach (ImportedModule im in m_imports)
             {
@@ -376,19 +394,25 @@ namespace tinyAsn1
 
     }
 
-
+    /// <summary>
+    /// Represents the ASN.1 Imported module
+    /// </summary>
     public partial class ImportedModule
     {
-        public Module m_parentModule;          // parent module is the module that contains myself
-        public string m_moduleID = "";  // moduleID is the module where the definition of imported types occurs
+        // parent module is the module that contains myself
+        public Module m_parentModule;
+        // moduleID is the module where the definition of imported types occurs  
+        public string m_moduleID = "";
+        //list of all types imported by module with name m_moduleID
         public List<string> m_importedTypes = new List<string>();
+        //list of all variables imported by module with name m_moduleID
         public List<string> m_importedVariables = new List<string>();
 
         ITree tree;
         //^(IMPORTS_FROM_MODULE modulereference typereference* valuereference*  )
         static public ImportedModule CreateFromAntlrAst(ITree tree, Module parent)
         {
-            ImportedModule ret = Asn1CompilerInvokation.Instance.Factory.CreateImportedModule();
+            ImportedModule ret = DefaultBackend.Instance.Factory.CreateImportedModule();
             ret.m_parentModule = parent;
             ret.tree = tree;
 
@@ -427,17 +451,23 @@ namespace tinyAsn1
     }
 
 
-
+    /// <summary>
+    /// Represents a value assigment
+    /// e.g. avar INTEGER ::= 12
+    /// </summary>
     public partial class ValueAssigment
     {
+        // name of variable
         public string m_name;
+        // variable type
         public Asn1Type m_type;
+        // the value
         public Asn1Value m_value;
 
         //^(VAL_ASSIG valuereference type value)
         static public ValueAssigment CreateFromAntlrAst(ITree tree)
         {
-            ValueAssigment ret = Asn1CompilerInvokation.Instance.Factory.CreateValueAssigment();
+            ValueAssigment ret = DefaultBackend.Instance.Factory.CreateValueAssigment();
             ret.m_name = tree.GetChild(0).Text;
             ret.m_type = Asn1Type.CreateFromAntlrAst(tree.GetChild(1));
             ret.m_value = Asn1Value.CreateFromAntlrAst(tree.GetChild(2));
@@ -475,20 +505,29 @@ namespace tinyAsn1
         }
     }
 
+    /// <summary>
+    /// Represents a type assigment
+    /// </summary>
     public partial class TypeAssigment
     {
-        public List<string> m_comments = new List<string>();
+        //name of type assigment
         public string m_name;
+        // the type
         public Asn1Type m_type;
-        public bool m_createdThroughTabulization = false;
+        // the module where the type assigment occurs
         public Module m_module = null;
+        //antlr tree node
         public ITree antlrNode;
+        //comments associated with this type assigment
+        public List<string> m_comments = new List<string>();
+
+        public bool m_createdThroughTabulization = false;
 
         //^(TYPE_ASSIG typereference type)
         static public TypeAssigment CreateFromAntlrAst(ITree tree, Module module)
         {
 
-            TypeAssigment ret = Asn1CompilerInvokation.Instance.Factory.CreateTypeAssigment();
+            TypeAssigment ret = DefaultBackend.Instance.Factory.CreateTypeAssigment();
             ret.antlrNode = tree;
             ret.m_module = module;
             ret.m_name = tree.GetChild(0).Text;

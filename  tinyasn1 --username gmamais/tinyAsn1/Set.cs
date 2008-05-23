@@ -1,3 +1,16 @@
+/**=============================================================================
+Definition of SetType class
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,6 +21,11 @@ namespace tinyAsn1
 {
 
 
+    /// <summary>
+    /// Represents ASN.1 type SET
+    /// Most functionality is implemented in the base class SequenceOrSetType
+    /// so please refer to this class for more information
+    /// </summary>
     public partial class SetType : SequenceOrSetType
     {
         public override string Name
@@ -19,13 +37,13 @@ namespace tinyAsn1
         {
             get
             {
-                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 17, TaggingMode.EXPLICIT, this);
+                return DefaultBackend.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 17, TaggingMode.EXPLICIT, this);
             }
         }
 
         static public new SetType CreateFromAntlrAst(ITree tree)
         {
-            SetType ret = Asn1CompilerInvokation.Instance.Factory.CreateSetType();
+            SetType ret = DefaultBackend.Instance.Factory.CreateSetType();
             if (tree.ChildCount>0)
                 SequenceOrSetType.CreateFromAntlrAst(ret, tree.GetChild(0));
             return ret;

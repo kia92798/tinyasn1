@@ -1,8 +1,19 @@
+/**=============================================================================
+Definition of class Program, entry point of autoICD application
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD application.
+See these sources for detailed information regarding the
+autoICD application.
+==============================================================================*/
+
 using System;
 using System.Collections.Generic;
 using System.Text;
-
-
 using Antlr.Runtime;
 using Antlr.StringTemplate;
 using Antlr.StringTemplate.Language;
@@ -17,8 +28,13 @@ namespace autoICD
     {
         static int Main(string[] args)
         {
+            //if running under debugger, do not catch unhandled exceptions
+            //so that Visual Studio IDE can locate the point where the exception
+            //was thrown
             if (System.Diagnostics.Debugger.IsAttached)
                 return Main2(args);
+
+
             try
             {
                 return Main2(args);
@@ -34,16 +50,15 @@ namespace autoICD
 
         static int Main2(string[] args)
         {
-            List<string> inputFiles = new List<string>();
-
-
-            ICDBackend compInv = new ICDBackend();
-
-
             bool debug = false;
             bool encodeVars = false;
             bool genOutput = false;
             string outFileName = null;
+            List<string> inputFiles = new List<string>();
+
+            //construct the backend
+            ICDBackend compInv = new ICDBackend();
+
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -56,9 +71,9 @@ namespace autoICD
                     else if (args[i] == "-icd")
                         genOutput = true;
                     else if (args[i] == "-useSpecialComments")
-                        Asn1CompilerInvokation.UseSpecialComments = true;
+                        DefaultBackend.UseSpecialComments = true;
                     else if (args[i] == "-displayTypesAsAppearInAsn1Grammar")
-                        Asn1CompilerInvokation.displayTypesAsAppearInAsn1Grammar = true;
+                        DefaultBackend.displayTypesAsAppearInAsn1Grammar = true;
                     else if (args[i] == "-wordSize")
                     {
                         try
@@ -123,8 +138,6 @@ namespace autoICD
             }
 
             //Create Syntax Tree
-
-
             try
             {
                 compInv.CreateASTs(inputFiles);
@@ -138,8 +151,8 @@ namespace autoICD
                 Console.Error.WriteLine(ex.Message);
                 return 2;
             }
-            // Modify Syntax Tree and make Semantic checks
 
+            // Modify Syntax Tree and make Semantic checks
             try
             {
                 compInv.SemanticParse();
@@ -166,7 +179,7 @@ namespace autoICD
                 compInv.PrintHtml(outFileName);
             }
 
-            Asn1CompilerInvokation.CheckRecursiveFuncSetIsEmpty();
+            DefaultBackend.CheckRecursiveFuncSetIsEmpty();
             return 0;
         }
 

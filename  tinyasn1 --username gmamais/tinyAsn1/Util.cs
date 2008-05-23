@@ -1,3 +1,16 @@
+/**=============================================================================
+Definition of utility classes
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -62,7 +75,10 @@ namespace tinyAsn1
     }
 
 
-    public class StreamWriterLevel : StreamWriter /* util class, no need to be abstract*/
+    /// <summary>
+    /// Utility class used for generating output
+    /// </summary>
+    public class StreamWriterLevel : StreamWriter 
     {
         public StreamWriterLevel(string fileName) : base(fileName) { }
         public void P(int level)
@@ -346,7 +362,8 @@ namespace tinyAsn1
         }
     }
 
-    public static class C 
+
+    public static class C
     {
         public static string ID(string str)
         {
@@ -360,84 +377,6 @@ namespace tinyAsn1
                 sx = "LL";
             return i.ToString() + sx;
         }
-#if obsolete
-        public static string CodeTemplate(string code, int lev, params KeyValuePair<string, string>[] replacements)
-        {
-            System.IO.StringWriter wr = new StringWriter();
-            foreach (KeyValuePair<string, string> p in replacements)
-            {
-                if (!code.Contains(p.Key))
-                    throw new ArgumentException("key attribute '" + p.Key + "' is not contained in the code template");
-            }
-            
-
-            List<string> lines = new List<string>(code.Split('\n'));
-            
-            foreach(string line in lines) 
-            {
-                
-                for (int i = 0; i < lev; i++)
-                    wr.Write("    ");
-                string curLine = line.TrimEnd();
-                
-                foreach (KeyValuePair<string, string> p in replacements)
-                {
-                    if (curLine.Contains(p.Key))
-                        curLine = curLine.Replace(p.Key, p.Value);
-                }
-                wr.WriteLine(curLine);
-                
-            }
-            return wr.ToString();
-        }
-#endif
-    }
-
-
-    /// <summary>
-    /// To be moved to CBackend
-    /// </summary>
-    public class CLocalVariable
-    {
-        public string varName = "";
-        public string type = "";
-        public int arrayLen = 0;
-        public string initVal = "";
-        public CLocalVariable(string VarName, string Type, int ArrayLen, string InitVal)
-        {
-            varName = VarName;
-            type = Type;
-            arrayLen = ArrayLen;
-            initVal = InitVal;
-        }
-        public static void Print(StreamWriterLevel c, OrderedDictionary<string, CLocalVariable> vars)
-        {
-            foreach (CLocalVariable v in vars.Values)
-            {
-                c.P(1);
-                if (v.arrayLen == 0)
-                {
-                    c.WriteLine("{0} {1} = {2};", v.type, v.varName, v.initVal);
-                }
-                else
-                {
-                    c.WriteLine("{0} {1}[{2}];", v.type, v.varName, v.arrayLen);
-                }
-            }
-            if (vars.Count > 0)
-                c.WriteLine();
-        }
-
-        public static int GetArrayIndex(string varName)
-        {
-            int ret = 0;
-            foreach (char ch in varName.ToCharArray())
-                if (ch == '[')
-                    ret++;
-            return ret;
-
-        }
-
     }
 
 }

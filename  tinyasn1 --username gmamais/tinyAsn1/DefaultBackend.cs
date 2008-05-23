@@ -1,4 +1,17 @@
-﻿using System;
+﻿/**=============================================================================
+Definitions DefaultAsn1Factory class
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Antlr.Runtime.Tree;
@@ -7,22 +20,9 @@ namespace tinyAsn1
 {
 
 
-    public class ICDAsn1CompilerInvokation : Asn1CompilerInvokation
-    {
-
-        public override IAsn1AbstractFactory Factory
-        {
-            get
-            {
-                return new DefaultAsn1Factory();
-            }
-        }
-
-
-    }
-
-
-
+    /// <summary>
+    /// This class provides a default implementation for the IAsn1AbstractFactory interface
+    /// </summary>
     public class DefaultAsn1Factory : IAsn1AbstractFactory
     {
 

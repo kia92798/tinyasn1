@@ -1,3 +1,16 @@
+/**=============================================================================
+Definitions of all classes related to ASN.1 constraints
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -5,70 +18,14 @@ using Antlr.Runtime.Tree;
 
 namespace tinyAsn1
 {
-    /* ************ CONSTRAINTS ********************** */
 
-    public partial class ExceptionSpec
-    {
-        public Asn1Type m_type = null;
-        public Asn1Value m_value = null;
-        public Module m_module = null;
-        static public ExceptionSpec CreateFromAntlrAst(ITree tree)
-        {
-            if (tree.Type != asn1Parser.EXCEPTION_SPEC)
-                throw new Exception("Internal Error");
-            ExceptionSpec ret = Asn1CompilerInvokation.Instance.Factory.CreateExceptionSpec();
-            IntegerType dummyInt;
-            switch (tree.GetChild(0).Type)
-            {
-                case asn1Parser.EXCEPTION_SPEC_CONST_INT:
-                case asn1Parser.EXCEPTION_SPEC_VAL_REF:
-                    dummyInt = Asn1CompilerInvokation.Instance.Factory.CreateIntegerType();
-                    dummyInt.m_module = Module.CurrentlyConstructModule;
-                    dummyInt.antlrNode = tree.GetChild(0);
-                    ret.m_type = dummyInt;
-                    ret.m_value = Asn1Value.CreateFromAntlrAst(tree.GetChild(0).GetChild(0));
-                    
-                    break;
-                case asn1Parser.EXCEPTION_SPEC_TYPE_VALUE:
-                    ret.m_type = Asn1Type.CreateFromAntlrAst(tree.GetChild(0).GetChild(0));
-                    ret.m_value = Asn1Value.CreateFromAntlrAst(tree.GetChild(0).GetChild(1));
-                    break;
-            }
-            ret.m_module = Module.CurrentlyConstructModule;
-            return ret;
-        }
 
-        public bool isResolved()
-        {
-            return m_type.SemanticAnalysisFinished() && m_value.IsResolved();
-        }
-
-        public void DoSemanticAnalysis()
-        {
-            m_type.DoSemanticAnalysis();
-            m_value = m_type.ResolveVariable(m_value);
-        }
-
-        public override string ToString()
-        {
-            string ret ="!";
-            if (m_type is IntegerType)
-                ret += m_value.ToString();
-            else
-                ret += m_type.Name + ":" + m_value.ToString();
-            
-            return ret;
-        }
-
-    }
-
+    // Constraint's interface
     public interface IConstraint
     {
         bool isValueAllowed(Asn1Value val);
         bool isPERVisible();
         IConstraint Simplify();
-        //Asn1Value MIN {get;} //applicable only for Integers & Reals & ?Strings
-        //Asn1Value MAX {get;} //applicable only for Integers & Reals & ?Strings
         bool IsResolved();
         void DoSemanticAnalysis();
         Asn1Type AsnType { get;}
@@ -79,6 +36,7 @@ namespace tinyAsn1
 
     }
 
+    // base class for all constraints
     public abstract class BaseConstraint : IConstraint
     {
         public static string AsString(List<IConstraint> cons)
@@ -108,9 +66,6 @@ namespace tinyAsn1
         {
             throw new Exception("Abstract method called");
         }
-        ////applicable only for Integers & Reals & Strings
-        //public virtual Asn1Value MIN { get { throw new Exception("Abstract method called"); }}
-        //public virtual Asn1Value MAX { get { throw new Exception("Abstract method called"); }}
 
         public Asn1Type m_type;
         
@@ -206,6 +161,9 @@ namespace tinyAsn1
 
     }
 
+    /// <summary>
+    /// Root constraint
+    /// </summary>
     public class RootConstraint : BaseConstraint
     {
         protected IConstraint m_constr;
@@ -246,7 +204,7 @@ namespace tinyAsn1
                 }
             }
 
-            RootConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreateRootConstraint();
+            RootConstraint ret = DefaultBackend.Instance.Factory.CreateRootConstraint();
             ret.m_type = type;
             ret.m_constr = constr;
             ret.m_extended = extended;
@@ -311,7 +269,7 @@ namespace tinyAsn1
         public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
         {
             get {
-                PERIntegerEffectiveConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreatePERIntegerEffectiveConstraint();
+                PERIntegerEffectiveConstraint ret = DefaultBackend.Instance.Factory.CreatePERIntegerEffectiveConstraint();
 
                 ret.m_rootRange = m_constr.PEREffectiveIntegerRange.m_rootRange;
                 ret.m_isExtended = m_extended;
@@ -340,7 +298,9 @@ namespace tinyAsn1
         }
     }
     
-    // Union, I
+    /// <summary>
+    /// Union constraint 
+    /// </summary>
     public class UnionConstraint : BaseConstraint
     {
         protected List<IConstraint> m_items;
@@ -358,7 +318,7 @@ namespace tinyAsn1
             {
                 items.Add(AndConstraint.Create(tree.GetChild(i), type));
             }
-            UnionConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreateUnionConstraint();
+            UnionConstraint ret = DefaultBackend.Instance.Factory.CreateUnionConstraint();
             ret.m_type = type;
             ret.m_items = items;
 
@@ -422,8 +382,8 @@ namespace tinyAsn1
         {
             get
             {
-                PERIntegerEffectiveConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreatePERIntegerEffectiveConstraint();
-                ret.m_rootRange = Asn1CompilerInvokation.Instance.Factory.CreateIntegerRange();
+                PERIntegerEffectiveConstraint ret = DefaultBackend.Instance.Factory.CreatePERIntegerEffectiveConstraint();
+                ret.m_rootRange = DefaultBackend.Instance.Factory.CreateIntegerRange();
                 
 
                 foreach (IConstraint con in m_items)
@@ -467,7 +427,10 @@ namespace tinyAsn1
         }
     }
 
-    // Intersection, ^
+    /// <summary>
+    /// Intersection, ^ constraint
+    /// </summary>
+ 
     public class AndConstraint : BaseConstraint
     {
         protected List<IConstraint> m_items;
@@ -484,7 +447,7 @@ namespace tinyAsn1
                 items.Add(BaseConstraint.CreateIntersectionItem(tree.GetChild(i), type));
             }
 
-            AndConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreateAndConstraint();
+            AndConstraint ret = DefaultBackend.Instance.Factory.CreateAndConstraint();
             ret.m_type = type;
             ret.m_items = items;
             return ret;
@@ -587,6 +550,9 @@ namespace tinyAsn1
         }
     }
 
+    /// <summary>
+    /// Except Constraint
+    /// </summary>
     public class ExceptConstraint : BaseConstraint
     {
         protected IConstraint m_c1;
@@ -599,7 +565,7 @@ namespace tinyAsn1
             if (tree.Type != asn1Parser.INTERSECTION_ELEMENT && tree.ChildCount==2)
                 throw new Exception("Internal Error");
 
-            ExceptConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreateExceptConstraint();
+            ExceptConstraint ret = DefaultBackend.Instance.Factory.CreateExceptConstraint();
 
             ret.m_type = type;
             ret.m_c1 = BaseConstraint.CreateConstraintExpression(tree.GetChild(0), type);
@@ -639,16 +605,6 @@ namespace tinyAsn1
             return m_c1.ToString() + " EXCEPT " + m_c2.ToString(true);
         }
 
-/*        public override Asn1Value MIN
-        {
-            get
-            {
-                //To calculate min and max we have to eliminate Exclude constraints. To achieve
-                // we will use set's algebra
-
-                return base.MIN;
-            }
-        }*/
 
         public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
         {
@@ -675,8 +631,9 @@ namespace tinyAsn1
         }
 
     }
-
-    // m_c1 is the Parent constraint
+    /// <summary>
+    /// All Except constraint
+    /// </summary>
     public class AllExceptConstraint : BaseConstraint
     {
         protected IConstraint m_c;
@@ -688,7 +645,7 @@ namespace tinyAsn1
             if (tree.Type != asn1Parser.UNION_SET_ALL_EXCEPT)
                 throw new Exception("Internal Error");
 
-            AllExceptConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreateAllExceptConstraint();
+            AllExceptConstraint ret = DefaultBackend.Instance.Factory.CreateAllExceptConstraint();
 
             ret.m_type = type;
             ret.m_c = BaseConstraint.CreateConstraintExpression(tree.GetChild(0), type);
@@ -747,7 +704,9 @@ namespace tinyAsn1
             }
         }
     }
-
+    /// <summary>
+    /// Single value constraint
+    /// </summary>
     public class SingleValueConstraint : BaseConstraint
     {
         protected Asn1Value m_val;
@@ -766,9 +725,9 @@ namespace tinyAsn1
 
             SingleValueConstraint ret;
             if ((type.GetFinalType() is IA5StringType) && (((IA5StringType)type.GetFinalType()).IamUsedInPermittedAlphabet))
-                ret = Asn1CompilerInvokation.Instance.Factory.CreateSinglePAValueConstraint();
+                ret = DefaultBackend.Instance.Factory.CreateSinglePAValueConstraint();
             else
-                ret = Asn1CompilerInvokation.Instance.Factory.CreateSingleValueConstraint();
+                ret = DefaultBackend.Instance.Factory.CreateSingleValueConstraint();
 
             ret.m_type = type;
             ret.m_val = val;
@@ -812,8 +771,8 @@ namespace tinyAsn1
         {
             get
             {
-                PERIntegerEffectiveConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreatePERIntegerEffectiveConstraint();
-                ret.m_rootRange = Asn1CompilerInvokation.Instance.Factory.CreateIntegerRange();
+                PERIntegerEffectiveConstraint ret = DefaultBackend.Instance.Factory.CreatePERIntegerEffectiveConstraint();
+                ret.m_rootRange = DefaultBackend.Instance.Factory.CreateIntegerRange();
                 ret.m_rootRange.m_max = ((IntegerValue)m_val).Value;
                 ret.m_rootRange.m_min = ((IntegerValue)m_val).Value;
                 ret.m_rootRange.m_maxIsIncluded = true;
@@ -841,6 +800,9 @@ namespace tinyAsn1
 
     }
 
+    /// <summary>
+    /// Single value constraint used in Permited alphabet (i.e. FROM("ABCD"))
+    /// </summary>
     public class SinglePAValueConstraint : SingleValueConstraint
     {
         public override bool isValueAllowed(Asn1Value val)
@@ -872,11 +834,14 @@ namespace tinyAsn1
                 ICharacterString set = m_val as ICharacterString;
                 if (set == null)
                     throw new Exception("Internal Error");
-                return Asn1CompilerInvokation.Instance.Factory.CreatePERAlphabetAndSizeEffectiveConstraint(new List<Char>(set.Value.ToCharArray()));
+                return DefaultBackend.Instance.Factory.CreatePERAlphabetAndSizeEffectiveConstraint(new List<Char>(set.Value.ToCharArray()));
             }
         }
     }
 
+    /// <summary>
+    /// Rnage Constraint e.g. INTEGER(5..10)
+    /// </summary>
     public class RangeConstraint : BaseConstraint
     {
         /// <summary>
@@ -944,9 +909,9 @@ namespace tinyAsn1
             RangeConstraint ret = null;
 
             if ((type.GetFinalType() is IA5StringType) && (((IA5StringType)type.GetFinalType()).IamUsedInPermittedAlphabet))
-                ret = Asn1CompilerInvokation.Instance.Factory.CreateRangePAConstraint();
+                ret = DefaultBackend.Instance.Factory.CreateRangePAConstraint();
             else
-                ret = Asn1CompilerInvokation.Instance.Factory.CreateRangeConstraint();
+                ret = DefaultBackend.Instance.Factory.CreateRangeConstraint();
 
             ret.m_type = type;
             ret.m_min = minVal;
@@ -1022,8 +987,8 @@ namespace tinyAsn1
         {
             get
             {
-                PERIntegerEffectiveConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreatePERIntegerEffectiveConstraint();
-                ret.m_rootRange = Asn1CompilerInvokation.Instance.Factory.CreateIntegerRange();
+                PERIntegerEffectiveConstraint ret = DefaultBackend.Instance.Factory.CreatePERIntegerEffectiveConstraint();
+                ret.m_rootRange = DefaultBackend.Instance.Factory.CreateIntegerRange();
                 if (m_min == null)
                     ret.m_rootRange.m_minIsInfinite = true;
                 else
@@ -1080,6 +1045,9 @@ namespace tinyAsn1
 
     }
 
+    /// <summary>
+    /// Range constraints for string types eg FROM("A".."Z")
+    /// </summary>
     public class RangePAConstraint : RangeConstraint
     {
 
@@ -1173,11 +1141,14 @@ namespace tinyAsn1
                 Char? max = null;
                 if (m_max != null)
                     max = Hi.Value[0];
-                return Asn1CompilerInvokation.Instance.Factory.CreatePERAlphabetAndSizeEffectiveConstraint(min, max, m_type as IStringType);
+                return DefaultBackend.Instance.Factory.CreatePERAlphabetAndSizeEffectiveConstraint(min, max, m_type as IStringType);
             }
         }
     }
 
+    /// <summary>
+    /// Size constraints e.g. SIZE(1..100)
+    /// </summary>
     public class SizeConstraint : BaseConstraint
     {
         public /*not need to be abstract*/ class DummyReferenceType : ReferenceType
@@ -1187,15 +1158,15 @@ namespace tinyAsn1
             {
                 m_module = mod;
                 antlrNode = antlr;
-                dummyInterger = Asn1CompilerInvokation.Instance.Factory.CreateIntegerType();
+                dummyInterger = DefaultBackend.Instance.Factory.CreateIntegerType();
                 dummyInterger.antlrNode = antlr;
                 dummyInterger.m_module = mod;
 
 
                 RangeConstraint ret = null;
-                ret = Asn1CompilerInvokation.Instance.Factory.CreateRangeConstraint();
+                ret = DefaultBackend.Instance.Factory.CreateRangeConstraint();
                 ret.m_type = dummyInterger;
-                ret.m_min = Asn1CompilerInvokation.Instance.Factory.CreateIntegerValue(0, mod, antlr, dummyInterger);
+                ret.m_min = DefaultBackend.Instance.Factory.CreateIntegerValue(0, mod, antlr, dummyInterger);
                 ret.m_max = null;
                 ret.m_minValIsInluded = true;
                 ret.m_maxValIsInluded = true;
@@ -1228,7 +1199,7 @@ namespace tinyAsn1
             if (!(tree.Type == asn1Parser.SIZE_EXPR || tree.Type==asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT))
                 throw new Exception("Internal Error");
 
-            SizeConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreateSizeConstraint();
+            SizeConstraint ret = DefaultBackend.Instance.Factory.CreateSizeConstraint();
             ret.m_type = type;
             ret.sizeCon = new DummyReferenceType(type.m_module, tree);
             ret.sizeCon.m_AntlrConstraints.Add(tree.GetChild(0));
@@ -1254,7 +1225,7 @@ namespace tinyAsn1
                 throw new ArgumentException("Internal Error, val does not implement Size interface");
 
 
-            return sizeCon.isValueAllowed(Asn1CompilerInvokation.Instance.Factory.CreateIntegerValue(size.Size, m_type.m_module, null, sizeCon));
+            return sizeCon.isValueAllowed(DefaultBackend.Instance.Factory.CreateIntegerValue(size.Size, m_type.m_module, null, sizeCon));
         }
 
         public override string ToString()
@@ -1273,14 +1244,14 @@ namespace tinyAsn1
         {
             get
             {
-                return Asn1CompilerInvokation.Instance.Factory.CreatePERSizeEffectiveConstraint(sizeCon.PEREffectiveConstraint as PERIntegerEffectiveConstraint);
+                return DefaultBackend.Instance.Factory.CreatePERSizeEffectiveConstraint(sizeCon.PEREffectiveConstraint as PERIntegerEffectiveConstraint);
             }
         }
         public override PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint
         {
             get
             {
-                return Asn1CompilerInvokation.Instance.Factory.CreatePERAlphabetAndSizeEffectiveConstraint(sizeCon.PEREffectiveConstraint as PERIntegerEffectiveConstraint);
+                return DefaultBackend.Instance.Factory.CreatePERAlphabetAndSizeEffectiveConstraint(sizeCon.PEREffectiveConstraint as PERIntegerEffectiveConstraint);
             }
         }
 
@@ -1298,7 +1269,7 @@ namespace tinyAsn1
             if (tree.Type != asn1Parser.PERMITTED_ALPHABET_EXPR)
                 throw new Exception("Internal Error");
 
-            PermittedAlphabetConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreatePermittedAlphabetConstraint();
+            PermittedAlphabetConstraint ret = DefaultBackend.Instance.Factory.CreatePermittedAlphabetConstraint();
 
             IA5StringType ia = type.GetFinalType() as IA5StringType;
             IA5StringType set = ia.CreateForPA(type.m_module, tree);
@@ -1325,7 +1296,7 @@ namespace tinyAsn1
                 throw new Exception("Internal error");
             foreach (Char ch in str.Value)
             {
-                IA5StringValue v = Asn1CompilerInvokation.Instance.Factory.CreateIA5StringValue(ch);
+                IA5StringValue v = DefaultBackend.Instance.Factory.CreateIA5StringValue(ch);
                 if (!allowed_char_set.isValueAllowed(v))
                     return false;
             }
@@ -1365,7 +1336,7 @@ namespace tinyAsn1
         {
             get
             {
-                PERAlphabetAndSizeEffectiveConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreatePERAlphabetAndSizeEffectiveConstraint();
+                PERAlphabetAndSizeEffectiveConstraint ret = DefaultBackend.Instance.Factory.CreatePERAlphabetAndSizeEffectiveConstraint();
                 ret = (PERAlphabetAndSizeEffectiveConstraint)ret.Compute(allowed_char_set.m_constraints, allowed_char_set);
                 return ret;
             }
@@ -1384,7 +1355,7 @@ namespace tinyAsn1
                 throw new ArgumentNullException();
             if (tree.Type != asn1Parser.SUBTYPE_EXPR)
                 throw new Exception("Internal Error");
-            TypeInclusionConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreateTypeInclusionConstraint();
+            TypeInclusionConstraint ret = DefaultBackend.Instance.Factory.CreateTypeInclusionConstraint();
 
             Asn1Type oth = Asn1Type.CreateFromAntlrAst(tree.GetChild(0));
             if (oth.SemanticAnalysisFinished())
@@ -1477,7 +1448,7 @@ namespace tinyAsn1
             if (innerConstraint.IsResolved())
                 innerConstraint = innerConstraint.Simplify();
 
-            WithComponentConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreateWithComponentConstraint();
+            WithComponentConstraint ret = DefaultBackend.Instance.Factory.CreateWithComponentConstraint();
 
             ret.m_type = type;
             ret.m_innerType = innerType;
@@ -1732,7 +1703,7 @@ namespace tinyAsn1
                         childComp.m_type.ResolveExternalConstraints(constraint, ref con);
                     if (con != null && con.IsResolved())
                         con = con.Simplify();
-                    components.Add(id, Asn1CompilerInvokation.Instance.Factory.CreateWithComponentsConstraintComponent(id, presenceConstr, con));
+                    components.Add(id, DefaultBackend.Instance.Factory.CreateWithComponentsConstraintComponent(id, presenceConstr, con));
                 }
              
             }
@@ -1744,7 +1715,7 @@ namespace tinyAsn1
                     {
                         //if component is not optional
                         if (cc.m_optional)
-                            components.Add(cc.m_childVarName, Asn1CompilerInvokation.Instance.Factory.CreateWithComponentsConstraintComponent(cc.m_childVarName, Component.PresenseConstraint.ABSENT, null));
+                            components.Add(cc.m_childVarName, DefaultBackend.Instance.Factory.CreateWithComponentsConstraintComponent(cc.m_childVarName, Component.PresenseConstraint.ABSENT, null));
                         else
                             throw new SemanticErrorException("Error line" + tree.Line+" Component '"+cc.m_childVarName+
                                 "' is not listed.\nEither make the WITH COMPONENTS constraint partial by using ... or add"+
@@ -1752,7 +1723,7 @@ namespace tinyAsn1
                     }
                 }
             }
-            WithComponentsSeqConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreateWithComponentsSeqConstraint();
+            WithComponentsSeqConstraint ret = DefaultBackend.Instance.Factory.CreateWithComponentsSeqConstraint();
             ret.m_type = type;
             ret.m_partialSpecification = partialSpecification;
             ret.m_components = components;
@@ -1888,7 +1859,7 @@ namespace tinyAsn1
                         childComp.m_type.ResolveExternalConstraints(constraint, ref con);
                     if (con != null && con.IsResolved())
                         con = con.Simplify();
-                    components.Add(id, Asn1CompilerInvokation.Instance.Factory.CreateWithComponentsConstraintComponent(id, presenceConstr, con));
+                    components.Add(id, DefaultBackend.Instance.Factory.CreateWithComponentsConstraintComponent(id, presenceConstr, con));
                 }
             }
 
@@ -1899,12 +1870,12 @@ namespace tinyAsn1
                     //full specification, constraint component name does not appear (hence it ABSENT 47.8.6)
                     if (!components.ContainsKey(cc.m_childVarName))
                     {
-                        components.Add(cc.m_childVarName, Asn1CompilerInvokation.Instance.Factory.CreateWithComponentsConstraintComponent(cc.m_childVarName, Component.PresenseConstraint.ABSENT, null));
+                        components.Add(cc.m_childVarName, DefaultBackend.Instance.Factory.CreateWithComponentsConstraintComponent(cc.m_childVarName, Component.PresenseConstraint.ABSENT, null));
                     }
                 }
             }
 
-            WithComponentsChConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreateWithComponentsChConstraint();
+            WithComponentsChConstraint ret = DefaultBackend.Instance.Factory.CreateWithComponentsChConstraint();
             ret.m_type = type;
             ret.m_partialSpecification = partialSpecification;
             ret.m_components = components;
@@ -2023,14 +1994,14 @@ namespace tinyAsn1
                     IConstraint con = null;
                     if (constraint != null)
                     {
-                        IntegerType dummyIntType = Asn1CompilerInvokation.Instance.Factory.CreateIntegerType();
+                        IntegerType dummyIntType = DefaultBackend.Instance.Factory.CreateIntegerType();
                         dummyIntType.antlrNode = tree;
                         dummyIntType.m_module = type.m_module;
                         dummyIntType.ResolveExternalConstraints(constraint, ref con);
                     }
                     if (con != null && con.IsResolved())
                         con = con.Simplify();
-                    components.Add(id, Asn1CompilerInvokation.Instance.Factory.CreateWithComponentsConstraintComponent(id, Component.PresenseConstraint.None, con));
+                    components.Add(id, DefaultBackend.Instance.Factory.CreateWithComponentsConstraintComponent(id, Component.PresenseConstraint.None, con));
                 }
             }
 
@@ -2040,7 +2011,7 @@ namespace tinyAsn1
                     "You must either use partial specification (i.e. use ...) or specify mantissa and base and exponent");
             }
 
-            WithComponentsChConstraint ret = Asn1CompilerInvokation.Instance.Factory.CreateWithComponentsChConstraint();
+            WithComponentsChConstraint ret = DefaultBackend.Instance.Factory.CreateWithComponentsChConstraint();
             ret.m_type = type;
             ret.m_partialSpecification = partialSpecification;
             ret.m_components = components;
@@ -2129,6 +2100,63 @@ tryWithBase10:
 
             return true;
         }
+    }
+    /// <summary>
+    /// This class represent the exception specification associated with a constraint
+    /// </summary>
+    public partial class ExceptionSpec
+    {
+        public Asn1Type m_type = null;
+        public Asn1Value m_value = null;
+        public Module m_module = null;
+        static public ExceptionSpec CreateFromAntlrAst(ITree tree)
+        {
+            if (tree.Type != asn1Parser.EXCEPTION_SPEC)
+                throw new Exception("Internal Error");
+            ExceptionSpec ret = DefaultBackend.Instance.Factory.CreateExceptionSpec();
+            IntegerType dummyInt;
+            switch (tree.GetChild(0).Type)
+            {
+                case asn1Parser.EXCEPTION_SPEC_CONST_INT:
+                case asn1Parser.EXCEPTION_SPEC_VAL_REF:
+                    dummyInt = DefaultBackend.Instance.Factory.CreateIntegerType();
+                    dummyInt.m_module = Module.CurrentlyConstructModule;
+                    dummyInt.antlrNode = tree.GetChild(0);
+                    ret.m_type = dummyInt;
+                    ret.m_value = Asn1Value.CreateFromAntlrAst(tree.GetChild(0).GetChild(0));
+
+                    break;
+                case asn1Parser.EXCEPTION_SPEC_TYPE_VALUE:
+                    ret.m_type = Asn1Type.CreateFromAntlrAst(tree.GetChild(0).GetChild(0));
+                    ret.m_value = Asn1Value.CreateFromAntlrAst(tree.GetChild(0).GetChild(1));
+                    break;
+            }
+            ret.m_module = Module.CurrentlyConstructModule;
+            return ret;
+        }
+
+        public bool isResolved()
+        {
+            return m_type.SemanticAnalysisFinished() && m_value.IsResolved();
+        }
+
+        public void DoSemanticAnalysis()
+        {
+            m_type.DoSemanticAnalysis();
+            m_value = m_type.ResolveVariable(m_value);
+        }
+
+        public override string ToString()
+        {
+            string ret = "!";
+            if (m_type is IntegerType)
+                ret += m_value.ToString();
+            else
+                ret += m_type.Name + ":" + m_value.ToString();
+
+            return ret;
+        }
+
     }
 
 }

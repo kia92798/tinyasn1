@@ -1,3 +1,16 @@
+/**=============================================================================
+Definition of single types classes used
+in autoICD project  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD application.
+See these sources for detailed information regarding the
+autoICD application.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -71,7 +84,7 @@ namespace autoICD
             List<Item> tmpList = new List<Item>();
             foreach (Item it in m_enumValues.Values)
             {
-                EnumeratedValue val = Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedValue(it.m_value, it.m_id, null, m_module, this);
+                EnumeratedValue val = DefaultBackend.Instance.Factory.CreateEnumeratedValue(it.m_value, it.m_id, null, m_module, this);
                 if (isValueAllowed(val, additionalConstraints))
                     tmpList.Add(it);
             }
@@ -94,13 +107,8 @@ namespace autoICD
                     itemComment += l;
                 }
                 ret += string.Format("<li><font  color=\"#5F9EA0\" >{0}</font>({1}) --{2}</li>", it.m_id, it.m_value, itemComment);
-                //if (i < cnt - 1)
-                //    ret += ", ";
-                //if (i % 3 == 2)
-                //    ret += "<br/>";
             }
             ret += "</ul>";
-            //            ret += "</pre>";
             return ret;
         }
 

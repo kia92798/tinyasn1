@@ -1,3 +1,16 @@
+/**=============================================================================
+Definition of ObjectIdentifier and ObjectIdentifierValue classes
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,6 +19,9 @@ using Antlr.Runtime;
 
 namespace tinyAsn1
 {
+    /// <summary>
+    /// Class represent the ASN.1 OBJECT IDENTIFIER
+    /// </summary>
     public partial class ObjectIdentifier : Asn1Type
     {
 
@@ -18,13 +34,13 @@ namespace tinyAsn1
         {
             get
             {
-                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 6, TaggingMode.EXPLICIT, this);
+                return DefaultBackend.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 6, TaggingMode.EXPLICIT, this);
             }
         }
 
         static public new ObjectIdentifier CreateFromAntlrAst(ITree tree)
         {
-            return Asn1CompilerInvokation.Instance.Factory.CreateObjectIdentifierType();
+            return DefaultBackend.Instance.Factory.CreateObjectIdentifierType();
         }
         
         internal override Asn1Value ResolveVariable(Asn1Value val)
@@ -35,7 +51,7 @@ namespace tinyAsn1
             {
                 case asn1Parser.OBJECT_ID_VALUE:
                     if (obVal == null)
-                        return Asn1CompilerInvokation.Instance.Factory.CreateObjectIdentifierValue(val.antlrNode, m_module, this);
+                        return DefaultBackend.Instance.Factory.CreateObjectIdentifierValue(val.antlrNode, m_module, this);
                     else
                     {
                         obVal.FixChildrenVars();
@@ -52,7 +68,7 @@ namespace tinyAsn1
                                 if (tmp.IsResolved())
                                 {
                                     if (tmp.Type.GetFinalType() == this)
-                                        return Asn1CompilerInvokation.Instance.Factory.CreateObjectIdentifierValue(tmp as ObjectIdentifierValue, val.antlrNode.GetChild(0));
+                                        return DefaultBackend.Instance.Factory.CreateObjectIdentifierValue(tmp as ObjectIdentifierValue, val.antlrNode.GetChild(0));
                                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
                                 }
                                 return val; // not yet fully resolved, wait for next round
@@ -99,6 +115,9 @@ namespace tinyAsn1
         }
     }
 
+    /// <summary>
+    /// class represent an OBJECT IDENTIFIER value
+    /// </summary>
     public partial class ObjectIdentifierValue : Asn1Value
     {
         public List<ObjectIdentifierComponent> m_components = new List<ObjectIdentifierComponent>();
@@ -135,7 +154,7 @@ namespace tinyAsn1
 
             static public ObjectIdentifierComponent CreateFromAntlrAst(ITree tree)
             {
-                ObjectIdentifierComponent ret = Asn1CompilerInvokation.Instance.Factory.CreateObjectIdentifierValueObjectIdentifierComponent();
+                ObjectIdentifierComponent ret = DefaultBackend.Instance.Factory.CreateObjectIdentifierValueObjectIdentifierComponent();
                 switch (tree.Type)
                 {
                     case asn1Parser.OBJ_LST_ITEM1:
@@ -325,10 +344,10 @@ namespace tinyAsn1
             // is id1.id2 reference to REL_OBJ ID --> ?
             List<ObjectIdentifierComponent> handleCase2(int Index, Module m)
             {
-                if (!Asn1CompilerInvokation.Instance.isModuleDefined(id1))
+                if (!DefaultBackend.Instance.isModuleDefined(id1))
                     throw new SemanticErrorException("Error in line: " + tr1.Line + ", col:" + tr1.CharPositionInLine + ". Identifier: " + id1 + " does not resolve to a MODULE");
 
-                Module mod = Asn1CompilerInvokation.Instance.GetModuleByName(id1);
+                Module mod = DefaultBackend.Instance.GetModuleByName(id1);
 
                 if (!mod.isValueDeclared(id2))
                     throw new SemanticErrorException("Error in line: " + tr2.Line + ", col:" + tr2.CharPositionInLine + ". Unknown identifier: " + id2);
@@ -383,10 +402,10 @@ namespace tinyAsn1
             // is id2.id3 reference to INT val  -> label := id1, no:=INT of id2.id3
             List<ObjectIdentifierComponent> handleCase6(int Index, Module m)
             {
-                if (!Asn1CompilerInvokation.Instance.isModuleDefined(id2))
+                if (!DefaultBackend.Instance.isModuleDefined(id2))
                     throw new SemanticErrorException("Error in line: " + tr2.Line + ", col:" + tr2.CharPositionInLine + ". Identifier: " + id2 + "does not resolve to a MODULE");
 
-                Module mod = Asn1CompilerInvokation.Instance.GetModuleByName(id2);
+                Module mod = DefaultBackend.Instance.GetModuleByName(id2);
 
                 if (!mod.isValueDeclared(id3))
                     throw new SemanticErrorException("Error in line: " + tr3.Line + ", col:" + tr3.CharPositionInLine + ". Unknown identifier: " + id3);

@@ -27,7 +27,7 @@ namespace asn1scc
         public static void PrintHConstraintConstant(Asn1Type pThis, StreamWriterLevel h, string name)
         {
             if (pThis.m_constraints.Count > 0)
-                h.WriteLine("#define ERR_{0}\t\t{1} /* {2} */", C.ID(name), Asn1CompilerInvokation.Instance.ConstraintErrorID++, pThis.Constraints);
+                h.WriteLine("#define ERR_{0}\t\t{1} /* {2} */", C.ID(name), DefaultBackend.Instance.ConstraintErrorID++, pThis.Constraints);
         }
 
         public static void PrintCIsConstraintValid(Asn1Type pThis, PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev, int arrayDepth)

@@ -1,3 +1,16 @@
+/**=============================================================================
+Definition of SequenceOrSetType and SequenceOrSetValue classes
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,9 +20,14 @@ using MB = System.Reflection.MethodBase;
 
 namespace tinyAsn1
 {
+    /// <summary>
+    /// base class for SEQUENCE and SET
+    /// </summary>
     public abstract partial class SequenceOrSetType : Asn1Type
     {
+        // list with all children of the SEQUENCE or SET
         public OrderedDictionary<string, Child> m_children = new OrderedDictionary<string, Child>();
+
         public bool m_extMarkPresent = false;
         public ExceptionSpec m_exceptionSpec;
         public bool m_extMarkPresent2 = false;
@@ -37,17 +55,28 @@ namespace tinyAsn1
             }
         }
 
-
+        /// <summary>
+        /// Represent a SEQUENCE or SET child
+        /// </summary>
         public partial class Child 
         {
+            // name of child
             public string m_childVarName;
+            // child tyoe
             public Asn1Type m_type;
+            // optionality
             public bool m_optional = false;
+            // has default value
             public bool m_default = false;
+            // the default value
             public Asn1Value m_defaultValue;
+            // is Extended?
             public bool m_extended = false;
+            // version group 
             public int? m_version=null;
+            // comments associated with this child
             public List<string> m_comments = new List<string>();
+            // antlr tree node
             public ITree antlrNode = null;
 
             public Child()
@@ -84,11 +113,10 @@ namespace tinyAsn1
 
             }
 
-            //            bool componentsOf = false;
             //^(SEQUENCE_ITEM identifier type (OPTIONAL|DEFAULT)? value?)
             static public Child CreateFromAntlrAst(ITree tree, int? version, bool extended)
             {
-                Child ret = Asn1CompilerInvokation.Instance.Factory.CreateSequenceOrSetChildType();
+                Child ret = DefaultBackend.Instance.Factory.CreateSequenceOrSetChildType();
                 ret.m_version = version;
                 ret.m_extended = extended;
                 ret.antlrNode = tree;
@@ -362,7 +390,7 @@ namespace tinyAsn1
                             throw new SemanticErrorException("Error line: " + compChild.m_type.antlrNode.Line + ". " + compChild.m_type.Name + " can not be expanded. Duplicate child name(" + otherChild.m_childVarName + ")");
                         if (otherChild.m_extended)
                             continue;
-                        Child childCopy = Asn1CompilerInvokation.Instance.Factory.CreateSequenceOrSetChildType(otherChild);
+                        Child childCopy = DefaultBackend.Instance.Factory.CreateSequenceOrSetChildType(otherChild);
                         childCopy.m_version = compChild.m_version;
                         childCopy.m_extended = compChild.m_extended;
                         newChildren.Add(childCopy.m_childVarName, childCopy);
@@ -390,7 +418,7 @@ namespace tinyAsn1
 
         public override void PerformAutomaticTagging()
         {
-            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
                 return;
 
             int curTag = 0;
@@ -399,7 +427,7 @@ namespace tinyAsn1
                 if (m_AutomaticTaggingTransformationCanBeApplied)
                 {
 
-                    ch.m_type.m_tag = Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag();
+                    ch.m_type.m_tag = DefaultBackend.Instance.Factory.CreateAsn1TypeTag();
                     ch.m_type.m_tag.m_class = Tag.TagClass.CONTEXT_SPECIFIC;
                     ch.m_type.m_tag.m_tag = curTag;
                     ch.m_type.m_tag.m_type = ch.m_type;
@@ -412,7 +440,7 @@ namespace tinyAsn1
                 ch.m_type.PerformAutomaticTagging();
             }
 
-            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
         }
 
 
@@ -427,9 +455,9 @@ namespace tinyAsn1
                 case asn1Parser.OBJECT_ID_VALUE:    // for catching cases {id id2} or {id 4}
                     if (sqVal == null)
                         if (this is SequenceType)
-                            return Asn1CompilerInvokation.Instance.Factory.CreateSequenceOrSetValue(val.antlrNode, m_module, this); //,true
+                            return DefaultBackend.Instance.Factory.CreateSequenceOrSetValue(val.antlrNode, m_module, this); //,true
                         else
-                            return Asn1CompilerInvokation.Instance.Factory.CreateSequenceOrSetValue(val.antlrNode, m_module, this); //, false
+                            return DefaultBackend.Instance.Factory.CreateSequenceOrSetValue(val.antlrNode, m_module, this); //, false
                     else
                     {
                         sqVal.FixChildrenVars();
@@ -446,7 +474,7 @@ namespace tinyAsn1
                                 if (tmp.IsResolved())
                                 {
                                     if (tmp.Type.GetFinalType() == this)
-                                        return Asn1CompilerInvokation.Instance.Factory.CreateSequenceOrSetValue(tmp as SequenceOrSetValue, val.antlrNode.GetChild(0));
+                                        return DefaultBackend.Instance.Factory.CreateSequenceOrSetValue(tmp as SequenceOrSetValue, val.antlrNode.GetChild(0));
                                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
                                 }
                                 return val; // not yet fully resolved, wait for next round
@@ -486,7 +514,7 @@ namespace tinyAsn1
 
         public override bool AreConstraintsResolved()
         {
-            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
                 return true;
             
             bool ret = true;
@@ -499,7 +527,7 @@ namespace tinyAsn1
             
             ret = ret && base.AreConstraintsResolved();
 
-            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
             return ret;
         }
         public override bool isValueAllowed(Asn1Value val)
@@ -662,7 +690,7 @@ namespace tinyAsn1
 
         public override long maxBitsInPER(PEREffectiveConstraint cns)
         {
-            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
                 return -1;
 
             long ret = 0;
@@ -687,7 +715,7 @@ namespace tinyAsn1
                 }
             }
 
-            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
 
             return ret;
         }
@@ -695,7 +723,7 @@ namespace tinyAsn1
         public override long minBitsInPER(PEREffectiveConstraint cns)
         {
 
-            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
                 return 0;
 
             long ret = PreambleLength;
@@ -715,7 +743,7 @@ namespace tinyAsn1
                 ret += m;
             }
             
-            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
 
             return ret;
         }
@@ -885,10 +913,6 @@ namespace tinyAsn1
                     throw new SemanticErrorException("Error in line :" + antlrNode.Line + ". Mandatory child '" + typeChildName + "' missing");
             }
 
-            //if (checkChildrenOrder)
-            //{
-            //    //to be implemented
-            //}
 
         }
 

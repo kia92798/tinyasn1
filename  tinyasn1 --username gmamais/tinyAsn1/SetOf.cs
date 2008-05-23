@@ -1,3 +1,16 @@
+/**=============================================================================
+Definition of SetOfType class
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,6 +19,10 @@ using Antlr.Runtime;
 
 namespace tinyAsn1
 {
+    /// <summary>
+    /// Represents the ASN.1 type SET OF
+    /// Please also refer to base class ArrayType
+    /// </summary>
     public partial class SetOfType : ArrayType
     {
         public override string Name
@@ -17,23 +34,20 @@ namespace tinyAsn1
         {
             get
             {
-                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 17, TaggingMode.EXPLICIT, this);
+                return DefaultBackend.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 17, TaggingMode.EXPLICIT, this);
             }
         }
 
         static public new SetOfType CreateFromAntlrAst(ITree tree)
         {
-            SetOfType ret = Asn1CompilerInvokation.Instance.Factory.CreateSetOfType();
+            SetOfType ret = DefaultBackend.Instance.Factory.CreateSetOfType();
             for (int i = 0; i < tree.ChildCount; i++)
             {
                 ITree child = tree.GetChild(i);
                 switch (child.Type)
                 {
                     case asn1Parser.SIMPLIFIED_SIZE_CONSTRAINT:
-                    //                        ret.m_constraints.Add(Constraint.CreateConstraintFromSizeConstraint(child));
-                    //                        break;
                     case asn1Parser.CONSTRAINT:
-                        //                        ret.m_constraints.Add(Constraint.CreateFromAntlrAst(child));
                         ret.m_AntlrConstraints.Add(child);
                         break;
                     case asn1Parser.LID:
@@ -72,7 +86,7 @@ namespace tinyAsn1
                 case asn1Parser.VALUE_LIST:
                 case asn1Parser.OBJECT_ID_VALUE: //for catching case {valref} or {23}
                     if (sqVal == null)
-                        return Asn1CompilerInvokation.Instance.Factory.CreateSetOfValue(val.antlrNode, m_module, this);
+                        return DefaultBackend.Instance.Factory.CreateSetOfValue(val.antlrNode, m_module, this);
                     else
                     {
                         sqVal.FixChildrenVars();
@@ -89,7 +103,7 @@ namespace tinyAsn1
                                 if (tmp.IsResolved())
                                 {
                                     if (tmp.Type.GetFinalType() == this)
-                                        return Asn1CompilerInvokation.Instance.Factory.CreateSetOfValue(tmp as SetOfValue, val.antlrNode.GetChild(0));
+                                        return DefaultBackend.Instance.Factory.CreateSetOfValue(tmp as SetOfValue, val.antlrNode.GetChild(0));
                                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
                                 }
                                 return val; // not yet fully resolved, wait for next round

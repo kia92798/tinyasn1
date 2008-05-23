@@ -81,9 +81,6 @@
     <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="StepsToPublishANewVersion.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\AntrlParser\AntrlParser.csproj">
       <Project>{029A06B3-D105-43EE-847B-30456C9F1F48}</Project>
       <Name>AntrlParser</Name>

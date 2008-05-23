@@ -1,4 +1,17 @@
-﻿using System;
+﻿/**=============================================================================
+Definition of ICDModule, and ICDTypeAssigment used
+in autoICD project  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD application.
+See these sources for detailed information regarding the
+autoICD application.
+==============================================================================*/
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Antlr.Runtime.Tree;
@@ -43,7 +56,7 @@ namespace autoICD
 
             List<TypeAssigment> topLevelPDUs = GetTopLevelTypes();
 
-            if (!Asn1CompilerInvokation.displayTypesAsAppearInAsn1Grammar)
+            if (!DefaultBackend.displayTypesAsAppearInAsn1Grammar)
             {
                 foreach (ICDTypeAssigment tas in topLevelPDUs)
                     tas.PrintHtml(wr, p + 1);
@@ -70,10 +83,6 @@ namespace autoICD
         /// <summary>
         /// Needed by Tabularize()
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="asn1Type"></param>
-        /// <param name="commenst"></param>
-        /// <returns></returns>
         public TypeAssigment CreateNewTypeAssigment(string name, Asn1Type asn1Type, List<string> commenst)
         {
             string newName = name[0].ToString().ToUpper() + name.Substring(1, name.Length - 1);
@@ -83,7 +92,7 @@ namespace autoICD
                 i++;
                 newName += i.ToString();
             }
-            TypeAssigment ret = Asn1CompilerInvokation.Instance.Factory.CreateTypeAssigment();
+            TypeAssigment ret = DefaultBackend.Instance.Factory.CreateTypeAssigment();
             ret.m_name = newName;
             ret.m_type = asn1Type;
             ret.m_comments = commenst;

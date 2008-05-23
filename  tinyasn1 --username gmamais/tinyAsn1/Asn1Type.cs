@@ -1,3 +1,17 @@
+/**=============================================================================
+Asn1Type and Asn1Value class definitions
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,14 +22,21 @@ namespace tinyAsn1
 
 
 
+    /// <summary>
+    /// Base class for all ASN.1 types
+    /// </summary>
     public abstract partial class Asn1Type
     {
-//public and internal members
+        // The antlr tree node for this type
         public ITree antlrNode;
+        // The module where this type is defined
         public Module m_module;
+        // type's tag
         public Tag m_tag;
-        public List<ITree> m_AntlrConstraints = new List<ITree>();
+        // constraints associated with this type
         public List<IConstraint> m_constraints = new List<IConstraint>();
+        
+        public List<ITree> m_AntlrConstraints = new List<ITree>();
 
         public virtual IEnumerable<T> GetMySelfAndAnyChildren<T>() where T : Asn1Type 
         {
@@ -40,7 +61,9 @@ namespace tinyAsn1
             set { _uniquePath = value; }
         }
         
-
+        /// <summary>
+        /// This class represents the ASN.1 tags
+        /// </summary>
         public partial class Tag
         {
             public enum TagClass
@@ -88,7 +111,7 @@ namespace tinyAsn1
             //(TYPE_TAG (UNIVERSAL | APPLICATION | PRIVATE)? INT ( IMPLICIT | EXPLICIT)?)
             static public Tag CreateFromAntlrAst(ITree tree)
             {
-                Tag ret = Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag();
+                Tag ret = DefaultBackend.Instance.Factory.CreateAsn1TypeTag();
                 for (int i = 0; i < tree.ChildCount; i++)
                 {
                     ITree child = tree.GetChild(i);
@@ -130,7 +153,7 @@ namespace tinyAsn1
 
                 if (valReference != null)
                 {
-                    IntegerType dummy = Asn1CompilerInvokation.Instance.Factory.CreateIntegerType();
+                    IntegerType dummy = DefaultBackend.Instance.Factory.CreateIntegerType();
                     dummy.m_module = m_type.m_module;
                     valReference = dummy.ResolveVariable(valReference);
                     if (valReference.IsResolved())
@@ -231,13 +254,13 @@ namespace tinyAsn1
                         tag = Tag.CreateFromAntlrAst(child);
                         break;
                     case asn1Parser.NULL:
-                        ret = Asn1CompilerInvokation.Instance.Factory.CreateNullType();
+                        ret = DefaultBackend.Instance.Factory.CreateNullType();
                         break;
                     case asn1Parser.BIT_STRING_TYPE:
                         ret = BitStringType.CreateFromAntlrAst(child);
                         break;
                     case asn1Parser.BOOLEAN:
-                        ret = Asn1CompilerInvokation.Instance.Factory.CreateBooleanType();
+                        ret = DefaultBackend.Instance.Factory.CreateBooleanType();
                         break;
                     case asn1Parser.ENUMERATED_TYPE:
                         ret = EnumeratedType.CreateFromAntlrAst(child);
@@ -246,7 +269,7 @@ namespace tinyAsn1
                         ret = IntegerType.CreateFromAntlrAst(child);
                         break;
                     case asn1Parser.REAL:
-                        ret = Asn1CompilerInvokation.Instance.Factory.CreateRealType();
+                        ret = DefaultBackend.Instance.Factory.CreateRealType();
                         break;
                     case asn1Parser.CHOICE_TYPE:
                         ret = ChoiceType.CreateFromAntlrAst(child);
@@ -272,19 +295,19 @@ namespace tinyAsn1
                     case asn1Parser.RELATIVE_OID:
                         throw new SemanticErrorException("Error line: " + child.Line + ", col: " + child.CharPositionInLine + ". RELATIVE-OID are not supported. Use OBJECT IDENTIFIER instead");
                     case asn1Parser.OCTECT_STING:
-                        ret = Asn1CompilerInvokation.Instance.Factory.CreateOctetStringType();
+                        ret = DefaultBackend.Instance.Factory.CreateOctetStringType();
                         break;
                     case asn1Parser.IA5String:
-                        ret = Asn1CompilerInvokation.Instance.Factory.CreateIA5StringType();
+                        ret = DefaultBackend.Instance.Factory.CreateIA5StringType();
                         break;
                     case asn1Parser.NumericString:
-                        ret = Asn1CompilerInvokation.Instance.Factory.CreateNumericStringType();
+                        ret = DefaultBackend.Instance.Factory.CreateNumericStringType();
                         break;
                     case asn1Parser.UTCTime:
-                        ret = Asn1CompilerInvokation.Instance.Factory.CreateUTCTimeTypeType();
+                        ret = DefaultBackend.Instance.Factory.CreateUTCTimeTypeType();
                         break;
                     case asn1Parser.GeneralizedTime:
-                        ret = Asn1CompilerInvokation.Instance.Factory.CreateGeneralizedTimeType();
+                        ret = DefaultBackend.Instance.Factory.CreateGeneralizedTimeType();
                         break;
                     case asn1Parser.PrintableString:
                     case asn1Parser.VisibleString:
@@ -295,7 +318,7 @@ namespace tinyAsn1
                     case asn1Parser.UniversalString:
                     case asn1Parser.BMPString:
                     case asn1Parser.UTF8String:
-                        ret = Asn1CompilerInvokation.Instance.Factory.CreateIA5StringType();
+                        ret = DefaultBackend.Instance.Factory.CreateIA5StringType();
                         break;
 
                     //                            throw new SemanticErrorException("Error line: " + child.Line + ", col: " + child.CharPositionInLine + ". "+child.Text+" is currently not supported.");
@@ -328,7 +351,7 @@ namespace tinyAsn1
         {
             get
             {
-                TagSequence ret = Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTagSequence();
+                TagSequence ret = DefaultBackend.Instance.Factory.CreateAsn1TypeTagSequence();
 
                 if (m_tag != null)
                 {
@@ -770,7 +793,9 @@ namespace tinyAsn1
 
 
 
-
+    /// <summary>
+    /// Base class for all ASN.1 values
+    /// </summary>
     public partial class Asn1Value : IComparable
     {
         internal ITree antlrNode;

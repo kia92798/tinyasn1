@@ -1,3 +1,17 @@
+/**=============================================================================
+Definition of constructed types classes used
+in autoICD project  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD application.
+See these sources for detailed information regarding the
+autoICD application.
+==============================================================================*/
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,18 +25,17 @@ namespace autoICD
 
     internal interface ICDType
     {
-        void Tabularize(string tasName);
         void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas, List<IConstraint> additonalConstraints);
+        void Tabularize(string tasName);
     }
 
     public static class ICDBType
     {
-        //Backend functions
+        //Default implementation of PrintHtml for all types
         public static void PrintHtml(Asn1Type pThis, PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas, List<IConstraint> additonalConstraints)
         {
             o.WriteLine("<a name=\"{0}\"></a>", "ICD_" + tas.m_name.Replace("-", "_"));
             o.WriteLine("<table border=\"0\" width=\"100%\" >");
-            //            o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
             o.WriteLine("<tbody>");
 
             o.WriteLine("<tr  bgcolor=\"{0}\">", (tas.m_createdThroughTabulization ? "#379CEE" : "#FF8f00"));
@@ -40,7 +53,6 @@ namespace autoICD
             o.WriteLine("</td>");
             o.WriteLine("</tr>");
 
-/////////////////////////////////////////////////////////////////////////
 
             IInternalContentsInHtml pICIH = pThis as IInternalContentsInHtml;
             string tmp = string.Empty;
@@ -70,7 +82,6 @@ namespace autoICD
 
             o.WriteLine("</tbody>");
             o.WriteLine("</table>");
-            //            o.WriteLine("</a>");
 
         }
 
@@ -98,7 +109,6 @@ namespace autoICD
         {
             o.WriteLine("<a name=\"{0}\"></a>", "ICD_" + tas.m_name.Replace("-", "_"));
             o.WriteLine("<table border=\"0\" width=\"100%\" >");
-            //            o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
             o.WriteLine("<tbody>");
             o.WriteLine("<tr  bgcolor=\"{0}\">", (tas.m_createdThroughTabulization ? "#379CEE" : "#FF8f00"));
             o.WriteLine("<td height=\"35\" colspan=\"3\">");
@@ -155,7 +165,6 @@ namespace autoICD
 
             o.WriteLine("</tbody>");
             o.WriteLine("</table>");
-            //            o.WriteLine("</a>");
         }
 
         private void PrintChoiceExtBitHtml(StreamWriterLevel o, int index, int fieldNo)
@@ -294,7 +303,6 @@ namespace autoICD
         {
             o.WriteLine("<a name=\"{0}\"></a>", "ICD_" + tas.m_name.Replace("-", "_"));
             o.WriteLine("<table border=\"0\" width=\"100%\" >");
-            //            o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
             o.WriteLine("<tbody>");
             o.WriteLine("<tr  bgcolor=\"{0}\">", (tas.m_createdThroughTabulization ? "#379CEE" : "#FF8f00"));
             o.WriteLine("<td height=\"35\" colspan=\"4\">");
@@ -340,7 +348,6 @@ namespace autoICD
             }
             o.WriteLine("</tbody>");
             o.WriteLine("</table>");
-            //            o.WriteLine("</a>");
         }
 
         public static void PrintPreambleHtml(SequenceOrSetType pThis, StreamWriterLevel o, int p)
@@ -417,7 +424,6 @@ namespace autoICD
         {
             o.WriteLine("<a name=\"{0}\"></a>", "ICD_" + tas.m_name.Replace("-", "_"));
             o.WriteLine("<table border=\"0\" width=\"100%\" >");
-            //            o.WriteLine("<table border=\"0\" width=\"100%\" align=\"left\">");
             o.WriteLine("<tbody>");
             o.WriteLine("<tr  bgcolor=\"{0}\">", (tas.m_createdThroughTabulization ? "#379CEE" : "#FF8f00"));
             o.WriteLine("<td height=\"35\" colspan=\"3\">");
@@ -431,7 +437,7 @@ namespace autoICD
             o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">max = {0} bytes</font>", (pThis.MaxBytesInPER == -1 ? "&#8734" : pThis.MaxBytesInPER.ToString()));
             o.WriteLine("</td>");
             o.WriteLine("</tr>");
-            /////////////////////////////////////////////////////////////////////////
+
             IInternalContentsInHtml pICIH = pThis as IInternalContentsInHtml;
             if (pICIH != null)
                 comment.Add(pICIH.InternalContentsInHtml(additonalConstraints));
@@ -466,8 +472,6 @@ namespace autoICD
 
             o.WriteLine("</tbody>");
             o.WriteLine("</table>");
-            //            o.WriteLine("</a>");
-
 
         }
 
@@ -494,7 +498,7 @@ namespace autoICD
             o.WriteLine("<td class=\"min\">{0}</td>", pThis.minSizeBitsInPER(cns));
             o.WriteLine("<td class=\"max\">{0}</td>", (pThis.maxSizeBitsInPER(cns) == -1 ? "16<a href=\"#ARRAYS_SIZE_EXPLAINED123\"><span style=\"vertical-align: super\">why?</span></a>" : pThis.maxSizeBitsInPER(cns).ToString()));
             if (pThis.maxSizeBitsInPER(cns) == -1)
-                Asn1CompilerInvokation.m_HtmlLengthSizeMustBeExplained = true;
+                DefaultBackend.m_HtmlLengthSizeMustBeExplained = true;
             o.WriteLine("</tr>");
         }
 

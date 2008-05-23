@@ -1,3 +1,16 @@
+/**=============================================================================
+Definition of OctetStringType and OctetStringTypeValue classes
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,6 +19,9 @@ using Antlr.Runtime;
 
 namespace tinyAsn1
 {
+    /// <summary>
+    /// Class representing ASN.1 OCTET STRING
+    /// </summary>
     public partial class OctetStringType : SizeableType
     {
         public override string Name
@@ -17,7 +33,7 @@ namespace tinyAsn1
         {
             get
             {
-                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 4, TaggingMode.EXPLICIT, this);
+                return DefaultBackend.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 4, TaggingMode.EXPLICIT, this);
             }
         }
 
@@ -28,7 +44,7 @@ namespace tinyAsn1
             {
                 case asn1Parser.BitStringLiteral:
                 case asn1Parser.OctectStringLiteral:
-                    return Asn1CompilerInvokation.Instance.Factory.CreateOctetStringValue(val.antlrNode, m_module, this);
+                    return DefaultBackend.Instance.Factory.CreateOctetStringValue(val.antlrNode, m_module, this);
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
                     if (m_module.isValueDeclared(referenceId))
@@ -37,7 +53,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.OCTECT_STRING:
-                                return Asn1CompilerInvokation.Instance.Factory.CreateOctetStringValue(tmp as OctetStringValue, val.antlrNode.GetChild(0));
+                                return DefaultBackend.Instance.Factory.CreateOctetStringValue(tmp as OctetStringValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
@@ -84,113 +100,11 @@ namespace tinyAsn1
             {
                 if (m_perEffectiveConstraint != null)
                     return m_perEffectiveConstraint;
-                m_perEffectiveConstraint = Asn1CompilerInvokation.Instance.Factory.CreatePERSizeEffectiveConstraint();
+                m_perEffectiveConstraint = DefaultBackend.Instance.Factory.CreatePERSizeEffectiveConstraint();
                 m_perEffectiveConstraint = (PERSizeEffectiveConstraint)m_perEffectiveConstraint.Compute(m_constraints, this);
                 return m_perEffectiveConstraint;
             }
         }
-/*
-        public override long minBitsInPER(PEREffectiveConstraint cns)
-        {
-            PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
-
-            if (cn == null)
-                return 8;
-
-            if (!cn.m_size.m_rootRange.m_maxIsInfinite &&
-                cn.m_size.m_rootRange.m_max < 0xFFFF &&
-                cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
-                return cn.m_size.m_rootRange.m_min * 8;
-
-
-            if (cn.m_size.m_rootRange.m_min <= 127)
-                return cn.m_size.m_rootRange.m_min * 8 + 8;
-            if (cn.m_size.m_rootRange.m_min <= 0x3FFF)
-                return cn.m_size.m_rootRange.m_min * 8 + 16;
-
-
-            return cn.m_size.m_rootRange.m_min * 8 + (cn.m_size.m_rootRange.m_min / 0x10000 + 3) * 8;
-        }
-        public override long maxBitsInPER(PEREffectiveConstraint cns)
-        {
-            PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
-
-            if (cn != null)
-            {
-                if (cn.Extensible)
-                    return -1;
-
-                if (!cn.m_size.m_rootRange.m_maxIsInfinite)
-                {
-                    if (cn.m_size.m_rootRange.m_max < 0xFFFF &&
-                        cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
-                        return cn.m_size.m_rootRange.m_max * 8;
-
-                    if (cn.m_size.m_rootRange.m_max <= 127)
-                        return cn.m_size.m_rootRange.m_max * 8 + 8;
-
-                    if (cn.m_size.m_rootRange.m_max <= 0x3FFF)
-                        return cn.m_size.m_rootRange.m_max * 8 + 16;
-
-                    return cn.m_size.m_rootRange.m_max * 8 + (cn.m_size.m_rootRange.m_max / 0x10000 + 3) * 8;
-                }
-                else
-                    return -1;
-            }
-
-            return -1;
-        }
-        */
-/*        public override long minBitsInPER(PEREffectiveConstraint cns)
-        {
-            PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
-            int extBit = 0;
-            if (cn.Extensible)
-                extBit++;
-
-            if (cn == null)
-                return extBit + 8;
-
-            if (!cn.m_size.m_rootRange.m_maxIsInfinite)
-            {
-                if (cn.m_size.m_rootRange.m_max < 0x10000 &&
-                    cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
-                    return extBit + cn.m_size.m_rootRange.m_min * 8;
-
-                if (cn.m_size.m_rootRange.m_max < 0x10000)
-                    return extBit + cn.m_size.m_rootRange.m_min * 8 + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
-            }
-
-
-            if (cn.m_size.m_rootRange.m_min <= 0x7F)
-                return extBit + cn.m_size.m_rootRange.m_min * 8 + 8;
-            if (cn.m_size.m_rootRange.m_min <= 0x3FFF)
-                return extBit + cn.m_size.m_rootRange.m_min * 8 + 16;
-
-
-            return extBit + cn.m_size.m_rootRange.m_min * 8 + (cn.m_size.m_rootRange.m_min / 0x10000 + 3) * 8;
-        }
-
-        public override long maxBitsInPER(PEREffectiveConstraint cns)
-        {
-            PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
-
-            if (cn == null)
-                return -1;
-            if (cn.Extensible)
-                return -1;
-            if (cn.m_size.m_rootRange.m_maxIsInfinite)
-                return -1;
-
-            if (cn.m_size.m_rootRange.m_max < 0x10000 &&
-                cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
-                return cn.m_size.m_rootRange.m_max * 8;
-
-            if (cn.m_size.m_rootRange.m_max < 0x10000)
-                return cn.m_size.m_rootRange.m_max * 8 + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
-
-            return cn.m_size.m_rootRange.m_max * 8 + (cn.m_size.m_rootRange.m_max / 0x10000 + 3) * 8;
-        }*/
 
         public override long minItemBitsInPER(PEREffectiveConstraint cns)
         {
@@ -206,27 +120,11 @@ namespace tinyAsn1
         }
 
 
-/* Print C backend */
-
-
-
-/*
-        internal override void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
-        {
-            string prefix = "";
-            bool topLevel = !varName.Contains("->");
-            if (topLevel)
-                prefix = varName + "->";
-            else
-                prefix = varName + ".";
-
-            c.P(lev);
-            c.WriteLine("BitStream_EncodeOctetString(pBitStrm, {0}arr, {0}nCount);", prefix);
-        }
- */ 
     }
 
-
+    /// <summary>
+    /// Class representing an OCTET STRING value e.g. 'AF'H
+    /// </summary>
     public partial class OctetStringValue : Asn1Value, ISize
     {
         static Dictionary<string, byte> lookup = new Dictionary<string, byte>();
@@ -317,35 +215,7 @@ namespace tinyAsn1
             antlrNode = tree;
             m_type = type;
 
-            BitStringValue tmp = Asn1CompilerInvokation.Instance.Factory.CreateBitStringValue(tree, mod, type);
-/*            string bitString = tmp.Value;
-            int nBitsToInsert = 0;
-            if (bitString.Length % 4 > 0)
-                nBitsToInsert = 4 - bitString.Length % 4;
-            else
-                nBitsToInsert = 0;
-
-            for (int i = 0; i < nBitsToInsert; i++)
-                bitString += "0";
-
-            List<byte> nibles = new List<byte>();
-            while (bitString.Length > 0)
-            {
-                string nible = bitString.Substring(0, 4);
-                nibles.Add(lookup[nible]);
-                bitString = bitString.Substring(4);
-            }
-            if (nibles.Count % 2 != 0)
-                nibles.Insert(0, 0);
-
-            while (nibles.Count > 0)
-            {
-                byte curByte = (byte)(nibles[0] << 4);
-                curByte |= nibles[1];
-                m_value.Add(curByte);
-                nibles.RemoveAt(0);
-                nibles.RemoveAt(0);
-            }*/
+            BitStringValue tmp = DefaultBackend.Instance.Factory.CreateBitStringValue(tree, mod, type);
 
             m_value = ConvertToOctetArray(tmp);
         }

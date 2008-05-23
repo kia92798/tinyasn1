@@ -57,7 +57,7 @@ namespace asn1scc
 
         public void PrintHConstraintConstant(StreamWriterLevel h, string name)
         {
-            h.WriteLine("#define ERR_{0}\t\t{1} /* {2} */", C.ID(name), Asn1CompilerInvokation.Instance.ConstraintErrorID++, Constraints);
+            h.WriteLine("#define ERR_{0}\t\t{1} /* {2} */", C.ID(name), DefaultBackend.Instance.ConstraintErrorID++, Constraints);
             foreach (ChoiceChild ch in m_children.Values)
             {
                 ((ISCCType)ch.m_type).PrintHConstraintConstant(h, C.ID(name) + "_" + C.ID(ch.m_childVarName));
