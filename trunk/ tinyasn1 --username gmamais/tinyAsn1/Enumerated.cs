@@ -1,3 +1,16 @@
+/**=============================================================================
+Definition of EnumeratedType and EnumeratedValue classes
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,14 +19,23 @@ using Antlr.Runtime;
 
 namespace tinyAsn1
 {
-
+    /// <summary>
+    /// Represents the ASN.1 ENUMERATED type
+    /// </summary>
     public partial class EnumeratedType : Asn1Type
     {
-        internal List<NumberedItem> m_enumValuesPriv = new List<NumberedItem>();
+        // list of enumerated items
         public OrderedDictionary<string, Item> m_enumValues = new OrderedDictionary<string, Item>();
+        // true if enumerated type is marked as extended
         public bool m_extMarkPresent = false;
+        // excpetion specification
         public ExceptionSpec m_exceptionSpec;
 
+        internal List<NumberedItem> m_enumValuesPriv = new List<NumberedItem>();
+
+        /// <summary>
+        /// Represents an enumerated item
+        /// </summary>
         public class Item
         {
             public Item(string id, Int64 val, bool isExtended) { m_id = id; m_value = val; m_isExtended = isExtended; m_valCalculated = true; }
@@ -51,14 +73,14 @@ namespace tinyAsn1
         {
             get
             {
-                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 10, TaggingMode.EXPLICIT, this);
+                return DefaultBackend.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 10, TaggingMode.EXPLICIT, this);
             }
         }
 
         //^(ENUMERATED_TYPE enumeratedTypeItems ('...' exceptionSpec? enumeratedTypeItems?) ?)
         static public new EnumeratedType CreateFromAntlrAst(ITree tree)
         {
-            EnumeratedType ret = Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedType();
+            EnumeratedType ret = DefaultBackend.Instance.Factory.CreateEnumeratedType();
             
             for (int i = 0; i < tree.ChildCount; i++)
             {
@@ -114,7 +136,7 @@ namespace tinyAsn1
                         if (this.isIdentifierProcessed(referenceId))
                         {
                             if (m_enumValues[referenceId].m_valCalculated)
-                                return Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedValue(m_enumValues[referenceId].m_value, referenceId,
+                                return DefaultBackend.Instance.Factory.CreateEnumeratedValue(m_enumValues[referenceId].m_value, referenceId,
                                     val.antlrNode, m_module, this);
                             else
                                 return val; //leave for a next pass where value will have been calculated
@@ -129,7 +151,7 @@ namespace tinyAsn1
                             return val; // not yet resolved. Wait for next round
                         if (tmp.Type.GetFinalType() == this)
                         {
-                            return Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedValue(tmp as EnumeratedValue, val.antlrNode.GetChild(0));
+                            return DefaultBackend.Instance.Factory.CreateEnumeratedValue(tmp as EnumeratedValue, val.antlrNode.GetChild(0));
 
                         }
                         else
@@ -198,14 +220,14 @@ namespace tinyAsn1
                         " containts more than once the identifier " + ni.m_id);
                 if (ni.m_valueAsInt != null)
                 {
-                    curItem = Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedTypeItem(ni.m_id, ni.m_valueAsInt.Value, ni.m_extended);
+                    curItem = DefaultBackend.Instance.Factory.CreateEnumeratedTypeItem(ni.m_id, ni.m_valueAsInt.Value, ni.m_extended);
                     curItem.antlrNode = ni.antlrNode;
                     m_enumValues.Add(ni.m_id, curItem);
                     toBeRemoved.Add(ni);
                 }
                 else if (ni.m_valueAsReference == "")
                 {
-                    curItem = Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedTypeItem(ni.m_id, ni.m_extended);
+                    curItem = DefaultBackend.Instance.Factory.CreateEnumeratedTypeItem(ni.m_id, ni.m_extended);
                     curItem.antlrNode = ni.antlrNode;
                     m_enumValues.Add(ni.m_id, curItem);
                     toBeRemoved.Add(ni);
@@ -221,7 +243,7 @@ namespace tinyAsn1
                             continue;
                         if (tmpVal.m_TypeID == Asn1Value.TypeID.INT)
                         {
-                            curItem = Asn1CompilerInvokation.Instance.Factory.CreateEnumeratedTypeItem(ni.m_id, ((IntegerValue)tmpVal).Value, ni.m_extended);
+                            curItem = DefaultBackend.Instance.Factory.CreateEnumeratedTypeItem(ni.m_id, ((IntegerValue)tmpVal).Value, ni.m_extended);
                             curItem.antlrNode = ni.antlrNode;
                             m_enumValues.Add(ni.m_id, curItem);
                             toBeRemoved.Add(ni);
@@ -388,15 +410,6 @@ namespace tinyAsn1
             ret += PER.GetNumberOfBitsForNonNegativeInteger((UInt64)(RootItemsCount - 1));
             return ret;
         }
-
-
-
-
-
-
-
-
-
 
     }
 

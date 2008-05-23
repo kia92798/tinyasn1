@@ -742,7 +742,7 @@ namespace asn1scc
 
         public void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
-            h.Write(Asn1CompilerInvokation.Instance.TypePrefix + C.ID(m_referencedTypeName));
+            h.Write(DefaultBackend.Instance.TypePrefix + C.ID(m_referencedTypeName));
         }
         public void PrintHConstraintConstant(StreamWriterLevel h, string name)
         {
@@ -756,7 +756,7 @@ namespace asn1scc
                 cur = cur.ParentType;
             }
             if (nCount > 0)
-                h.WriteLine("#define ERR_{0}\t\t{1} /* {2} */", C.ID(name), Asn1CompilerInvokation.Instance.ConstraintErrorID++, conConstraints);
+                h.WriteLine("#define ERR_{0}\t\t{1} /* {2} */", C.ID(name), DefaultBackend.Instance.ConstraintErrorID++, conConstraints);
         }
         public void VarsNeededForPrintCInitialize(int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {
@@ -767,9 +767,9 @@ namespace asn1scc
             {
                 h.P(lev);
                 if ((Type is IA5StringType) || !varName.Contains("->"))
-                    h.WriteLine("{0}_Initialize({1});", Asn1CompilerInvokation.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
+                    h.WriteLine("{0}_Initialize({1});", DefaultBackend.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
                 else
-                    h.WriteLine("{0}_Initialize(&{1});", Asn1CompilerInvokation.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
+                    h.WriteLine("{0}_Initialize(&{1});", DefaultBackend.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
             }
             else
             {
@@ -784,9 +784,9 @@ namespace asn1scc
         {
             c.P(lev); c.Write("if ( !");
             if ((Type is IA5StringType) || !varName.Contains("->"))
-                c.WriteLine("{0}_IsConstraintValid({1}, pErrCode) )", Asn1CompilerInvokation.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
+                c.WriteLine("{0}_IsConstraintValid({1}, pErrCode) )", DefaultBackend.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
             else
-                c.WriteLine("{0}_IsConstraintValid(&{1}, pErrCode) )", Asn1CompilerInvokation.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
+                c.WriteLine("{0}_IsConstraintValid(&{1}, pErrCode) )", DefaultBackend.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
 
             c.P(lev);
             c.WriteLine("{");
@@ -810,9 +810,9 @@ namespace asn1scc
             {
                 c.P(lev);
                 if ((Type is IA5StringType) || !varName.Contains("->"))
-                    c.WriteLine("{0}_Encode({1}, pBitStrm, pErrCode, FALSE);", Asn1CompilerInvokation.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
+                    c.WriteLine("{0}_Encode({1}, pBitStrm, pErrCode, FALSE);", DefaultBackend.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
                 else
-                    c.WriteLine("{0}_Encode(&{1}, pBitStrm, pErrCode, FALSE);", Asn1CompilerInvokation.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
+                    c.WriteLine("{0}_Encode(&{1}, pBitStrm, pErrCode, FALSE);", DefaultBackend.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
             }
             else
             {
@@ -830,9 +830,9 @@ namespace asn1scc
             {
                 c.P(lev);
                 if ((Type is IA5StringType) || !varName.Contains("->"))
-                    c.WriteLine("if ( !{0}_Decode({1}, pBitStrm, pErrCode) ) {{", Asn1CompilerInvokation.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
+                    c.WriteLine("if ( !{0}_Decode({1}, pBitStrm, pErrCode) ) {{", DefaultBackend.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
                 else
-                    c.WriteLine("if ( !{0}_Decode(&{1}, pBitStrm, pErrCode) ) {{", Asn1CompilerInvokation.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
+                    c.WriteLine("if ( !{0}_Decode(&{1}, pBitStrm, pErrCode) ) {{", DefaultBackend.Instance.TypePrefix + C.ID(m_referencedTypeName), varName);
                 c.P(lev + 1);
                 c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
                 c.P(lev + 1);

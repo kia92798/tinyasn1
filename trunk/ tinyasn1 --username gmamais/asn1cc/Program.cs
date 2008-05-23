@@ -63,7 +63,7 @@ namespace asn1scc
 
                     }
                     else if (args[i] == "-useSpecialComments")
-                        Asn1CompilerInvokation.UseSpecialComments = true;
+                        DefaultBackend.UseSpecialComments = true;
                     else if (args[i] == "-o")
                     {
                         try
@@ -75,7 +75,7 @@ namespace asn1scc
                                 Console.Error.WriteLine("{0} is not a valid directory.", outFileDir);
                                 return Usage();
                             }
-                            Asn1CompilerInvokation.m_outDirectory = outFileDir;
+                            DefaultBackend.m_outDirectory = outFileDir;
                         }
                         catch (Exception )
                         {
@@ -145,9 +145,9 @@ namespace asn1scc
             try
             {
                 compInv.printC();
-                File.WriteAllText(Asn1CompilerInvokation.m_outDirectory + "asn1crt.h", Properties.Resources.asn1crt);
-                File.WriteAllText(Asn1CompilerInvokation.m_outDirectory + "asn1crt.c", Properties.Resources.asn1crt1);
-                File.WriteAllText(Asn1CompilerInvokation.m_outDirectory + "real.c", Properties.Resources.real);
+                File.WriteAllText(DefaultBackend.m_outDirectory + "asn1crt.h", Properties.Resources.asn1crt);
+                File.WriteAllText(DefaultBackend.m_outDirectory + "asn1crt.c", Properties.Resources.asn1crt1);
+                File.WriteAllText(DefaultBackend.m_outDirectory + "real.c", Properties.Resources.real);
             }
             catch (SemanticErrorException ex)
             {
@@ -155,7 +155,7 @@ namespace asn1scc
                 return 2;
             }
 
-            Asn1CompilerInvokation.CheckRecursiveFuncSetIsEmpty();
+            DefaultBackend.CheckRecursiveFuncSetIsEmpty();
             return 0;
         }
 

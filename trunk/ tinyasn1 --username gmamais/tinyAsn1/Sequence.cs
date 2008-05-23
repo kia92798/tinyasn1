@@ -1,3 +1,16 @@
+/**=============================================================================
+Definition of SequenceType class
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,6 +20,11 @@ using MB = System.Reflection.MethodBase;
 
 namespace tinyAsn1
 {
+    /// <summary>
+    /// Represents ASN.1 type SEQUENCE
+    /// Most functionality is implemented in the base class SequenceOrSetType
+    /// so please refer to this class for more information
+    /// </summary>
     public partial class SequenceType : SequenceOrSetType
     {
         public override string Name
@@ -18,13 +36,13 @@ namespace tinyAsn1
         {
             get
             {
-                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 16, TaggingMode.EXPLICIT, this);
+                return DefaultBackend.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 16, TaggingMode.EXPLICIT, this);
             }
         }
 
         static public new SequenceType CreateFromAntlrAst(ITree tree)
         {
-            SequenceType ret = Asn1CompilerInvokation.Instance.Factory.CreateSequenceType();
+            SequenceType ret = DefaultBackend.Instance.Factory.CreateSequenceType();
             if (tree.ChildCount>0)
                 SequenceOrSetType.CreateFromAntlrAst(ret, tree.GetChild(0));
             return ret;
@@ -32,7 +50,7 @@ namespace tinyAsn1
 
         public override void CheckChildrensTags()
         {
-            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
                 return;
 
             string err = "Error: Tag clash for type defined in line {0}." +
@@ -52,21 +70,6 @@ namespace tinyAsn1
                     else
                     {
                         clearTagsList = true;
-                        //do the checking;
-                        /*                        if (chTags.Contains(ch.m_type.Tags))
-                                                {
-                                                    TagSequence other = chTags[chTags.IndexOf(ch.m_type.Tags)];
-                                                    err = string.Format(err,
-                                                        antlrNode.Line,
-                                                        other.m_tags[0].m_type.antlrNode.Line,
-                                                        ch.m_type.antlrNode.Line);
-
-                                                    throw new SemanticErrorException(err);
-                                                }
-
-                                                //chTags.Add(ch.m_type.Tags);
-                                                chTags.Clear();
-                                                continue;*/
                     }
                 }
 
@@ -120,7 +123,7 @@ namespace tinyAsn1
                 ch.m_type.CheckChildrensTags();
 
             }
-            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
         }
 
         public override bool Compatible(Asn1Type other)

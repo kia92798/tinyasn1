@@ -54,7 +54,7 @@ namespace asn1scc
 
         public void printC()
         {
-            string path = Asn1CompilerInvokation.m_outDirectory;
+            string path = DefaultBackend.m_outDirectory;
             string fileName = Path.GetFileNameWithoutExtension(m_fileName);
             if (path != "" && !path.EndsWith(Path.DirectorySeparatorChar.ToString()))
                 path += Path.DirectorySeparatorChar;
@@ -75,7 +75,7 @@ namespace asn1scc
                     foreach (ImportedModule imp in m.m_imports)
                     {
                         Asn1File incf = null;
-                        foreach (Asn1File f in Asn1CompilerInvokation.Instance.m_files)
+                        foreach (Asn1File f in DefaultBackend.Instance.m_files)
                             foreach (Module exp in f.m_modules)
                                 if (exp.m_moduleID == imp.m_moduleID)
                                     incf = f;
@@ -94,7 +94,7 @@ namespace asn1scc
 
                 foreach (SCCTypeAssigment t in tmp)
                 {
-                    string uniqueID = Asn1CompilerInvokation.Instance.TypePrefix + Asn1CompilerInvokation.Instance.GetUniqueID(C.ID(t.m_name));
+                    string uniqueID = DefaultBackend.Instance.TypePrefix + DefaultBackend.Instance.GetUniqueID(C.ID(t.m_name));
                     t.PrintH(h, uniqueID);
                 }
 
@@ -123,7 +123,7 @@ namespace asn1scc
                 c.WriteLine("#include \"{0}\"", fileName + ".h");
                 foreach (SCCTypeAssigment t in tmp)
                 {
-                    string uniqueID = Asn1CompilerInvokation.Instance.TypePrefix + Asn1CompilerInvokation.Instance.GetUniqueID(C.ID(t.m_name));
+                    string uniqueID = DefaultBackend.Instance.TypePrefix + DefaultBackend.Instance.GetUniqueID(C.ID(t.m_name));
                     t.PrintC(c, uniqueID);
                 }
 

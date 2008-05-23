@@ -1,8 +1,26 @@
+/**=============================================================================
+Antlr grammar of the ASN.1 parser used
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
+
 grammar asn1;
 options {
 	output=AST;
 	language=CSharp;
 }
+
+/*
+Parser tokens
+*/
 
 tokens {
 	MODULE_DEF;
@@ -34,10 +52,8 @@ tokens {
 	OBJ_LST_ITEM1;
 	OBJ_LST_ITEM2;
 	DEFINED_VALUE;
-//	NUMERIC_VALUE;
 	CONSTRAINT;
 	EXCEPTION_SPEC;
-//	SET_OF_VALUES;
 	UNION_ELEMENT2;
 	UNION_SET_ALL_EXCEPT;
 	INTERSECTION_ELEMENT;
@@ -51,7 +67,6 @@ tokens {
 	MIN_VAL_INCLUDED;
 	MAX_VAL_INCLUDED;
 	MAX_VAL_PRESENT;
-//	BIT_STRING_VALUE;
 	CHAR_SEQUENCE_VALUE;
 	EXPORTS_ALL;
 	IMPORTS_FROM_MODULE;
@@ -98,7 +113,6 @@ public override void ReportError(RecognitionException e) {
 @lexer::members {
 System.Collections.Generic.List<IToken> tokens = new System.Collections.Generic.List<IToken>();
 public override void Emit(IToken tok) {
-//        state.token = token;
         token = tok;
        	tokens.Add(tok);
 }
@@ -117,8 +131,11 @@ public override void ReportError(RecognitionException e) {
 }
 }
 
+
+
+
 /* ********************************************************************************************************************* */
-/* ************************************* MODULE DEFINITION ************************************************************* */
+/* *************************************    PARSER         ************************************************************* */
 /* ********************************************************************************************************************* */
 
 moduleDefinitions 
@@ -137,7 +154,6 @@ definitiveObjIdComponent
 	
 moduleDefinition :  	a=modulereference	definitiveIdentifier?
 			d=DEFINITIONS
-			//			moduleTag?
 			(EXPLICIT TAGS
 			|IMPLICIT TAGS
 			| AUTOMATIC TAGS)?
@@ -151,9 +167,9 @@ moduleDefinition :  	a=modulereference	definitiveIdentifier?
 //				|valueSetAssigment
 			)*
 			END
-//			->  ^(MODULE_DEF modulereference moduleTag? EXTENSIBILITY? exports? imports? typeAssigment* valueAssigment* valueSetAssigment*)
 			->  ^(MODULE_DEF[$d] modulereference EXPLICIT? IMPLICIT? AUTOMATIC? EXTENSIBILITY? exports? imports? typeAssigment* valueAssigment* /* valueSetAssigment* */)
 			;
+
 /*
 EXPLICIT TAGS (default)==> all tags in explicit mode (i.e. multiple tags per type are encoded in BER)
 IMPLICIT TAGS 	==>	all tags are implicit
@@ -166,9 +182,6 @@ EXTENSIBILITY ==> An ENUMERATED, SEQUENCE, SET or CHOICE type that does not incl
 	IMPLIED clause in its header
 */			
 			
-
-
-	
 			
 exports :
 	   a=EXPORTS ALL ';' -> EXPORTS_ALL[$a]
@@ -198,6 +211,7 @@ valueSetAssigment
 typeAssigment 
 	:	/*SPECIAL_COMMENT**/ typereference a=ASSIG_OP type -> ^(TYPE_ASSIG[$a] typereference type /*SPECIAL_COMMENT* */)
 	;	
+
 	
 /* ********************************************************************************************************************* */
 /* *************************************** TYPE DEFINITION ************************************************************* */
@@ -314,7 +328,7 @@ choiceItemsList
 	;
 	
 choiceItem
-	:	/*SPECIAL_COMMENT* */ identifier type				->  ^(CHOICE_ITEM identifier type /*SPECIAL_COMMENT* */)
+	:	identifier type				->  ^(CHOICE_ITEM identifier type )
 	;	
 
 choiceListExtension
@@ -360,7 +374,7 @@ componentTypeList
 	;
 	
 componentType
-	:	/*SPECIAL_COMMENT* */ identifier type (optOrDef=OPTIONAL | optOrDef=DEFAULT value)?	-> ^(SEQUENCE_ITEM identifier type $optOrDef? ^(DEFAULT_VALUE value)? /*SPECIAL_COMMENT* */)
+	:	 identifier type (optOrDef=OPTIONAL | optOrDef=DEFAULT value)?	-> ^(SEQUENCE_ITEM identifier type $optOrDef? ^(DEFAULT_VALUE value)? )
 		| a=COMPONENTS OF type											-> ^(COMPONENTS_OF[$a] type)
 	;	
 	
@@ -405,15 +419,6 @@ choiceValue :	identifier a=':' value	->^(CHOICE_VALUE[$a] identifier value)
 namedValue 	:	a=identifier value		->^(NAMED_VALUE[a.start] identifier value)
 	;
 	
-/*	
-namedValueList	: a=namedValue (COMMA namedValue)* 		->^(NAMED_VALUE_LIST[a.start] namedValue+)
-	;
-*/	
-/*	
-valueList 	:	
-	a=value (COMMA value)* 			->^(VALUE_LIST[a.start] value+)
-;	
-*/
 /*
 To resolve another grammar Ambiguouity, we no more declare bitStringValue. The parser will only return valueList. Extra checking 
 must be done during semantic checking.
@@ -456,39 +461,9 @@ value	:
 /*
 a CharacterStringValue is
 	a string literal
-or value list of 4 INT
-or value list of 2 INT	
-or value list that contains any of the following 
-		a string literal
-	or value list of 4 INT
-	or value list of 2 INT	
-		
-restrictedCharacterStringValue	:
-		StringLiteral
-	|	characterStringList
-	|	quadruple
-	|	tuple
-	;
-
-characterStringList  	:	
-	L_BRACKET charsDefn ( COMMA charsDefn)* R_BRACKET
-	;
-
-charsDefn	:
-		StringLiteral
-	|	quadruple
-	|	tuple
-	|	definedValue
-	;
-	
-quadruple 	:	L_BRACKET INT COMMA INT COMMA INT COMMA INT R_BRACKET	;
 tuple		:   L_BRACKET INT COMMA INT R_BRACKET	;
 */	
-/*
-objectIdentifierValue
-	:	objectIdentifierComponent+  			->   ^(OBJECT_ID_VALUE objectIdentifierComponent+ )
-	;	
-*/
+
 objectIdentifierComponent
 	:	identifier ( L_PAREN (INT | definedValue) R_PAREN )?	->^(OBJ_LST_ITEM1 identifier INT? definedValue?) //3 cases identifier or valuereference or identifier(number)
 	| 	a=INT											->^(OBJ_LST_ITEM2[$a] INT)
@@ -520,11 +495,6 @@ exceptionSpec
 	;
 
 
-/*
-setOfValues
-	:	uset1=unionSet (COMMA extMark='...' ( COMMA uset2=unionSet)?)?			-> ^(SET_OF_VALUES $uset1 $extMark? $uset2?)
-	;
-*/	
 unionSet
 	:	intersectionSet (UnionMark intersectionSet)*			-> ^(UNION_SET intersectionSet+ )
 	|	a=ALL EXCEPT constraintExpression							-> ^(UNION_SET_ALL_EXCEPT[$a] constraintExpression)
@@ -611,7 +581,7 @@ relativeOID	:	RELATIVE_OID;
 
 /* ***************************************************************************************************************** */
 /* ***************************************************************************************************************** */
-/* ***************************************************************************************************************** */
+/* **************************************      LEXER    ************************************************************ */
 /* ***************************************************************************************************************** */
 /* ***************************************************************************************************************** */
 
@@ -715,12 +685,6 @@ LID  :   ('a'..'z') ('a'..'z'|'A'..'Z'|'0'..'9'|'-')*
 fragment	
 INT	:	('+'|'-')? ( '0' | ('1'..'9') ('0'..'9')*);
 
-/*
-fragment
-FloatingPointLiteral
-    :   INT (DOT ('0'..'9')*)? Exponent?
-	;
-*/
 
 	
 fragment
@@ -759,22 +723,10 @@ COMMENT
     :   '/*' ( options {greedy=false;} : . )* '*/' {$channel=HIDDEN;}
     ;
 
-/*
-SPECIAL_COMMENT
-    :   '--@' ( options {greedy=false;} : . )* ('--'|'\r'?'\n') 
-    ;
-*/
 COMMENT2
     :   '--' ( options {greedy=false;} : . )* ('--'|'\r'?'\n') {$channel=HIDDEN;}
     ;
 
 
 
-/* ********************** UNSUPPORTED ASN.1 FEATURES **********************************/
-
-/*
-definitiveIdentifier in module definition. (parsed but ignored)
-valueSetAssigments
-
-*/
 

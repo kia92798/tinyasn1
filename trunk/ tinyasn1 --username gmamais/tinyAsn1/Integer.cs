@@ -1,3 +1,16 @@
+/**=============================================================================
+Definition of IntegerType and IntegerValue classes
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,12 +20,15 @@ using Antlr.Runtime;
 namespace tinyAsn1
 {
 
+    /// <summary>
+    /// Represent the ASN.1 type INTEGER
+    /// </summary>
     public partial class IntegerType : Asn1Type
     {
-        internal List<NumberedItem> m_privNamedValues = new List<NumberedItem>();
+        // list with named integer values 
         public OrderedDictionary<string, Int64> m_namedValues = new OrderedDictionary<string, Int64>();
 
-
+        internal List<NumberedItem> m_privNamedValues = new List<NumberedItem>();
 
         public override string Name
         {
@@ -23,13 +39,13 @@ namespace tinyAsn1
         {
             get
             {
-                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 2, TaggingMode.EXPLICIT, this);
+                return DefaultBackend.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 2, TaggingMode.EXPLICIT, this);
             }
         }
 
         static public new IntegerType CreateFromAntlrAst(ITree tree)
         {
-            IntegerType ret = Asn1CompilerInvokation.Instance.Factory.CreateIntegerType();
+            IntegerType ret = DefaultBackend.Instance.Factory.CreateIntegerType();
             for (int i = 0; i < tree.ChildCount; i++)
             {
                 ITree child = tree.GetChild(i);
@@ -63,7 +79,7 @@ namespace tinyAsn1
             switch (val.antlrNode.Type)
             {
                 case asn1Parser.INT:
-                    return Asn1CompilerInvokation.Instance.Factory.CreateIntegerValue(val.antlrNode, m_module, this);
+                    return DefaultBackend.Instance.Factory.CreateIntegerValue(val.antlrNode, m_module, this);
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
                     if (m_module.isValueDeclared(referenceId))
@@ -72,7 +88,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.INT:
-                                return Asn1CompilerInvokation.Instance.Factory.CreateIntegerValue(tmp as IntegerValue, val.antlrNode.GetChild(0));
+                                return DefaultBackend.Instance.Factory.CreateIntegerValue(tmp as IntegerValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 return val;
                             default:
@@ -82,7 +98,7 @@ namespace tinyAsn1
                     else if (this.isIdentifierDeclared(referenceId))
                     {
                         if (this.isIdentifierProcessed(referenceId))
-                            return Asn1CompilerInvokation.Instance.Factory.CreateIntegerValue(m_namedValues[referenceId], m_module, val.antlrNode, this);
+                            return DefaultBackend.Instance.Factory.CreateIntegerValue(m_namedValues[referenceId], m_module, val.antlrNode, this);
                         return val; //else wait for next round
                     }
                     else
@@ -162,7 +178,6 @@ namespace tinyAsn1
                 }
             }
 
-//            SemanticCheckConstraints();
         }
 
 
@@ -234,7 +249,7 @@ namespace tinyAsn1
             {
                 if (m_perEffectiveConstraint != null)
                     return m_perEffectiveConstraint;
-                m_perEffectiveConstraint = Asn1CompilerInvokation.Instance.Factory.CreatePERIntegerEffectiveConstraint();
+                m_perEffectiveConstraint = DefaultBackend.Instance.Factory.CreatePERIntegerEffectiveConstraint();
                 m_perEffectiveConstraint = (PERIntegerEffectiveConstraint)m_perEffectiveConstraint.Compute(m_constraints, this);
                 return m_perEffectiveConstraint;
             }
@@ -275,7 +290,7 @@ namespace tinyAsn1
             {
                 if (MaxBitsInPER == (Config.IntegerSize + 1) * 8)
                 {
-                    Asn1CompilerInvokation.m_HtmlIntegerSizeMustBeExplained = true;
+                    DefaultBackend.m_HtmlIntegerSizeMustBeExplained = true;
                     return "<a href=\"#INT_SIZE_EXPLAINED123\"><span style=\"vertical-align: super\">why?</span></a>";
                 }
                 return base.MaxBitsInPER_Explained;
@@ -321,12 +336,6 @@ namespace tinyAsn1
                 {
                     case asn1Parser.INT:
                         m_value = Int64.Parse(antlrNode.Text);
-                        /*                        if (antlrNode.ChildCount == 1)
-                                                    m_value = Int64.Parse(antlrNode.GetChild(0).Text);
-                                                else if ((antlrNode.ChildCount == 2) && (antlrNode.GetChild(1).Text == "-"))
-                                                    m_value = -Int64.Parse(antlrNode.GetChild(0).Text);
-                                                else
-                                                    throw new SemanticErrorException("Error in line : " + antlrNode.Line + " Expecting integer or integer variable");*/
                         break;
                     default:
                         throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Expecting integer or integer variable");

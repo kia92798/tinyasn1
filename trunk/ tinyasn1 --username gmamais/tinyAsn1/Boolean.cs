@@ -1,3 +1,16 @@
+/**=============================================================================
+BooleanType and BooleanValue class definitions
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,7 +30,7 @@ namespace tinyAsn1
         {
             get
             {
-                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 1, TaggingMode.EXPLICIT, this);
+                return DefaultBackend.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 1, TaggingMode.EXPLICIT, this);
             }
         }
 
@@ -28,7 +41,7 @@ namespace tinyAsn1
             {
                 case asn1Parser.TRUE:
                 case asn1Parser.FALSE:
-                    return Asn1CompilerInvokation.Instance.Factory.CreateBooleanValue(val.antlrNode, m_module, this);
+                    return DefaultBackend.Instance.Factory.CreateBooleanValue(val.antlrNode, m_module, this);
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
                     if (m_module.isValueDeclared(referenceId))
@@ -37,7 +50,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.BOOLEAN:
-                                return Asn1CompilerInvokation.Instance.Factory.CreateBooleanValue(tmp as BooleanValue, val.antlrNode.GetChild(0));
+                                return DefaultBackend.Instance.Factory.CreateBooleanValue(tmp as BooleanValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;

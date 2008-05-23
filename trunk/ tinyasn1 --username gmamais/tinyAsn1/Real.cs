@@ -1,3 +1,16 @@
+/**=============================================================================
+Definition of RealType and RealValue classes
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -18,7 +31,7 @@ namespace tinyAsn1
         {
             get
             {
-                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 9, TaggingMode.EXPLICIT, this);
+                return DefaultBackend.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 9, TaggingMode.EXPLICIT, this);
             }
         }
 
@@ -32,7 +45,7 @@ namespace tinyAsn1
                 case asn1Parser.MINUS_INFINITY:
                 case asn1Parser.PLUS_INFINITY:
                 case asn1Parser.NUMERIC_VALUE2: //e.g. {mantissa 2, base 10, exponent 0}
-                    return Asn1CompilerInvokation.Instance.Factory.CreateRealValue(val.antlrNode, m_module, this);
+                    return DefaultBackend.Instance.Factory.CreateRealValue(val.antlrNode, m_module, this);
 
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
@@ -42,7 +55,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.REAL:
-                                return Asn1CompilerInvokation.Instance.Factory.CreateRealValue(tmp as RealValue, val.antlrNode.GetChild(0));
+                                return DefaultBackend.Instance.Factory.CreateRealValue(tmp as RealValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
@@ -115,7 +128,7 @@ namespace tinyAsn1
         {
             get
             {
-                Asn1CompilerInvokation.m_HtmlRealSizeMustBeExplained = true;
+                DefaultBackend.m_HtmlRealSizeMustBeExplained = true;
                 return "<a href=\"#REAL_SIZE_EXPLAINED123\"><span style=\"vertical-align: super\">why?</span></a>";
             }
         }

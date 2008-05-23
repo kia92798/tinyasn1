@@ -1,3 +1,17 @@
+/**=============================================================================
+SizeableType, ArrayType and ArrayValue class definitions
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,8 +21,15 @@ using Antlr.Runtime;
 namespace tinyAsn1
 {
 
+    /// <summary>
+    /// This is an abstract class serving common functionality to all types that
+    /// can have a SIZE constraint.
+    /// These types are: SEQUENCE OF, SET OF, OCTET STRING, BIT STRING and character
+    /// types
+    /// </summary>
     public class SizeableType : Asn1Type
     {
+        //see base class for more information
         public override long maxBitsInPER(PEREffectiveConstraint cns)
         {
             PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
@@ -29,6 +50,8 @@ namespace tinyAsn1
 
             return cn.m_size.m_rootRange.m_max * maxItemBitsInPER(cns) + (cn.m_size.m_rootRange.m_max / 0x10000 + 3) * 8;
         }
+        
+        //see base class for more information
         public override long minBitsInPER(PEREffectiveConstraint cns)
         {
             PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
@@ -59,21 +82,28 @@ namespace tinyAsn1
             return extBit + cn.m_size.m_rootRange.m_min * minItemBitsInPER(cns) + (cn.m_size.m_rootRange.m_min / 0x10000 + 3) * 8;
         }
 
+        /// <summary>
+        /// Return the minimum number of bits for encoding in uPER the internal item
+        /// </summary>
         public virtual long minItemBitsInPER(PEREffectiveConstraint cns)
         {
             throw new Exception("Abstract method called");
         }
+        /// <summary>
+        /// Return the maximum number of bits for encoding in uPER the internal item
+        /// </summary>
         public virtual long maxItemBitsInPER(PEREffectiveConstraint cns)
         {
             throw new Exception("Abstract method called");
         }
 
+        // Get internal item constraint as printable string
         public virtual string ItemConstraint(PEREffectiveConstraint cns)
         {
             throw new Exception("Abstract method called");
         }
 
-
+        // Get the minimum number of items that are allowed (based on the SIZE constraint)
         public long minItems(PEREffectiveConstraint cns)
         {
             if (cns == null)
@@ -81,6 +111,7 @@ namespace tinyAsn1
             PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
             return cn.m_size.m_rootRange.m_min;
         }
+        // Get the maximum number of items that are allowed (based on the SIZE constraint)
         public long maxItems(PEREffectiveConstraint cns)
         {
             if (cns == null)
@@ -91,7 +122,7 @@ namespace tinyAsn1
             return cn.m_size.m_rootRange.m_max;
         }
 
-
+        // Get the minimum number of bits required for encode the size in uPER
         public long minSizeBitsInPER(PEREffectiveConstraint cns)
         {
             PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
@@ -121,6 +152,7 @@ namespace tinyAsn1
             return -1;
         }
 
+        // Get the maximum number of bits required for encode the size in uPER
         public long maxSizeBitsInPER(PEREffectiveConstraint cns)
         {
             PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
@@ -142,23 +174,22 @@ namespace tinyAsn1
             return -1;
         }
 
-
-
-
-
-
-
     }
 
 
     /// <summary>
-    /// Common base class for SEQUENCE OF and SET OF
+    /// This is an abstract class serving common functionality to 
+    /// SEQUENCE OF and  SET OF types
     /// </summary>
     public partial class ArrayType : SizeableType
     {
-        public string m_xmlVarName;
+        // The internal type of Sequence Of or Set Of
         public Asn1Type m_type;
+        public string m_xmlVarName;
 
+        /// <summary>
+        /// Auxiliary methods for implementing the visitor pattern
+        /// </summary>
         public override IEnumerable<T> GetMySelfAndAnyChildren<T>()
         {
             if (this is T)
@@ -167,6 +198,9 @@ namespace tinyAsn1
                 yield return grCh;
         }
 
+        /// <summary>
+        /// Auxiliary methods for implementing the visitor pattern
+        /// </summary>
         public override IEnumerable<KeyValuePair<string, T>> GetMySelfAndAnyChildrenWithPath<T>(string pathUpToHere)
         {
             if (this is T)
@@ -217,7 +251,7 @@ namespace tinyAsn1
             {
                 if (m_perEffectiveConstraint != null)
                     return m_perEffectiveConstraint;
-                m_perEffectiveConstraint = Asn1CompilerInvokation.Instance.Factory.CreatePERSizeEffectiveConstraint();
+                m_perEffectiveConstraint = DefaultBackend.Instance.Factory.CreatePERSizeEffectiveConstraint();
                 m_perEffectiveConstraint = (PERSizeEffectiveConstraint)m_perEffectiveConstraint.Compute(m_constraints,this);
                 return m_perEffectiveConstraint;
             }
@@ -264,6 +298,10 @@ namespace tinyAsn1
     }
 
 
+    /// <summary>
+    /// Abstract class providing common functionality
+    /// to SEQUENCE OF and SET OF values
+    /// </summary>
     public abstract partial class ArrayValue : Asn1Value, ISize
     {
         public List<Asn1Value> m_children = new List<Asn1Value>();

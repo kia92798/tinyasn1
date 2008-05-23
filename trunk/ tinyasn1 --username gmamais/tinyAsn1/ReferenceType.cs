@@ -1,3 +1,16 @@
+/**=============================================================================
+Definition of ReferenceType class
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,6 +22,7 @@ namespace tinyAsn1
 {
     public partial class ReferenceType : Asn1Type 
     {
+        //the name of the type
         public string m_referencedTypeName = "";
         public string m_referencedModName = "";
 
@@ -16,7 +30,7 @@ namespace tinyAsn1
 
         static public new ReferenceType CreateFromAntlrAst(ITree tree)
         {
-            ReferenceType ret = Asn1CompilerInvokation.Instance.Factory.CreateReferenceType();
+            ReferenceType ret = DefaultBackend.Instance.Factory.CreateReferenceType();
             if (tree.ChildCount == 1)
                 ret.m_referencedTypeName = tree.GetChild(0).Text;
             else if (tree.ChildCount == 2)
@@ -55,9 +69,9 @@ namespace tinyAsn1
                     if (((ReferenceType)ret).m_referencedModName != "")
                     {
                         //                        throw new Exception("Type references to external modules are not implemented (yet) ...");
-                        if (!Asn1CompilerInvokation.Instance.isModuleDefined(((ReferenceType)ret).m_referencedModName))
+                        if (!DefaultBackend.Instance.isModuleDefined(((ReferenceType)ret).m_referencedModName))
                             throw new SemanticErrorException("Error: No module is defined with name '" + ((ReferenceType)ret).m_referencedModName + "'. Line: " + ret.antlrNode.Line);
-                        Module otherModule = Asn1CompilerInvokation.Instance.GetModuleByName(((ReferenceType)ret).m_referencedModName);
+                        Module otherModule = DefaultBackend.Instance.GetModuleByName(((ReferenceType)ret).m_referencedModName);
                         ret = otherModule.GetTypeByName(((ReferenceType)ret).m_referencedTypeName);
                     }
                     if (ret.m_module.m_typeAssigments.ContainsKey(((ReferenceType)ret).m_referencedTypeName))
@@ -87,9 +101,9 @@ namespace tinyAsn1
                 if (m_referencedModName != "")
                 {
                     //                        throw new Exception("Type references to external modules are not implemented (yet) ...");
-                    if (!Asn1CompilerInvokation.Instance.isModuleDefined(m_referencedModName))
+                    if (!DefaultBackend.Instance.isModuleDefined(m_referencedModName))
                         throw new SemanticErrorException("Error: No module is defined with name '" + m_referencedModName + "'. Line: " + antlrNode.Line);
-                    Module otherModule = Asn1CompilerInvokation.Instance.GetModuleByName(m_referencedModName);
+                    Module otherModule = DefaultBackend.Instance.GetModuleByName(m_referencedModName);
                     return otherModule.GetTypeByName(m_referencedTypeName);
                 }
                 return m_module.GetTypeByName(m_referencedTypeName);
@@ -99,7 +113,7 @@ namespace tinyAsn1
         {
             get
             {
-                TagSequence ret = Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTagSequence();
+                TagSequence ret = DefaultBackend.Instance.Factory.CreateAsn1TypeTagSequence();
                 Asn1Type type = this;
                 bool implicitTagging = false;
                 while (type != null)
@@ -166,14 +180,6 @@ namespace tinyAsn1
             base.DoSemanticAnalysis();
         }
 
-        /*        public override IConstraint ParentConstraint
-                {
-                    get
-                    {
-                        return ParentType.Constraint;
-                    }
-                }
-        */
         public override void ResolveConstraints()
         {
             if (AreConstraintsResolved())
@@ -205,12 +211,12 @@ namespace tinyAsn1
 
         public override bool AreConstraintsResolved()
         {
-            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
                 return true;
             
             bool ret = _AreConstraintsResolved();
 
-            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
             return ret;
 
         }
@@ -289,7 +295,7 @@ namespace tinyAsn1
 
         public static ReferenceType CreateByName(TypeAssigment newTas)
         {
-            ReferenceType ret = Asn1CompilerInvokation.Instance.Factory.CreateReferenceType();
+            ReferenceType ret = DefaultBackend.Instance.Factory.CreateReferenceType();
             ret.m_referencedTypeName = newTas.m_name;
             ret.m_module = newTas.m_type.m_module;
             ret.antlrNode = newTas.m_type.antlrNode;
@@ -310,14 +316,14 @@ namespace tinyAsn1
 
         public override bool ContainsTypeAssigment(string typeAssigment)
         {
-            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
                 return true;
 
             bool ret = _ContainsTypeAssigment(typeAssigment);
 
             
 
-            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
             return ret;
         }
 

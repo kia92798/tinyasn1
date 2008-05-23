@@ -1,10 +1,30 @@
-﻿using System;
+﻿/**=============================================================================
+IAsn1AbstractFactory definition  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Antlr.Runtime.Tree;
 
 namespace tinyAsn1
 {
+
+    /// <summary>
+    /// This is the interface of the Abstract Factory for all asn1 classes.
+    /// Whenever, you need to build a new backend you must create a class
+    /// that implements this interface. The easiest way to do this is to extend
+    /// the DefaultAsn1Factory class which provides a default implementation
+    /// of the IAsn1AbstractFactory interface
+    /// </summary>
     public interface IAsn1AbstractFactory
     {
         Asn1File CreateAsn1File();

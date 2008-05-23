@@ -1,3 +1,16 @@
+/**=============================================================================
+Definition of NumberedItem class
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,7 +25,7 @@ namespace tinyAsn1
     /// This class is not exposed to outside world 
     /// </summary>
 
-    internal /* not need to be abstract */partial class NumberedItem
+    internal partial class NumberedItem
     {
         public string m_id = "";
         public string m_valueAsReference = "";
@@ -20,18 +33,6 @@ namespace tinyAsn1
         public bool m_extended = false;
         public ITree antlrNode;
 
-/*
-        public Object Value
-        {
-            get
-            {
-                if (m_valueAsInt != null)
-                    return m_valueAsInt;
-                else
-                    return m_valueAsReference;
-            }
-        }
-*/
         // ^(NUMBER_LST_ITEM identifier INT? valuereference?)
         //|^(NUMBER_LST_ITEM identifier signedNumber? valuereference?)
         static public NumberedItem CreateFromAntlrAst(ITree tree)
@@ -47,9 +48,6 @@ namespace tinyAsn1
                     case asn1Parser.INT:
                         ret.m_valueAsInt = int.Parse(child.Text);
                         break;
-                    //case asn1Parser.NUMERIC_VALUE:
-                    //    ret.m_valueAsInt = Asn1Value.GetValFrom_NUMERIC_VALUE_asInt(child);
-                    //    break;
                     case asn1Parser.LID:
                         ret.m_valueAsReference = child.Text;
                         break;

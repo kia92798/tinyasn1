@@ -1,3 +1,17 @@
+/**=============================================================================
+Definition of IA5StringType, NumericStringType, IA5StringValue and NumericStringValue  class
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,6 +25,9 @@ namespace tinyAsn1
         Char[] AllowedCharSet { get;}
     }
 
+    /// <summary>
+    /// Class representing the IA5String type
+    /// </summary>
     public partial class IA5StringType : SizeableType, IStringType
     {
         public override string Name
@@ -22,7 +39,7 @@ namespace tinyAsn1
         {
             get
             {
-                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 22, TaggingMode.EXPLICIT, this);
+                return DefaultBackend.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 22, TaggingMode.EXPLICIT, this);
             }
         }
 
@@ -33,7 +50,7 @@ namespace tinyAsn1
             {
                 case asn1Parser.StringLiteral:
                 case asn1Parser.VALUE_LIST:
-                    return Asn1CompilerInvokation.Instance.Factory.CreateIA5StringValue(val.antlrNode, m_module, this);
+                    return DefaultBackend.Instance.Factory.CreateIA5StringValue(val.antlrNode, m_module, this);
 
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
@@ -43,7 +60,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.IA5String:
-                                return Asn1CompilerInvokation.Instance.Factory.CreateIA5StringValue(tmp as IA5StringValue, val.antlrNode.GetChild(0));
+                                return DefaultBackend.Instance.Factory.CreateIA5StringValue(tmp as IA5StringValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
@@ -107,7 +124,7 @@ namespace tinyAsn1
 
         public virtual IA5StringType CreateForPA(Module mod, ITree antrl)
         {
-            IA5StringType ret = Asn1CompilerInvokation.Instance.Factory.CreateIA5StringType();
+            IA5StringType ret = DefaultBackend.Instance.Factory.CreateIA5StringType();
             ret.m_IamUsedInPermittedAlphabet = true;
             ret.m_module = mod;
             ret.antlrNode = antrl;
@@ -162,7 +179,7 @@ namespace tinyAsn1
             {
                 if (m_perEffectiveConstraint != null)
                     return m_perEffectiveConstraint;
-                m_perEffectiveConstraint = Asn1CompilerInvokation.Instance.Factory.CreatePERAlphabetAndSizeEffectiveConstraint();
+                m_perEffectiveConstraint = DefaultBackend.Instance.Factory.CreatePERAlphabetAndSizeEffectiveConstraint();
                 m_perEffectiveConstraint = (PERAlphabetAndSizeEffectiveConstraint)m_perEffectiveConstraint.Compute(m_constraints, this);
                 return m_perEffectiveConstraint;
             }
@@ -206,7 +223,9 @@ namespace tinyAsn1
 
 
     }
-
+    /// <summary>
+    /// Class represent the NumericString type
+    /// </summary>
     public partial class NumericStringType : IA5StringType
     {
         public override string Name
@@ -218,7 +237,7 @@ namespace tinyAsn1
         {
             get
             {
-                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 18, TaggingMode.EXPLICIT, this);
+                return DefaultBackend.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 18, TaggingMode.EXPLICIT, this);
             }
         }
 
@@ -228,7 +247,7 @@ namespace tinyAsn1
             switch (val.antlrNode.Type)
             {
                 case asn1Parser.StringLiteral:
-                    return Asn1CompilerInvokation.Instance.Factory.CreateNumericStringValue(val.antlrNode, m_module, this);
+                    return DefaultBackend.Instance.Factory.CreateNumericStringValue(val.antlrNode, m_module, this);
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
                     if (m_module.isValueDeclared(referenceId))
@@ -237,7 +256,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.NumericString:
-                                return Asn1CompilerInvokation.Instance.Factory.CreateNumericStringValue(tmp as NumericStringValue, val.antlrNode.GetChild(0));
+                                return DefaultBackend.Instance.Factory.CreateNumericStringValue(tmp as NumericStringValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
@@ -254,7 +273,7 @@ namespace tinyAsn1
         }
         public override IA5StringType CreateForPA(Module mod, ITree antrl)
         {
-            NumericStringType ret = Asn1CompilerInvokation.Instance.Factory.CreateNumericStringType();
+            NumericStringType ret = DefaultBackend.Instance.Factory.CreateNumericStringType();
             ret.IamUsedInPermittedAlphabet = true;
             ret.m_module = mod;
             ret.antlrNode = antrl;
@@ -270,10 +289,11 @@ namespace tinyAsn1
         {
             get { return m_allowedCharSet; }
         }
-//        protected override string EncodingCFunctionName { get { return "BitStream_EncodeNumericString"; } }
     }
 
-
+    /// <summary>
+    /// Class represent the IA5String value
+    /// </summary>
     public partial class IA5StringValue : Asn1Value, ISize, ICharacterString
     {
         protected string m_value;
@@ -540,6 +560,9 @@ namespace tinyAsn1
 
     }
 
+    /// <summary>
+    /// Class represent the NumericString value
+    /// </summary>
     public partial class NumericStringValue : IA5StringValue
     {
         static Char[] AllowedCharSet = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ' };

@@ -1,3 +1,16 @@
+/**=============================================================================
+ChoiceType, ChoiceChild and ChoiceValue class definitions
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,12 +20,18 @@ using MB = System.Reflection.MethodBase;
 
 namespace tinyAsn1
 {
-
+    /// <summary>
+    /// Class represent the ASN.1 CHOICE type
+    /// </summary>
     public partial class ChoiceType : Asn1Type
     {
+        // Choice alternatives list
         public OrderedDictionary<string, ChoiceChild> m_children = new OrderedDictionary<string, ChoiceChild>();
+        // extention mark is present
         public bool m_extMarkPresent = false;
+        // exception class
         public ExceptionSpec m_exceptionSpec;
+        // second extention mark is present
         public bool m_extMarkPresent2 = false;
 
         string _cid_none = null;
@@ -64,7 +83,7 @@ namespace tinyAsn1
         //	^(CHOICE_TYPE choiceItemsList choiceExtensionBody?)
         static public new ChoiceType CreateFromAntlrAst(ITree tree)
         {
-            ChoiceType ret = Asn1CompilerInvokation.Instance.Factory.CreateChoiceType();
+            ChoiceType ret = DefaultBackend.Instance.Factory.CreateChoiceType();
             for (int i = 0; i < tree.ChildCount; i++)
             {
                 ITree child = tree.GetChild(i);
@@ -191,7 +210,7 @@ namespace tinyAsn1
 
         public override void PerformAutomaticTagging()
         {
-            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
                 return;
 
             int curTag = 0;
@@ -200,7 +219,7 @@ namespace tinyAsn1
                 if (m_AutomaticTaggingTransformationCanBeApplied)
                 {
 
-                    ch.m_type.m_tag = Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag();
+                    ch.m_type.m_tag = DefaultBackend.Instance.Factory.CreateAsn1TypeTag();
                     ch.m_type.m_tag.m_class = Tag.TagClass.CONTEXT_SPECIFIC;
                     ch.m_type.m_tag.m_tag = curTag;
                     ch.m_type.m_tag.m_type = ch.m_type;
@@ -213,7 +232,7 @@ namespace tinyAsn1
                 ch.m_type.PerformAutomaticTagging();
             }
 
-            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
 
         }
 
@@ -227,7 +246,7 @@ namespace tinyAsn1
             {
                 case asn1Parser.CHOICE_VALUE:
                     if (sqVal == null)
-                        return Asn1CompilerInvokation.Instance.Factory.CreateChoiceValue(val.antlrNode, m_module, this);
+                        return DefaultBackend.Instance.Factory.CreateChoiceValue(val.antlrNode, m_module, this);
                     else
                     {
                         sqVal.FixChildrenVars();
@@ -244,7 +263,7 @@ namespace tinyAsn1
                                 if (tmp.IsResolved())
                                 {
                                     if (tmp.Type.GetFinalType() == this)
-                                        return Asn1CompilerInvokation.Instance.Factory.CreateChoiceValue(tmp as ChoiceValue, val.antlrNode.GetChild(0));
+                                        return DefaultBackend.Instance.Factory.CreateChoiceValue(tmp as ChoiceValue, val.antlrNode.GetChild(0));
                                     throw new SemanticErrorException("Error in line : " + val.antlrNode.Line + ". Incompatible variable assigment");
                                 }
                                 return val; // not yet fully resolved, wait for next round
@@ -281,7 +300,7 @@ namespace tinyAsn1
 
         public override bool AreConstraintsResolved()
         {
-            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
                 return true;
 
             bool ret = true;
@@ -293,7 +312,7 @@ namespace tinyAsn1
 
             ret = ret && base.AreConstraintsResolved();
 
-            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
 
             return ret;
 
@@ -410,7 +429,7 @@ namespace tinyAsn1
 
         public override void CheckChildrensTags()
         {
-            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
                 return;
 
             
@@ -437,7 +456,7 @@ namespace tinyAsn1
                 ch.m_type.CheckChildrensTags();
             }
             
-            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
 
         }
         
@@ -480,7 +499,7 @@ namespace tinyAsn1
 
         public override long minBitsInPER(PEREffectiveConstraint cns)
         {
-            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
                 return 0;
 
             long ret = 0;
@@ -499,14 +518,14 @@ namespace tinyAsn1
             ret+=PER.GetNumberOfBitsForNonNegativeInteger(nRootChildren);
             ret += smallestChild;
 
-            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
 
             return ret;
         }
 
         public override long maxBitsInPER(PEREffectiveConstraint cns)
         {
-            if (!Asn1CompilerInvokation.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
                 return -1;
 
             long ret = 0;
@@ -528,7 +547,7 @@ namespace tinyAsn1
                 ret += largestChild;
             }
 
-            Asn1CompilerInvokation.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
 
             return ret;
         }
@@ -571,31 +590,24 @@ namespace tinyAsn1
             return ret;
         }
 
-
-
-
-/*
-        internal override void PrintCIsConstraintValidAux(StreamWriterLevel c)
-        {
-            base.PrintCIsConstraintValidAux(c);
-            foreach (ChoiceChild ch in m_children.Values)
-                ch.m_type.PrintCIsConstraintValidAux(c);
-        }
-*/
-
-
-
-
-
     }
 
+    /// <summary>
+    /// This class represent a choice alternative name
+    /// </summary>
     public partial class ChoiceChild 
     {
+        // alternative name
         public string m_childVarName = "";
+        // alternative type
         public Asn1Type m_type;
+        // alternative is extended
         public bool m_extended = false;
+        // version group
         public int? m_version = null;
+        // comments associated with this alternative
         public List<string> m_comments = new List<string>();
+        //antler tree node
         public ITree antlrNode = null;
 
         string _cid = null;
@@ -628,7 +640,7 @@ namespace tinyAsn1
         //^(CHOICE_ITEM identifier type )
         static public ChoiceChild CreateFromAntlrAst(ITree tree, int? version, bool extended)
         {
-            ChoiceChild ret = Asn1CompilerInvokation.Instance.Factory.CreateChoiceChildType();
+            ChoiceChild ret = DefaultBackend.Instance.Factory.CreateChoiceChildType();
             ret.m_version = version;
             ret.m_extended = extended;
             ret.antlrNode = tree;

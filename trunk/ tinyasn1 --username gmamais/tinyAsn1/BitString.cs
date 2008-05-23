@@ -1,3 +1,16 @@
+/**=============================================================================
+BitStringType and BitStringValue class definitions
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,10 +19,15 @@ using Antlr.Runtime;
 
 namespace tinyAsn1
 {
+    /// <summary>
+    /// BIT STRING
+    /// </summary>
     public partial class BitStringType : SizeableType
     {
-        internal List<NumberedItem> m_namedBitsPriv = new List<NumberedItem>();
+        // List with the bitstring special values
         public OrderedDictionary<string, Int64> m_namedBits = new OrderedDictionary<string, Int64>();
+
+        internal List<NumberedItem> m_namedBitsPriv = new List<NumberedItem>();
         public override string Name
         {
             get { return "BIT STRING"; }
@@ -19,13 +37,13 @@ namespace tinyAsn1
         {
             get
             {
-                return Asn1CompilerInvokation.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 3, TaggingMode.EXPLICIT, this);
+                return DefaultBackend.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 3, TaggingMode.EXPLICIT, this);
             }
         }
 
         static public new BitStringType CreateFromAntlrAst(ITree tree)
         {
-            BitStringType ret = Asn1CompilerInvokation.Instance.Factory.CreateBitStringType();
+            BitStringType ret = DefaultBackend.Instance.Factory.CreateBitStringType();
             for (int i = 0; i < tree.ChildCount; i++)
             {
                 ITree child = tree.GetChild(i);
@@ -101,7 +119,7 @@ namespace tinyAsn1
             {
                 case asn1Parser.BitStringLiteral:
                 case asn1Parser.OctectStringLiteral:
-                    return Asn1CompilerInvokation.Instance.Factory.CreateBitStringValue(val.antlrNode, m_module, this);
+                    return DefaultBackend.Instance.Factory.CreateBitStringValue(val.antlrNode, m_module, this);
 
                 case asn1Parser.OBJECT_ID_VALUE: // There is case { id } that the parser thinks that this a OBJECT ID value
                     // although it should handled as VALUE_LIST
@@ -124,7 +142,7 @@ namespace tinyAsn1
 
                         List<Int64> ids = new List<Int64>();
                         ids.Add(m_namedBits[id]);
-                        return Asn1CompilerInvokation.Instance.Factory.CreateBitStringValue(ids, val.antlrNode, m_module, this);
+                        return DefaultBackend.Instance.Factory.CreateBitStringValue(ids, val.antlrNode, m_module, this);
                     }
 
 
@@ -152,7 +170,7 @@ namespace tinyAsn1
 
                             ids.Add(m_namedBits[id]);
                         }
-                        return Asn1CompilerInvokation.Instance.Factory.CreateBitStringValue(ids, val.antlrNode, m_module, this);
+                        return DefaultBackend.Instance.Factory.CreateBitStringValue(ids, val.antlrNode, m_module, this);
                     }
                 case asn1Parser.VALUE_REFERENCE:
                     referenceId = val.antlrNode.GetChild(0).Text;
@@ -162,7 +180,7 @@ namespace tinyAsn1
                         switch (tmp.m_TypeID)
                         {
                             case Asn1Value.TypeID.BIT_STRING:
-                                return Asn1CompilerInvokation.Instance.Factory.CreateBitStringValue(tmp as BitStringValue, val.antlrNode.GetChild(0));
+                                return DefaultBackend.Instance.Factory.CreateBitStringValue(tmp as BitStringValue, val.antlrNode.GetChild(0));
                             case Asn1Value.TypeID.UNRESOLVED:
                                 // not yet resolved, wait for next round
                                 return val;
@@ -237,7 +255,7 @@ namespace tinyAsn1
             {
                 if (m_perEffectiveConstraint != null)
                     return m_perEffectiveConstraint;
-                m_perEffectiveConstraint = Asn1CompilerInvokation.Instance.Factory.CreatePERSizeEffectiveConstraint();
+                m_perEffectiveConstraint = DefaultBackend.Instance.Factory.CreatePERSizeEffectiveConstraint();
                 m_perEffectiveConstraint = (PERSizeEffectiveConstraint)m_perEffectiveConstraint.Compute(m_constraints, this);
                 return m_perEffectiveConstraint;
             }
