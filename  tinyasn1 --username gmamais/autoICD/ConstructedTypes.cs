@@ -354,7 +354,7 @@ namespace autoICD
         {
             string comment = "Special field used by PER to indicate the presence/absence of optional and default fields.";
             if (pThis.IsPERExtensible())
-                comment = "Special field used by PER to (a) mark the presense of extension(s) and (b) to indicate the presence/absence of optional and default fields.";
+                comment = "Special field used by PER to (a) mark the presence of extension(s) and (b) to indicate the presence/absence of optional and default fields.";
             List<ICDSequenceOrSetTypeChild> tmp = new List<ICDSequenceOrSetTypeChild>();
             foreach (ICDSequenceOrSetTypeChild ch in pThis.m_children.Values)
             {
@@ -461,13 +461,15 @@ namespace autoICD
 
             PrintSizeLengthHtml(pThis, cns, o, lev + 1, BaseConstraint.AsString(additonalConstraints));
             PrintItemHtml(pThis, cns, o, 1);
-            if (pThis.maxItems(cns) > 2)
+
+            long mxItems = pThis.maxItems(cns);
+            if (mxItems > 2 || mxItems==-1)
             {
                 o.WriteLine("<tr class=\"CommentRow\">");
                 o.WriteLine("<td class=\"threeDots\" colspan=\"7\"> <p>. . .</p> </td>");
                 o.WriteLine("</tr>");
             }
-            if (pThis.maxItems(cns) >= 2)
+            if (pThis.maxItems(cns) >= 2 || mxItems==-1)
                 PrintItemHtml(pThis, cns, o, pThis.maxItems(cns));
 
             o.WriteLine("</tbody>");

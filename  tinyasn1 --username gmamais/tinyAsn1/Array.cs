@@ -40,6 +40,8 @@ namespace tinyAsn1
                 return -1;
             if (cn.m_size.m_rootRange.m_maxIsInfinite)
                 return -1;
+            if (maxItemBitsInPER(cns) == -1)
+                return -1;
 
             if (cn.m_size.m_rootRange.m_max < 0x10000 &&
                 cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
