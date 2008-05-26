@@ -539,6 +539,12 @@ namespace tinyAsn1
                 {
                     if (ch.m_extended)
                         continue;
+                    if (ch.m_type.MaxBitsInPER == -1)
+                    {
+                        DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+                        return -1;
+                    }
+
                     if (ch.m_type.MaxBitsInPER > largestChild)
                         largestChild = ch.m_type.MaxBitsInPER;
                     nRootChildren++;

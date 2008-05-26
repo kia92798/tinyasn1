@@ -330,7 +330,14 @@ namespace autoICD
                             j++;
                         else
                             break;
-                    if (m_tokes[j].Type == asn1Lexer.ASSIG_OP)
+                    int k = i - 1;
+                    while (k>0)
+                        if (m_tokes[k].Type == asn1Lexer.WS || m_tokes[k].Type == asn1Lexer.COMMENT || m_tokes[k].Type == asn1Lexer.COMMENT2)
+                            k--;
+                        else
+                            break;
+
+                    if (m_tokes[j].Type == asn1Lexer.ASSIG_OP && m_tokes[k].Type != asn1Lexer.LID)
                         strm.Write("<a name=\"ASN1_" + t.Text.Replace("-", "_") + "\"></a><a href=\"#ICD_" + t.Text.Replace("-", "_") + "\"><font  color=\"#B8860B\" ><b>" + t.Text + "</b></font></a>");
                     else
                         strm.Write("<a href=\"#ASN1_" + t.Text.Replace("-", "_") + "\"><font  color=\"#000000\" >" + t.Text + "</font></a>");

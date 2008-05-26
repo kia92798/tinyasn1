@@ -106,7 +106,11 @@ namespace autoICD
                         l = l.Substring(2, l.Length - 4);
                     itemComment += l;
                 }
-                ret += string.Format("<li><font  color=\"#5F9EA0\" >{0}</font>({1}) --{2}</li>", it.m_id, it.m_value, itemComment);
+                if (itemComment.Length>0)
+                    ret += string.Format("<li><font  color=\"#5F9EA0\" >{0}</font>({1}) --{2}</li>", it.m_id, it.m_value, itemComment);
+                else
+                    ret += string.Format("<li><font  color=\"#5F9EA0\" >{0}</font>({1})</li>", it.m_id, it.m_value );
+
             }
             ret += "</ul>";
             return ret;
