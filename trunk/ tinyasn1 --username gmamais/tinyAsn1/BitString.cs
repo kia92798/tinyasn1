@@ -344,8 +344,8 @@ namespace tinyAsn1
                 foreach (Char ch in tmp.ToUpper())
                     m_value += lookup[ch];
 
-                while (m_value.Length > 0 && m_value[m_value.Length - 1] == '0')
-                    m_value = m_value.Remove(m_value.Length - 1);
+                //while (m_value.Length > 0 && m_value[m_value.Length - 1] == '0')
+                //    m_value = m_value.Remove(m_value.Length - 1);
             }
             else
                 throw new Exception("Internal Error");
