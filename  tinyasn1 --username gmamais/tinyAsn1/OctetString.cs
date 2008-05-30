@@ -215,9 +215,11 @@ namespace tinyAsn1
             antlrNode = tree;
             m_type = type;
 
+
             BitStringValue tmp = DefaultBackend.Instance.Factory.CreateBitStringValue(tree, mod, type);
 
             m_value = ConvertToOctetArray(tmp);
+
         }
 
 

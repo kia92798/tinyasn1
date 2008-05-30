@@ -29,7 +29,7 @@ namespace tinyAsn1
     /// Most important attribute is m_files which is the list of all files
     /// passed in the command line argument
     /// </summary>
-    public abstract class DefaultBackend
+    public class DefaultBackend
     {
 
         // The following attributes correspond to the equivalent command 
@@ -48,7 +48,7 @@ namespace tinyAsn1
         /// Return the Asn1AbstractFactory
         /// Must be overriden in the subclass
         /// </summary>
-        public abstract IAsn1AbstractFactory Factory { get;}
+        public virtual IAsn1AbstractFactory Factory { get { return new DefaultAsn1Factory(); } }
 
         /// <summary>
         /// the list of all files
