@@ -271,7 +271,7 @@ namespace tinyAsn1
                 Asn1Type parType = ParentType;
                 while (parType != null)
                 {
-                    m_perEffectiveConstraint = PEREffectiveConstraint.Intersection(m_perEffectiveConstraint, ParentType.PEREffectiveConstraint);
+                    m_perEffectiveConstraint = PEREffectiveConstraint.Intersection(m_perEffectiveConstraint, parType.PEREffectiveConstraint);
 
                     parType = parType.ParentType;
                 }
@@ -280,6 +280,55 @@ namespace tinyAsn1
                 return m_perEffectiveConstraint;
             }
         }
+
+        public double m_MinRealValue
+        {
+            get
+            {
+                double ret = double.NegativeInfinity;
+                foreach (IConstraint con in m_constraints)
+                    ret = Math.Max(ret, con.m_MinRealValue);
+
+                Asn1Type parType = ParentType;
+                while (parType != null)
+                {
+                    if (parType is RealType)
+                        ret = Math.Max(ret, ((RealType)parType).m_MinRealValue);
+                    else if (parType is ReferenceType)
+                        ret = Math.Max(ret, ((ReferenceType)parType).m_MinRealValue);
+                    else
+                        throw new Exception("Internal Error: m_MinValue is not supported for type: " + parType.Name);
+                    parType = parType.ParentType;
+                }
+
+                return ret;
+            }
+        }
+
+
+        public double m_MaxRealValue
+        {
+            get
+            {
+                double ret = double.PositiveInfinity;
+                foreach (IConstraint con in m_constraints)
+                    ret = Math.Min(ret, con.m_MaxRealValue);
+                Asn1Type parType = ParentType;
+                while (parType != null)
+                {
+                    if (parType is RealType)
+                        ret = Math.Min(ret, ((RealType)parType).m_MaxRealValue);
+                    else if (parType is ReferenceType)
+                        ret = Math.Min(ret, ((ReferenceType)parType).m_MaxRealValue);
+                    else
+                        throw new Exception("Internal Error: m_MinValue is not supported for type: " + parType.Name);
+                    parType = parType.ParentType;
+                }
+                return ret;
+            }
+        }
+
+
 
         public override long minBitsInPER(PEREffectiveConstraint cns)
         {
@@ -352,11 +401,6 @@ namespace tinyAsn1
 
             return ret;
         }
-
-
-
-
-
 
     }
 }

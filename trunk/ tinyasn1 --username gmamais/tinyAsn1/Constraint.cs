@@ -34,6 +34,11 @@ namespace tinyAsn1
         PERSizeEffectiveConstraint PEREffectiveSizeConstraint { get;}
         PERAlphabetAndSizeEffectiveConstraint PEREffectiveAlphabetAndSizeConstraint { get;}
 
+        //It return the minimum allowed value for a REAL type. If associated is not a RAEL type, it throws an exception
+        double m_MinRealValue { get;}
+        //It return the maximum allowed value for a REAL type. If associated is not a RAEL type, it throws an exception
+        double m_MaxRealValue { get;}
+
     }
 
     // base class for all constraints
@@ -158,6 +163,9 @@ namespace tinyAsn1
         {
             get { throw new Exception("The method or operation is not implemented."); }
         }
+
+        public virtual double m_MinRealValue { get { throw new Exception("The method or operation is not implemented."); } }
+        public virtual double m_MaxRealValue { get { throw new Exception("The method or operation is not implemented."); } }
 
     }
 
@@ -296,6 +304,26 @@ namespace tinyAsn1
                 return ret;
             }
         }
+
+        public override double m_MinRealValue
+        {
+            get
+            {
+                if (m_extConstr != null)
+                    return Math.Min(m_constr.m_MinRealValue, m_extConstr.m_MaxRealValue);
+                return m_constr.m_MinRealValue;
+            }
+        }
+
+        public override double m_MaxRealValue
+        {
+            get
+            {
+                if (m_extConstr != null)
+                    return Math.Max(m_constr.m_MaxRealValue, m_extConstr.m_MaxRealValue);
+                return m_constr.m_MaxRealValue;
+            }
+        }
     }
     
     /// <summary>
@@ -425,6 +453,36 @@ namespace tinyAsn1
                 return ret;
             }
         }
+
+        public override double m_MinRealValue
+        {
+            get
+            {
+                if (m_items.Count == 0)
+                    return double.NegativeInfinity;
+                
+                double ret = double.PositiveInfinity;
+                foreach (IConstraint con in m_items)
+                    ret = Math.Min(ret, con.m_MinRealValue);
+
+                return ret;
+            }
+        }
+
+        public override double m_MaxRealValue
+        {
+            get
+            {
+                if (m_items.Count == 0)
+                    return double.PositiveInfinity;
+
+                double ret = double.NegativeInfinity;
+                foreach (IConstraint con in m_items)
+                    ret = Math.Max(ret, con.m_MaxRealValue);
+
+                return ret;
+            }
+        }
     }
 
     /// <summary>
@@ -548,6 +606,29 @@ namespace tinyAsn1
                 return ret;
             }
         }
+        public override double m_MinRealValue
+        {
+            get
+            {
+                double ret = double.NegativeInfinity;
+                foreach (IConstraint con in m_items)
+                    ret = Math.Max(ret, con.m_MinRealValue);
+
+                return ret;
+            }
+        }
+
+        public override double m_MaxRealValue
+        {
+            get
+            {
+                double ret = double.PositiveInfinity;
+                foreach (IConstraint con in m_items)
+                    ret = Math.Min(ret, con.m_MaxRealValue);
+
+                return ret;
+            }
+        }
     }
 
     /// <summary>
@@ -629,6 +710,20 @@ namespace tinyAsn1
                 return m_c1.PEREffectiveAlphabetAndSizeConstraint;
             }
         }
+        public override double m_MinRealValue
+        {
+            get
+            {
+                return m_c1.m_MinRealValue;
+            }
+        }
+        public override double m_MaxRealValue
+        {
+            get
+            {
+                return m_c1.m_MaxRealValue;
+            }
+        }
 
     }
     /// <summary>
@@ -701,6 +796,20 @@ namespace tinyAsn1
             get
             {
                 return PERAlphabetAndSizeEffectiveConstraint.Full(m_type);
+            }
+        }
+        public override double m_MinRealValue
+        {
+            get
+            {
+                return double.NegativeInfinity;
+            }
+        }
+        public override double m_MaxRealValue
+        {
+            get
+            {
+                return double.PositiveInfinity;
             }
         }
     }
@@ -797,6 +906,21 @@ namespace tinyAsn1
             }
         }
 
+        public override double m_MinRealValue
+        {
+            get
+            {
+                return ((RealValue)m_val).Value;
+            }
+        }
+
+        public override double m_MaxRealValue
+        {
+            get
+            {
+                return ((RealValue)m_val).Value;
+            }
+        }
 
     }
 
@@ -1043,6 +1167,24 @@ namespace tinyAsn1
             return ret;
         }
 
+        public override double m_MinRealValue
+        {
+            get
+            {
+                if (m_min == null)
+                    return double.NegativeInfinity;
+                return ((RealValue)m_min).Value;
+            }
+        }
+        public override double m_MaxRealValue
+        {
+            get
+            {
+                if (m_max == null)
+                    return double.PositiveInfinity;
+                return ((RealValue)m_max).Value;
+            }
+        }
     }
 
     /// <summary>
@@ -1423,6 +1565,29 @@ namespace tinyAsn1
             get
             {
                 return m_otherType.PEREffectiveConstraint as PERAlphabetAndSizeEffectiveConstraint;
+            }
+        }
+
+        public override double m_MinRealValue
+        {
+            get
+            {
+                double ret = double.NegativeInfinity;
+                foreach (IConstraint con in m_otherType.m_constraints)
+                    ret = Math.Max(ret, con.m_MinRealValue);
+                return ret;
+            }
+        }
+
+        public override double m_MaxRealValue
+        {
+            get
+            {
+                double ret = double.PositiveInfinity;
+                foreach (IConstraint con in m_otherType.m_constraints)
+                    ret = Math.Min(ret, con.m_MaxRealValue);
+                return ret;
+
             }
         }
     }

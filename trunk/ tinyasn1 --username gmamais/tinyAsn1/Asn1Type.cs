@@ -40,9 +40,10 @@ namespace tinyAsn1
 
         public virtual IEnumerable<T> GetMySelfAndAnyChildren<T>() where T : Asn1Type 
         {
-         
+
             if (this is T)
                 yield return this as T;
+
             yield break;
         }
 
