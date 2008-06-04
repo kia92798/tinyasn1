@@ -133,8 +133,28 @@ namespace tinyAsn1
             }
         }
 
+        public double m_MinRealValue
+        {
+            get
+            {
+                double ret = double.NegativeInfinity;
+                foreach (IConstraint con in m_constraints)
+                    ret = Math.Max(ret, con.m_MinRealValue);
+                return ret;
+            }
+        }
 
 
+        public double m_MaxRealValue
+        {
+            get
+            {
+                double ret = double.PositiveInfinity;
+                foreach (IConstraint con in m_constraints)
+                    ret = Math.Min(ret, con.m_MaxRealValue);
+                return ret;
+            }
+        }
 
     }
 

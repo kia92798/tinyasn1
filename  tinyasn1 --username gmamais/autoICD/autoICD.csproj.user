@@ -1,5 +1,5 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <StartArguments>-icd C:\prj\DataModeling\tinyAsn1\autoICD\Maxime\ecntest2.asn</StartArguments>
+    <StartArguments>C:\prj\DataModeling\tinyAsn1\asn1cc\thanos\DataView.asn</StartArguments>
   </PropertyGroup>
 </Project>

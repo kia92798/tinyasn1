@@ -163,6 +163,10 @@ namespace autoICD
                 return 2;
             }
 
+            AsnTypeVisitor vis = new AsnTypeVisitor(compInv);
+
+            foreach (int j in vis.GetInts())
+                Console.WriteLine(j);
 
             if (debug)
             {

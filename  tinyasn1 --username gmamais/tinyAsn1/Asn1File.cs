@@ -22,6 +22,31 @@ using System.Text.RegularExpressions;
 
 namespace tinyAsn1
 {
+
+
+    public class AsnTypeVisitor<T> where T : Asn1Type 
+    {
+        private DefaultBackend m_backend = null;
+        public AsnTypeVisitor(DefaultBackend backend)
+        {
+            m_backend = backend;
+        }
+
+
+        public List<T> GetTypes() 
+        {
+
+            List<T> ret = new List<T>();
+
+            ret.AddRange(m_backend.GetTypes<T>());
+
+            return ret;
+        }
+
+    }
+
+
+
     /// <summary>
     /// This is a singleton class (i.e. only one instance can exist)
     /// It is the root element in the generated AST (i.e. the class that
