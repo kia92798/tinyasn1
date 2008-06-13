@@ -25,6 +25,7 @@ namespace tinyAsn1
     /// </summary>
     public partial class IntegerType : Asn1Type
     {
+
         // list with named integer values 
         public OrderedDictionary<string, Int64> m_namedValues = new OrderedDictionary<string, Int64>();
 

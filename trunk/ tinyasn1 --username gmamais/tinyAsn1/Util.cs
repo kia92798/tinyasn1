@@ -150,6 +150,17 @@ namespace tinyAsn1
                 WriteLine(line.TrimEnd(Environment.NewLine.ToCharArray()));
             }
         }
+
+        public void WL(int L, string format, params object[] arg)
+        {
+            P(L);
+            if (arg.Length > 0)
+                WriteLine(format, arg);
+            else
+                WriteLine(format);
+        }
+
+        
     }
 
     public class SemanticTreeNode : ITree /* util class, no need to be abstract*/

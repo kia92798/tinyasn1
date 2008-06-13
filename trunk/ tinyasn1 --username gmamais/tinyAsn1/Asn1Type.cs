@@ -38,6 +38,7 @@ namespace tinyAsn1
         
         public List<ITree> m_AntlrConstraints = new List<ITree>();
 
+
         public virtual IEnumerable<T> GetMySelfAndAnyChildren<T>() where T : Asn1Type 
         {
 
@@ -69,10 +70,10 @@ namespace tinyAsn1
         {
             public enum TagClass
             {
-                UNIVERSAL,
-                APPLICATION,
-                PRIVATE,
-                CONTEXT_SPECIFIC
+                UNIVERSAL = 0,
+                APPLICATION = 1,
+                CONTEXT_SPECIFIC = 2,
+                PRIVATE = 3,
             }
             public int m_tag;
             internal Asn1Type m_type;
@@ -228,6 +229,8 @@ namespace tinyAsn1
                 return ret;
             }
         }
+
+
 
         public virtual Asn1Type GetFinalType()
         {
