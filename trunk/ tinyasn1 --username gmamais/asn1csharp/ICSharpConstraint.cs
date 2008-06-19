@@ -195,7 +195,7 @@ namespace asn1csharp
             else if (m_type.GetFinalType() is OctetStringType || m_type.GetFinalType() is BitStringType)
                 varName2 = varName + ".Count";
             else if (m_type.GetFinalType() is ArrayType)
-                varName2 = varName + ".m_children.Count";
+                varName2 = "m_children.Count";
 
 
             string ret = "";
@@ -216,7 +216,7 @@ namespace asn1csharp
         {
             System.IO.StringWriter o = new System.IO.StringWriter();
 
-            o.Write("new List<char>(val).TrueForAll(delegate(char c) { return ");
+            o.Write("new List<char>(Value).TrueForAll(delegate(char c) { return ");
             for (int i = 0; i < allowed_char_set.m_constraints.Count; i++)
             {
                 o.Write(((ICSharpConstraint)allowed_char_set.m_constraints[i]).PrintConstraintCode("c", enumPrefix));

@@ -25,40 +25,90 @@ namespace asn1csharp
                     childType.DeclareType(csFile, propName, level);
                     csFile.WriteLine();
                 }
+
                 
 
                 csFile.WL(level, "public {0} {1}", ((ICSharpType)ch.m_type).DeclaredTypeName, C.ID(ch.m_childVarName));
                 csFile.WL(level++, "{");
 
-                csFile.WL(level, "get {{ return m_children[\"{0}\"].m_asn1Object as {1}; }}", C.ID(ch.m_childVarName), ((ICSharpType)ch.m_type).DeclaredTypeName);
-
+                csFile.WL(level, "get {{ return m_children[ClassDef.m_children[\"{0}\"].m_index] as {1}; }}", C.ID(ch.m_childVarName), ((ICSharpType)ch.m_type).DeclaredTypeName);
+                
                 csFile.WL(--level, "}");
 
 
                 csFile.WL(level, "public {0} Create_{1}()", childType.DeclaredTypeName, C.ID(ch.m_childVarName));
                 csFile.WL(level++, "{");
-                csFile.WL(level, "{0} ret = new {0}();",childType.DeclaredTypeName);
-                if (!childType.RequiresNewTypeDeclaration())
-                    childType.WriteConstructorCode(csFile, level, "ret", ch.m_type.m_constraints);
 
-                csFile.WL(level, "m_children[\"{0}\"].m_asn1Object = ret;", C.ID(ch.m_childVarName));
-
-                csFile.WL(level, "return ret;");
+//                csFile.WL(level, "return CreateChild(\"{0}\");", C.ID(ch.m_childVarName));
+                csFile.WL(level, "return CreateChild(\"{0}\") as {1};", C.ID(ch.m_childVarName), childType.DeclaredTypeName);
                 csFile.WL(--level, "}");
 
             }
+            
+            CSharpType.WriteEncodeDecodeMethods(pThis, csFile, level);
+
+            csFile.WL(level, "static Asn1CompositeClass<OptionalNamedChild> _clsDef = new {0}ClassDefinition();",TypeName);
+            csFile.WL(level, "public override Asn1CompositeClass<OptionalNamedChild> ClassDef");
+            csFile.WL(level++, "{");
+            csFile.WL(level, "get");
+            csFile.WL(level++, "{");
+            csFile.WL(level, "return _clsDef;");
+            csFile.WL(--level, "}");
+            csFile.WL(--level, "}");
+
 
             csFile.WL(level, "public {0}()", TypeName);
             csFile.WL(level++, "{");
+            csFile.WL(level, "m_children = new Asn1Object[{0}];",pThis.m_children.Count);
+            csFile.WL(--level, "}");
+
+//class definition
+
+            csFile.WL(level, "public class {0}ClassDefinition : Asn1CompositeClass<OptionalNamedChild>", TypeName);
+            csFile.WL(level++, "{");
+
+            csFile.WL(level, "public {0}ClassDefinition()", TypeName);
+            csFile.WL(level++, "{");
+
+
             csFile.WL(level, "OptionalNamedChild ch;");
+            int idx = 0;
             foreach (SequenceOrSetType.Child ch in pThis.m_children.Values)
             {
-                csFile.WL(level, "ch = new OptionalNamedChild(\"{0}\", null, Create_{0}, {1}, null);", C.ID(ch.m_childVarName), (ch.m_optional ? "true" : "false"));
 
+                ICSharpType childType = ch.m_type as ICSharpType;
+
+                csFile.WL(level, "ch = new OptionalNamedChild(\"{0}\", {1}, delegate() {{return new {2}();}}, {3}, null);", C.ID(ch.m_childVarName), idx,
+                    childType.DeclaredTypeName, (ch.m_optional ? "true" : "false"));
+                idx++;
+
+                ChoiceType chChild = ch.m_type.GetFinalType() as ChoiceType;
+                if (chChild != null && !ch.m_type.IsTagged())
+                {
+                    csFile.WL(level, "ch.UnTaggedChoice = true;");
+                    csFile.WL(level, "ch.m_childrenTags = new List<Tag>();");
+
+                    List<Asn1Type.TagSequence> tags = chChild.getChildrenTags();
+                    foreach (Asn1Type.TagSequence tgSq in tags)
+                    {
+                        csFile.WL(level, "ch.m_childrenTags.Add(new Tag({0}, TagClass.{1}));", tgSq.m_tags[0].m_tag, tgSq.m_tags[0].m_class);
+                    }
+                }
+                else
+                {
+                    Asn1Type.Tag lstTag = ch.m_type.Tags.m_tags[0];
+                    csFile.WL(level, "ch.m_Tag = new Tag({0}, TagClass.{1});", lstTag.m_tag, lstTag.m_class);
+
+                }
+
+                
                 csFile.WL(level, "m_children.Add(\"{0}\", ch);", C.ID(ch.m_childVarName));
+                csFile.WriteLine();
+
 
             }
 
+            csFile.WL(--level, "}");
             csFile.WL(--level, "}");
            
 
@@ -88,12 +138,8 @@ namespace asn1csharp
             return true;
         }
 
-        public void WriteConstructorCode(StreamWriterLevel csFile, int level, string pThis, List<IConstraint> constraints)
-        {
-//            throw new Exception("Internal Error: This method should never be called for a sequence");
-        }
 
-        public string ConstraintType { get { return DeclaredTypeName; } }
+        public string ConstraintVariable { get { return "this"; } }
 
     }
 
@@ -117,12 +163,8 @@ namespace asn1csharp
             return true;
         }
 
-        public void WriteConstructorCode(StreamWriterLevel csFile, int level, string pThis, List<IConstraint> constraints)
-        {
-//            throw new Exception("Internal Error: This method should never be called for a set");
-        }
 
-        public string ConstraintType { get { return DeclaredTypeName; } }
+        public string ConstraintVariable { get { return "this"; } }
     }
 
 
@@ -212,36 +254,85 @@ namespace asn1csharp
                 csFile.WL(level, "public {0} {1}", ((ICSharpType)ch.m_type).DeclaredTypeName, C.ID(ch.m_childVarName));
                 csFile.WL(level++, "{");
 
-                csFile.WL(level, "get {{ return m_children[\"{0}\"].m_asn1Object as {1}; }}", C.ID(ch.m_childVarName), ((ICSharpType)ch.m_type).DeclaredTypeName);
-
+                csFile.WL(level, "get {{ return m_children[ClassDef.m_children[\"{0}\"].m_index] as {1}; }}", C.ID(ch.m_childVarName), ((ICSharpType)ch.m_type).DeclaredTypeName);
+                //
                 csFile.WL(--level, "}");
 
 
                 csFile.WL(level, "public {0} Create_{1}()", childType.DeclaredTypeName, C.ID(ch.m_childVarName));
                 csFile.WL(level++, "{");
-                csFile.WL(level, "{0} ret = new {0}();", childType.DeclaredTypeName);
-                if (!childType.RequiresNewTypeDeclaration())
-                    childType.WriteConstructorCode(csFile, level, "ret", ch.m_type.m_constraints);
-                csFile.WL(level, "if (m_AlternativeName != string.Empty)");
-                csFile.WL(level + 1, "m_children[m_AlternativeName].m_asn1Object = null;");
-                csFile.WL(level, "m_children[\"{0}\"].m_asn1Object = ret;", C.ID(ch.m_childVarName));
-                csFile.WL(level, "m_AlternativeName = \"{0}\";", C.ID(ch.m_childVarName));
-                csFile.WL(level, "return ret;");
+                //csFile.WL(level, "{0} ret = new {0}();", childType.DeclaredTypeName);
+                //csFile.WL(level, "if (m_AlternativeName != string.Empty)");
+                //csFile.WL(level + 1, "m_children[m_AlternativeName].m_asn1Object = null;");
+                //csFile.WL(level, "m_children[\"{0}\"].m_asn1Object = ret;", C.ID(ch.m_childVarName));
+                //csFile.WL(level, "m_AlternativeName = \"{0}\";", C.ID(ch.m_childVarName));
+                csFile.WL(level, "return CreateChild(\"{0}\") as {1};", C.ID(ch.m_childVarName), childType.DeclaredTypeName);
                 csFile.WL(--level, "}");
 
             }
 
+            CSharpType.WriteEncodeDecodeMethods(this, csFile, level);
+
+            csFile.WL(level, "static Asn1CompositeClass<NamedChild> _clsDef = new {0}ClassDefinition();", TypeName);
+            csFile.WL(level, "public override Asn1CompositeClass<NamedChild> ClassDef");
+            csFile.WL(level++, "{");
+            csFile.WL(level, "get");
+            csFile.WL(level++, "{");
+            csFile.WL(level, "return _clsDef;");
+            csFile.WL(--level, "}");
+            csFile.WL(--level, "}");
+
+
             csFile.WL(level, "public {0}()", TypeName);
             csFile.WL(level++, "{");
+            csFile.WL(level, "m_children = new Asn1Object[{0}];", m_children.Count);
+            csFile.WL(--level, "}");
+
+            //class definition
+
+            csFile.WL(level, "public class {0}ClassDefinition : Asn1CompositeClass<NamedChild>", TypeName);
+            csFile.WL(level++, "{");
+
+            csFile.WL(level, "public {0}ClassDefinition()", TypeName);
+            csFile.WL(level++, "{");
+
+ 
             csFile.WL(level, "NamedChild ch;");
+            int idx = 0;
             foreach (ChoiceChild ch in m_children.Values)
             {
-                csFile.WL(level, "ch = new NamedChild(\"{0}\", null, Create_{0});", C.ID(ch.m_childVarName));
+                ICSharpType childType = ch.m_type as ICSharpType;
+
+                csFile.WL(level, "ch = new NamedChild(\"{0}\", {1}, delegate() {{return new {2}();}});", C.ID(ch.m_childVarName), idx, childType.DeclaredTypeName);
+
+                idx++;
+
+                ChoiceType chChild = ch.m_type.GetFinalType() as ChoiceType;
+
+                if (chChild != null && !ch.m_type.IsTagged())
+                {
+                    csFile.WL(level, "ch.UnTaggedChoice = true;");
+                    csFile.WL(level, "ch.m_childrenTags = new List<Tag>();");
+
+                    List<Asn1Type.TagSequence> tags = chChild.getChildrenTags();
+                    foreach (Asn1Type.TagSequence tgSq in tags)
+                    {
+                        csFile.WL(level, "ch.m_childrenTags.Add(new Tag({0}, TagClass.{1}));", tgSq.m_tags[0].m_tag, tgSq.m_tags[0].m_class);
+                    }
+                }
+                else
+                {
+                    Asn1Type.Tag lstTag = ch.m_type.Tags.m_tags[0];
+                    csFile.WL(level, "ch.m_Tag = new Tag({0}, TagClass.{1});", lstTag.m_tag, lstTag.m_class);
+
+                }
+
 
                 csFile.WL(level, "m_children.Add(\"{0}\", ch);", C.ID(ch.m_childVarName));
 
             }
 
+            csFile.WL(--level, "}");
             csFile.WL(--level, "}");
            
 
@@ -259,12 +350,8 @@ namespace asn1csharp
             return true;
         }
 
-        public void WriteConstructorCode(StreamWriterLevel csFile, int level, string pThis, List<IConstraint> constraints)
-        {
-//            throw new Exception("Internal Error: This method should never be called for a choice");
-        }
 
-        public string ConstraintType { get { return DeclaredTypeName; } }
+        public string ConstraintVariable { get { return "this"; } }
 
     }
 
