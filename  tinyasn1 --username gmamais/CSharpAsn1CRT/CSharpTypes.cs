@@ -50,6 +50,7 @@ namespace CSharpAsn1CRT
 
         public uint m_tagNo;
         public TagClass m_tgClass;
+        public bool isPrimitive;
 
         public Tag() { }
         public Tag(uint tagNo, TagClass tgClass)
@@ -57,77 +58,120 @@ namespace CSharpAsn1CRT
             m_tagNo = tagNo;
             m_tgClass = tgClass;
         }
-        
-        public bool Equals(Tag o)
+
+        public Tag(uint tagNo, TagClass tgClass, bool primitive)
         {
-            //Tag o = obj as Tag;
-            //if (o == null)
-            //    return false;
+            m_tagNo = tagNo;
+            m_tgClass = tgClass;
+            isPrimitive = primitive;
+        }
+
+        public override bool Equals(object obj)
+        {
+            Tag o = obj as Tag;
+            if (o == null)
+                return false;
             return o.m_tagNo == m_tagNo && o.m_tgClass == m_tgClass;
+        }
+        public override int GetHashCode()
+        {
+            return m_tagNo.GetHashCode();
         }
 
     }
 
-    public delegate Asn1Object CreateAsn1Object();
 
     public delegate TResult Func<TResult>();
-    public delegate TResult Func<T, TResult>(T arg);
+    public delegate TResult Func<TResult, T>();
     
     public abstract class Asn1Object
     {
-        public List<Tag> m_Tags = new List<Tag>();
 
-        public abstract void Encode(Stream strm, EncodingRules encRule);
-        public abstract void Decode(Stream strm, EncodingRules encRule);
+        public abstract uint Decode(Stream strm, EncodingRules encRule);
+        public abstract uint Encode(Stream strm, EncodingRules encRule);
+        //Encodes only the content, not tag and length
+        //return the length of bytes encoded
+        public abstract uint EncodeContent(Stream strm, EncodingRules encRule);
+        //Decodes only the content, not tag and length
+        //returns the length of bytes decoded
+        public abstract uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen);
         public abstract bool IsConstraintValid();
+
         public abstract IEnumerable<Asn1Object> GetChildren(bool includeMyself);
+        public virtual bool IsPrimitive { get { return true; } }
 
-        public static bool MatchTags(Stream strm, Tag[] Tags)
+        public uint Encode(Stream strm, EncodingRules encRule, TagClass tagClass, bool primitive, uint tagNumber)
         {
-            long strPos = strm.Position;
-
-            foreach (Tag t in Tags)
-                if (!t.Equals(BER.DecodeTag(strm)))
-                {
-                    strm.Position = strPos;
-                    return false;
-                }
-
-            strm.Position = strPos;
-            return true;
+            long sPos = strm.Position;
+            using (MemoryStream tmp = new MemoryStream())
+            {
+                BER.EncodeTag(strm, tagClass, primitive, tagNumber);
+                uint len = EncodeContent(tmp, encRule);
+                BER.EncodeLengthDF(strm, len);
+                strm.Write(tmp.GetBuffer(), 0, (int)tmp.Length);
+            }
+            return (uint)(strm.Position - sPos);
         }
 
-        public void DecodeTags(Stream strm)
+        
+        public uint Decode(Stream strm, EncodingRules encRule, TagClass tagClass, bool primitive, uint tagNumber)
         {
-            long strPos = strm.Position;
 
-            foreach (Tag t in m_Tags)
+            long initPos = strm.Position;
+
+            Tag t = BER.DecodeTag(strm);
+            if (t == null)
+                throw new UnexpectedTagException();
+
+
+            if (t.m_tagNo != tagNumber || t.m_tgClass != tagClass)
+                throw new UnexpectedTagException();
+
+            uint length = 0;
+            BER.DecodeLength(strm, out length);
+            long sPos = strm.Position;
+
+            DecodeContent(strm, encRule, length);
+
+            if (length==0 && strm.Position==sPos)
+                return (uint)(strm.Position - initPos);
+
+            if (length == 0)
+                BER.DecodeTwoZeros(strm);
+            else
             {
-                if (!t.Equals(BER.DecodeTag(strm)))
-                {
-                    strm.Position = strPos;
-                    throw new UnexpectedTagException();
-                }
+                long decodedData = strm.Position - sPos;
+                if (decodedData != length)
+                    throw new LengthMismatchException();
             }
 
+            
+            return (uint)(strm.Position-initPos);
         }
-       
     }
 
 
     public class Asn1NullObject : Asn1Object
     {
-        public Asn1NullObject() { m_Tags.Add(new Tag(5, TagClass.UNIVERSAL)); }
 
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
+        {
+            return 0;
+        }
+        public override uint EncodeContent(Stream strm, EncodingRules encRule)
+        {
+            return 0;
+        }
+        public override uint Decode(Stream strm, EncodingRules encRule)
+        {
+            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 2);
 
-        public override void Decode(Stream strm, EncodingRules encRule)
-        {
-            throw new Exception("The method or operation is not implemented.");
         }
-        public override void Encode(Stream strm, EncodingRules encRule)
+        public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            throw new Exception("The method or operation is not implemented.");
+            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 5);
         }
+
         public override bool IsConstraintValid()
         {
             return true;
@@ -143,15 +187,10 @@ namespace CSharpAsn1CRT
     {
         public T Value;
 
-        public List<Func<T, bool>> m_constraints = new List<Func<T, bool>>();
 
 
         public override bool IsConstraintValid()
         {
-            foreach (Func<T, bool> f in m_constraints)
-                if (!f(Value))
-                    return false;
-
             return true;
         }
 
@@ -160,6 +199,8 @@ namespace CSharpAsn1CRT
             if (includeMyself)
                 yield return this;
         }
+
+
     }
 
 
@@ -167,44 +208,87 @@ namespace CSharpAsn1CRT
     public class Asn1IntegerObject : Asn1PrimitiveObject<Int64>
     {
 
-        public Asn1IntegerObject() { m_Tags.Add(new Tag(2, TagClass.UNIVERSAL)); }
-
-        public override void Encode(Stream strm, EncodingRules encRule)
+        public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            throw new Exception("The method or operation is not implemented.");
+            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 2);
         }
-        public override void Decode(Stream strm, EncodingRules encRule)
+
+        public override uint Decode(Stream strm, EncodingRules encRule)
         {
-            throw new Exception("The method or operation is not implemented.");
+            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 2);
+        }
+
+        public override uint EncodeContent(Stream strm, EncodingRules encRule)
+        {
+            if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
+                return BER.EncodeInteger(strm, Value);
+
+            throw new Exception("Unsupported encoding");
+        }
+
+
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
+        {
+
+            if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
+                Value = BER.DecodeInteger(strm, dataLen);
+            else
+                throw new Exception("Unsupported encoding");
+
+            return dataLen;
         }
 
     }
 
     public class Asn1RealObject : Asn1PrimitiveObject<double>
     {
-        public Asn1RealObject() { m_Tags.Add(new Tag(9, TagClass.UNIVERSAL)); }
-
-        public override void Encode(Stream strm, EncodingRules encRule)
+        public override uint EncodeContent(Stream strm, EncodingRules encRule)
         {
             throw new Exception("The method or operation is not implemented.");
         }
-        public override void Decode(Stream strm, EncodingRules encRule)
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
         {
             throw new Exception("The method or operation is not implemented.");
+        }
+        public override uint Decode(Stream strm, EncodingRules encRule)
+        {
+            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 9);
+        }
+        public override uint Encode(Stream strm, EncodingRules encRule)
+        {
+            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 9);
         }
     }
 
     public class Asn1BoolObject : Asn1PrimitiveObject<bool>
     {
-        public Asn1BoolObject() { m_Tags.Add(new Tag(1, TagClass.UNIVERSAL)); }
-
-        public override void Encode(Stream strm, EncodingRules encRule)
+        public override uint EncodeContent(Stream strm, EncodingRules encRule)
         {
-            throw new Exception("The method or operation is not implemented.");
+            if (Value)
+                strm.WriteByte(0xFF);
+            else
+                strm.WriteByte(0);
+            
+            return 1;
         }
-        public override void Decode(Stream strm, EncodingRules encRule)
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
         {
-            throw new Exception("The method or operation is not implemented.");
+            int n = strm.ReadByte();
+            if (n == -1)
+                throw new UnexpectedEndOfStreamException();
+            if (n == 0)
+                Value = false;
+            else
+                Value = true;
+            return 1;
+        }
+        public override uint Decode(Stream strm, EncodingRules encRule)
+        {
+            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 1);
+        }
+        public override uint Encode(Stream strm, EncodingRules encRule)
+        {
+            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 1);
         }
     }
 
@@ -212,24 +296,30 @@ namespace CSharpAsn1CRT
     {
         public Asn1IA5StringObject()  
         {
-            m_Tags.Add(new Tag(22, TagClass.UNIVERSAL));
             Value = string.Empty;
         }
 
-        public override void Decode(Stream strm, EncodingRules encRule)
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
         {
             throw new Exception("The method or operation is not implemented.");
         }
-        public override void Encode(Stream strm, EncodingRules encRule)
+        public override uint EncodeContent(Stream strm, EncodingRules encRule)
         {
             throw new Exception("The method or operation is not implemented.");
+        }
+        public override uint Decode(Stream strm, EncodingRules encRule)
+        {
+            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 22);
+        }
+        public override uint Encode(Stream strm, EncodingRules encRule)
+        {
+            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 22);
         }
     }
 
     public class Asn1NumericStringObject : Asn1IA5StringObject
     {
 
-        public Asn1NumericStringObject() { m_Tags.Add(new Tag(18, TagClass.UNIVERSAL)); }
 
         private string CharSet = " 0123456789";
         public override bool IsConstraintValid()
@@ -240,50 +330,72 @@ namespace CSharpAsn1CRT
                     return false;
             return true;
         }
+        public override uint Decode(Stream strm, EncodingRules encRule)
+        {
+            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 18);
+        }
+        public override uint Encode(Stream strm, EncodingRules encRule)
+        {
+            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 18);
+        }
     }
 
-    public abstract class Asn1EnumeratedObject<T> : Asn1PrimitiveObject<T>
+    public abstract class Asn1EnumeratedObject<T> : Asn1PrimitiveObject<T> 
     {
-        public Asn1EnumeratedObject()  { m_Tags.Add(new Tag(10, TagClass.UNIVERSAL));}
+        protected abstract long ValueAsLong { get;}
 
-        //public enum dd
-        //{
-        //    a = 4,
-        //    f =5,
-        //}
-
-        public override void Encode(Stream strm, EncodingRules encRule)
+        public override uint EncodeContent(Stream strm, EncodingRules encRule)
         {
-//            Int32 val = (Int32)Value;
-            throw new Exception("The method or operation is not implemented.");
+            return BER.EncodeInteger(strm, ValueAsLong);
         }
 
-        public override void Decode(Stream strm, EncodingRules encRule)
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
         {
-            //int decodedVal = 45;
-            //Value = (T)Enum.ToObject(Value.GetType(), decodedVal);
-            throw new Exception("The method or operation is not implemented.");
+            long decodedVal = BER.DecodeInteger(strm, dataLen);
+            Value = (T)Enum.ToObject(Value.GetType(), decodedVal);
+            return dataLen;
+        }
+        public override uint Decode(Stream strm, EncodingRules encRule)
+        {
+            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 10);
+        }
+        public override uint Encode(Stream strm, EncodingRules encRule)
+        {
+            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 10);
         }
     }
-
-
 
     public class Asn1OctetStringObject : Asn1Object
     {
         public List<byte> m_Data = new List<byte>();
 
-        public List<Func<List<byte>, bool>> m_constraints = new List<Func<List<byte>, bool>>();
 
-        public Asn1OctetStringObject() { m_Tags.Add(new Tag(4, TagClass.UNIVERSAL)); }
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
+        {
+            for (int i = 0; i < dataLen; i++)
+            {
+                int nval = strm.ReadByte();
+                if (nval < 0)
+                    throw new UnexpectedEndOfStreamException();
+                m_Data.Add((byte)nval);
+            }
+            return dataLen;
+        }
+        public override uint EncodeContent(Stream strm, EncodingRules encRule)
+        {
+            strm.Write(m_Data.ToArray(), 0, m_Data.Count);
+            return (uint)m_Data.Count;
+        }
 
-        public override void Decode(Stream strm, EncodingRules encRule)
+        public override uint Decode(Stream strm, EncodingRules encRule)
         {
-            throw new Exception("The method or operation is not implemented.");
+            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 4);
         }
-        public override void Encode(Stream strm, EncodingRules encRule)
+        public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            throw new Exception("The method or operation is not implemented.");
+            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 4);
         }
+     
         public override bool IsConstraintValid()
         {
             return true;
@@ -297,18 +409,27 @@ namespace CSharpAsn1CRT
 
     public class Asn1BitStringObject : Asn1Object
     {
-        public Asn1BitStringObject() { m_Tags.Add(new Tag(3, TagClass.UNIVERSAL)); }
-        public List<Func<List<byte>, bool>> m_constraints = new List<Func<List<byte>, bool>>();
-
         public System.Collections.BitArray m_Data = new System.Collections.BitArray(0);
-        public override void Decode(Stream strm, EncodingRules encRule)
+
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
         {
             throw new Exception("The method or operation is not implemented.");
         }
-        public override void Encode(Stream strm, EncodingRules encRule)
+        
+        public override uint EncodeContent(Stream strm, EncodingRules encRule)
         {
             throw new Exception("The method or operation is not implemented.");
         }
+        
+        public override uint Decode(Stream strm, EncodingRules encRule)
+        {
+            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 8);
+        }
+        public override uint Encode(Stream strm, EncodingRules encRule)
+        {
+            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 8);
+        }
+
         public override bool IsConstraintValid()
         {
             return true;
@@ -321,35 +442,31 @@ namespace CSharpAsn1CRT
     }
 
 
-    
 
-
-    public abstract class Asn1ArrayObject<T> : Asn1Object where T : Asn1Object
+    public abstract class Asn1ArrayObject<T> : Asn1Object where T : Asn1Object, new()
     {
-        public List<Func<Asn1ArrayObject<T>, bool>> m_constraints = new List<Func<Asn1ArrayObject<T>, bool>>();
-
-        public Child<T> m_child = new Child<T>();
-
         public List<T> m_children = new List<T>();
 
         public T AppendNewChild()
         {
-            T ret = m_child.createObj();
+            T ret = new T();
             m_children.Add(ret);
             return ret;
         }
 
-        public override void Decode(Stream strm, EncodingRules encRule)
+
+        public override bool IsPrimitive { get { return false; } }
+
+
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
         {
+            long decodedData = 0;
             if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
             {
-                DecodeTags(strm);
 
                 //Decode Length
-                uint length = 0;
-                BER.DecodeLength(strm, out length);
+                uint length = dataLen;
                 long curStrPos = strm.Position;
-                long decodedData = 0;
                 //Decode content (i.e. children)
 
                 while (true)
@@ -357,56 +474,49 @@ namespace CSharpAsn1CRT
                     decodedData = strm.Position - curStrPos;
                     if (length == 0 && BER.AreNextTwoBytesZeros(strm))
                         break;
-                    else if (length > 0 && decodedData >= length)
-                        break;
-                    T ch = m_child.createObj();
-                    ch.Decode(strm, encRule);
-                    // in SET OF we must check for unique values
-                    m_children.Add(ch);
-                }
-
-
-                if (length == 0)
-                    BER.DecodeTwoZeros(strm);
-                else
-                {
-                    if (decodedData != length)
+                    else if (length >= 0 && decodedData >= length)
+                    {
+                        if (decodedData == length)
+                            break;
                         throw new LengthMismatchException();
+                    }
+                    T ch = AppendNewChild();
+                    ch.Decode(strm, encRule);
+
+                    if (m_children.Count > 1000)
+                        if (m_children.Count % 1000 == 0)
+                            Console.WriteLine(m_children.Count);
+
+
+
+                    // in SET OF we must check for unique values
                 }
             }
             else
                 throw new ArgumentException("Unimplemented encoding rule");
+
+            return (uint)decodedData;
+
         }
-        public override void Encode(Stream strm, EncodingRules encRule)
+        public override uint EncodeContent(Stream strm, EncodingRules encRule)
         {
+            uint ret = 0;
             if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
             {
-                //encode Tag
-                foreach (Tag t in m_Tags)
-                    BER.EncodeTag(strm, t.m_tgClass, false, t.m_tagNo);
-
-                //encode Length
-                strm.WriteByte(0x80);
 
                 //encode children
                 foreach (T ch in m_children)
-                    ch.Encode(strm, encRule);
-
-                //encode end-of-contents
-                strm.WriteByte(0x0);
-                strm.WriteByte(0x0);
+                    ret += ch.Encode(strm, encRule);
 
             }
             else
                 throw new ArgumentException("Unimplemented encoding rule");
+
+            return ret;
         }
         
         public override bool IsConstraintValid()
         {
-            foreach (Func<Asn1ArrayObject<T>, bool> f in m_constraints)
-                if (!f(this))
-                    return false;
-
             foreach (T ch in m_children)
                 if (!ch.IsConstraintValid())
                     return false;
@@ -424,25 +534,41 @@ namespace CSharpAsn1CRT
 
     }
 
-    public class Asn1SequenceOfObject<T> : Asn1ArrayObject<T> where T : Asn1Object
+    public class Asn1SequenceOfObject<T> : Asn1ArrayObject<T> where T : Asn1Object, new()
     {
-        public Asn1SequenceOfObject() { m_Tags.Add(new Tag(16, TagClass.UNIVERSAL)); }
+        public override uint Decode(Stream strm, EncodingRules encRule)
+        {
+            return Decode(strm, encRule, TagClass.UNIVERSAL, false, 16);
+        }
+        public override uint Encode(Stream strm, EncodingRules encRule)
+        {
+            return Encode(strm, encRule, TagClass.UNIVERSAL, false, 16);
+        }
     }
 
-    public class Asn1SetOfObject<T> : Asn1ArrayObject<T> where T : Asn1Object
+    public class Asn1SetOfObject<T> : Asn1ArrayObject<T> where T : Asn1Object, new()
     {
-        public Asn1SetOfObject() { m_Tags.Add(new Tag(17, TagClass.UNIVERSAL)); }
+        public override uint Decode(Stream strm, EncodingRules encRule)
+        {
+            return Decode(strm, encRule, TagClass.UNIVERSAL, false, 17);
+        }
+        public override uint Encode(Stream strm, EncodingRules encRule)
+        {
+            return Encode(strm, encRule, TagClass.UNIVERSAL, false, 17);
+        }
     }
 
 
     public class Child<T>
     {
-        public List<List<Tag>> m_TagLists = null;
+        public Tag m_Tag = null;
+
+        public List<Tag> m_childrenTags = null; // This is used only in case where child is an untagged choice
         public Func<T> createObj = null;
 
-        public void AddTagList(params Tag[] tagList)
+        public void SetChildrenTagList(params Tag[] tagList)
         {
-            m_TagLists.Add(new List<Tag>(tagList));
+            m_childrenTags = new List<Tag>(tagList);
         }
         
         public Child()
@@ -453,20 +579,29 @@ namespace CSharpAsn1CRT
         {
             createObj = CreateObj;
         }
+
+        bool _untaggedChoice=false;
+        public bool UnTaggedChoice
+        {
+            get { return _untaggedChoice; }
+            set { _untaggedChoice = value; }
+        }
+
     }
 
 
     public class NamedChild : Child<Asn1Object>
     {
         public string m_name = string.Empty;
-        public Asn1Object m_asn1Object = null;
+//        public Asn1Object m_asn1Object = null;
+        public int m_index;
 
 
-        public NamedChild(string name, Asn1Object asn1Obj, Func<Asn1Object> CreateObj)
+        public NamedChild(string name, int idx, Func<Asn1Object> CreateObj)
             : base(CreateObj)
         {
             m_name = name;
-            m_asn1Object = asn1Obj;
+            m_index = idx;
         }
     }
 
@@ -474,42 +609,50 @@ namespace CSharpAsn1CRT
     {
         public bool m_isOptional = false;
         public string m_defaultValue = null;
-        public OptionalNamedChild(string name, Asn1Object asn1Obj, Func<Asn1Object> CreateObj)
-            : base(name, asn1Obj, CreateObj) { }
+        public OptionalNamedChild(string name, int idx, Func<Asn1Object> CreateObj)
+            : base(name, idx, CreateObj) { }
 
-        public OptionalNamedChild(string name, Asn1Object asn1Obj, Func<Asn1Object> CreateObj, bool optional, string defValue)
-            : base(name, asn1Obj, CreateObj) 
+        public OptionalNamedChild(string name, int idx, Func<Asn1Object> CreateObj, bool optional, string defValue)
+            : base(name, idx, CreateObj) 
         {
             m_isOptional = optional;
             m_defaultValue = defValue;
         }
+
+
     }
 
 
     public abstract class Asn1CompositeObject<T> : Asn1Object where T : NamedChild
     {
 
-        public List<Func<Asn1CompositeObject<T>, bool>> m_constraints = new List<Func<Asn1CompositeObject<T>, bool>>();
+        public override bool IsPrimitive { get { return false; } }
+
+        
 
 
-        public OrderedDictionary<string, T> m_children = new OrderedDictionary<string, T>();
+        public abstract Asn1CompositeClass<T> ClassDef { get;}
+
+
+//        public OrderedDictionary<string, T> m_children = new OrderedDictionary<string, T>();
+//        public List<Asn1Object> m_children = new List<Asn1Object>();
+        public Asn1Object[] m_children = null;
+
+
 
         public override IEnumerable<Asn1Object> GetChildren(bool includeMyself)
         {
             if (includeMyself)
                 yield return this;
-            foreach (T ch in m_children.Values)
-                foreach (Asn1Object grCh in ch.m_asn1Object.GetChildren(true))
-                    yield return grCh;
+            //foreach (T ch in m_children.Values)
+            //    foreach (Asn1Object grCh in ch.m_asn1Object.GetChildren(true))
+            //        yield return grCh;
         }
 
         public override bool IsConstraintValid()
         {
-            foreach (Func<Asn1CompositeObject<T>, bool> f in m_constraints)
-                if (!f(this))
-                    return false;
-            foreach (NamedChild ch in m_children.Values)
-                if (ch.m_asn1Object != null && !ch.m_asn1Object.IsConstraintValid())
+            foreach (Asn1Object ch in m_children)
+                if (ch != null && !ch.IsConstraintValid())
                     return false;
 
             return true;
@@ -517,7 +660,10 @@ namespace CSharpAsn1CRT
 
         public virtual Asn1Object CreateChild(string childName)
         {
-            return m_children[childName].createObj();
+            NamedChild ch = ClassDef.m_children[childName];
+            m_children[ch.m_index] = ch.createObj();
+
+            return m_children[ch.m_index];
         }
 
     }
@@ -528,11 +674,57 @@ namespace CSharpAsn1CRT
 
         public override bool IsConstraintValid()
         {
-            foreach (OptionalNamedChild ch in m_children.Values)
-                if (!ch.m_asn1Object.IsConstraintValid())
-                    return false;
-            return true;
+            //foreach (OptionalNamedChild ch in m_children.Values)
+            //    if (ch.m_asn1Object==null && (!ch.m_isOptional || ch.m_defaultValue!=null))
+            //        return false;
+            return base.IsConstraintValid();
         }
+        public override uint EncodeContent(Stream strm, EncodingRules encRule)
+        {
+            long sPos = strm.Position;
+            if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
+            {
+
+                //encode children
+                foreach (Asn1Object ch in m_children)
+                    if (ch != null)
+                    {
+                        ch.Encode(strm, encRule);
+                    }
+
+
+                return (uint)(strm.Position - sPos);
+            }
+            throw new Exception();
+        }
+
+        
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
+        {
+            if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
+            {
+                uint ret = 0;
+                Tag nextTag = null;
+                while (BER.GetNextTag(strm, out nextTag))
+                {
+                    OptionalNamedChild childClass = ClassDef.getChildByTag(nextTag);
+                    if (childClass == null)
+                        break;
+                    m_children[childClass.m_index] = childClass.createObj();
+                    ret += m_children[childClass.m_index].Decode(strm, encRule);
+                    if (dataLen == ret)
+                        return ret;
+                    if (ret > dataLen)
+                        throw new LengthMismatchException();
+                }
+
+
+                return ret;
+            }
+            throw new Exception();
+        }
+
+
 
     }
 
@@ -541,134 +733,74 @@ namespace CSharpAsn1CRT
 
     public abstract class Asn1SequenceObject : Asn1SequenceOrSetObject
     {
-        public Asn1SequenceObject()  
+        public override uint Decode(Stream strm, EncodingRules encRule)
         {
-            m_Tags.Add(new Tag(16, TagClass.UNIVERSAL));
+            return Decode(strm, encRule, TagClass.UNIVERSAL, false, 16);
         }
-
-        public override void Decode(Stream strm, EncodingRules encRule)
+        public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
-            {
-                DecodeTags(strm);
-
-                //Decode Length
-                uint length = 0;
-                BER.DecodeLength(strm, out length);
-                long curStrPos = strm.Position;
-
-                //Decode content (i.e. children)
-                foreach (OptionalNamedChild ch in m_children.Values)
-                {
-                    foreach (List<Tag> tagList in ch.m_TagLists)
-                    {
-                        if (Asn1Object.MatchTags(strm, tagList.ToArray()))
-                        {
-                            ch.m_asn1Object = ch.createObj();
-                            ch.m_asn1Object.Decode(strm, encRule);
-                        }
-                    }
-
-                }
-                if (length == 0)
-                    BER.DecodeTwoZeros(strm);
-                else
-                {
-                    long decodedData = strm.Position - curStrPos;
-                    if (decodedData != length)
-                        throw new LengthMismatchException();
-                }
-            }
-            else
-                throw new ArgumentException("Unimplemented encoding rule");
+            return Encode(strm, encRule, TagClass.UNIVERSAL, false, 16);
         }
-        
-        public override void Encode(Stream strm, EncodingRules encRule)
-        {
-            if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
-            {
-                //encode Tag
-                foreach (Tag t in m_Tags)
-                    BER.EncodeTag(strm, t.m_tgClass, false, t.m_tagNo);
-
-                //encode Length
-                strm.WriteByte(0x80);
-
-                //encode children
-                foreach (OptionalNamedChild ch in m_children.Values)
-                    if (ch.m_asn1Object != null)
-                        ch.m_asn1Object.Encode(strm, encRule);
-
-                //encode end-of-contents
-                strm.WriteByte(0x0);
-                strm.WriteByte(0x0);
-
-            } 
-            else 
-                throw new ArgumentException("Unimplemented encoding rule");
-        }
-
     }
 
 
     public abstract class Asn1SetObject : Asn1SequenceOrSetObject
     {
-        public Asn1SetObject() { m_Tags.Add(new Tag(17, TagClass.UNIVERSAL)); }
+        public override uint Decode(Stream strm, EncodingRules encRule)
+        {
+            return Decode(strm, encRule, TagClass.UNIVERSAL, false, 17);
+        }
+        public override uint Encode(Stream strm, EncodingRules encRule)
+        {
+            return Encode(strm, encRule, TagClass.UNIVERSAL, false, 17);
+        }
 
-        public override void Decode(Stream strm, EncodingRules encRule)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-        public override void Encode(Stream strm, EncodingRules encRule)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
     }
 
     public abstract class Asn1ChoiceObject : Asn1CompositeObject<NamedChild>
     {
         public Asn1ChoiceObject() : base() { }
 
-        public override void Decode(Stream strm, EncodingRules encRule)
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
         {
             if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
             {
-                DecodeTags(strm); // normally no Tag is associated with choice
 
-                //Decode content (i.e. children)
-                foreach (NamedChild ch in m_children.Values)
+                uint ret = 0;
+                Tag nextTag = null;
+                if (BER.GetNextTag(strm, out nextTag))
                 {
-                    foreach (List<Tag> tagList in ch.m_TagLists)
-                    {
-                        if (Asn1Object.MatchTags(strm, tagList.ToArray()))
-                        {
-                            ch.m_asn1Object = ch.createObj();
-                            ch.m_asn1Object.Decode(strm, encRule);
-                            m_AlternativeName = ch.m_name;
-                            break;
-                        }
-                    }
-
+                    NamedChild childClass = ClassDef.getChildByTag(nextTag);
+                    m_children[childClass.m_index] = childClass.createObj();
+                    m_AlternativeName = childClass.m_name;
+                    ret += m_children[childClass.m_index].Decode(strm, encRule);
                 }
+                
+                return ret;
             }
             else
                 throw new ArgumentException("Unimplemented encoding rule");
         }
-        public override void Encode(Stream strm, EncodingRules encRule)
+        public override uint EncodeContent(Stream strm, EncodingRules encRule)
         {
             if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
             {
-                //encode Tag
-                foreach (Tag t in m_Tags)
-                    BER.EncodeTag(strm, t.m_tgClass, false, t.m_tagNo);
-
                 if (m_AlternativeName == string.Empty || m_Alternative == null)
                     throw new EmptyChoiceException();
-                m_Alternative.Encode(strm, encRule);
+                return m_Alternative.Encode(strm, encRule);
             }
             else
                 throw new ArgumentException("Unimplemented encoding rule");
         }
+        public override uint Decode(Stream strm, EncodingRules encRule)
+        {
+            return DecodeContent(strm, encRule, uint.MaxValue);
+        }
+        public override uint Encode(Stream strm, EncodingRules encRule)
+        {
+            return EncodeContent(strm, encRule);
+        }
+
 
         private string choiceAlternative = string.Empty;
 
@@ -677,9 +809,10 @@ namespace CSharpAsn1CRT
             get { return choiceAlternative; }
             set
             {
-                if (m_children.ContainsKey(value))
-                    choiceAlternative = value;
-                throw new ArgumentNullException();
+                if (ClassDef.m_children.ContainsKey(value))
+                        choiceAlternative = value;
+                else
+                    throw new ArgumentNullException();
             }
         }
 
@@ -687,13 +820,24 @@ namespace CSharpAsn1CRT
         {
             get
             {
-                return m_children[choiceAlternative].m_asn1Object;
+                foreach (Asn1Object ch in m_children)
+                    if (ch != null)
+                        return ch;
+                return null;
             }
         }
 
         public override bool IsConstraintValid()
         {
             return base.IsConstraintValid() && m_AlternativeName != string.Empty;
+        }
+
+        public override Asn1Object CreateChild(string childName)
+        {
+            for (int i = 0; i < m_children.Length; i++)
+                m_children[i] = null;
+            m_AlternativeName = childName;
+            return base.CreateChild(childName);
         }
     }
 
@@ -703,7 +847,7 @@ namespace CSharpAsn1CRT
 
     // The difference with the normal dictionary is that
     // the Values property retains order (as inserted)
-    public class OrderedDictionary<TKey, TValue>    /* util class, no need to be abstract*/
+    public class OrderedDictionary<TKey, TValue>    
     {
         Dictionary<TKey, TValue> m_keyval = new Dictionary<TKey, TValue>();
         List<TValue> m_values = new List<TValue>();
@@ -757,8 +901,9 @@ namespace CSharpAsn1CRT
             return m_keyval.GetHashCode();
         }
 
-    }
+        
 
+    }
 
 
 }

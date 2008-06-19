@@ -413,7 +413,7 @@ namespace tinyAsn1
             PrintAsn1Constraints(o);
         }
         
-        internal List<Asn1Type.TagSequence> getChildrenTags()
+        public List<Asn1Type.TagSequence> getChildrenTags()
         {
             List<TagSequence> ret = new List<TagSequence>();
             foreach (ChoiceChild ch in m_children.Values)

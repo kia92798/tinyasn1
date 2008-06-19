@@ -8,7 +8,7 @@ namespace asn1csharp
 {
     public static class CSharpArrayType
     {
-        public static void DeclareType(ArrayType pThis, StreamWriterLevel csFile, string TypeName, int level,
+        public static void DeclareTypeA(ArrayType pThis, StreamWriterLevel csFile, string TypeName, int level,
             string baseClassName, out string DeclaredTypeName)
         {
             ICSharpType childType = pThis.m_type as ICSharpType;
@@ -18,10 +18,21 @@ namespace asn1csharp
             {
                 DeclaredTypeName = TypeName;
 
-                csFile.WL(level, "public class {0} : {1}<{0}.InternalType>", TypeName, baseClassName);
+                string internalTypeName = "InternalType";
+
+                int levCount = 0;
+                StackTrace str = new StackTrace();
+                foreach (StackFrame frm in str.GetFrames())
+                    if (frm.GetMethod().Name.Contains("DeclareTypeA"))
+                        levCount++;
+                if (levCount > 1)
+                    internalTypeName += (--levCount).ToString();
+                
+
+                csFile.WL(level, "public class {0} : {1}<{0}.{2}>", TypeName, baseClassName, internalTypeName);
                 csFile.WL(level++, "{");
 
-                childType.DeclareType(csFile, "InternalType", level);
+                childType.DeclareType(csFile, internalTypeName, level);
                 csFile.WriteLine();
             }
             else
@@ -31,16 +42,20 @@ namespace asn1csharp
                 csFile.WL(level++, "{");
             }
 
-            csFile.WL(level, "public {0}()", TypeName);
-            csFile.WL(level++, "{");
-            WriteConstructorCodeA(pThis, csFile, level, "", pThis.m_constraints);
-            csFile.WL(--level, "}");
+            CSharpType.WriteEncodeDecodeMethods(pThis, csFile, level);
+            CSharpType.WriteIsConstraintValid(pThis, csFile, level, "m_children", "");
+
+            //csFile.WL(level, "public {0}()", TypeName);
+            //csFile.WL(level++, "{");
+            //WriteConstructorCodeA(pThis, csFile, level, "", pThis.m_constraints, pThis.m_tag);
+            //csFile.WL(--level, "}");
 
 
             csFile.WL(--level, "}");
         }
-        
-        public static void WriteConstructorCodeA(ArrayType pThis, StreamWriterLevel csFile, int level, string pThisString, List<IConstraint> constraints)
+
+#if obsolete
+        public static void WriteConstructorCodeA(ArrayType pThis, StreamWriterLevel csFile, int level, string pThisString, List<IConstraint> constraints, Asn1Type.Tag tag)
         {
             int levCount=0;
             StackTrace str = new StackTrace();
@@ -58,19 +73,33 @@ namespace asn1csharp
             csFile.WL(level, "{0}m_child.createObj = new Func<{1}>(delegate()", prefix,childType.DeclaredTypeName);
             csFile.WL(level++, "{");
             csFile.WL(level, "{0} {1} = new {0}();", childType.DeclaredTypeName, retVarName);
-            if (!childType.RequiresNewTypeDeclaration())
-                childType.WriteConstructorCode(csFile, level, retVarName, pThis.m_type.m_constraints);
             csFile.WL(level, "return {0};", retVarName);
             csFile.WL(--level, "});");
 
 
-            csFile.WL(level, "//Write constraints");
-            foreach (ICSharpConstraint con in constraints)
+            ChoiceType chChild = pThis.m_type.GetFinalType() as ChoiceType;
+            if (chChild != null && !pThis.m_type.IsTagged())
             {
-                csFile.WL(level, "{0}m_constraints.Add(new Func<{1}, bool>(delegate({1} val) {{ return {2}; }}));", prefix, ((ICSharpType)pThis).ConstraintType, con.PrintConstraintCode("val",""));
+                csFile.WL(level, "{0}m_child.UnTaggedChoice = true;", prefix);
+                csFile.WL(level, "{0}m_child.m_childrenTags = new List<Tag>();", prefix);
+
+                List<Asn1Type.TagSequence> tags = chChild.getChildrenTags();
+                foreach (Asn1Type.TagSequence tgSq in tags)
+                {
+                    csFile.WL(level, "{0}m_child.m_childrenTags.Add(new Tag({1}, TagClass.{2}));",prefix, tgSq.m_tags[0].m_tag, tgSq.m_tags[0].m_class);
+                }
+            }
+            else
+            {
+                Asn1Type.Tag lstTag = pThis.m_type.Tags.m_tags[0];
+                csFile.WL(level, "{0}m_child.m_Tag = new Tag({1}, TagClass.{2});",prefix, lstTag.m_tag, lstTag.m_class);
+
             }
 
+
+
         }
+#endif
 
     }
 
@@ -82,7 +111,7 @@ namespace asn1csharp
 
         public void DeclareType(StreamWriterLevel csFile, string TypeName, int level)
         {
-            CSharpArrayType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName);
+            CSharpArrayType.DeclareTypeA(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName);
         }
 
         public string DeclaredTypeName
@@ -96,17 +125,11 @@ namespace asn1csharp
 
         public bool RequiresNewTypeDeclaration()
         {
-            return ((ICSharpType)m_type).RequiresNewTypeDeclaration();
+//            return ((ICSharpType)m_type).RequiresNewTypeDeclaration();
+            return true;
         }
 
-        public void WriteConstructorCode(StreamWriterLevel csFile, int level, string pThis, List<IConstraint> constraints)
-        {
-            if (RequiresNewTypeDeclaration())
-                throw new Exception("Internal Error");
-
-            CSharpArrayType.WriteConstructorCodeA(this, csFile, level, pThis, constraints);
-        }
-        public string ConstraintType { get { return "Asn1ArrayObject<"+((ICSharpType)m_type).DeclaredTypeName+ ">"; } }
+        public string ConstraintVariable { get { return "this"; } }
 
     }
 
@@ -117,7 +140,7 @@ namespace asn1csharp
 
         public void DeclareType(StreamWriterLevel csFile, string TypeName, int level)
         {
-            CSharpArrayType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName);
+            CSharpArrayType.DeclareTypeA(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName);
         }
 
         public string DeclaredTypeName
@@ -126,17 +149,12 @@ namespace asn1csharp
         }
         public bool RequiresNewTypeDeclaration()
         {
-            return ((ICSharpType)m_type).RequiresNewTypeDeclaration();
+//            return ((ICSharpType)m_type).RequiresNewTypeDeclaration();
+            return true;
+
         }
 
-        public void WriteConstructorCode(StreamWriterLevel csFile, int level, string pThis, List<IConstraint> constraints)
-        {
-            if (RequiresNewTypeDeclaration())
-                throw new Exception("Internal Error");
-
-            CSharpArrayType.WriteConstructorCodeA(this, csFile, level, pThis, constraints);
-        }
-        public string ConstraintType { get { return DeclaredTypeName; } }
+        public string ConstraintVariable { get { return "this"; } }
 
     }
 

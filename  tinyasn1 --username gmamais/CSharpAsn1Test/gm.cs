@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 using CSharpAsn1CRT;
 
 namespace TYPES
@@ -8,98 +9,125 @@ namespace TYPES
 
     public class FLOAT32 : Asn1RealObject
     {
-        public FLOAT32()
-        {
-            //Write constraints
-        }
     }
 
     public class OBIT : Asn1IntegerObject
     {
-        public OBIT()
+
+        public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            //Write constraints
-            m_constraints.Add(new Func<long, bool>(delegate(long val) { return ((val>=0) && (val<=4294967296)); }));
+            return Encode(strm, encRule, TagClass.APPLICATION, IsPrimitive, 120);
+        }
+
+        public override uint Decode(Stream strm, EncodingRules encRule)
+        {
+            return Decode(strm, encRule, TagClass.APPLICATION, IsPrimitive, 120);
+        }
+        public override bool IsConstraintValid()
+        {
+            return ((Value>=0) && (Value<=4294967296)) && base.IsConstraintValid();
         }
     }
 
     public class A_FL : FLOAT32
     {
-        public A_FL()
+        public override bool IsConstraintValid()
         {
-            //Write constraints
-            m_constraints.Add(new Func<double, bool>(delegate(double val) { return ((val>=23) && (val<=100)); }));
+            return ((Value>=23) && (Value<=100)) && base.IsConstraintValid();
         }
     }
 
     public class MyStr : Asn1IA5StringObject
     {
-        public MyStr()
+        public override bool IsConstraintValid()
         {
-            //Write constraints
-            m_constraints.Add(new Func<string, bool>(delegate(string val) { return ((val.Length>=1) && (val.Length<=10)); }));
+            return ((Value.Length>=1) && (Value.Length<=10)) && base.IsConstraintValid();
         }
     }
 
     public class MyStr2 : Asn1IA5StringObject
     {
-        public MyStr2()
+
+        public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            //Write constraints
-            m_constraints.Add(new Func<string, bool>(delegate(string val) { return new List<char>(val).TrueForAll(delegate(char c) { return ((c>='A') && (c<='Z')); }); }));
+            return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 100);
+        }
+
+        public override uint Decode(Stream strm, EncodingRules encRule)
+        {
+            return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 100);
+        }
+        public override bool IsConstraintValid()
+        {
+            return new List<char>(Value).TrueForAll(delegate(char c) { return ((c>='A') && (c<='Z')); }) && base.IsConstraintValid();
         }
     }
 
     public class MyStr3 : Asn1IA5StringObject
     {
-        public MyStr3()
+        public override bool IsConstraintValid()
         {
-            //Write constraints
-            m_constraints.Add(new Func<string, bool>(delegate(string val) { return ((val.Length>=1) && (val.Length<=10)); }));
-            m_constraints.Add(new Func<string, bool>(delegate(string val) { return new List<char>(val).TrueForAll(delegate(char c) { return (((c>='A') && (c<='Z')) || string.Format("abcd").Contains(c.ToString())); }); }));
+            return ((Value.Length>=1) && (Value.Length<=10)) && new List<char>(Value).TrueForAll(delegate(char c) { return (((c>='A') && (c<='Z')) || string.Format("abcd").Contains(c.ToString())); }) && base.IsConstraintValid();
         }
     }
 
     public class MyStr4 : Asn1IA5StringObject
     {
-        public MyStr4()
+
+        public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            //Write constraints
-            m_constraints.Add(new Func<string, bool>(delegate(string val) { return (new List<char>(val).TrueForAll(delegate(char c) { return string.Format("ABCDE").Contains(c.ToString()); }) || ((val.Length>=1) && (val.Length<=20))); }));
+            return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 107);
+        }
+
+        public override uint Decode(Stream strm, EncodingRules encRule)
+        {
+            return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 107);
+        }
+        public override bool IsConstraintValid()
+        {
+            return (new List<char>(Value).TrueForAll(delegate(char c) { return string.Format("ABCDE").Contains(c.ToString()); }) || ((Value.Length>=1) && (Value.Length<=20))) && base.IsConstraintValid();
         }
     }
 
     public class MyStrStr : MyStr4
     {
-        public MyStrStr()
+
+        public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            //Write constraints
-            m_constraints.Add(new Func<string, bool>(delegate(string val) { return new List<char>(val).TrueForAll(delegate(char c) { return string.Format("ABC").Contains(c.ToString()); }); }));
+            return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 108);
+        }
+
+        public override uint Decode(Stream strm, EncodingRules encRule)
+        {
+            return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 108);
+        }
+        public override bool IsConstraintValid()
+        {
+            return new List<char>(Value).TrueForAll(delegate(char c) { return string.Format("ABC").Contains(c.ToString()); }) && base.IsConstraintValid();
         }
     }
 
     public class MyOctStr : Asn1OctetStringObject
     {
-        public MyOctStr()
+        public override bool IsConstraintValid()
         {
-            //Write constraints
-            m_constraints.Add(new Func<List<byte>, bool>(delegate(List<byte> val) { return ((val.Count>=1) && (val.Count<=5)); }));
+            return ((m_Data.Count>=1) && (m_Data.Count<=5)) && base.IsConstraintValid();
         }
     }
 
-    public class MySeqOF : Asn1SequenceOfObject<Asn1IntegerObject>
+    public class MySeqOF : Asn1SequenceOfObject<MySeqOF.InternalType>
     {
-        public MySeqOF()
+        public class InternalType : Asn1IntegerObject
         {
-            m_child.createObj = new Func<Asn1IntegerObject>(delegate()
+            public override bool IsConstraintValid()
             {
-                Asn1IntegerObject ch1 = new Asn1IntegerObject();
-                //Write constraints
-                ch1.m_constraints.Add(new Func<long, bool>(delegate(long val) { return ((val>=1) && (val<=10)); }));
-                return ch1;
-            });
-            //Write constraints
-            m_constraints.Add(new Func<Asn1ArrayObject<Asn1IntegerObject>, bool>(delegate(Asn1ArrayObject<Asn1IntegerObject> val) { return ((val.m_children.Count>=1) && (val.m_children.Count<=20)); }));
+                return ((Value>=1) && (Value<=10)) && base.IsConstraintValid();
+            }
+        }
+
+        public override bool IsConstraintValid()
+        {
+            return ((m_children.Count>=1) && (m_children.Count<=20)) && base.IsConstraintValid();
         }
     }
 
@@ -111,254 +139,471 @@ namespace TYPES
             green = 1,
             blue = 2,
         }
-        public MyEnum()
+        protected override long ValueAsLong { get {return (long)Value;}}
+        public override bool IsConstraintValid()
         {
-            //Write constraints
-            m_constraints.Add(new Func<MyEnum.Enumerated, bool>(delegate(MyEnum.Enumerated val) { return ((val == MyEnum.Enumerated.red) || (val == MyEnum.Enumerated.blue)); }));
+            bool ret=true;
+            ret = ret && ((Value == MyEnum.Enumerated.red) || (Value == MyEnum.Enumerated.blue));
+            return base.IsConstraintValid() && ret;
         }
     }
 
     public class MySeq : Asn1SequenceObject
     {
 
-        public Asn1IntegerObject a
+        public class A : Asn1IntegerObject
         {
-            get { return m_children["a"].m_asn1Object as Asn1IntegerObject; }
-        }
-        public Asn1IntegerObject Create_a()
-        {
-            Asn1IntegerObject ret = new Asn1IntegerObject();
-            //Write constraints
-            m_children["a"].m_asn1Object = ret;
-            return ret;
-        }
 
-        public Asn1IntegerObject b
-        {
-            get { return m_children["b"].m_asn1Object as Asn1IntegerObject; }
-        }
-        public Asn1IntegerObject Create_b()
-        {
-            Asn1IntegerObject ret = new Asn1IntegerObject();
-            //Write constraints
-            ret.m_constraints.Add(new Func<long, bool>(delegate(long val) { return ((val>=1) && (val<=10)); }));
-            m_children["b"].m_asn1Object = ret;
-            return ret;
-        }
-
-        public OBIT c
-        {
-            get { return m_children["c"].m_asn1Object as OBIT; }
-        }
-        public OBIT Create_c()
-        {
-            OBIT ret = new OBIT();
-            //Write constraints
-            ret.m_constraints.Add(new Func<long, bool>(delegate(long val) { return ((val>=4) && (val<=20)); }));
-            m_children["c"].m_asn1Object = ret;
-            return ret;
-        }
-
-        public MyStrStr strst
-        {
-            get { return m_children["strst"].m_asn1Object as MyStrStr; }
-        }
-        public MyStrStr Create_strst()
-        {
-            MyStrStr ret = new MyStrStr();
-            //Write constraints
-            ret.m_constraints.Add(new Func<string, bool>(delegate(string val) { return (val.Length == 4); }));
-            m_children["strst"].m_asn1Object = ret;
-            return ret;
-        }
-
-        public Asn1SequenceOfObject<Asn1IntegerObject> arr
-        {
-            get { return m_children["arr"].m_asn1Object as Asn1SequenceOfObject<Asn1IntegerObject>; }
-        }
-        public Asn1SequenceOfObject<Asn1IntegerObject> Create_arr()
-        {
-            Asn1SequenceOfObject<Asn1IntegerObject> ret = new Asn1SequenceOfObject<Asn1IntegerObject>();
-            ret.m_child.createObj = new Func<Asn1IntegerObject>(delegate()
+            public override uint Encode(Stream strm, EncodingRules encRule)
             {
-                Asn1IntegerObject ch1 = new Asn1IntegerObject();
-                //Write constraints
-                ch1.m_constraints.Add(new Func<long, bool>(delegate(long val) { return ((val>=1) && (val<=10)); }));
-                return ch1;
-            });
-            //Write constraints
-            ret.m_constraints.Add(new Func<Asn1ArrayObject<Asn1IntegerObject>, bool>(delegate(Asn1ArrayObject<Asn1IntegerObject> val) { return ((val.m_children.Count>=1) && (val.m_children.Count<=20)); }));
-            m_children["arr"].m_asn1Object = ret;
-            return ret;
+                return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 0);
+            }
+
+            public override uint Decode(Stream strm, EncodingRules encRule)
+            {
+                return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 0);
+            }
         }
 
-        public Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>> arr2
+        public A a
         {
-            get { return m_children["arr2"].m_asn1Object as Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>>; }
+            get { return m_children[ClassDef.m_children["a"].m_idx] as A; }
         }
-        public Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>> Create_arr2()
+        public A Create_a()
         {
-            Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>> ret = new Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>>();
-            ret.m_child.createObj = new Func<Asn1SequenceOfObject<Asn1IntegerObject>>(delegate()
+            return CreateChild("a");
+        }
+
+        public class B : Asn1IntegerObject
+        {
+
+            public override uint Encode(Stream strm, EncodingRules encRule)
             {
-                Asn1SequenceOfObject<Asn1IntegerObject> ch1 = new Asn1SequenceOfObject<Asn1IntegerObject>();
-                ch1.m_child.createObj = new Func<Asn1IntegerObject>(delegate()
+                return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 1);
+            }
+
+            public override uint Decode(Stream strm, EncodingRules encRule)
+            {
+                return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 1);
+            }
+            public override bool IsConstraintValid()
+            {
+                return ((Value>=1) && (Value<=10)) && base.IsConstraintValid();
+            }
+        }
+
+        public B b
+        {
+            get { return m_children[ClassDef.m_children["b"].m_idx] as B; }
+        }
+        public B Create_b()
+        {
+            return CreateChild("b");
+        }
+
+        public class C : OBIT
+        {
+
+            public override uint Encode(Stream strm, EncodingRules encRule)
+            {
+                return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 2);
+            }
+
+            public override uint Decode(Stream strm, EncodingRules encRule)
+            {
+                return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 2);
+            }
+            public override bool IsConstraintValid()
+            {
+                return ((Value>=4) && (Value<=20)) && base.IsConstraintValid();
+            }
+        }
+
+        public C c
+        {
+            get { return m_children[ClassDef.m_children["c"].m_idx] as C; }
+        }
+        public C Create_c()
+        {
+            return CreateChild("c");
+        }
+
+        public class Strst : MyStrStr
+        {
+
+            public override uint Encode(Stream strm, EncodingRules encRule)
+            {
+                return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 3);
+            }
+
+            public override uint Decode(Stream strm, EncodingRules encRule)
+            {
+                return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 3);
+            }
+            public override bool IsConstraintValid()
+            {
+                return (Value.Length == 4) && base.IsConstraintValid();
+            }
+        }
+
+        public Strst strst
+        {
+            get { return m_children[ClassDef.m_children["strst"].m_idx] as Strst; }
+        }
+        public Strst Create_strst()
+        {
+            return CreateChild("strst");
+        }
+
+        public class Arr : Asn1SequenceOfObject<Arr.InternalType>
+        {
+            public class InternalType : Asn1IntegerObject
+            {
+                public override bool IsConstraintValid()
                 {
-                    Asn1IntegerObject ch2 = new Asn1IntegerObject();
-                    //Write constraints
-                    ch2.m_constraints.Add(new Func<long, bool>(delegate(long val) { return ((val>=1) && (val<=10)); }));
-                    return ch2;
-                });
-                //Write constraints
-                ch1.m_constraints.Add(new Func<Asn1ArrayObject<Asn1IntegerObject>, bool>(delegate(Asn1ArrayObject<Asn1IntegerObject> val) { return ((val.m_children.Count>=100) && (val.m_children.Count<=200)); }));
-                return ch1;
-            });
-            //Write constraints
-            ret.m_constraints.Add(new Func<Asn1ArrayObject<Asn1SequenceOfObject<Asn1IntegerObject>>, bool>(delegate(Asn1ArrayObject<Asn1SequenceOfObject<Asn1IntegerObject>> val) { return ((val.m_children.Count>=1) && (val.m_children.Count<=20)); }));
-            m_children["arr2"].m_asn1Object = ret;
-            return ret;
+                    return ((Value>=1) && (Value<=10)) && base.IsConstraintValid();
+                }
+            }
+
+
+            public override uint Encode(Stream strm, EncodingRules encRule)
+            {
+                return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 4);
+            }
+
+            public override uint Decode(Stream strm, EncodingRules encRule)
+            {
+                return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 4);
+            }
+            public override bool IsConstraintValid()
+            {
+                return ((m_children.Count>=1) && (m_children.Count<=20)) && base.IsConstraintValid();
+            }
+        }
+
+        public Arr arr
+        {
+            get { return m_children[ClassDef.m_children["arr"].m_idx] as Arr; }
+        }
+        public Arr Create_arr()
+        {
+            return CreateChild("arr");
+        }
+
+        public class Arr2 : Asn1SequenceOfObject<Arr2.InternalType>
+        {
+            public class InternalType : Asn1SequenceOfObject<InternalType.InternalType1>
+            {
+                public class InternalType1 : Asn1IntegerObject
+                {
+                    public override bool IsConstraintValid()
+                    {
+                        return ((Value>=1) && (Value<=10)) && base.IsConstraintValid();
+                    }
+                }
+
+                public override bool IsConstraintValid()
+                {
+                    return ((m_children.Count>=100) && (m_children.Count<=200)) && base.IsConstraintValid();
+                }
+            }
+
+
+            public override uint Encode(Stream strm, EncodingRules encRule)
+            {
+                return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 5);
+            }
+
+            public override uint Decode(Stream strm, EncodingRules encRule)
+            {
+                return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 5);
+            }
+            public override bool IsConstraintValid()
+            {
+                return ((m_children.Count>=1) && (m_children.Count<=20)) && base.IsConstraintValid();
+            }
+        }
+
+        public Arr2 arr2
+        {
+            get { return m_children[ClassDef.m_children["arr2"].m_idx] as Arr2; }
+        }
+        public Arr2 Create_arr2()
+        {
+            return CreateChild("arr2");
         }
 
         public class Inn : Asn1SequenceObject
         {
 
-            public Asn1IntegerObject a
+            public class A : Asn1IntegerObject
             {
-                get { return m_children["a"].m_asn1Object as Asn1IntegerObject; }
-            }
-            public Asn1IntegerObject Create_a()
-            {
-                Asn1IntegerObject ret = new Asn1IntegerObject();
-                //Write constraints
-                m_children["a"].m_asn1Object = ret;
-                return ret;
-            }
 
-            public Asn1IntegerObject b
-            {
-                get { return m_children["b"].m_asn1Object as Asn1IntegerObject; }
-            }
-            public Asn1IntegerObject Create_b()
-            {
-                Asn1IntegerObject ret = new Asn1IntegerObject();
-                //Write constraints
-                ret.m_constraints.Add(new Func<long, bool>(delegate(long val) { return ((val>=1) && (val<=10)); }));
-                m_children["b"].m_asn1Object = ret;
-                return ret;
-            }
-
-            public OBIT c
-            {
-                get { return m_children["c"].m_asn1Object as OBIT; }
-            }
-            public OBIT Create_c()
-            {
-                OBIT ret = new OBIT();
-                //Write constraints
-                ret.m_constraints.Add(new Func<long, bool>(delegate(long val) { return ((val>=4) && (val<=20)); }));
-                m_children["c"].m_asn1Object = ret;
-                return ret;
-            }
-
-            public MyStrStr strst
-            {
-                get { return m_children["strst"].m_asn1Object as MyStrStr; }
-            }
-            public MyStrStr Create_strst()
-            {
-                MyStrStr ret = new MyStrStr();
-                //Write constraints
-                ret.m_constraints.Add(new Func<string, bool>(delegate(string val) { return (val.Length == 4); }));
-                m_children["strst"].m_asn1Object = ret;
-                return ret;
-            }
-
-            public Asn1SequenceOfObject<Asn1IntegerObject> arr
-            {
-                get { return m_children["arr"].m_asn1Object as Asn1SequenceOfObject<Asn1IntegerObject>; }
-            }
-            public Asn1SequenceOfObject<Asn1IntegerObject> Create_arr()
-            {
-                Asn1SequenceOfObject<Asn1IntegerObject> ret = new Asn1SequenceOfObject<Asn1IntegerObject>();
-                ret.m_child.createObj = new Func<Asn1IntegerObject>(delegate()
+                public override uint Encode(Stream strm, EncodingRules encRule)
                 {
-                    Asn1IntegerObject ch1 = new Asn1IntegerObject();
-                    //Write constraints
-                    ch1.m_constraints.Add(new Func<long, bool>(delegate(long val) { return ((val>=1) && (val<=10)); }));
-                    return ch1;
-                });
-                //Write constraints
-                ret.m_constraints.Add(new Func<Asn1ArrayObject<Asn1IntegerObject>, bool>(delegate(Asn1ArrayObject<Asn1IntegerObject> val) { return ((val.m_children.Count>=1) && (val.m_children.Count<=20)); }));
-                m_children["arr"].m_asn1Object = ret;
-                return ret;
+                    return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 0);
+                }
+
+                public override uint Decode(Stream strm, EncodingRules encRule)
+                {
+                    return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 0);
+                }
             }
 
-            public Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>> arr2
+            public A a
             {
-                get { return m_children["arr2"].m_asn1Object as Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>>; }
+                get { return m_children[ClassDef.m_children["a"].m_idx] as A; }
             }
-            public Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>> Create_arr2()
+            public A Create_a()
             {
-                Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>> ret = new Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>>();
-                ret.m_child.createObj = new Func<Asn1SequenceOfObject<Asn1IntegerObject>>(delegate()
+                return CreateChild("a");
+            }
+
+            public class B : Asn1IntegerObject
+            {
+
+                public override uint Encode(Stream strm, EncodingRules encRule)
                 {
-                    Asn1SequenceOfObject<Asn1IntegerObject> ch1 = new Asn1SequenceOfObject<Asn1IntegerObject>();
-                    ch1.m_child.createObj = new Func<Asn1IntegerObject>(delegate()
+                    return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 1);
+                }
+
+                public override uint Decode(Stream strm, EncodingRules encRule)
+                {
+                    return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 1);
+                }
+                public override bool IsConstraintValid()
+                {
+                    return ((Value>=1) && (Value<=10)) && base.IsConstraintValid();
+                }
+            }
+
+            public B b
+            {
+                get { return m_children[ClassDef.m_children["b"].m_idx] as B; }
+            }
+            public B Create_b()
+            {
+                return CreateChild("b");
+            }
+
+            public class C : OBIT
+            {
+
+                public override uint Encode(Stream strm, EncodingRules encRule)
+                {
+                    return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 2);
+                }
+
+                public override uint Decode(Stream strm, EncodingRules encRule)
+                {
+                    return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 2);
+                }
+                public override bool IsConstraintValid()
+                {
+                    return ((Value>=4) && (Value<=20)) && base.IsConstraintValid();
+                }
+            }
+
+            public C c
+            {
+                get { return m_children[ClassDef.m_children["c"].m_idx] as C; }
+            }
+            public C Create_c()
+            {
+                return CreateChild("c");
+            }
+
+            public class Strst : MyStrStr
+            {
+
+                public override uint Encode(Stream strm, EncodingRules encRule)
+                {
+                    return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 3);
+                }
+
+                public override uint Decode(Stream strm, EncodingRules encRule)
+                {
+                    return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 3);
+                }
+                public override bool IsConstraintValid()
+                {
+                    return (Value.Length == 4) && base.IsConstraintValid();
+                }
+            }
+
+            public Strst strst
+            {
+                get { return m_children[ClassDef.m_children["strst"].m_idx] as Strst; }
+            }
+            public Strst Create_strst()
+            {
+                return CreateChild("strst");
+            }
+
+            public class Arr : Asn1SequenceOfObject<Arr.InternalType>
+            {
+                public class InternalType : Asn1IntegerObject
+                {
+                    public override bool IsConstraintValid()
                     {
-                        Asn1IntegerObject ch2 = new Asn1IntegerObject();
-                        //Write constraints
-                        ch2.m_constraints.Add(new Func<long, bool>(delegate(long val) { return ((val>=1) && (val<=10)); }));
-                        return ch2;
-                    });
-                    //Write constraints
-                    ch1.m_constraints.Add(new Func<Asn1ArrayObject<Asn1IntegerObject>, bool>(delegate(Asn1ArrayObject<Asn1IntegerObject> val) { return ((val.m_children.Count>=100) && (val.m_children.Count<=200)); }));
-                    return ch1;
-                });
-                //Write constraints
-                ret.m_constraints.Add(new Func<Asn1ArrayObject<Asn1SequenceOfObject<Asn1IntegerObject>>, bool>(delegate(Asn1ArrayObject<Asn1SequenceOfObject<Asn1IntegerObject>> val) { return ((val.m_children.Count>=1) && (val.m_children.Count<=20)); }));
-                m_children["arr2"].m_asn1Object = ret;
-                return ret;
+                        return ((Value>=1) && (Value<=10)) && base.IsConstraintValid();
+                    }
+                }
+
+
+                public override uint Encode(Stream strm, EncodingRules encRule)
+                {
+                    return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 4);
+                }
+
+                public override uint Decode(Stream strm, EncodingRules encRule)
+                {
+                    return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 4);
+                }
+                public override bool IsConstraintValid()
+                {
+                    return ((m_children.Count>=1) && (m_children.Count<=20)) && base.IsConstraintValid();
+                }
             }
-            public Inn()
+
+            public Arr arr
             {
-                OptionalNamedChild ch;
-                ch = new OptionalNamedChild("a", null, Create_a, false, null);
-                m_children.Add("a", ch);
-                ch = new OptionalNamedChild("b", null, Create_b, false, null);
-                m_children.Add("b", ch);
-                ch = new OptionalNamedChild("c", null, Create_c, false, null);
-                m_children.Add("c", ch);
-                ch = new OptionalNamedChild("strst", null, Create_strst, false, null);
-                m_children.Add("strst", ch);
-                ch = new OptionalNamedChild("arr", null, Create_arr, false, null);
-                m_children.Add("arr", ch);
-                ch = new OptionalNamedChild("arr2", null, Create_arr2, false, null);
-                m_children.Add("arr2", ch);
+                get { return m_children[ClassDef.m_children["arr"].m_idx] as Arr; }
+            }
+            public Arr Create_arr()
+            {
+                return CreateChild("arr");
+            }
+
+            public class Arr2 : Asn1SequenceOfObject<Arr2.InternalType>
+            {
+                public class InternalType : Asn1SequenceOfObject<InternalType.InternalType1>
+                {
+                    public class InternalType1 : Asn1IntegerObject
+                    {
+                        public override bool IsConstraintValid()
+                        {
+                            return ((Value>=1) && (Value<=10)) && base.IsConstraintValid();
+                        }
+                    }
+
+                    public override bool IsConstraintValid()
+                    {
+                        return ((m_children.Count>=100) && (m_children.Count<=200)) && base.IsConstraintValid();
+                    }
+                }
+
+
+                public override uint Encode(Stream strm, EncodingRules encRule)
+                {
+                    return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 5);
+                }
+
+                public override uint Decode(Stream strm, EncodingRules encRule)
+                {
+                    return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 5);
+                }
+                public override bool IsConstraintValid()
+                {
+                    return ((m_children.Count>=1) && (m_children.Count<=20)) && base.IsConstraintValid();
+                }
+            }
+
+            public Arr2 arr2
+            {
+                get { return m_children[ClassDef.m_children["arr2"].m_idx] as Arr2; }
+            }
+            public Arr2 Create_arr2()
+            {
+                return CreateChild("arr2");
+            }
+
+            public override uint Encode(Stream strm, EncodingRules encRule)
+            {
+                return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 6);
+            }
+
+            public override uint Decode(Stream strm, EncodingRules encRule)
+            {
+                return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 6);
+            }
+            Asn1CompositeClass<OptionalNamedChild> _clsDef = null;
+            public override Asn1CompositeClass<OptionalNamedChild> ClassDef
+            {
+                get
+                {
+                    if (_clsDef==null)
+                        _clsDef = new InnClassDefinition();
+                    return _clsDef;
+                }
+            }
+            public class InnClassDefinition
+            {
+                public InnClassDefinition()
+                {
+                    OptionalNamedChild ch;
+                    ch = new OptionalNamedChild("a", 0, delegate() {return new A();}, false, null);
+                    ch.m_Tag = new Tag(0, TagClass.CONTEXT_SPECIFIC);
+                    m_children.Add("a", ch);
+
+                    ch = new OptionalNamedChild("b", 1, delegate() {return new B();}, false, null);
+                    ch.m_Tag = new Tag(1, TagClass.CONTEXT_SPECIFIC);
+                    m_children.Add("b", ch);
+
+                    ch = new OptionalNamedChild("c", 2, delegate() {return new C();}, false, null);
+                    ch.m_Tag = new Tag(2, TagClass.CONTEXT_SPECIFIC);
+                    m_children.Add("c", ch);
+
+                    ch = new OptionalNamedChild("strst", 3, delegate() {return new Strst();}, false, null);
+                    ch.m_Tag = new Tag(3, TagClass.CONTEXT_SPECIFIC);
+                    m_children.Add("strst", ch);
+
+                    ch = new OptionalNamedChild("arr", 4, delegate() {return new Arr();}, false, null);
+                    ch.m_Tag = new Tag(4, TagClass.CONTEXT_SPECIFIC);
+                    m_children.Add("arr", ch);
+
+                    ch = new OptionalNamedChild("arr2", 5, delegate() {return new Arr2();}, false, null);
+                    ch.m_Tag = new Tag(5, TagClass.CONTEXT_SPECIFIC);
+                    m_children.Add("arr2", ch);
+
+                }
             }
         }
 
         public Inn inn
         {
-            get { return m_children["inn"].m_asn1Object as Inn; }
+            get { return m_children[ClassDef.m_children["inn"].m_idx] as Inn; }
         }
         public Inn Create_inn()
         {
-            Inn ret = new Inn();
-            m_children["inn"].m_asn1Object = ret;
-            return ret;
+            return CreateChild("inn");
         }
 
-        public MyEnum en1
+        public class En1 : MyEnum
         {
-            get { return m_children["en1"].m_asn1Object as MyEnum; }
+
+            public override uint Encode(Stream strm, EncodingRules encRule)
+            {
+                return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 7);
+            }
+
+            public override uint Decode(Stream strm, EncodingRules encRule)
+            {
+                return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 7);
+            }
+            public override bool IsConstraintValid()
+            {
+                return ((Value == MyEnum.Enumerated.red) || (Value == MyEnum.Enumerated.green)) && base.IsConstraintValid();
+            }
         }
-        public MyEnum Create_en1()
+
+        public En1 en1
         {
-            MyEnum ret = new MyEnum();
-            //Write constraints
-            ret.m_constraints.Add(new Func<MyEnum.Enumerated, bool>(delegate(MyEnum.Enumerated val) { return ((val == MyEnum.Enumerated.red) || (val == MyEnum.Enumerated.green)); }));
-            m_children["en1"].m_asn1Object = ret;
-            return ret;
+            get { return m_children[ClassDef.m_children["en1"].m_idx] as En1; }
+        }
+        public En1 Create_en1()
+        {
+            return CreateChild("en1");
         }
 
         public class En2 : Asn1EnumeratedObject<En2.Enumerated>
@@ -369,58 +614,159 @@ namespace TYPES
                 green = 1,
                 blue = 2,
             }
-            public En2()
+            protected override long ValueAsLong { get {return (long)Value;}}
+
+            public override uint Encode(Stream strm, EncodingRules encRule)
             {
-                //Write constraints
-                m_constraints.Add(new Func<En2.Enumerated, bool>(delegate(En2.Enumerated val) { return ((val == En2.Enumerated.red) || (val == En2.Enumerated.blue)); }));
+                return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 8);
+            }
+
+            public override uint Decode(Stream strm, EncodingRules encRule)
+            {
+                return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 8);
+            }
+            public override bool IsConstraintValid()
+            {
+                bool ret=true;
+                ret = ret && ((Value == En2.Enumerated.red) || (Value == En2.Enumerated.blue));
+                return base.IsConstraintValid() && ret;
             }
         }
 
         public En2 en2
         {
-            get { return m_children["en2"].m_asn1Object as En2; }
+            get { return m_children[ClassDef.m_children["en2"].m_idx] as En2; }
         }
         public En2 Create_en2()
         {
-            En2 ret = new En2();
-            m_children["en2"].m_asn1Object = ret;
-            return ret;
+            return CreateChild("en2");
         }
-        public MySeq()
+
+        public class MyChoice : MyCh
         {
-            OptionalNamedChild ch;
-            ch = new OptionalNamedChild("a", null, Create_a, false, null);
-            m_children.Add("a", ch);
-            ch = new OptionalNamedChild("b", null, Create_b, false, null);
-            m_children.Add("b", ch);
-            ch = new OptionalNamedChild("c", null, Create_c, false, null);
-            m_children.Add("c", ch);
-            ch = new OptionalNamedChild("strst", null, Create_strst, false, null);
-            m_children.Add("strst", ch);
-            ch = new OptionalNamedChild("arr", null, Create_arr, false, null);
-            m_children.Add("arr", ch);
-            ch = new OptionalNamedChild("arr2", null, Create_arr2, false, null);
-            m_children.Add("arr2", ch);
-            ch = new OptionalNamedChild("inn", null, Create_inn, false, null);
-            m_children.Add("inn", ch);
-            ch = new OptionalNamedChild("en1", null, Create_en1, false, null);
-            m_children.Add("en1", ch);
-            ch = new OptionalNamedChild("en2", null, Create_en2, false, null);
-            m_children.Add("en2", ch);
+
+            public override uint Encode(Stream strm, EncodingRules encRule)
+            {
+                return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, false, 9);
+            }
+
+            public override uint Decode(Stream strm, EncodingRules encRule)
+            {
+                return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, false, 9);
+            }
+
+            public override uint EncodeContent(Stream strm, EncodingRules encRule)
+            {
+                return base.Encode(strm, encRule);
+            }
+
+            public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
+            {
+                return base.Decode(strm, encRule);
+            }
+        }
+
+        public MyChoice myChoice
+        {
+            get { return m_children[ClassDef.m_children["myChoice"].m_idx] as MyChoice; }
+        }
+        public MyChoice Create_myChoice()
+        {
+            return CreateChild("myChoice");
+        }
+
+        public override uint Encode(Stream strm, EncodingRules encRule)
+        {
+            return Encode(strm, encRule, TagClass.APPLICATION, IsPrimitive, 102);
+        }
+
+        public override uint Decode(Stream strm, EncodingRules encRule)
+        {
+            return Decode(strm, encRule, TagClass.APPLICATION, IsPrimitive, 102);
+        }
+        Asn1CompositeClass<OptionalNamedChild> _clsDef = null;
+        public override Asn1CompositeClass<OptionalNamedChild> ClassDef
+        {
+            get
+            {
+                if (_clsDef==null)
+                    _clsDef = new MySeqClassDefinition();
+                return _clsDef;
+            }
+        }
+        public class MySeqClassDefinition
+        {
+            public MySeqClassDefinition()
+            {
+                OptionalNamedChild ch;
+                ch = new OptionalNamedChild("a", 0, delegate() {return new A();}, true, null);
+                ch.m_Tag = new Tag(0, TagClass.CONTEXT_SPECIFIC);
+                m_children.Add("a", ch);
+
+                ch = new OptionalNamedChild("b", 1, delegate() {return new B();}, true, null);
+                ch.m_Tag = new Tag(1, TagClass.CONTEXT_SPECIFIC);
+                m_children.Add("b", ch);
+
+                ch = new OptionalNamedChild("c", 2, delegate() {return new C();}, false, null);
+                ch.m_Tag = new Tag(2, TagClass.CONTEXT_SPECIFIC);
+                m_children.Add("c", ch);
+
+                ch = new OptionalNamedChild("strst", 3, delegate() {return new Strst();}, false, null);
+                ch.m_Tag = new Tag(3, TagClass.CONTEXT_SPECIFIC);
+                m_children.Add("strst", ch);
+
+                ch = new OptionalNamedChild("arr", 4, delegate() {return new Arr();}, false, null);
+                ch.m_Tag = new Tag(4, TagClass.CONTEXT_SPECIFIC);
+                m_children.Add("arr", ch);
+
+                ch = new OptionalNamedChild("arr2", 5, delegate() {return new Arr2();}, false, null);
+                ch.m_Tag = new Tag(5, TagClass.CONTEXT_SPECIFIC);
+                m_children.Add("arr2", ch);
+
+                ch = new OptionalNamedChild("inn", 6, delegate() {return new Inn();}, false, null);
+                ch.m_Tag = new Tag(6, TagClass.CONTEXT_SPECIFIC);
+                m_children.Add("inn", ch);
+
+                ch = new OptionalNamedChild("en1", 7, delegate() {return new En1();}, false, null);
+                ch.m_Tag = new Tag(7, TagClass.CONTEXT_SPECIFIC);
+                m_children.Add("en1", ch);
+
+                ch = new OptionalNamedChild("en2", 8, delegate() {return new En2();}, false, null);
+                ch.m_Tag = new Tag(8, TagClass.CONTEXT_SPECIFIC);
+                m_children.Add("en2", ch);
+
+                ch = new OptionalNamedChild("myChoice", 9, delegate() {return new MyChoice();}, false, null);
+                ch.m_Tag = new Tag(9, TagClass.CONTEXT_SPECIFIC);
+                m_children.Add("myChoice", ch);
+
+            }
         }
     }
 
     public class MyCh : Asn1ChoiceObject
     {
 
-        public Asn1IntegerObject a
+        public class A : Asn1IntegerObject
         {
-            get { return m_children["a"].m_asn1Object as Asn1IntegerObject; }
+
+            public override uint Encode(Stream strm, EncodingRules encRule)
+            {
+                return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 0);
+            }
+
+            public override uint Decode(Stream strm, EncodingRules encRule)
+            {
+                return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 0);
+            }
         }
-        public Asn1IntegerObject Create_a()
+
+        public A a
         {
-            Asn1IntegerObject ret = new Asn1IntegerObject();
-            //Write constraints
+            get { return m_children[ClassDef.m_children["a"].m_idx] as A; }
+        }
+        public A Create_a()
+        {
+            A ret = new A();
             if (m_AlternativeName != string.Empty)
                 m_children[m_AlternativeName].m_asn1Object = null;
             m_children["a"].m_asn1Object = ret;
@@ -428,15 +774,31 @@ namespace TYPES
             return ret;
         }
 
-        public Asn1IntegerObject b
+        public class B : Asn1IntegerObject
         {
-            get { return m_children["b"].m_asn1Object as Asn1IntegerObject; }
+
+            public override uint Encode(Stream strm, EncodingRules encRule)
+            {
+                return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 1);
+            }
+
+            public override uint Decode(Stream strm, EncodingRules encRule)
+            {
+                return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 1);
+            }
+            public override bool IsConstraintValid()
+            {
+                return ((Value>=1) && (Value<=10)) && base.IsConstraintValid();
+            }
         }
-        public Asn1IntegerObject Create_b()
+
+        public B b
         {
-            Asn1IntegerObject ret = new Asn1IntegerObject();
-            //Write constraints
-            ret.m_constraints.Add(new Func<long, bool>(delegate(long val) { return ((val>=1) && (val<=10)); }));
+            get { return m_children[ClassDef.m_children["b"].m_idx] as B; }
+        }
+        public B Create_b()
+        {
+            B ret = new B();
             if (m_AlternativeName != string.Empty)
                 m_children[m_AlternativeName].m_asn1Object = null;
             m_children["b"].m_asn1Object = ret;
@@ -444,15 +806,31 @@ namespace TYPES
             return ret;
         }
 
-        public OBIT c
+        public class C : OBIT
         {
-            get { return m_children["c"].m_asn1Object as OBIT; }
+
+            public override uint Encode(Stream strm, EncodingRules encRule)
+            {
+                return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 2);
+            }
+
+            public override uint Decode(Stream strm, EncodingRules encRule)
+            {
+                return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 2);
+            }
+            public override bool IsConstraintValid()
+            {
+                return ((Value>=4) && (Value<=20)) && base.IsConstraintValid();
+            }
         }
-        public OBIT Create_c()
+
+        public C c
         {
-            OBIT ret = new OBIT();
-            //Write constraints
-            ret.m_constraints.Add(new Func<long, bool>(delegate(long val) { return ((val>=4) && (val<=20)); }));
+            get { return m_children[ClassDef.m_children["c"].m_idx] as C; }
+        }
+        public C Create_c()
+        {
+            C ret = new C();
             if (m_AlternativeName != string.Empty)
                 m_children[m_AlternativeName].m_asn1Object = null;
             m_children["c"].m_asn1Object = ret;
@@ -460,15 +838,31 @@ namespace TYPES
             return ret;
         }
 
-        public MyStrStr strst
+        public class Strst : MyStrStr
         {
-            get { return m_children["strst"].m_asn1Object as MyStrStr; }
+
+            public override uint Encode(Stream strm, EncodingRules encRule)
+            {
+                return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 3);
+            }
+
+            public override uint Decode(Stream strm, EncodingRules encRule)
+            {
+                return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 3);
+            }
+            public override bool IsConstraintValid()
+            {
+                return (Value.Length == 4) && base.IsConstraintValid();
+            }
         }
-        public MyStrStr Create_strst()
+
+        public Strst strst
         {
-            MyStrStr ret = new MyStrStr();
-            //Write constraints
-            ret.m_constraints.Add(new Func<string, bool>(delegate(string val) { return (val.Length == 4); }));
+            get { return m_children[ClassDef.m_children["strst"].m_idx] as Strst; }
+        }
+        public Strst Create_strst()
+        {
+            Strst ret = new Strst();
             if (m_AlternativeName != string.Empty)
                 m_children[m_AlternativeName].m_asn1Object = null;
             m_children["strst"].m_asn1Object = ret;
@@ -476,22 +870,39 @@ namespace TYPES
             return ret;
         }
 
-        public Asn1SequenceOfObject<Asn1IntegerObject> arr
+        public class Arr : Asn1SequenceOfObject<Arr.InternalType>
         {
-            get { return m_children["arr"].m_asn1Object as Asn1SequenceOfObject<Asn1IntegerObject>; }
-        }
-        public Asn1SequenceOfObject<Asn1IntegerObject> Create_arr()
-        {
-            Asn1SequenceOfObject<Asn1IntegerObject> ret = new Asn1SequenceOfObject<Asn1IntegerObject>();
-            ret.m_child.createObj = new Func<Asn1IntegerObject>(delegate()
+            public class InternalType : Asn1IntegerObject
             {
-                Asn1IntegerObject ch1 = new Asn1IntegerObject();
-                //Write constraints
-                ch1.m_constraints.Add(new Func<long, bool>(delegate(long val) { return ((val>=1) && (val<=10)); }));
-                return ch1;
-            });
-            //Write constraints
-            ret.m_constraints.Add(new Func<Asn1ArrayObject<Asn1IntegerObject>, bool>(delegate(Asn1ArrayObject<Asn1IntegerObject> val) { return ((val.m_children.Count>=1) && (val.m_children.Count<=20)); }));
+                public override bool IsConstraintValid()
+                {
+                    return ((Value>=1) && (Value<=10)) && base.IsConstraintValid();
+                }
+            }
+
+
+            public override uint Encode(Stream strm, EncodingRules encRule)
+            {
+                return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 4);
+            }
+
+            public override uint Decode(Stream strm, EncodingRules encRule)
+            {
+                return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 4);
+            }
+            public override bool IsConstraintValid()
+            {
+                return ((m_children.Count>=1) && (m_children.Count<=20)) && base.IsConstraintValid();
+            }
+        }
+
+        public Arr arr
+        {
+            get { return m_children[ClassDef.m_children["arr"].m_idx] as Arr; }
+        }
+        public Arr Create_arr()
+        {
+            Arr ret = new Arr();
             if (m_AlternativeName != string.Empty)
                 m_children[m_AlternativeName].m_asn1Object = null;
             m_children["arr"].m_asn1Object = ret;
@@ -499,29 +910,47 @@ namespace TYPES
             return ret;
         }
 
-        public Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>> arr2
+        public class Arr2 : Asn1SequenceOfObject<Arr2.InternalType>
         {
-            get { return m_children["arr2"].m_asn1Object as Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>>; }
-        }
-        public Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>> Create_arr2()
-        {
-            Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>> ret = new Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>>();
-            ret.m_child.createObj = new Func<Asn1SequenceOfObject<Asn1IntegerObject>>(delegate()
+            public class InternalType : Asn1SequenceOfObject<InternalType.InternalType1>
             {
-                Asn1SequenceOfObject<Asn1IntegerObject> ch1 = new Asn1SequenceOfObject<Asn1IntegerObject>();
-                ch1.m_child.createObj = new Func<Asn1IntegerObject>(delegate()
+                public class InternalType1 : Asn1IntegerObject
                 {
-                    Asn1IntegerObject ch2 = new Asn1IntegerObject();
-                    //Write constraints
-                    ch2.m_constraints.Add(new Func<long, bool>(delegate(long val) { return ((val>=1) && (val<=10)); }));
-                    return ch2;
-                });
-                //Write constraints
-                ch1.m_constraints.Add(new Func<Asn1ArrayObject<Asn1IntegerObject>, bool>(delegate(Asn1ArrayObject<Asn1IntegerObject> val) { return ((val.m_children.Count>=100) && (val.m_children.Count<=200)); }));
-                return ch1;
-            });
-            //Write constraints
-            ret.m_constraints.Add(new Func<Asn1ArrayObject<Asn1SequenceOfObject<Asn1IntegerObject>>, bool>(delegate(Asn1ArrayObject<Asn1SequenceOfObject<Asn1IntegerObject>> val) { return ((val.m_children.Count>=1) && (val.m_children.Count<=20)); }));
+                    public override bool IsConstraintValid()
+                    {
+                        return ((Value>=1) && (Value<=10)) && base.IsConstraintValid();
+                    }
+                }
+
+                public override bool IsConstraintValid()
+                {
+                    return ((m_children.Count>=100) && (m_children.Count<=200)) && base.IsConstraintValid();
+                }
+            }
+
+
+            public override uint Encode(Stream strm, EncodingRules encRule)
+            {
+                return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 5);
+            }
+
+            public override uint Decode(Stream strm, EncodingRules encRule)
+            {
+                return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 5);
+            }
+            public override bool IsConstraintValid()
+            {
+                return ((m_children.Count>=1) && (m_children.Count<=20)) && base.IsConstraintValid();
+            }
+        }
+
+        public Arr2 arr2
+        {
+            get { return m_children[ClassDef.m_children["arr2"].m_idx] as Arr2; }
+        }
+        public Arr2 Create_arr2()
+        {
+            Arr2 ret = new Arr2();
             if (m_AlternativeName != string.Empty)
                 m_children[m_AlternativeName].m_asn1Object = null;
             m_children["arr2"].m_asn1Object = ret;
@@ -532,124 +961,243 @@ namespace TYPES
         public class Inn : Asn1SequenceObject
         {
 
-            public Asn1IntegerObject a
+            public class A : Asn1IntegerObject
             {
-                get { return m_children["a"].m_asn1Object as Asn1IntegerObject; }
-            }
-            public Asn1IntegerObject Create_a()
-            {
-                Asn1IntegerObject ret = new Asn1IntegerObject();
-                //Write constraints
-                m_children["a"].m_asn1Object = ret;
-                return ret;
-            }
 
-            public Asn1IntegerObject b
-            {
-                get { return m_children["b"].m_asn1Object as Asn1IntegerObject; }
-            }
-            public Asn1IntegerObject Create_b()
-            {
-                Asn1IntegerObject ret = new Asn1IntegerObject();
-                //Write constraints
-                ret.m_constraints.Add(new Func<long, bool>(delegate(long val) { return ((val>=1) && (val<=10)); }));
-                m_children["b"].m_asn1Object = ret;
-                return ret;
-            }
-
-            public OBIT c
-            {
-                get { return m_children["c"].m_asn1Object as OBIT; }
-            }
-            public OBIT Create_c()
-            {
-                OBIT ret = new OBIT();
-                //Write constraints
-                ret.m_constraints.Add(new Func<long, bool>(delegate(long val) { return ((val>=4) && (val<=20)); }));
-                m_children["c"].m_asn1Object = ret;
-                return ret;
-            }
-
-            public MyStrStr strst
-            {
-                get { return m_children["strst"].m_asn1Object as MyStrStr; }
-            }
-            public MyStrStr Create_strst()
-            {
-                MyStrStr ret = new MyStrStr();
-                //Write constraints
-                ret.m_constraints.Add(new Func<string, bool>(delegate(string val) { return (val.Length == 4); }));
-                m_children["strst"].m_asn1Object = ret;
-                return ret;
-            }
-
-            public Asn1SequenceOfObject<Asn1IntegerObject> arr
-            {
-                get { return m_children["arr"].m_asn1Object as Asn1SequenceOfObject<Asn1IntegerObject>; }
-            }
-            public Asn1SequenceOfObject<Asn1IntegerObject> Create_arr()
-            {
-                Asn1SequenceOfObject<Asn1IntegerObject> ret = new Asn1SequenceOfObject<Asn1IntegerObject>();
-                ret.m_child.createObj = new Func<Asn1IntegerObject>(delegate()
+                public override uint Encode(Stream strm, EncodingRules encRule)
                 {
-                    Asn1IntegerObject ch1 = new Asn1IntegerObject();
-                    //Write constraints
-                    ch1.m_constraints.Add(new Func<long, bool>(delegate(long val) { return ((val>=1) && (val<=10)); }));
-                    return ch1;
-                });
-                //Write constraints
-                ret.m_constraints.Add(new Func<Asn1ArrayObject<Asn1IntegerObject>, bool>(delegate(Asn1ArrayObject<Asn1IntegerObject> val) { return ((val.m_children.Count>=1) && (val.m_children.Count<=20)); }));
-                m_children["arr"].m_asn1Object = ret;
-                return ret;
+                    return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 0);
+                }
+
+                public override uint Decode(Stream strm, EncodingRules encRule)
+                {
+                    return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 0);
+                }
             }
 
-            public Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>> arr2
+            public A a
             {
-                get { return m_children["arr2"].m_asn1Object as Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>>; }
+                get { return m_children[ClassDef.m_children["a"].m_idx] as A; }
             }
-            public Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>> Create_arr2()
+            public A Create_a()
             {
-                Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>> ret = new Asn1SequenceOfObject<Asn1SequenceOfObject<Asn1IntegerObject>>();
-                ret.m_child.createObj = new Func<Asn1SequenceOfObject<Asn1IntegerObject>>(delegate()
+                return CreateChild("a");
+            }
+
+            public class B : Asn1IntegerObject
+            {
+
+                public override uint Encode(Stream strm, EncodingRules encRule)
                 {
-                    Asn1SequenceOfObject<Asn1IntegerObject> ch1 = new Asn1SequenceOfObject<Asn1IntegerObject>();
-                    ch1.m_child.createObj = new Func<Asn1IntegerObject>(delegate()
+                    return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 1);
+                }
+
+                public override uint Decode(Stream strm, EncodingRules encRule)
+                {
+                    return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 1);
+                }
+                public override bool IsConstraintValid()
+                {
+                    return ((Value>=1) && (Value<=10)) && base.IsConstraintValid();
+                }
+            }
+
+            public B b
+            {
+                get { return m_children[ClassDef.m_children["b"].m_idx] as B; }
+            }
+            public B Create_b()
+            {
+                return CreateChild("b");
+            }
+
+            public class C : OBIT
+            {
+
+                public override uint Encode(Stream strm, EncodingRules encRule)
+                {
+                    return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 2);
+                }
+
+                public override uint Decode(Stream strm, EncodingRules encRule)
+                {
+                    return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 2);
+                }
+                public override bool IsConstraintValid()
+                {
+                    return ((Value>=4) && (Value<=20)) && base.IsConstraintValid();
+                }
+            }
+
+            public C c
+            {
+                get { return m_children[ClassDef.m_children["c"].m_idx] as C; }
+            }
+            public C Create_c()
+            {
+                return CreateChild("c");
+            }
+
+            public class Strst : MyStrStr
+            {
+
+                public override uint Encode(Stream strm, EncodingRules encRule)
+                {
+                    return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 3);
+                }
+
+                public override uint Decode(Stream strm, EncodingRules encRule)
+                {
+                    return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 3);
+                }
+                public override bool IsConstraintValid()
+                {
+                    return (Value.Length == 4) && base.IsConstraintValid();
+                }
+            }
+
+            public Strst strst
+            {
+                get { return m_children[ClassDef.m_children["strst"].m_idx] as Strst; }
+            }
+            public Strst Create_strst()
+            {
+                return CreateChild("strst");
+            }
+
+            public class Arr : Asn1SequenceOfObject<Arr.InternalType>
+            {
+                public class InternalType : Asn1IntegerObject
+                {
+                    public override bool IsConstraintValid()
                     {
-                        Asn1IntegerObject ch2 = new Asn1IntegerObject();
-                        //Write constraints
-                        ch2.m_constraints.Add(new Func<long, bool>(delegate(long val) { return ((val>=1) && (val<=10)); }));
-                        return ch2;
-                    });
-                    //Write constraints
-                    ch1.m_constraints.Add(new Func<Asn1ArrayObject<Asn1IntegerObject>, bool>(delegate(Asn1ArrayObject<Asn1IntegerObject> val) { return ((val.m_children.Count>=100) && (val.m_children.Count<=200)); }));
-                    return ch1;
-                });
-                //Write constraints
-                ret.m_constraints.Add(new Func<Asn1ArrayObject<Asn1SequenceOfObject<Asn1IntegerObject>>, bool>(delegate(Asn1ArrayObject<Asn1SequenceOfObject<Asn1IntegerObject>> val) { return ((val.m_children.Count>=1) && (val.m_children.Count<=20)); }));
-                m_children["arr2"].m_asn1Object = ret;
-                return ret;
+                        return ((Value>=1) && (Value<=10)) && base.IsConstraintValid();
+                    }
+                }
+
+
+                public override uint Encode(Stream strm, EncodingRules encRule)
+                {
+                    return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 4);
+                }
+
+                public override uint Decode(Stream strm, EncodingRules encRule)
+                {
+                    return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 4);
+                }
+                public override bool IsConstraintValid()
+                {
+                    return ((m_children.Count>=1) && (m_children.Count<=20)) && base.IsConstraintValid();
+                }
             }
-            public Inn()
+
+            public Arr arr
             {
-                OptionalNamedChild ch;
-                ch = new OptionalNamedChild("a", null, Create_a, false, null);
-                m_children.Add("a", ch);
-                ch = new OptionalNamedChild("b", null, Create_b, false, null);
-                m_children.Add("b", ch);
-                ch = new OptionalNamedChild("c", null, Create_c, false, null);
-                m_children.Add("c", ch);
-                ch = new OptionalNamedChild("strst", null, Create_strst, false, null);
-                m_children.Add("strst", ch);
-                ch = new OptionalNamedChild("arr", null, Create_arr, false, null);
-                m_children.Add("arr", ch);
-                ch = new OptionalNamedChild("arr2", null, Create_arr2, false, null);
-                m_children.Add("arr2", ch);
+                get { return m_children[ClassDef.m_children["arr"].m_idx] as Arr; }
+            }
+            public Arr Create_arr()
+            {
+                return CreateChild("arr");
+            }
+
+            public class Arr2 : Asn1SequenceOfObject<Arr2.InternalType>
+            {
+                public class InternalType : Asn1SequenceOfObject<InternalType.InternalType1>
+                {
+                    public class InternalType1 : Asn1IntegerObject
+                    {
+                        public override bool IsConstraintValid()
+                        {
+                            return ((Value>=1) && (Value<=10)) && base.IsConstraintValid();
+                        }
+                    }
+
+                    public override bool IsConstraintValid()
+                    {
+                        return ((m_children.Count>=100) && (m_children.Count<=200)) && base.IsConstraintValid();
+                    }
+                }
+
+
+                public override uint Encode(Stream strm, EncodingRules encRule)
+                {
+                    return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 5);
+                }
+
+                public override uint Decode(Stream strm, EncodingRules encRule)
+                {
+                    return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 5);
+                }
+                public override bool IsConstraintValid()
+                {
+                    return ((m_children.Count>=1) && (m_children.Count<=20)) && base.IsConstraintValid();
+                }
+            }
+
+            public Arr2 arr2
+            {
+                get { return m_children[ClassDef.m_children["arr2"].m_idx] as Arr2; }
+            }
+            public Arr2 Create_arr2()
+            {
+                return CreateChild("arr2");
+            }
+
+            public override uint Encode(Stream strm, EncodingRules encRule)
+            {
+                return Encode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 6);
+            }
+
+            public override uint Decode(Stream strm, EncodingRules encRule)
+            {
+                return Decode(strm, encRule, TagClass.CONTEXT_SPECIFIC, IsPrimitive, 6);
+            }
+            Asn1CompositeClass<OptionalNamedChild> _clsDef = null;
+            public override Asn1CompositeClass<OptionalNamedChild> ClassDef
+            {
+                get
+                {
+                    if (_clsDef==null)
+                        _clsDef = new InnClassDefinition();
+                    return _clsDef;
+                }
+            }
+            public class InnClassDefinition
+            {
+                public InnClassDefinition()
+                {
+                    OptionalNamedChild ch;
+                    ch = new OptionalNamedChild("a", 0, delegate() {return new A();}, false, null);
+                    ch.m_Tag = new Tag(0, TagClass.CONTEXT_SPECIFIC);
+                    m_children.Add("a", ch);
+
+                    ch = new OptionalNamedChild("b", 1, delegate() {return new B();}, false, null);
+                    ch.m_Tag = new Tag(1, TagClass.CONTEXT_SPECIFIC);
+                    m_children.Add("b", ch);
+
+                    ch = new OptionalNamedChild("c", 2, delegate() {return new C();}, false, null);
+                    ch.m_Tag = new Tag(2, TagClass.CONTEXT_SPECIFIC);
+                    m_children.Add("c", ch);
+
+                    ch = new OptionalNamedChild("strst", 3, delegate() {return new Strst();}, false, null);
+                    ch.m_Tag = new Tag(3, TagClass.CONTEXT_SPECIFIC);
+                    m_children.Add("strst", ch);
+
+                    ch = new OptionalNamedChild("arr", 4, delegate() {return new Arr();}, false, null);
+                    ch.m_Tag = new Tag(4, TagClass.CONTEXT_SPECIFIC);
+                    m_children.Add("arr", ch);
+
+                    ch = new OptionalNamedChild("arr2", 5, delegate() {return new Arr2();}, false, null);
+                    ch.m_Tag = new Tag(5, TagClass.CONTEXT_SPECIFIC);
+                    m_children.Add("arr2", ch);
+
+                }
             }
         }
 
         public Inn inn
         {
-            get { return m_children["inn"].m_asn1Object as Inn; }
+            get { return m_children[ClassDef.m_children["inn"].m_idx] as Inn; }
         }
         public Inn Create_inn()
         {
@@ -660,37 +1208,51 @@ namespace TYPES
             m_AlternativeName = "inn";
             return ret;
         }
-        public MyCh()
+        Asn1CompositeClass<NamedChild> _clsDef = null;
+        public override Asn1CompositeClass<NamedChild> ClassDef
         {
-            NamedChild ch;
-            ch = new NamedChild("a", null, Create_a);
-            m_children.Add("a", ch);
-            ch = new NamedChild("b", null, Create_b);
-            m_children.Add("b", ch);
-            ch = new NamedChild("c", null, Create_c);
-            m_children.Add("c", ch);
-            ch = new NamedChild("strst", null, Create_strst);
-            m_children.Add("strst", ch);
-            ch = new NamedChild("arr", null, Create_arr);
-            m_children.Add("arr", ch);
-            ch = new NamedChild("arr2", null, Create_arr2);
-            m_children.Add("arr2", ch);
-            ch = new NamedChild("inn", null, Create_inn);
-            m_children.Add("inn", ch);
+            get
+            {
+                if (_clsDef==null)
+                    _clsDef = new MyChClassDefinition();
+                return _clsDef;
+            }
+        }
+        public class MyChClassDefinition
+        {
+            public MyChClassDefinition()
+            {
+                NamedChild ch;
+                ch = new NamedChild("a", 0, delegate() {return new A();});
+                ch.m_Tag = new Tag(0, TagClass.CONTEXT_SPECIFIC);
+                m_children.Add("a", ch);
+                ch = new NamedChild("b", 1, delegate() {return new B();});
+                ch.m_Tag = new Tag(1, TagClass.CONTEXT_SPECIFIC);
+                m_children.Add("b", ch);
+                ch = new NamedChild("c", 2, delegate() {return new C();});
+                ch.m_Tag = new Tag(2, TagClass.CONTEXT_SPECIFIC);
+                m_children.Add("c", ch);
+                ch = new NamedChild("strst", 3, delegate() {return new Strst();});
+                ch.m_Tag = new Tag(3, TagClass.CONTEXT_SPECIFIC);
+                m_children.Add("strst", ch);
+                ch = new NamedChild("arr", 4, delegate() {return new Arr();});
+                ch.m_Tag = new Tag(4, TagClass.CONTEXT_SPECIFIC);
+                m_children.Add("arr", ch);
+                ch = new NamedChild("arr2", 5, delegate() {return new Arr2();});
+                ch.m_Tag = new Tag(5, TagClass.CONTEXT_SPECIFIC);
+                m_children.Add("arr2", ch);
+                ch = new NamedChild("inn", 6, delegate() {return new Inn();});
+                ch.m_Tag = new Tag(6, TagClass.CONTEXT_SPECIFIC);
+                m_children.Add("inn", ch);
+            }
         }
     }
 
     public class MySeqOF2 : Asn1SequenceOfObject<MySeq>
     {
-        public MySeqOF2()
+        public override bool IsConstraintValid()
         {
-            m_child.createObj = new Func<MySeq>(delegate()
-            {
-                MySeq ch1 = new MySeq();
-                return ch1;
-            });
-            //Write constraints
-            m_constraints.Add(new Func<Asn1ArrayObject<MySeq>, bool>(delegate(Asn1ArrayObject<MySeq> val) { return ((val.m_children.Count>=1) && (val.m_children.Count<=20)); }));
+            return ((m_children.Count>=1) && (m_children.Count<=20)) && base.IsConstraintValid();
         }
     }
 

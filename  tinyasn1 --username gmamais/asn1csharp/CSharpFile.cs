@@ -26,6 +26,7 @@ namespace asn1csharp
                 csFile.WriteLine("using System;");
                 csFile.WriteLine("using System.Collections.Generic;");
                 csFile.WriteLine("using System.Text;");
+                csFile.WriteLine("using System.IO;");
                 csFile.WriteLine("using CSharpAsn1CRT;");
                 foreach (CSharpModule m in m_modules)
                     m.printCode(csFile);

@@ -14,40 +14,85 @@ namespace asn1csharp
 
         bool RequiresNewTypeDeclaration();
 
-        void WriteConstructorCode(StreamWriterLevel csFile, int level, string pThis, List<IConstraint> constraints);
 
-        string ConstraintType {get;}
+        string ConstraintVariable {get;}
 
     }
 
     public static class CSharpType
     {
         public static void DeclareType(Asn1Type pThis, StreamWriterLevel csFile, string TypeName, int level, string baseClassName,
-            out string DeclaredTypeName)
+            out string DeclaredTypeName, string valueName, string enumPrefix)
         {
             
             DeclaredTypeName = TypeName;
 
             csFile.WL(level, "public class {0} : {1}", DeclaredTypeName, baseClassName);
             csFile.WL(level++, "{");
-            csFile.WL(level, "public {0}()", DeclaredTypeName);
-            csFile.WL(level++, "{");
-            WriteConstructorCode(pThis, csFile, level, "", pThis.m_constraints);
-            csFile.WL(--level, "}");
+            WriteEncodeDecodeMethods(pThis, csFile, level);
+            WriteIsConstraintValid(pThis, csFile, level, valueName, enumPrefix);
             csFile.WL(--level, "}");
 
         }
 
-        public static void WriteConstructorCode(Asn1Type pThis, StreamWriterLevel csFile, int level, string pThisString, List<IConstraint> constraints)
-        {
-            string prefix = pThisString;
-            if (pThisString != "")
-                prefix += ".";
 
-            csFile.WL(level, "//Write constraints");
-            foreach (ICSharpConstraint con in constraints)
+
+        public static void WriteIsConstraintValid(Asn1Type pThis, StreamWriterLevel csFile, int level, 
+            string valueName, string enumPrefix)
+        {
+            if (pThis.m_constraints.Count == 0)
+                return;
+
+            csFile.WL(level, "public override bool IsConstraintValid()");
+            csFile.WL(level++, "{");
+            csFile.P(level);
+            csFile.Write("return ");
+            foreach (ICSharpConstraint con in pThis.m_constraints)
             {
-                csFile.WL(level, "{0}m_constraints.Add(new Func<{1}, bool>(delegate({1} val) {{ return {2}; }}));", prefix, ((ICSharpType)pThis).ConstraintType, con.PrintConstraintCode("val","") );
+                csFile.Write("{0} && ",con.PrintConstraintCode(valueName,enumPrefix));
+
+            }
+            csFile.WriteLine("base.IsConstraintValid();");
+            csFile.WL(--level, "}");
+
+        }
+
+
+        public static void WriteEncodeDecodeMethods(Asn1Type pThis, StreamWriterLevel csFile, int level)
+        {
+            if (pThis.m_tag == null)
+                return;
+            csFile.WriteLine();
+            csFile.WL(level, "public override uint Encode(Stream strm, EncodingRules encRule)");
+            csFile.WL(level++, "{");
+            if (pThis.m_tag.m_taggingMode== TaggingMode.EXPLICIT)
+                csFile.WL(level, "return Encode(strm, encRule, TagClass.{0}, false, {1});", pThis.m_tag.m_class, pThis.m_tag.m_tag);
+            else
+                csFile.WL(level, "return Encode(strm, encRule, TagClass.{0}, IsPrimitive, {1});", pThis.m_tag.m_class, pThis.m_tag.m_tag);
+            csFile.WL(--level, "}");
+
+            csFile.WriteLine();
+            csFile.WL(level, "public override uint Decode(Stream strm, EncodingRules encRule)");
+            csFile.WL(level++, "{");
+            if (pThis.m_tag.m_taggingMode == TaggingMode.EXPLICIT)
+                csFile.WL(level, "return Decode(strm, encRule, TagClass.{0}, false, {1});", pThis.m_tag.m_class, pThis.m_tag.m_tag);
+            else
+                csFile.WL(level, "return Decode(strm, encRule, TagClass.{0}, IsPrimitive, {1});", pThis.m_tag.m_class, pThis.m_tag.m_tag);
+            csFile.WL(--level, "}");
+
+            if (pThis.m_tag.m_taggingMode == TaggingMode.EXPLICIT)
+            {
+                csFile.WriteLine();
+                csFile.WL(level, "public override uint EncodeContent(Stream strm, EncodingRules encRule)");
+                csFile.WL(level++, "{");
+                csFile.WL(level, "return base.Encode(strm, encRule);");
+                csFile.WL(--level, "}");
+
+                csFile.WriteLine();
+                csFile.WL(level, "public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)");
+                csFile.WL(level++, "{");
+                csFile.WL(level, "return base.Decode(strm, encRule);");
+                csFile.WL(--level, "}");
             }
 
         }
@@ -62,7 +107,7 @@ namespace asn1csharp
 
         public void DeclareType(StreamWriterLevel csFile, string TypeName, int level)
         {
-            CSharpType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName);
+            CSharpType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName, "Value","");
         }
 
         public string DeclaredTypeName
@@ -71,14 +116,10 @@ namespace asn1csharp
         }
         public bool RequiresNewTypeDeclaration()
         {
-            return false;
+            return true;
         }
 
-        public void WriteConstructorCode(StreamWriterLevel csFile, int level, string pThis, List<IConstraint> constraints)
-        {
-            CSharpType.WriteConstructorCode(this, csFile, level, pThis, constraints);
-        }
-        public string ConstraintType { get { return "long"; } }
+        public string ConstraintVariable { get { return "Value"; } }
 
 
     }
@@ -89,7 +130,7 @@ namespace asn1csharp
 
         public void DeclareType(StreamWriterLevel csFile, string TypeName, int level)
         {
-            CSharpType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName);
+            CSharpType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName, "Value", "");
         }
 
         public string DeclaredTypeName
@@ -98,14 +139,10 @@ namespace asn1csharp
         }
         public bool RequiresNewTypeDeclaration()
         {
-            return false;
+            return true;
         }
 
-        public void WriteConstructorCode(StreamWriterLevel csFile, int level, string pThis, List<IConstraint> constraints)
-        {
-            CSharpType.WriteConstructorCode(this, csFile, level, pThis, constraints);
-        }
-        public string ConstraintType { get { return "bool"; } }
+        public string ConstraintVariable { get { return "Value"; } }
     }
 
     public class CSharpRealType : RealType, ICSharpType
@@ -114,7 +151,7 @@ namespace asn1csharp
 
         public void DeclareType(StreamWriterLevel csFile, string TypeName, int level)
         {
-            CSharpType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName);
+            CSharpType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName, "Value", "");
         }
 
         public string DeclaredTypeName
@@ -123,14 +160,10 @@ namespace asn1csharp
         }
         public bool RequiresNewTypeDeclaration()
         {
-            return false;
+            return true;
         }
 
-        public void WriteConstructorCode(StreamWriterLevel csFile, int level, string pThis, List<IConstraint> constraints)
-        {
-            CSharpType.WriteConstructorCode(this, csFile, level, pThis, constraints);
-        }
-        public string ConstraintType { get { return "double"; } }
+        public string ConstraintVariable { get { return "Value"; } }
     }
 
     public class CSharpIA5StringType : IA5StringType, ICSharpType
@@ -139,7 +172,7 @@ namespace asn1csharp
 
         public void DeclareType(StreamWriterLevel csFile, string TypeName, int level)
         {
-            CSharpType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName);
+            CSharpType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName, "Value", "");
         }
 
         public string DeclaredTypeName
@@ -148,14 +181,10 @@ namespace asn1csharp
         }
         public bool RequiresNewTypeDeclaration()
         {
-            return false;
+            return true;
         }
 
-        public void WriteConstructorCode(StreamWriterLevel csFile, int level, string pThis, List<IConstraint> constraints)
-        {
-            CSharpType.WriteConstructorCode(this, csFile, level, pThis, constraints);
-        }
-        public string ConstraintType { get { return "string"; } }
+        public string ConstraintVariable { get { return "Value"; } }
     }
 
     public class CSharpNumericStringType : NumericStringType, ICSharpType
@@ -164,7 +193,7 @@ namespace asn1csharp
 
         public void DeclareType(StreamWriterLevel csFile, string TypeName, int level)
         {
-            CSharpType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName);
+            CSharpType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName, "Value", "");
         }
 
         public string DeclaredTypeName
@@ -173,14 +202,10 @@ namespace asn1csharp
         }
         public bool RequiresNewTypeDeclaration()
         {
-            return false;
+            return true;
         }
 
-        public void WriteConstructorCode(StreamWriterLevel csFile, int level, string pThis, List<IConstraint> constraints)
-        {
-            CSharpType.WriteConstructorCode(this, csFile, level, pThis, constraints);
-        }
-        public string ConstraintType { get { return "string"; } }
+        public string ConstraintVariable { get { return "Value"; } }
     }
 
 
@@ -202,12 +227,28 @@ namespace asn1csharp
             }
             csFile.WL(--level, "}");
 
-            csFile.WL(level, "public {0}()", DeclaredTypeName);
-            csFile.WL(level++, "{");
-            WriteConstructorCode(csFile, level, "", m_constraints);
-            csFile.WL(--level, "}");
+            csFile.WL(level, "protected override long ValueAsLong { get {return (long)Value;}}");
+            CSharpType.WriteEncodeDecodeMethods(this, csFile, level);
 
-            
+
+            if (m_constraints.Count > 0)
+            {
+
+                csFile.WL(level, "public override bool IsConstraintValid()");
+                csFile.WL(level++, "{");
+                csFile.WL(level, "bool ret=true;");
+
+
+                foreach (ICSharpConstraint con in m_constraints)
+                {
+                    csFile.WL(level, "ret = ret && {0};", con.PrintConstraintCode("Value", DeclaredTypeName + ".Enumerated."));
+
+                }
+                csFile.WL(level, "return base.IsConstraintValid() && ret;");
+                csFile.WL(--level, "}");
+            }
+
+
             csFile.WL(--level, "}");
 
         }
@@ -221,20 +262,7 @@ namespace asn1csharp
             return true;
         }
 
-        public void WriteConstructorCode(StreamWriterLevel csFile, int level, string pThisString, List<IConstraint> constraints)
-        {
-            string prefix = pThisString;
-            if (pThisString != "")
-                prefix += ".";
-
-            csFile.WL(level, "//Write constraints");
-            foreach (ICSharpConstraint con in constraints)
-            {
-                csFile.WL(level, "{0}m_constraints.Add(new Func<{1}, bool>(delegate({1} val) {{ return {2}; }}));", 
-                    prefix, ConstraintType, con.PrintConstraintCode("val", ConstraintType+"."));
-            }
-        }
-        public string ConstraintType { get { return DeclaredTypeName + ".Enumerated"; } }
+        public string ConstraintVariable { get { return "Value"; } }
     }
 
     public class CSharpOctetStringType : OctetStringType, ICSharpType
@@ -243,7 +271,7 @@ namespace asn1csharp
 
         public void DeclareType(StreamWriterLevel csFile, string TypeName, int level)
         {
-            CSharpType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName);
+            CSharpType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName, "m_Data", "");
         }
 
         public string DeclaredTypeName
@@ -252,14 +280,10 @@ namespace asn1csharp
         }
         public bool RequiresNewTypeDeclaration()
         {
-            return false;
+            return true;
         }
 
-        public void WriteConstructorCode(StreamWriterLevel csFile, int level, string pThis, List<IConstraint> constraints)
-        {
-            CSharpType.WriteConstructorCode(this, csFile, level, pThis, constraints);
-        }
-        public string ConstraintType { get { return "List<byte>"; } }
+        public string ConstraintVariable { get { return "m_Data"; } }
     }
 
     public class CSharpBitStringType : BitStringType, ICSharpType
@@ -268,7 +292,7 @@ namespace asn1csharp
 
         public void DeclareType(StreamWriterLevel csFile, string TypeName, int level)
         {
-            CSharpType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName);
+            CSharpType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName, "m_Data", "");
         }
 
         public string DeclaredTypeName
@@ -277,14 +301,10 @@ namespace asn1csharp
         }
         public bool RequiresNewTypeDeclaration()
         {
-            return false;
+            return true;
         }
 
-        public void WriteConstructorCode(StreamWriterLevel csFile, int level, string pThis, List<IConstraint> constraints)
-        {
-            CSharpType.WriteConstructorCode(this, csFile, level, pThis, constraints);
-        }
-        public string ConstraintType { get { return "List<byte>"; } }
+        public string ConstraintVariable { get { return "m_Data"; } }
     }
 
     public class CSharpReferenceType : ReferenceType, ICSharpType
@@ -294,12 +314,16 @@ namespace asn1csharp
         public void DeclareType(StreamWriterLevel csFile, string TypeName, int level)
         {
             _declaredTypeName = C.ID(m_referencedTypeName);
-            CSharpType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName);
+            string enumPrefix = string.Empty;
+            if (GetFinalType() is EnumeratedType)
+                enumPrefix = DeclaredTypeName + ".Enumerated.";
+
+            CSharpType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName, ConstraintVariable, enumPrefix);
         }
 
         public string DeclaredTypeName
         {
-            get { 
+            get  { 
                 if (_declaredTypeName == string.Empty)
                     _declaredTypeName = C.ID(m_referencedTypeName);
                 return _declaredTypeName; 
@@ -308,15 +332,12 @@ namespace asn1csharp
 
         public bool RequiresNewTypeDeclaration()
         {
-            return false;
+            if (m_constraints.Count == 0 && m_tag == null)
+                return false;
+            return true;
         }
 
-        public void WriteConstructorCode(StreamWriterLevel csFile, int level, string pThis, List<IConstraint> constraints)
-        {
-//            if ( !((ICSharpType)Type).RequiresNewTypeDeclaration())
-                ((ICSharpType)Type).WriteConstructorCode(csFile, level, pThis, constraints);
-        }
-        public string ConstraintType { get { return ((ICSharpType)GetFinalType()).ConstraintType; } }
+        public string ConstraintVariable { get { return ((ICSharpType)GetFinalType()).ConstraintVariable; } }
     }
 
     public class CSharpNullType : NullType, ICSharpType
@@ -325,7 +346,7 @@ namespace asn1csharp
 
         public void DeclareType(StreamWriterLevel csFile, string TypeName, int level)
         {
-            CSharpType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName);
+            CSharpType.DeclareType(this, csFile, TypeName, level, _declaredTypeName, out _declaredTypeName,"","");
         }
 
         public string DeclaredTypeName
@@ -334,14 +355,10 @@ namespace asn1csharp
         }
         public bool RequiresNewTypeDeclaration()
         {
-            return false;
+            return true;
         }
 
-        public void WriteConstructorCode(StreamWriterLevel csFile, int level, string pThis, List<IConstraint> constraints)
-        {
-            CSharpType.WriteConstructorCode(this, csFile, level, pThis, constraints);
-        }
-        public string ConstraintType { get { return "int"; } }
+        public string ConstraintVariable { get { return ""; } }
     }
 
 }
