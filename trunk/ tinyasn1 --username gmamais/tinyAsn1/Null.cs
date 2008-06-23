@@ -32,7 +32,7 @@ namespace tinyAsn1
             get
             {
 
-                return DefaultBackend.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 0, TaggingMode.EXPLICIT, this);
+                return DefaultBackend.Instance.Factory.CreateAsn1TypeTag(Tag.TagClass.UNIVERSAL, 5, TaggingMode.EXPLICIT, this);
             }
         }
 

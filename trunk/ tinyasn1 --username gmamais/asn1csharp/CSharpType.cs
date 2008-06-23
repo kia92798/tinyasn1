@@ -66,18 +66,22 @@ namespace asn1csharp
             csFile.WL(level, "public override uint Encode(Stream strm, EncodingRules encRule)");
             csFile.WL(level++, "{");
             if (pThis.m_tag.m_taggingMode== TaggingMode.EXPLICIT)
-                csFile.WL(level, "return Encode(strm, encRule, TagClass.{0}, false, {1});", pThis.m_tag.m_class, pThis.m_tag.m_tag);
+//                csFile.WL(level, "return Encode(strm, encRule, TagClass.{0}, false, {1});", pThis.m_tag.m_class, pThis.m_tag.m_tag);
+                csFile.WL(level, "return Encode(strm, encRule, false, 0x{0:X});", CSharpSequenceOrSetType.CalculateTag(pThis.m_tag));
             else
-                csFile.WL(level, "return Encode(strm, encRule, TagClass.{0}, IsPrimitive, {1});", pThis.m_tag.m_class, pThis.m_tag.m_tag);
+                csFile.WL(level, "return Encode(strm, encRule, IsPrimitive, 0x{0:X});", CSharpSequenceOrSetType.CalculateTag(pThis.m_tag));
+//                csFile.WL(level, "return Encode(strm, encRule, TagClass.{0}, IsPrimitive, {1});", pThis.m_tag.m_class, pThis.m_tag.m_tag);
             csFile.WL(--level, "}");
 
             csFile.WriteLine();
             csFile.WL(level, "public override uint Decode(Stream strm, EncodingRules encRule)");
             csFile.WL(level++, "{");
             if (pThis.m_tag.m_taggingMode == TaggingMode.EXPLICIT)
-                csFile.WL(level, "return Decode(strm, encRule, TagClass.{0}, false, {1});", pThis.m_tag.m_class, pThis.m_tag.m_tag);
+                csFile.WL(level, "return Decode(strm, encRule, false, 0x{0:X});", CSharpSequenceOrSetType.CalculateTag(pThis.m_tag));
+//                csFile.WL(level, "return Decode(strm, encRule, TagClass.{0}, false, {1});", pThis.m_tag.m_class, pThis.m_tag.m_tag);
             else
-                csFile.WL(level, "return Decode(strm, encRule, TagClass.{0}, IsPrimitive, {1});", pThis.m_tag.m_class, pThis.m_tag.m_tag);
+                csFile.WL(level, "return Decode(strm, encRule, IsPrimitive, 0x{0:X});", CSharpSequenceOrSetType.CalculateTag(pThis.m_tag));
+//                csFile.WL(level, "return Decode(strm, encRule, TagClass.{0}, IsPrimitive, {1});", pThis.m_tag.m_class, pThis.m_tag.m_tag);
             csFile.WL(--level, "}");
 
             if (pThis.m_tag.m_taggingMode == TaggingMode.EXPLICIT)

@@ -8,6 +8,47 @@ namespace asn1csharp
     public static class CSharpSequenceOrSetType
     {
 
+        public static UInt32 CalculateTag(Asn1Type.Tag tg)
+        {
+            UInt32 ret = (byte)((byte)tg.m_class << 6);
+
+            uint tagNumber = (uint)tg.m_tag;
+
+
+            if (tagNumber < 31)
+            {
+                ret |= (byte)tagNumber;
+
+                return ret;
+            }
+
+            ret |= 0x1F;
+
+            List<byte> encBytes = new List<byte>();
+
+            while (tagNumber > 0)
+            {
+                byte encTagPart = (byte)(tagNumber & 0x7F);
+
+                tagNumber = tagNumber >> 7;
+                if (encBytes.Count == 0)
+                    encBytes.Insert(0, encTagPart);
+                else
+                    encBytes.Insert(0, (byte)(0x80 | encTagPart));
+            }
+
+            if (encBytes.Count > 3)
+                throw new SemanticErrorException("Tag is too big! :" + tg.m_tag.ToString());
+
+            foreach (byte b in encBytes)
+            {
+                ret <<= 8;
+                ret |= b;
+            }
+
+            return ret;
+        }
+
         public static void DeclareType(SequenceOrSetType pThis, StreamWriterLevel csFile, string TypeName, int level, string baseClassName)
         {
             csFile.WL(level, "public class {0} : {1}", TypeName, baseClassName);
@@ -85,20 +126,23 @@ namespace asn1csharp
                 ChoiceType chChild = ch.m_type.GetFinalType() as ChoiceType;
                 if (chChild != null && !ch.m_type.IsTagged())
                 {
-                    csFile.WL(level, "ch.UnTaggedChoice = true;");
-                    csFile.WL(level, "ch.m_childrenTags = new List<Tag>();");
+//                    csFile.WL(level, "ch.UnTaggedChoice = true;");
+//                    csFile.WL(level, "ch.m_childrenTags = new List<Tag>();");
 
                     List<Asn1Type.TagSequence> tags = chChild.getChildrenTags();
                     foreach (Asn1Type.TagSequence tgSq in tags)
                     {
-                        csFile.WL(level, "ch.m_childrenTags.Add(new Tag({0}, TagClass.{1}));", tgSq.m_tags[0].m_tag, tgSq.m_tags[0].m_class);
+//                        csFile.WL(level, "ch.m_childrenTags.Add(new Tag({0}, TagClass.{1}));", tgSq.m_tags[0].m_tag, tgSq.m_tags[0].m_class);
+
+                        csFile.WL(level, "m_posChildren.Add(0x{0:X}, ch);", CalculateTag(tgSq.m_tags[0]));
                     }
                 }
                 else
                 {
                     Asn1Type.Tag lstTag = ch.m_type.Tags.m_tags[0];
-                    csFile.WL(level, "ch.m_Tag = new Tag({0}, TagClass.{1});", lstTag.m_tag, lstTag.m_class);
+//                    csFile.WL(level, "ch.m_Tag = new Tag({0}, TagClass.{1});", lstTag.m_tag, lstTag.m_class);
 
+                    csFile.WL(level, "m_posChildren.Add(0x{0:X}, ch);", CalculateTag(lstTag));
                 }
 
                 
@@ -311,19 +355,22 @@ namespace asn1csharp
 
                 if (chChild != null && !ch.m_type.IsTagged())
                 {
-                    csFile.WL(level, "ch.UnTaggedChoice = true;");
-                    csFile.WL(level, "ch.m_childrenTags = new List<Tag>();");
+//                    csFile.WL(level, "ch.UnTaggedChoice = true;");
+//                    csFile.WL(level, "ch.m_childrenTags = new List<Tag>();");
 
                     List<Asn1Type.TagSequence> tags = chChild.getChildrenTags();
                     foreach (Asn1Type.TagSequence tgSq in tags)
                     {
-                        csFile.WL(level, "ch.m_childrenTags.Add(new Tag({0}, TagClass.{1}));", tgSq.m_tags[0].m_tag, tgSq.m_tags[0].m_class);
+//                        csFile.WL(level, "ch.m_childrenTags.Add(new Tag({0}, TagClass.{1}));", tgSq.m_tags[0].m_tag, tgSq.m_tags[0].m_class);
+
+                        csFile.WL(level, "m_posChildren.Add(0x{0:X}, ch);", CSharpSequenceOrSetType.CalculateTag(tgSq.m_tags[0]));
                     }
                 }
                 else
                 {
                     Asn1Type.Tag lstTag = ch.m_type.Tags.m_tags[0];
-                    csFile.WL(level, "ch.m_Tag = new Tag({0}, TagClass.{1});", lstTag.m_tag, lstTag.m_class);
+//                    csFile.WL(level, "ch.m_Tag = new Tag({0}, TagClass.{1});", lstTag.m_tag, lstTag.m_class);
+                    csFile.WL(level, "m_posChildren.Add(0x{0:X}, ch);", CSharpSequenceOrSetType.CalculateTag(lstTag));
 
                 }
 
