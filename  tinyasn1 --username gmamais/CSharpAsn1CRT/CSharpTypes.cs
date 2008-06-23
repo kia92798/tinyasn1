@@ -100,31 +100,77 @@ namespace CSharpAsn1CRT
         public abstract IEnumerable<Asn1Object> GetChildren(bool includeMyself);
         public virtual bool IsPrimitive { get { return true; } }
 
-        public uint Encode(Stream strm, EncodingRules encRule, TagClass tagClass, bool primitive, uint tagNumber)
+        //public uint Encode(Stream strm, EncodingRules encRule, TagClass tagClass, bool primitive, uint tagNumber)
+        //{
+        //    long sPos = strm.Position;
+        //    using (MemoryStream tmp = new MemoryStream())
+        //    {
+        //        BER.EncodeTag(strm, tagClass, primitive, tagNumber);
+        //        uint len = EncodeContent(tmp, encRule);
+        //        BER.EncodeLengthDF(strm, len);
+        //        strm.Write(tmp.GetBuffer(), 0, (int)tmp.Length);
+        //    }
+        //    return (uint)(strm.Position - sPos);
+        //}
+
+        public uint Encode(Stream strm, EncodingRules encRule, bool primitive, UInt32 tag)
         {
             long sPos = strm.Position;
             using (MemoryStream tmp = new MemoryStream())
             {
-                BER.EncodeTag(strm, tagClass, primitive, tagNumber);
+                BER.EncodeTagAsInt(strm, tag, primitive);
                 uint len = EncodeContent(tmp, encRule);
                 BER.EncodeLengthDF(strm, len);
                 strm.Write(tmp.GetBuffer(), 0, (int)tmp.Length);
             }
             return (uint)(strm.Position - sPos);
         }
-
         
-        public uint Decode(Stream strm, EncodingRules encRule, TagClass tagClass, bool primitive, uint tagNumber)
+        //public uint Decode(Stream strm, EncodingRules encRule, TagClass tagClass, bool primitive, uint tagNumber)
+        //{
+
+        //    long initPos = strm.Position;
+
+        //    Tag t = BER.DecodeTag(strm);
+        //    if (t == null)
+        //        throw new UnexpectedTagException();
+
+
+        //    if (t.m_tagNo != tagNumber || t.m_tgClass != tagClass)
+        //        throw new UnexpectedTagException();
+
+        //    uint length = 0;
+        //    BER.DecodeLength(strm, out length);
+        //    long sPos = strm.Position;
+
+        //    DecodeContent(strm, encRule, length);
+
+        //    if (length==0 && strm.Position==sPos)
+        //        return (uint)(strm.Position - initPos);
+
+        //    if (length == 0)
+        //        BER.DecodeTwoZeros(strm);
+        //    else
+        //    {
+        //        long decodedData = strm.Position - sPos;
+        //        if (decodedData != length)
+        //            throw new LengthMismatchException();
+        //    }
+
+            
+        //    return (uint)(strm.Position-initPos);
+        //}
+
+        public uint Decode(Stream strm, EncodingRules encRule, bool primitive, UInt32 tag)
         {
 
             long initPos = strm.Position;
 
-            Tag t = BER.DecodeTag(strm);
-            if (t == null)
+            UInt32 t = BER.DecodeTagAsInt(strm);
+
+            if (t == UInt32.MaxValue)
                 throw new UnexpectedTagException();
-
-
-            if (t.m_tagNo != tagNumber || t.m_tgClass != tagClass)
+            if (t != tag)
                 throw new UnexpectedTagException();
 
             uint length = 0;
@@ -133,21 +179,43 @@ namespace CSharpAsn1CRT
 
             DecodeContent(strm, encRule, length);
 
-            if (length==0 && strm.Position==sPos)
-                return (uint)(strm.Position - initPos);
+            long decodedData = strm.Position - sPos;
 
-            if (length == 0)
-                BER.DecodeTwoZeros(strm);
-            else
-            {
-                long decodedData = strm.Position - sPos;
-                if (decodedData != length)
-                    throw new LengthMismatchException();
-            }
+            if (length != 0 && decodedData != length)
+                throw new LengthMismatchException();
+            else if (length == 0 && decodedData > 0)
+                BER.DecodeTwoZeros(strm); // throws LengthMismatchException if no two zeros found
 
-            
-            return (uint)(strm.Position-initPos);
+
+
+            return (uint)(strm.Position - initPos);
+
         }
+
+        //public uint DecodeLenContent(Stream strm, EncodingRules encRule)
+        //{
+        //    long initPos = strm.Position;
+
+        //    uint length = 0;
+        //    BER.DecodeLength(strm, out length);
+        //    long sPos = strm.Position;
+
+        //    DecodeContent(strm, encRule, length);
+
+        //    long decodedData = strm.Position - sPos;
+
+
+        //    if (length!=0 && decodedData != length)
+        //        throw new LengthMismatchException();
+        //    else  if (length == 0 && decodedData>0)
+        //        BER.DecodeTwoZeros(strm); // throws LengthMismatchException if no two zeros found
+
+
+        //    return (uint)(strm.Position - initPos);
+        //}
+
+
+
     }
 
 
@@ -164,12 +232,14 @@ namespace CSharpAsn1CRT
         }
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
-            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 2);
+            return Decode(strm, encRule, true, 5);
+//            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 5);
 
         }
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 5);
+            return Encode(strm, encRule, true, 5);
+//            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 5);
         }
 
         public override bool IsConstraintValid()
@@ -210,12 +280,14 @@ namespace CSharpAsn1CRT
 
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 2);
+            return Encode(strm, encRule, true, 2);
+//            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 2);
         }
 
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
-            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 2);
+            return Decode(strm, encRule, true, 2);
+//            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 2);
         }
 
         public override uint EncodeContent(Stream strm, EncodingRules encRule)
@@ -252,11 +324,13 @@ namespace CSharpAsn1CRT
         }
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
-            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 9);
+            return Decode(strm, encRule, true, 9);
+//            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 9);
         }
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 9);
+            return Encode(strm, encRule, true, 9);
+//            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 9);
         }
     }
 
@@ -284,11 +358,13 @@ namespace CSharpAsn1CRT
         }
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
-            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 1);
+            return Decode(strm, encRule, true, 1);
+//            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 1);
         }
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 1);
+            return Encode(strm, encRule, true, 1);
+//            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 1);
         }
     }
 
@@ -309,11 +385,13 @@ namespace CSharpAsn1CRT
         }
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
-            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 22);
+            return Decode(strm, encRule, true, 22);
+//            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 22);
         }
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 22);
+            return Encode(strm, encRule, true, 22);
+//            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 22);
         }
     }
 
@@ -332,11 +410,13 @@ namespace CSharpAsn1CRT
         }
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
-            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 18);
+//            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 18);
+            return Decode(strm, encRule, true, 18);
         }
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 18);
+            return Encode(strm, encRule, true, 18);
+//            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 18);
         }
     }
 
@@ -357,43 +437,77 @@ namespace CSharpAsn1CRT
         }
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
-            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 10);
+//            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 10);
+            return Decode(strm, encRule, true, 10);
         }
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 10);
+//            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 10);
+            return Encode(strm, encRule, true, 10);
         }
     }
 
     public class Asn1OctetStringObject : Asn1Object
     {
-        public List<byte> m_Data = new List<byte>();
+//        public List<byte> m_Data = new List<byte>(10);
+
+        byte[] _Data = null;
+
+        //public List<byte> m_Data
+        //{
+        //    get
+        //    {
+
+        //    }
+        //}
 
 
         public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
         {
-            for (int i = 0; i < dataLen; i++)
-            {
-                int nval = strm.ReadByte();
-                if (nval < 0)
-                    throw new UnexpectedEndOfStreamException();
-                m_Data.Add((byte)nval);
-            }
+            if (strm.Length - strm.Position < dataLen)
+                throw new UnexpectedEndOfStreamException();
+
+            //byte[] tmp = new byte[dataLen];
+            //strm.Read(tmp, 0, (int)dataLen);
+            //m_Data = new List<byte>(tmp);
+
+            _Data = new byte[dataLen];
+            strm.Read(_Data, 0, (int)dataLen);
+
+            //if (m_Data.Capacity < dataLen)
+            //    m_Data.Capacity = (int)dataLen;
+
+
+            
+
+
+
+            //for (int i = 0; i < dataLen; i++)
+            //{
+            //    int nval = strm.ReadByte();
+            //    //if (nval < 0)
+            //    //    throw new UnexpectedEndOfStreamException();
+            //    m_Data.Add((byte)nval);
+            //}
             return dataLen;
         }
         public override uint EncodeContent(Stream strm, EncodingRules encRule)
         {
-            strm.Write(m_Data.ToArray(), 0, m_Data.Count);
-            return (uint)m_Data.Count;
+            strm.Write(_Data, 0, _Data.Length);
+            return (uint)_Data.Length;
+            //strm.Write(m_Data.ToArray(), 0, m_Data.Count);
+            //return (uint)m_Data.Count;
         }
 
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
-            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 4);
+            return Decode(strm, encRule, true, 4);
+//            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 4);
         }
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 4);
+            return Encode(strm, encRule, true, 4);
+//            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 4);
         }
      
         public override bool IsConstraintValid()
@@ -423,11 +537,13 @@ namespace CSharpAsn1CRT
         
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
-            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 8);
+//            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 8);
+            return Decode(strm, encRule, true, 8);
         }
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 8);
+//            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 8);
+            return Encode(strm, encRule, true, 8);
         }
 
         public override bool IsConstraintValid()
@@ -443,13 +559,17 @@ namespace CSharpAsn1CRT
 
 
 
-    public abstract class Asn1ArrayObject<T> : Asn1Object where T : Asn1Object, new()
+    public abstract class Asn1ArrayObject<T> : Asn1Object where T : Asn1Object
     {
-        public List<T> m_children = new List<T>();
+        public List<T> m_children = new List<T>(5);
 
+        protected abstract List<UInt32> ChildTags { get;}
+
+        protected abstract Func<T> CreateEmptyChild { get;}
         public T AppendNewChild()
         {
-            T ret = new T();
+//            T ret = new T();
+            T ret = CreateEmptyChild();
             m_children.Add(ret);
             return ret;
         }
@@ -469,23 +589,31 @@ namespace CSharpAsn1CRT
                 long curStrPos = strm.Position;
                 //Decode content (i.e. children)
 
-                while (true)
+                UInt32 nextTag = UInt32.MaxValue;
+                while (BER.GetNextTag(strm, out nextTag))   //on end of file or ZERO tag return 0
+//                    while (true)
                 {
+                    
                     decodedData = strm.Position - curStrPos;
-                    if (length == 0 && BER.AreNextTwoBytesZeros(strm))
-                        break;
-                    else if (length >= 0 && decodedData >= length)
+                    if (length == 0)
+                    {
+                        if (!ChildTags.Contains(nextTag) || BER.AreNextTwoBytesZeros(strm))
+                            break;
+                        
+                    } 
+                    else if (length > 0 && decodedData >= length)
                     {
                         if (decodedData == length)
                             break;
                         throw new LengthMismatchException();
                     }
+
                     T ch = AppendNewChild();
                     ch.Decode(strm, encRule);
 
-                    if (m_children.Count > 1000)
-                        if (m_children.Count % 1000 == 0)
-                            Console.WriteLine(m_children.Count);
+                    //if (m_children.Count > 1000)
+                    //    if (m_children.Count % 1000 == 0)
+                    //        Console.WriteLine(m_children.Count);
 
 
 
@@ -534,42 +662,46 @@ namespace CSharpAsn1CRT
 
     }
 
-    public class Asn1SequenceOfObject<T> : Asn1ArrayObject<T> where T : Asn1Object, new()
+    public abstract class Asn1SequenceOfObject<T> : Asn1ArrayObject<T> where T : Asn1Object
     {
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
-            return Decode(strm, encRule, TagClass.UNIVERSAL, false, 16);
+//            return Decode(strm, encRule, TagClass.UNIVERSAL, false, 16);
+            return Decode(strm, encRule, false, 16);
         }
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            return Encode(strm, encRule, TagClass.UNIVERSAL, false, 16);
+//            return Encode(strm, encRule, TagClass.UNIVERSAL, false, 16);
+            return Encode(strm, encRule, false, 16);
         }
     }
 
-    public class Asn1SetOfObject<T> : Asn1ArrayObject<T> where T : Asn1Object, new()
+    public abstract class Asn1SetOfObject<T> : Asn1ArrayObject<T> where T : Asn1Object
     {
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
-            return Decode(strm, encRule, TagClass.UNIVERSAL, false, 17);
+            return Decode(strm, encRule, false, 17);
+//            return Decode(strm, encRule, TagClass.UNIVERSAL, false, 17);
         }
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            return Encode(strm, encRule, TagClass.UNIVERSAL, false, 17);
+            return Encode(strm, encRule, false, 17);
+//            return Encode(strm, encRule, TagClass.UNIVERSAL, false, 17);
         }
     }
 
 
     public class Child<T>
     {
-        public Tag m_Tag = null;
+//        public Tag m_Tag = null;
 
-        public List<Tag> m_childrenTags = null; // This is used only in case where child is an untagged choice
+//        public List<Tag> m_childrenTags = null; // This is used only in case where child is an untagged choice
         public Func<T> createObj = null;
 
-        public void SetChildrenTagList(params Tag[] tagList)
-        {
-            m_childrenTags = new List<Tag>(tagList);
-        }
+        //public void SetChildrenTagList(params Tag[] tagList)
+        //{
+        //    m_childrenTags = new List<Tag>(tagList);
+        //}
         
         public Child()
         {
@@ -580,12 +712,12 @@ namespace CSharpAsn1CRT
             createObj = CreateObj;
         }
 
-        bool _untaggedChoice=false;
-        public bool UnTaggedChoice
-        {
-            get { return _untaggedChoice; }
-            set { _untaggedChoice = value; }
-        }
+        //bool _untaggedChoice=false;
+        //public bool UnTaggedChoice
+        //{
+        //    get { return _untaggedChoice; }
+        //    set { _untaggedChoice = value; }
+        //}
 
     }
 
@@ -699,32 +831,82 @@ namespace CSharpAsn1CRT
         }
 
         
+        //public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
+        //{
+        //    if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
+        //    {
+        //        uint ret = 0;
+        //        Tag nextTag = null;
+        //        while (BER.GetNextTag(strm, out nextTag))
+        //        {
+        //            OptionalNamedChild childClass = ClassDef.getChildByTag(nextTag);
+        //            if (childClass == null)
+        //                break;
+        //            m_children[childClass.m_index] = childClass.createObj();
+        //            ret += m_children[childClass.m_index].Decode(strm, encRule);
+        //            if (dataLen == ret)
+        //                return ret;
+        //            if (ret > dataLen)
+        //                throw new LengthMismatchException();
+        //        }
+
+
+        //        return ret;
+        //    }
+        //    throw new Exception();
+        //}
         public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
         {
             if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
             {
                 uint ret = 0;
-                Tag nextTag = null;
-                while (BER.GetNextTag(strm, out nextTag))
+                UInt32 nextTag = UInt32.MaxValue;
+
+                long pos1 = strm.Position;
+                if (dataLen > 0)
                 {
-                    OptionalNamedChild childClass = ClassDef.getChildByTag(nextTag);
-                    if (childClass == null)
-                        break;
-                    m_children[childClass.m_index] = childClass.createObj();
-                    ret += m_children[childClass.m_index].Decode(strm, encRule);
-                    if (dataLen == ret)
-                        return ret;
-                    if (ret > dataLen)
-                        throw new LengthMismatchException();
+                    while ( BER.GetNextTag(strm, out nextTag) )   //on end of file or ZERO tag return 0
+                    {
+                        OptionalNamedChild childClass = ClassDef.getChildByTag2(nextTag);
+
+                        m_children[childClass.m_index] = childClass.createObj();
+                        ret += m_children[childClass.m_index].Decode(strm, encRule);
+                        
+                        if (dataLen == ret)
+                            return ret;
+                        if (ret > dataLen)
+                            throw new LengthMismatchException();
+                    }
                 }
+                else
+                {
+                    while ( BER.GetNextTag(strm, out nextTag))   //return false on end of file or on ZERO tag
+                    {
+                        OptionalNamedChild childClass = ClassDef.getChildByTag2(nextTag);
+                        m_children[childClass.m_index] = childClass.createObj();
+                        ret += m_children[childClass.m_index].Decode(strm, encRule);
+
+                    }
+                }
+
+
+                //while (BER.GetNextTag(strm, out nextTag))   //return false on end of file or on ZERO tag
+                //{
+                //    OptionalNamedChild childClass = ClassDef.getChildByTag2(nextTag);
+
+                //    m_children[childClass.m_index] = childClass.createObj();
+                //    ret += m_children[childClass.m_index].Decode(strm, encRule);
+                //    if (dataLen == ret && dataLen!=0)
+                //        return ret;
+                //    if (ret > dataLen && dataLen!=0)
+                //        throw new LengthMismatchException();
+                //}
 
 
                 return ret;
             }
             throw new Exception();
         }
-
-
 
     }
 
@@ -735,11 +917,13 @@ namespace CSharpAsn1CRT
     {
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
-            return Decode(strm, encRule, TagClass.UNIVERSAL, false, 16);
+            return Decode(strm, encRule, false, 16);
+//            return Decode(strm, encRule, TagClass.UNIVERSAL, false, 16);
         }
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            return Encode(strm, encRule, TagClass.UNIVERSAL, false, 16);
+            return Encode(strm, encRule, false, 16);
+//            return Encode(strm, encRule, TagClass.UNIVERSAL, false, 16);
         }
     }
 
@@ -748,11 +932,13 @@ namespace CSharpAsn1CRT
     {
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
-            return Decode(strm, encRule, TagClass.UNIVERSAL, false, 17);
+            return Decode(strm, encRule, false, 17);
+//            return Decode(strm, encRule, TagClass.UNIVERSAL, false, 17);
         }
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
-            return Encode(strm, encRule, TagClass.UNIVERSAL, false, 17);
+            return Encode(strm, encRule, false, 17);
+//            return Encode(strm, encRule, TagClass.UNIVERSAL, false, 17);
         }
 
     }
@@ -761,26 +947,48 @@ namespace CSharpAsn1CRT
     {
         public Asn1ChoiceObject() : base() { }
 
+        //public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
+        //{
+        //    if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
+        //    {
+
+        //        uint ret = 0;
+        //        Tag nextTag = null;
+        //        if (BER.GetNextTag(strm, out nextTag))
+        //        {
+        //            NamedChild childClass = ClassDef.getChildByTag(nextTag);
+        //            m_children[childClass.m_index] = childClass.createObj();
+        //            m_AlternativeName = childClass.m_name;
+        //            ret += m_children[childClass.m_index].Decode(strm, encRule);
+        //        }
+                
+        //        return ret;
+        //    }
+        //    else
+        //        throw new ArgumentException("Unimplemented encoding rule");
+        //}
+
         public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
         {
             if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
             {
 
                 uint ret = 0;
-                Tag nextTag = null;
-                if (BER.GetNextTag(strm, out nextTag))
+                UInt32 nextTag = UInt32.MaxValue;
+                if ( BER.GetNextTag(strm, out nextTag))
                 {
-                    NamedChild childClass = ClassDef.getChildByTag(nextTag);
+                    NamedChild childClass = ClassDef.getChildByTag2(nextTag);
                     m_children[childClass.m_index] = childClass.createObj();
                     m_AlternativeName = childClass.m_name;
                     ret += m_children[childClass.m_index].Decode(strm, encRule);
                 }
-                
+
                 return ret;
             }
             else
                 throw new ArgumentException("Unimplemented encoding rule");
         }
+
         public override uint EncodeContent(Stream strm, EncodingRules encRule)
         {
             if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)

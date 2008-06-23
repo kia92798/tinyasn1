@@ -36,6 +36,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="tap304.cs" />
     <Compile Include="tap310.cs" />
   </ItemGroup>
   <ItemGroup>

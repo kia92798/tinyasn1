@@ -45,6 +45,36 @@ namespace asn1csharp
             CSharpType.WriteEncodeDecodeMethods(pThis, csFile, level);
             CSharpType.WriteIsConstraintValid(pThis, csFile, level, "m_children", "");
 
+
+            string childTags = string.Empty;
+            int chTagsNo=0;
+            ChoiceType chChild = pThis.m_type.GetFinalType() as ChoiceType;
+            if (chChild != null && !pThis.m_type.IsTagged())
+            {
+                List<Asn1Type.TagSequence> tags = chChild.getChildrenTags();
+                foreach (Asn1Type.TagSequence tgSq in tags) {
+                    childTags += string.Format("0x{0:X},", CSharpSequenceOrSetType.CalculateTag(tgSq.m_tags[0]));
+                    chTagsNo++;
+                }
+                childTags = childTags.Substring(0, childTags.Length - 1);
+            }
+            else
+            {
+                Asn1Type.Tag lstTag = pThis.m_type.Tags.m_tags[0];
+                childTags = string.Format("0x{0:X}", CSharpSequenceOrSetType.CalculateTag(lstTag));
+                chTagsNo=1;
+            }
+            csFile.WL(level, "static List<UInt32> _childTags = new List<UInt32>( new UInt32[{0}] {{ {1} }} );", chTagsNo, childTags);
+            csFile.WL(level, "protected override List<UInt32> ChildTags { get { return _childTags; } }");
+
+            csFile.WL(level, "protected override Func<{0}> CreateEmptyChild {{ get {{ return delegate() {{ return new {0} (); }}; }} }}", childType.DeclaredTypeName);
+
+
+
+
+
+
+
             //csFile.WL(level, "public {0}()", TypeName);
             //csFile.WL(level++, "{");
             //WriteConstructorCodeA(pThis, csFile, level, "", pThis.m_constraints, pThis.m_tag);

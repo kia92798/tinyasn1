@@ -14,13 +14,15 @@ namespace CSharpAsn1Test
 
             long t1 = Environment.TickCount;
 
-            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.10\CDDEUD2GRCPF11000.131072.tap310\CDDEUD2GRCPF10000.gprs";
-
+            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.4\CDDEUD2GRCPF13110";
+//            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.10\CDDEUD2GRCPF11000.131072.tap310\CDDEUD2GRCPF10000.gprs";
+//            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.10\CDDEUD2GRCPF11000.131072.tap310\CDDEUD2GRCPF10000.10K";
             if (args.Length > 0)
                 tapFile = args[0];
 
-
             
+            
+
 
 //            using (System.IO.FileStream f = new System.IO.FileStream(tapFile, System.IO.FileMode.Open))
             using (System.IO.MemoryStream f = new System.IO.MemoryStream(System.IO.File.ReadAllBytes(tapFile),false))
@@ -28,6 +30,9 @@ namespace CSharpAsn1Test
                 DataInterChange di = new DataInterChange();
                 di.Decode(f, CSharpAsn1CRT.EncodingRules.CER);
                 long t2 = Environment.TickCount;
+
+
+                
 
                 using (System.IO.FileStream w = new System.IO.FileStream(tapFile + ".new", System.IO.FileMode.Create))
                 {
