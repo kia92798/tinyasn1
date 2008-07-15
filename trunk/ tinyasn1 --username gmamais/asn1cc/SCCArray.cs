@@ -80,7 +80,7 @@ namespace asn1scc
             string nCountInit, string arrName, long max, string i, string prefix, string nCount, string curBlockSize, string curItem)
         {
 
-            c.P(lev); c.WriteLine("/* Fragmentation required since {0} is grater than 64K*/", max);
+//            c.P(lev); c.WriteLine("/* Fragmentation required since {0} is grater than 64K*/", max);
 
             c.P(lev); c.WriteLine(nCountInit);
             c.P(lev); c.WriteLine("{0} = 0;", curBlockSize);
@@ -226,7 +226,7 @@ namespace asn1scc
     *pErrCode = ERR_INSUFFICIENT_DATA;
     return FALSE;
 }}
-while(({1} & 0xC0)>0) 
+while(({1} & 0xC0)==0xC0) 
 {{
 	if ({1} == 0xC4)
 		{2} = 0x10000;
@@ -240,16 +240,16 @@ while(({1} & 0xC0)>0)
 		*pErrCode = ERR_INCORRECT_PER_STREAM;
 		return FALSE;
 	}}
-	if ({3}+{2}>100000)
+	if ({3}+{2}>{4})
 	{{
 		*pErrCode = ERR_INSUFFICIENT_DATA;
 		return FALSE;
 	}}
 
 	for({0}=0;{0}<{2};{0}++)
-	{{", i, length, curBlockSize, nCount);
+	{{", i, length, curBlockSize, nCount,max);
 
-            ((ISCCSizeable)pThis).PrintCDecodeItem(cns, c, prefix + arrName + "[" + i + "]", lev + 2);
+            ((ISCCSizeable)pThis).PrintCDecodeItem(cns, c, prefix + arrName + "[" + nCount + "+" + i + "]", lev + 2);
 
             c.WriteCodeBlock(lev,
 @"    }}
@@ -263,24 +263,24 @@ while(({1} & 0xC0)>0)
 if ( ({1} & 0x80)>0) 
 {{
 	asn1SccSint len2;
-	len2<<=8;
+	{1}<<=8;
 	if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, &len2, 0, 0xFF)) {{
 		*pErrCode = ERR_INSUFFICIENT_DATA;
 		return FALSE;
 	}}
 	{1} |= len2;
-	{1} |= 0x7FFF;
+	{1} &= 0x7FFF;
 }}
 
-if ({3}+{1}>100000)
+if ({3}+{1}>{4})
 {{
 	*pErrCode = ERR_INSUFFICIENT_DATA;
 	return FALSE;
 }}
 for({0}=0;{0}<{1};{0}++)
 {{
-", i, length, curBlockSize, nCount);
-            ((ISCCSizeable)pThis).PrintCDecodeItem(cns, c, prefix + arrName + "[" + i + "]", lev + 1);
+", i, length, curBlockSize, nCount,max);
+            ((ISCCSizeable)pThis).PrintCDecodeItem(cns, c, prefix + arrName + "[" + nCount + "+" + i + "]", lev + 1);
 
             c.WriteCodeBlock(lev,
 @"}}

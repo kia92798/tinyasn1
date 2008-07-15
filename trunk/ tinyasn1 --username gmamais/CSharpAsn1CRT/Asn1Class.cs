@@ -33,16 +33,23 @@ namespace CSharpAsn1CRT
 
 //        private Dictionary<Tag, T> m_tags = null;
 
+        void foo()
+        {
+//            System.Collections.Hashtable f = new System.Collections.Hashtable();
+
+            //System.Collections.Specialized.ListDictionary g = new System.Collections.Specialized.ListDictionary();
+            
+        }
 
 
+        protected Dictionary<UInt32, T> m_posChildren = new Dictionary<uint, T>();
 
-        public Dictionary<UInt32, T> m_posChildren = new Dictionary<uint, T>();
         public T getChildByTag2(UInt32 tg)
         {
             return m_posChildren[tg];
-            //if (m_posChildren.ContainsKey(tg))
-            //    return m_posChildren[tg];
-            //return null;
+        //    //if (m_posChildren.ContainsKey(tg))
+        //    //    return m_posChildren[tg];
+        //    //return null;
         }
 
 //        public T getChildByTag(Tag nextTag)

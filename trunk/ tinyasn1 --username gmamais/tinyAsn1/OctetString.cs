@@ -143,7 +143,7 @@ namespace tinyAsn1
             lookup.Add("1010", 0xA);
             lookup.Add("1011", 0xB);
             lookup.Add("1100", 0xC);
-            lookup.Add("1101", 0xF);
+            lookup.Add("1101", 0xD);
             lookup.Add("1110", 0xE);
             lookup.Add("1111", 0xF);
         }

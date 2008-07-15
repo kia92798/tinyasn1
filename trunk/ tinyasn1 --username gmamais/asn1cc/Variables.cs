@@ -65,7 +65,7 @@ namespace asn1scc
 
             int cnt = val.Count;
 
-            c.P(lev); c.WriteLine("{0},", cnt);
+            c.P(lev); c.WriteLine("{0},", cnt*8);
 
             c.P(lev); c.WriteLine("{");
             for (int i = 0; i < cnt; i++)
