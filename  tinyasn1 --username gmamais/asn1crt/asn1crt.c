@@ -118,6 +118,7 @@ void BitStream_AppendBits(BitStream* pBitStrm, byte* srcBuffer, int nbits)
 	BitStream_AppendPartialByte(pBitStrm, lastByte, (byte)nbits,FALSE);
 }
 
+/*
 void BitStream_AppendBitsWithFragmentation(BitStream* pBitStrm, byte* srcBuffer, int nbits)
 {
 	assert(0);
@@ -126,7 +127,7 @@ void BitStream_AppendBitsWithFragmentation(BitStream* pBitStrm, byte* srcBuffer,
 	nbits = nbits;
 
 }
-
+*/
 void BitStream_AppendBit(BitStream* pBitStrm, flag v) 
 {
 	if (v) 

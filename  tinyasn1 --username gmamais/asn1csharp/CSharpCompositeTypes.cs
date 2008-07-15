@@ -119,7 +119,8 @@ namespace asn1csharp
 
                 ICSharpType childType = ch.m_type as ICSharpType;
 
-                csFile.WL(level, "ch = new OptionalNamedChild(\"{0}\", {1}, delegate() {{return new {2}();}}, {3}, null);", C.ID(ch.m_childVarName), idx,
+                csFile.WL(level, "ch = new OptionalNamedChild(\"{0}\", {1}, Create{2}, {3}, null);", C.ID(ch.m_childVarName), idx,
+//                csFile.WL(level, "ch = new OptionalNamedChild(\"{0}\", {1}, delegate() {{return new {2}();}}, {3}, null);", C.ID(ch.m_childVarName), idx,
                     childType.DeclaredTypeName, (ch.m_optional ? "true" : "false"));
                 idx++;
 
@@ -151,12 +152,21 @@ namespace asn1csharp
 
 
             }
+            
+            csFile.WL(--level, "}"); //constructor
 
-            csFile.WL(--level, "}");
-            csFile.WL(--level, "}");
+            foreach (SequenceOrSetType.Child ch in pThis.m_children.Values)
+            {
+                ICSharpType childType = ch.m_type as ICSharpType;
+                csFile.WL(level, "public static {0} Create{0}() {{ return new {0}();}}", childType.DeclaredTypeName);
+
+            }
+            
+            csFile.WL(--level, "}"); //internal class
+
            
 
-            csFile.WL(--level, "}");
+            csFile.WL(--level, "}"); //class
 
         }
     }
@@ -347,7 +357,8 @@ namespace asn1csharp
             {
                 ICSharpType childType = ch.m_type as ICSharpType;
 
-                csFile.WL(level, "ch = new NamedChild(\"{0}\", {1}, delegate() {{return new {2}();}});", C.ID(ch.m_childVarName), idx, childType.DeclaredTypeName);
+                csFile.WL(level, "ch = new NamedChild(\"{0}\", {1}, Create{2});", C.ID(ch.m_childVarName), idx, childType.DeclaredTypeName);
+//                csFile.WL(level, "ch = new NamedChild(\"{0}\", {1}, delegate() {{return new {2}();}});", C.ID(ch.m_childVarName), idx, childType.DeclaredTypeName);
 
                 idx++;
 
@@ -380,6 +391,15 @@ namespace asn1csharp
             }
 
             csFile.WL(--level, "}");
+            
+            foreach (ChoiceChild ch in m_children.Values)
+            {
+                ICSharpType childType = ch.m_type as ICSharpType;
+                csFile.WL(level, "public static {0} Create{0}() {{ return new {0}();}}", childType.DeclaredTypeName);
+
+            }
+
+
             csFile.WL(--level, "}");
            
 

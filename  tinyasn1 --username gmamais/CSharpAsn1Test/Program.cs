@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TAP_0310;
+using CSharpAsn1CRT;
 namespace CSharpAsn1Test
 {
     class Program
@@ -14,9 +15,9 @@ namespace CSharpAsn1Test
 
             long t1 = Environment.TickCount;
 
-            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.4\CDDEUD2GRCPF13110";
+//            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.4\CDDEUD2GRCPF13110";
 //            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.10\CDDEUD2GRCPF11000.131072.tap310\CDDEUD2GRCPF10000.gprs";
-//            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.10\CDDEUD2GRCPF11000.131072.tap310\CDDEUD2GRCPF10000.10K";
+            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.10\CDDEUD2GRCPF11000.131072.tap310\CDDEUD2GRCPF10000.10K";
             if (args.Length > 0)
                 tapFile = args[0];
 
@@ -46,10 +47,34 @@ namespace CSharpAsn1Test
                 }
             }
 
-
-
-
-
         }
     }
+
+
+    public class Parents : Stack<Asn1Object>
+    {
+        public TRes GetParentOfType<TRes>() where TRes : Asn1Object
+        {
+            foreach (Asn1Object obj in this) 
+                if (obj is TRes)
+                    return obj as TRes;
+            return null;
+        }
+    }
+
+    public static class Validations
+    {
+
+
+        public static bool ChargeDetail_100(ChargeDetail cd, Parents pars)
+        {
+            //pars.GetParentOfType<CallEventDetail>()
+
+            if (cd.charge != null && cd.charge.Value > 0)
+                return false;
+
+            return true;
+        }
+    }
+
 }

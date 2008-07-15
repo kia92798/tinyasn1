@@ -1,0 +1,7 @@
+CAR-PARTS DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+	MyTestPDU ::= NumericString(SIZE(20))
+	
+	testPDU MyTestPDU ::= "1234567890123       "
+	
+END

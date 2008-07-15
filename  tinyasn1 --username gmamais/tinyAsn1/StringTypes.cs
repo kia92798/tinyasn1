@@ -572,7 +572,8 @@ namespace tinyAsn1
         {
             m_TypeID = Asn1Value.TypeID.NumericString;
             List<Char> acs = new List<char>(AllowedCharSet);
-            m_value = m_value.Replace("\r", "").Replace("\n", "").Replace("\t", "").Replace(" ", "");
+            m_value = m_value.Replace("\r", "").Replace("\n", "").Replace("\t", "");
+//            m_value = m_value.Replace("\r", "").Replace("\n", "").Replace("\t", "").Replace(" ", "");
             foreach (Char ch in Value.ToCharArray())
                 if (!acs.Contains(ch))
                     throw new SemanticErrorException("Error in line: " + antlrNode.Line + ", col: " + antlrNode.CharPositionInLine + ". Character: '" + ch + "' can not be contained in a Numeric string");

@@ -87,6 +87,8 @@ namespace CSharpAsn1CRT
     public abstract class Asn1Object
     {
 
+        
+
         public abstract uint Decode(Stream strm, EncodingRules encRule);
         public abstract uint Encode(Stream strm, EncodingRules encRule);
         //Encodes only the content, not tag and length
@@ -100,66 +102,32 @@ namespace CSharpAsn1CRT
         public abstract IEnumerable<Asn1Object> GetChildren(bool includeMyself);
         public virtual bool IsPrimitive { get { return true; } }
 
-        //public uint Encode(Stream strm, EncodingRules encRule, TagClass tagClass, bool primitive, uint tagNumber)
-        //{
-        //    long sPos = strm.Position;
-        //    using (MemoryStream tmp = new MemoryStream())
-        //    {
-        //        BER.EncodeTag(strm, tagClass, primitive, tagNumber);
-        //        uint len = EncodeContent(tmp, encRule);
-        //        BER.EncodeLengthDF(strm, len);
-        //        strm.Write(tmp.GetBuffer(), 0, (int)tmp.Length);
-        //    }
-        //    return (uint)(strm.Position - sPos);
-        //}
 
-        public uint Encode(Stream strm, EncodingRules encRule, bool primitive, UInt32 tag)
+        public virtual uint Encode(Stream strm, EncodingRules encRule, bool primitive, UInt32 tag)
         {
             long sPos = strm.Position;
-            using (MemoryStream tmp = new MemoryStream())
+            if (!primitive)
             {
                 BER.EncodeTagAsInt(strm, tag, primitive);
-                uint len = EncodeContent(tmp, encRule);
-                BER.EncodeLengthDF(strm, len);
-                strm.Write(tmp.GetBuffer(), 0, (int)tmp.Length);
+                strm.WriteByte(0x80);
+                EncodeContent(strm, encRule);
+                strm.WriteByte(0);
+                strm.WriteByte(0);
+            }
+            else
+            {
+                using (MemoryStream tmp = new MemoryStream())
+                {
+                    BER.EncodeTagAsInt(strm, tag, primitive);
+                    uint len = EncodeContent(tmp, encRule);
+                    BER.EncodeLengthDF(strm, len);
+                    strm.Write(tmp.GetBuffer(), 0, (int)tmp.Length);
+                }
             }
             return (uint)(strm.Position - sPos);
         }
         
-        //public uint Decode(Stream strm, EncodingRules encRule, TagClass tagClass, bool primitive, uint tagNumber)
-        //{
 
-        //    long initPos = strm.Position;
-
-        //    Tag t = BER.DecodeTag(strm);
-        //    if (t == null)
-        //        throw new UnexpectedTagException();
-
-
-        //    if (t.m_tagNo != tagNumber || t.m_tgClass != tagClass)
-        //        throw new UnexpectedTagException();
-
-        //    uint length = 0;
-        //    BER.DecodeLength(strm, out length);
-        //    long sPos = strm.Position;
-
-        //    DecodeContent(strm, encRule, length);
-
-        //    if (length==0 && strm.Position==sPos)
-        //        return (uint)(strm.Position - initPos);
-
-        //    if (length == 0)
-        //        BER.DecodeTwoZeros(strm);
-        //    else
-        //    {
-        //        long decodedData = strm.Position - sPos;
-        //        if (decodedData != length)
-        //            throw new LengthMismatchException();
-        //    }
-
-            
-        //    return (uint)(strm.Position-initPos);
-        //}
 
         public uint Decode(Stream strm, EncodingRules encRule, bool primitive, UInt32 tag)
         {
@@ -191,29 +159,6 @@ namespace CSharpAsn1CRT
             return (uint)(strm.Position - initPos);
 
         }
-
-        //public uint DecodeLenContent(Stream strm, EncodingRules encRule)
-        //{
-        //    long initPos = strm.Position;
-
-        //    uint length = 0;
-        //    BER.DecodeLength(strm, out length);
-        //    long sPos = strm.Position;
-
-        //    DecodeContent(strm, encRule, length);
-
-        //    long decodedData = strm.Position - sPos;
-
-
-        //    if (length!=0 && decodedData != length)
-        //        throw new LengthMismatchException();
-        //    else  if (length == 0 && decodedData>0)
-        //        BER.DecodeTwoZeros(strm); // throws LengthMismatchException if no two zeros found
-
-
-        //    return (uint)(strm.Position - initPos);
-        //}
-
 
 
     }
@@ -292,7 +237,7 @@ namespace CSharpAsn1CRT
 
         public override uint EncodeContent(Stream strm, EncodingRules encRule)
         {
-            if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
+//            if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
                 return BER.EncodeInteger(strm, Value);
 
             throw new Exception("Unsupported encoding");
@@ -462,6 +407,15 @@ namespace CSharpAsn1CRT
         //}
 
 
+        public override uint Encode(Stream strm, EncodingRules encRule, bool primitive, uint tag)
+        {
+            long sPos = strm.Position;
+            BER.EncodeTagAsInt(strm, tag, primitive);
+            BER.EncodeLengthDF(strm, (uint)_Data.Length);
+            EncodeContent(strm, encRule);
+
+            return (uint)(strm.Position - sPos);
+        }
         public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
         {
             if (strm.Length - strm.Position < dataLen)
@@ -1000,6 +954,7 @@ namespace CSharpAsn1CRT
             else
                 throw new ArgumentException("Unimplemented encoding rule");
         }
+
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
             return DecodeContent(strm, encRule, uint.MaxValue);

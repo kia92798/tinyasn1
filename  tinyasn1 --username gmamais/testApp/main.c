@@ -19,12 +19,13 @@ int main(int argc, char* argv[])
 	BitStream bitStrm;
 	BitStream bitStrm2;
 	int encSize1;
-	byte perBuffer[MyTestPDU_REQUIRED_BYTES_FOR_ENCODING];
-	byte perBuffer2[MyTestPDU_REQUIRED_BYTES_FOR_ENCODING];
 	int errorCode;
 	FILE* fp;
-	MyTestPDU decodePDU;
 	int i;
+
+	static byte perBuffer[MyTestPDU_REQUIRED_BYTES_FOR_ENCODING];
+	static byte perBuffer2[MyTestPDU_REQUIRED_BYTES_FOR_ENCODING];
+	static MyTestPDU decodePDU;
 
 
 
@@ -112,7 +113,7 @@ int main(int argc, char* argv[])
 	}
 
 
-	if (memcmp(perBuffer, perBuffer2, MyTestPDU_REQUIRED_BYTES_FOR_ENCODING)!=0) 
+	if (memcmp(perBuffer, perBuffer2, encSize1)!=0) 
 	{
 		printf("Comparison of encoded and re-encoded PDU failed.\n");
 		return 3;
