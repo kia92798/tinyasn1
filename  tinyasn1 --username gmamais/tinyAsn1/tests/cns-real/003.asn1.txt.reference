@@ -11,18 +11,26 @@ EXPORTS
 	myIntVar3;
 
 
-	MyInta ::= REAL
+    MyInta ::= REAL
 
-	MyInt ::= REAL (5..MAX)
+    MyInt ::= REAL (5..MAX)
 
-	MyInt2 ::= MyInt (0..100)
+    MyInt2 ::= MyInt (0..100)
 
-	MyInt3 ::= MyInt2 (ALL EXCEPT (10..50))
+    MyInt3 ::= MyInt2 (ALL EXCEPT (10..50))
 
 
-	myIntVar REAL ::= 100
-	myIntVar1 REAL ::= 200
-	myIntVar2 REAL ::= 500
-	myIntVar3 REAL ::= 500
+    myIntVar REAL ::= 100
+    --PER:03800219
+
+    myIntVar1 REAL ::= 200
+    --PER:03800319
+
+    myIntVar2 REAL ::= 500
+    --PER:0380027D
+
+    myIntVar3 REAL ::= 500
+    --PER:0380027D
+
 
 END

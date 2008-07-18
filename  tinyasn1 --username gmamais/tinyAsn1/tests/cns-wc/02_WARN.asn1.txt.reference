@@ -6,11 +6,13 @@ EXPORTS
 	myArray;
 
 
-	MYSQOF ::= SEQUENCE (SIZE (3)) OF INTEGER 
+    MYSQOF ::= SEQUENCE (SIZE (3))--SIZE [3..3]-- OF INTEGER 
 
-	MYSQOF2 ::= MYSQOF (WITH COMPONENT (1..10))
+    MYSQOF2 ::= MYSQOF (WITH COMPONENT (1..10))--SIZE [3..3]--
 
 
-	myArray MYSQOF2 ::= { 1, 2,30 }
+    myArray MYSQOF2 ::= { 1, 2,30 }
+    --PER:Invalid!!!
+
 
 END

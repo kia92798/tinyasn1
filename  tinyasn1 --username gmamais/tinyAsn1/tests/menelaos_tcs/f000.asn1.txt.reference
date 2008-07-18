@@ -81,144 +81,276 @@ EXPORTS
 	t809c;
 
 
-	T01 ::= BOOLEAN
+    T01 ::= BOOLEAN
 
-	T02 ::= NULL
+    T02 ::= NULL
 
-	T03 ::= INTEGER 
+    T03 ::= INTEGER 
 
-	MachineState ::= INTEGER {
-		operational(1),
-		needs-maintenance(2),
-		broken(3)
-	}
+    MachineState ::= INTEGER {
+        operational(1),
+        needs-maintenance(2),
+        broken(3)
+    }
 
-	T03B ::= INTEGER  (1..2)
+    ---- make sure maxMachineState is used
 
-	T03C ::= INTEGER  (1..23)
+    T03B ::= INTEGER  (1..2)--[1..2]--
 
-	T04 ::= REAL
+    ---- make sure unnamedNewState is used
 
-	T05 ::= ENUMERATED {
-		a(1),
-		b(2),
-		c(3)
-	}
+    T03C ::= INTEGER  (1..23)--[1..23]--
 
-	T05B ::= ENUMERATED {
-		a(1),
-		b(2),
-		c(3)
-		,...
-	}
+    T04 ::= REAL
 
-	T05C ::= ENUMERATED {
-		c1(0),
-		c2(1),
-		c3(2)
-		,...
-	}
+    T05 ::= ENUMERATED {
+        a(1),
+        b(2),
+        c(3)
+    }
 
-	T05D ::= ENUMERATED {
-		c1(0),
-		c2(1),
-		c3(2),
-				...,
+    ---- ability to extend enumerations
+
+    T05B ::= ENUMERATED {
+        a(1),
+        b(2),
+        c(3)
+        ,...
+    }
+
+    ---- automatic numbering
+
+    T05C ::= ENUMERATED {
+        c1(0),
+        c2(1),
+        c3(2)
+        ,...
+    }
+
+    ---- automatic numbering
+
+    T05D ::= ENUMERATED {
+        c1(0),
+        c2(1),
+        c3(2),
+                ...,
 c4(3),
-		c5(4)
-	}
+        c5(4)
+    }
 
-	BinaryReal ::= REAL (WITH COMPONENTS {..., base (2)})
+    BinaryReal ::= REAL (WITH COMPONENTS {..., base (2)})
 
-	RestrictedReal ::= REAL (WITH COMPONENTS {mantissa (-16777215..16777215), base (2), exponent (-125..128)})
+    RestrictedReal ::= REAL (WITH COMPONENTS {mantissa (-16777215..16777215), base (2), exponent (-125..128)})
 
-	UnlikelyRestrictedReal ::= REAL (WITH COMPONENTS {mantissa (-135..7238), base (7), exponent (12..3888)})
+    UnlikelyRestrictedReal ::= REAL (WITH COMPONENTS {mantissa (-135..7238), base (7), exponent (12..3888)})
 
-	NoMoreThan10Bits ::=  BIT STRING (SIZE (10))
+    NoMoreThan10Bits ::=  BIT STRING (SIZE (10))--SIZE [10..10]--
 
-	NamedBits ::= BIT STRING {
-		a(1),
-		b(2),
-		c(3),
-		d(4),
-		e(5)
-	}
+    NamedBits ::= BIT STRING {
+        a(1),
+        b(2),
+        c(3),
+        d(4),
+        e(5)
+    }
 
-	LimitedOctetString ::= OCTET STRING (SIZE (4))
+    LimitedOctetString ::= OCTET STRING (SIZE (4))--SIZE [4..4]--
 
-	ID ::= OBJECT IDENTIFIER
+    ---- no arc name
 
-	T800 ::= IA5String
+    ID ::= OBJECT IDENTIFIER
 
-	T802 ::= IA5String
+    ----	carriageReturn IA5String ::= {0, 13}
 
-	T803 ::= IA5String
+    ----ia5StringThreeLines IA5String ::= {"sfsdfkjhkjh", carriageReturn, "sfdd sdf", carriageReturn, "234k23987"}
 
-	T804 ::= IA5String
+    T800 ::= IA5String
 
-	T805 ::= IA5String
+    ----	T801 ::= T61String
 
-	T806 ::= IA5String
+    ----	t61String T801 ::= "sdhf lskdj"
 
-	T807 ::= IA5String
+    T802 ::= IA5String
 
-	T808 ::= GeneralizedTime
+    T803 ::= IA5String
 
-	T809 ::= UTCTimeType
+    T804 ::= IA5String
+
+    T805 ::= IA5String
+
+    ----latinCapitalLetterA T805 ::= {0,0,0,65}
+
+    ----	anotherUniversalString T805 ::= {"strings can be ", " concatenated; this is capital alpha: ", latinCapitalLetterA}
+
+    ----	C0 ::= UniversalString (FROM ({0,0,0,0}..{0,0,0,31}))
+
+    ----	C1 ::= UniversalString (FROM ({0,0,0,128}..{0,0,0,159}))
+
+    ----	VanillaUniversalString ::= UniversalString	(FROM (ALL EXCEPT (C0|C1)))
+
+    T806 ::= IA5String
+
+    T807 ::= IA5String
+
+    T808 ::= GeneralizedTime
+
+    T809 ::= UTCTimeType
 
 
-	vT01 T01 ::= TRUE
-	vT02 T01 ::= FALSE
-	vT03 T02 ::= NULL
-	vT03-1 T03 ::= -1
-	vT03-2 T03 ::= 0
-	vT03-3 T03 ::= 1
-	maxMachineState MachineState ::= 2
-	unnamedNewState MachineState ::= 23
-	pi REAL ::= 3.14159
-	e REAL ::= 2.71828128459045
-	zero REAL ::= 0
-	vReal00 REAL ::= Infinity
-	vReal01 REAL ::= -Infinity
-	vReal02 REAL ::= 3
-	vReal03 REAL ::= 3.1
-	vReal04 REAL ::= -3
-	vReal07 REAL ::= 30
-	vReal08 REAL ::= 2.3E+24
-	a-bit-String BIT STRING ::= '0010100100101000101001010011'B
-	a-bit-String-spanning-multiple-lines BIT STRING ::= '01001011010010111010101001010101'B
-	a-hex-String BIT STRING ::= '000000010000100001000100001110101011110011011110111100000010001100000010000100111001000000111001'B
-	noMoreThan10Bits NoMoreThan10Bits ::= '1010100101'B
-	whichBits NamedBits ::= '01001'B
-	octetString1 OCTET STRING ::= '17726466'H
-	octetString2 OCTET STRING ::= '987313ABCF'H
-	octetString2-spanning-multiple-lines OCTET STRING ::= '230942A9898923874987223948923847ABCFEF'H
-	objIdentifier OBJECT IDENTIFIER ::= {a(1) b(23) c(234) e(34)  }
-	objIdentifier2 OBJECT IDENTIFIER ::= {iso(1) member-body(2)  }
-	objIdentifier3 OBJECT IDENTIFIER ::= {2 23 34 2 1 0  }
-	id01 ID ::= {iso(1) member-body(2) 23  }
-	id02 ID ::= {iso(1) member-body(2) 23 23 23  }
-	numericString1 NumericString ::= "23034234234"
-	numericString2 NumericString ::= "2303423423423423"
-	printableString1 IA5String ::= "45987sdkfjh SDKFHKHJ FSD"
-	printableString2 IA5String ::= "45987sdkfjh SDKFHKHJ
+    vT01 T01 ::= TRUE
+    --PER:80
+
+    vT02 T01 ::= FALSE
+    --PER:00
+
+    vT03 T02 ::= NULL
+    --PER:
+
+    vT03-1 T03 ::= -1
+    --PER:01FF
+
+    vT03-2 T03 ::= 0
+    --PER:0100
+
+    vT03-3 T03 ::= 1
+    --PER:0101
+
+    maxMachineState MachineState ::= 2
+    --PER:0102
+
+    unnamedNewState MachineState ::= 23
+    --PER:0117
+
+    pi REAL ::= 3.14159
+    --PER:0980CD1921F9F01B866F
+
+    e REAL ::= 2.71828128459045
+    --PER:0980CD15BF0A421528AD
+
+    zero REAL ::= 0
+    --PER:00
+
+    vReal00 REAL ::= Infinity
+    --PER:0140
+
+    vReal01 REAL ::= -Infinity
+    --PER:0141
+
+    vReal02 REAL ::= 3
+    --PER:03800003
+
+    vReal03 REAL ::= 3.1
+    --PER:0980CD18CCCCCCCCCCCD
+
+    vReal04 REAL ::= -3
+    --PER:03C00101
+
+    vReal07 REAL ::= 30
+    --PER:0380010F
+
+    vReal08 REAL ::= 2.3E+24
+    --PER:09801D0F3859FFA9EDE1
+
+    a-bit-String  BIT STRING ::= '0010100100101000101001010011'B
+    --PER:1C2928A530
+
+    a-bit-String-spanning-multiple-lines  BIT STRING ::= '01001011010010111010101001010101'B
+    --PER:204B4BAA55
+
+    a-hex-String  BIT STRING ::= '000000010000100001000100001110101011110011011110111100000010001100000010000100111001000000111001000000000000'B
+    --PER:6C0108443ABCDEF023021390390000
+
+    noMoreThan10Bits NoMoreThan10Bits ::= '1010100101'B
+    --PER:A940
+
+    whichBits NamedBits ::= '01001'B
+    --PER:0548
+
+    octetString1 OCTET STRING ::= '17726466'H
+    --PER:0417726466
+
+    octetString2 OCTET STRING ::= '987313ABCD'H
+    --PER:05987313ABCD
+
+    octetString2-spanning-multiple-lines OCTET STRING ::= '230942A9898923874987223948923847ABCDEF'H
+    --PER:13230942A9898923874987223948923847ABCDEF
+
+    objIdentifier OBJECT IDENTIFIER ::= {a(1) b(23) c(234) e(34)  }
+    --PER:03FCB500
+
+    objIdentifier2 OBJECT IDENTIFIER ::= {iso(1) member-body(2)  }
+    --PER:01A8
+
+    objIdentifier3 OBJECT IDENTIFIER ::= {2 23 34 2 1 0  }
+    --PER:0467888080
+
+    id01 ID ::= {iso(1) member-body(2) 23  }
+    --PER:01A8
+
+    id02 ID ::= {iso(1) member-body(2) 23 23 23  }
+    --PER:03A8B8B8
+
+    numericString1 NumericString ::= "23034234 234"
+    --PER:0C341453450345
+
+    numericString2 NumericString ::= "23034234 234 23423"
+    --PER:12341453450345034534
+
+    printableString1 IA5String ::= "45987sdkfjh SDKFHKHJ FSD"
+    --PER:1868D5CB86FCF26BCDAB420A7125C6912E44A411A9C4
+
+    printableString2 IA5String ::= "45987sdkfjh SDKFHKHJ
 							FSD"
-	visibleString1 IA5String ::= "sdf sfd adsfdfs"
-	visibleString2 IA5String ::= "sdf 
+    --PER:1F68D5CB86FCF26BCDAB420A7125C6912E44A142448912244898D4E200
+
+    visibleString1 IA5String ::= "sdf sfd adsfdfs"
+    --PER:0FE793320E79B220C3939E6C99B980
+
+    visibleString2 IA5String ::= "sdf 
 					sfd adsfdfs"
-	ia5String IA5String ::= "sdf2k3jh 4k23jh4 kljhsf lskjhf"
-	teletexString T800 ::= "sdf 234"
-	videotexString T802 ::= "sdfsd"
-	graphicString T803 ::= "sdfkj sdf"
-	generalString T804 ::= "sdf "
-	t806 T806 ::= "sfd "
-	t807 T807 ::= "sfd "
-	t808a T808 ::= "19980528142905.1"
-	t808b T808 ::= "19980528142905,1"
-	t808c T808 ::= "19980528142905Z"
-	t808d T808 ::= "19980528142905+0200"
-	t809a T809 ::= "0401181823"
-	t809b T809 ::= "0401181823Z"
-	t809c T809 ::= "0401181823-0300"
+    --PER:15E793320142448912279E6C8830E4E79B266E60
+
+    ia5String IA5String ::= "sdf2k3jh 4k23jh4 kljhsf lskjhf"
+    --PER:1EE793332D6CF56840D35B267AB43441AF66AD1CF320D9CF5EAD1980
+
+    teletexString T800 ::= "sdf 234"
+    --PER:07E79332064CDA00
+
+    videotexString T802 ::= "sdfsd"
+    --PER:05E793373C80
+
+    graphicString T803 ::= "sdfkj sdf"
+    --PER:09E79336BD4839E4CC
+
+    generalString T804 ::= "sdf "
+    --PER:04E7933200
+
+    t806 T806 ::= "sfd "
+    --PER:04E79B2200
+
+    t807 T807 ::= "sfd "
+    --PER:04E79B2200
+
+    t808a T808 ::= "19980528142905.1"
+    --PER:1062E5CB860D593862D193960D5731
+
+    t808b T808 ::= "19980528142905,1"
+    --PER:1062E5CB860D593862D193960D5631
+
+    t808c T808 ::= "19980528142905Z"
+    --PER:0F62E5CB860D593862D193960D6D00
+
+    t808d T808 ::= "19980528142905+0200"
+    --PER:1362E5CB860D593862D193960D55B064C180
+
+    t809a T809 ::= "0401181823"
+    --PER:0A60D183162E18B864CC
+
+    t809b T809 ::= "0401181823Z"
+    --PER:0B60D183162E18B864CED0
+
+    t809c T809 ::= "0401181823-0300"
+    --PER:0F60D183162E18B864CD6B066C1800
+
 
 END

@@ -7,16 +7,20 @@ EXPORTS
 	myStr2;
 
 
-	MyStr ::= IA5String (FROM (("A".."Z"|"a".."z"|" ")))
+    MyStr ::= IA5String (FROM (("A".."Z" | "a".."z" | " ")))--SIZE [0..MAX]FROM [" ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"]--
 
-	MITSOS ::= SEQUENCE {
-		a [0] IMPLICIT MyStr DEFAULT "Thanassis",
-		b [1] IMPLICIT IA5String DEFAULT "Hello world",
-		c [2] IMPLICIT IA5String DEFAULT "This is string contains a "string""
-	}
+    MITSOS ::= SEQUENCE {
+        a [0] IMPLICIT MyStr DEFAULT "Thanassis",
+        b [1] IMPLICIT IA5String DEFAULT "Hello world",
+        c [2] IMPLICIT IA5String DEFAULT "This is string contains a "string""
+    }
 
 
-	myStr1 MyStr ::= "Hello world"
-	myStr2 MyStr ::= "Hello world"
+    myStr1 MyStr ::= "Hello world"
+    --PER:0B21F9A6A40C69B26780
+
+    myStr2 MyStr ::= "Hello world"
+    --PER:0B21F9A6A40C69B26780
+
 
 END

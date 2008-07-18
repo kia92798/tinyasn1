@@ -4,7 +4,7 @@ EXPORTS
 	Type;
 
 
-	Type ::= INTEGER 
+    Type ::= INTEGER 
 
 
 
@@ -15,7 +15,7 @@ EXPORTS
 	Type;
 
 
-	Type ::= INTEGER 
+    Type ::= INTEGER 
 
 
 

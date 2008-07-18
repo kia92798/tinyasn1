@@ -6,11 +6,13 @@ EXPORTS
 	matrix;
 
 
-	IntegerMatrix ::= SEQUENCE (SIZE (2)) OF SEQUENCE OF INTEGER 
+    IntegerMatrix ::= SEQUENCE (SIZE (2))--SIZE [2..2]-- OF SEQUENCE OF INTEGER 
 
-	CM ::= IntegerMatrix (WITH COMPONENT ((SIZE (3)^WITH COMPONENT (-100..100))))
+    CM ::= IntegerMatrix (WITH COMPONENT ((SIZE (3) ^ WITH COMPONENT (-100..100))))--SIZE [2..2]--
 
 
-	matrix CM ::= { { 50, 10,20 },{ 10, -10,5 } }
+    matrix CM ::= { { 50, 10,20 },{ 10, -10,5 } }
+    --PER:030132010A011403010A01F60105
+
 
 END

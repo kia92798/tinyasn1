@@ -7,16 +7,22 @@ EXPORTS
 	b2;
 
 
-	MYSQ ::= SEQUENCE {
-		a [0] IMPLICIT SEQUENCE OF INTEGER  (1..10),
-		b [1] IMPLICIT INTEGER  OPTIONAL,
-		c [2] IMPLICIT INTEGER  DEFAULT 4
-	}
+    MYSQ ::= SEQUENCE {
+        a [0] IMPLICIT SEQUENCE OF INTEGER  (1..10)--[1..10]--,
+        b [1] IMPLICIT INTEGER  OPTIONAL,
+        c [2] IMPLICIT INTEGER  DEFAULT 4
+    }
 
-	MYSQ2 ::= MYSQ (WITH COMPONENTS {..., a ((SIZE (4)^WITH COMPONENT (2..4))), b (1..10) PRESENT})
+    ---- PARTIAL, OPTIONAL, PRESENT
+
+    MYSQ2 ::= MYSQ (WITH COMPONENTS {..., a ((SIZE (4) ^ WITH COMPONENT (2..4))), b (1..10) PRESENT})
 
 
-	a1 MYSQ ::= { a { 2, 2, 3,4 }, b 1 }
-	b2 MYSQ2 ::= { a { 2, 2, 3,4 }, b 1 }
+    a1 MYSQ ::= { a { 2, 2, 3,4 }, b 1 }
+    --PER:810448C04040
+
+    b2 MYSQ2 ::= { a { 2, 2, 3,4 }, b 1 }
+    --PER:810448C04040
+
 
 END

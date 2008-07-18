@@ -5,17 +5,19 @@ EXPORTS
 	exceptionValue;
 
 
-	A ::= SET {
-		one [0] IMPLICIT INTEGER ,
-		two [1] IMPLICIT INTEGER ,
-		three [2] IMPLICIT INTEGER ,
-		...!101,
-		four [3] IMPLICIT INTEGER ,
-		five [4] IMPLICIT INTEGER ,
-		six [5] IMPLICIT INTEGER 
-	}
+    A ::= SET {
+        one [0] IMPLICIT INTEGER ,
+        two [1] IMPLICIT INTEGER ,
+        three [2] IMPLICIT INTEGER ,
+        ...!101,
+        four [3] IMPLICIT INTEGER ,
+        five [4] IMPLICIT INTEGER ,
+        six [5] IMPLICIT INTEGER 
+    }
 
 
-	exceptionValue INTEGER ::= 101
+    exceptionValue INTEGER  ::= 101
+    --PER:0165
+
 
 END

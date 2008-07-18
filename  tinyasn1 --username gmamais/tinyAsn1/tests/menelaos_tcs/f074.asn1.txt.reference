@@ -4,7 +4,11 @@ EXPORTS
 	AStringType;
 
 
-	AStringType ::= IA5String (SIZE (1..10,...))
+    ----IntegerTypeA ::= INTEGER (10|11,...,12)
+
+    ----IntegerTypeB ::= INTEGER (10..1100,...,2100)
+
+    AStringType ::= IA5String (SIZE (1..10,...))--SIZE [1..10,...]--
 
 
 

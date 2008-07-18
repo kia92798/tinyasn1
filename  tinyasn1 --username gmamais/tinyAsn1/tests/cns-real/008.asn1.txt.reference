@@ -4,7 +4,7 @@ EXPORTS
 	MyInt;
 
 
-	MyInt ::= REAL (WITH COMPONENTS {..., mantissa (-1000..1000), base (2), exponent (-10..10)})
+    MyInt ::= REAL (WITH COMPONENTS {..., mantissa (-1000..1000), base (2), exponent (-10..10)})
 
 
 

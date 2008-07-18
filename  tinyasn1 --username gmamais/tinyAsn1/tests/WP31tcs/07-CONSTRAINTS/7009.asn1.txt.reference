@@ -4,7 +4,7 @@ EXPORTS
 	Str;
 
 
-	Str ::= IA5String (SIZE (10..27))(FROM (("ABC"|"def")))
+    Str ::= IA5String (SIZE (10..27))(FROM (("ABC" | "def")))--SIZE [10..27]FROM ["ABCdef"]--
 
 
 

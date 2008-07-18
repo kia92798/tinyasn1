@@ -5,15 +5,15 @@ EXPORTS
 	Enum1;
 
 
-	Enum0 ::= [1] EXPLICIT ENUMERATED {
-		one(0),
-		two(1)
-	}
+    Enum0 ::= [1] EXPLICIT ENUMERATED {
+        one(0),
+        two(1)
+    }
 
-	Enum1 ::= [2] EXPLICIT ENUMERATED {
-		one(0),
-		two(1)
-	} (one(0))
+    Enum1 ::= [2] EXPLICIT ENUMERATED {
+        one(0),
+        two(1)
+    } (one(0))
 
 
 

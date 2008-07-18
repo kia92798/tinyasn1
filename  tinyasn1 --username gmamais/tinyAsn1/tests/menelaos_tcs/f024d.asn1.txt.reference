@@ -8,34 +8,38 @@ EXPORTS
 	exceptionExtension;
 
 
-	A ::= SEQUENCE {
-		one [0] IMPLICIT INTEGER ,
-		two [1] IMPLICIT INTEGER ,
-		three [2] IMPLICIT INTEGER 
-		,...!23
-	}
+    A ::= SEQUENCE {
+        one [0] IMPLICIT INTEGER ,
+        two [1] IMPLICIT INTEGER ,
+        three [2] IMPLICIT INTEGER 
+        ,...!23
+    }
 
-	B ::= SEQUENCE {
-		one [0] IMPLICIT INTEGER ,
-		two [1] IMPLICIT INTEGER ,
-		three [2] IMPLICIT INTEGER 
-		,...!123
-	}
+    B ::= SEQUENCE {
+        one [0] IMPLICIT INTEGER ,
+        two [1] IMPLICIT INTEGER ,
+        three [2] IMPLICIT INTEGER 
+        ,...!123
+    }
 
-	ExceptionClass ::= ENUMERATED {
-		newChoice(0),
-		missingChoice(1)
-		,...
-	}
+    ----C ::= SEQUENCE {one INTEGER, two INTEGER, three INTEGER, ... !IA5String:"exception message"}
 
-	E ::= SEQUENCE {
-		one [0] IMPLICIT INTEGER ,
-		two [1] IMPLICIT INTEGER ,
-		three [2] IMPLICIT INTEGER 
-		,...!23
-	}
+    ExceptionClass ::= ENUMERATED {
+        newChoice(0),
+        missingChoice(1)
+        ,...
+    }
+
+    E ::= SEQUENCE {
+        one [0] IMPLICIT INTEGER ,
+        two [1] IMPLICIT INTEGER ,
+        three [2] IMPLICIT INTEGER 
+        ,...!23
+    }
 
 
-	exceptionExtension INTEGER ::= 123
+    exceptionExtension INTEGER  ::= 123
+    --PER:017B
+
 
 END

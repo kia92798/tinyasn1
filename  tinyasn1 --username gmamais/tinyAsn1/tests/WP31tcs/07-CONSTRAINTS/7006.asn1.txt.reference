@@ -5,9 +5,9 @@ EXPORTS
 	Int2;
 
 
-	Int ::= INTEGER  (MIN..5)
+    Int ::= INTEGER  (MIN..5)--[MIN..5]--
 
-	Int2 ::= INTEGER  (Int)
+    Int2 ::= INTEGER  (Int)--[MIN..5]--
 
 
 

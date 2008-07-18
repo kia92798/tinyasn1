@@ -4,7 +4,7 @@ EXPORTS
 	MyReal;
 
 
-	MyReal ::= REAL (2.1..4.9)
+    MyReal ::= REAL (2.1..4.9)
 
 
 

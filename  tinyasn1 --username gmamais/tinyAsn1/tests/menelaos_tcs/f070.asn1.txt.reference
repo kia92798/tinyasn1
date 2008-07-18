@@ -5,9 +5,11 @@ EXPORTS
 	anInteger;
 
 
-	StrangeIntegerType ::= SEQUENCE OF INTEGER  (ALL EXCEPT (30..40))
+    StrangeIntegerType ::= SEQUENCE OF INTEGER  (ALL EXCEPT (30..40))--[MIN..MAX]--
 
 
-	anInteger StrangeIntegerType ::= {50 }
+    anInteger StrangeIntegerType ::= {50 }
+    --PER:010132
+
 
 END

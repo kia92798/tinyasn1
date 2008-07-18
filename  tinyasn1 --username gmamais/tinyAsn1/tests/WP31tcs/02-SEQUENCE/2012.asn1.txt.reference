@@ -5,16 +5,18 @@ EXPORTS
 	myvalue;
 
 
-	MySeq ::= SEQUENCE {
-		a1 INTEGER ,
-		s1 OCTET STRING,
-		...!OCTET STRING:'10FF'H,
-		[[2: a3 INTEGER ]],
-		[[2: s3 OCTET STRING]]
-		,...
-	}
+    MySeq ::= SEQUENCE {
+        a1 INTEGER ,
+        s1 OCTET STRING,
+        ...!OCTET STRING:'10FF'H,
+        [[2: a3 INTEGER ]],
+        [[2: s3 OCTET STRING]]
+        ,...
+    }
 
 
-	myvalue INTEGER ::= 10
+    myvalue INTEGER  ::= 10
+    --PER:010A
+
 
 END

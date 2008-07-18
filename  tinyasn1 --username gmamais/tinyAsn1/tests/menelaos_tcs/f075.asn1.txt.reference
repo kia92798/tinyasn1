@@ -7,17 +7,17 @@ EXPORTS
 	Exception;
 
 
-	IntegerType ::= INTEGER  (1..5,...!10)
+    IntegerType ::= INTEGER  (1..5,...!10)--[1..5,...]--
 
-	IntegerTypeA ::= INTEGER  ((10|11),...!Exception:a(0))
+    IntegerTypeA ::= INTEGER  ((10 | 11),...!Exception:a(0))--[10..11,...]--
 
-	IntegerTypeB ::= INTEGER  (10..1100,...!Exception:b(1))
+    IntegerTypeB ::= INTEGER  (10..1100,...!Exception:b(1))--[10..1100,...]--
 
-	Exception ::= ENUMERATED {
-		a(0),
-		b(1)
-		,...
-	}
+    Exception ::= ENUMERATED {
+        a(0),
+        b(1)
+        ,...
+    }
 
 
 

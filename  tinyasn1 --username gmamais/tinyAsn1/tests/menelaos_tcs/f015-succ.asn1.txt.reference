@@ -8,23 +8,27 @@ EXPORTS
 	wisePerson;
 
 
-	Person ::= CHOICE {
-		man [1] IMPLICIT IA5String,
-		woman [2] IMPLICIT IA5String
-	}
+    Person ::= CHOICE {
+        man [1] IMPLICIT IA5String,
+        woman [2] IMPLICIT IA5String
+    }
 
-	WisePerson ::= CHOICE {
-		wiseman [2] IMPLICIT IA5String,
-		wisewoman [3] IMPLICIT IA5String
-	}
+    WisePerson ::= CHOICE {
+        wiseman [2] IMPLICIT IA5String,
+        wisewoman [3] IMPLICIT IA5String
+    }
 
-	SetOfPersons ::= SET {
-		person [4] IMPLICIT Person,
-		wisePerson [5] IMPLICIT WisePerson
-	}
+    SetOfPersons ::= SET {
+        person [4] IMPLICIT Person,
+        wisePerson [5] IMPLICIT WisePerson
+    }
 
 
-	person Person ::= woman:"Joanne Doe"
-	wisePerson WisePerson ::= wisewoman:"Cathrine Doe"
+    person Person ::= woman:"Joanne Doe"
+    --PER:854ADF8776ECA8226FCA
+
+    wisePerson WisePerson ::= wisewoman:"Cathrine Doe"
+    --PER:8643C3D3472D3BB2A089BF28
+
 
 END

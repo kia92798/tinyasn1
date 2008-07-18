@@ -5,9 +5,9 @@ EXPORTS
 	NumericBlock;
 
 
-	TextBlock ::= SEQUENCE OF IA5String
+    TextBlock ::= SEQUENCE OF IA5String
 
-	NumericBlock ::= TextBlock (WITH COMPONENT (NumericString))
+    NumericBlock ::= TextBlock (WITH COMPONENT (NumericString))--SIZE [0..MAX]--
 
 
 

@@ -6,20 +6,22 @@ EXPORTS
 	B;
 
 
-	MySQ0 ::= SEQUENCE {
-		a A,
-		b B
-	}
+    ---- not tag glass because MySQ0 is a SEQUENCE, if it was choice or set -> tag glass
 
-	A ::= CHOICE {
-		d [0] EXPLICIT NULL,
-		e [1] EXPLICIT NULL
-	}
+    MySQ0 ::= SEQUENCE {
+        a A,
+        b B
+    }
 
-	B ::= CHOICE {
-		d [0] EXPLICIT NULL,
-		e [1] EXPLICIT NULL
-	}
+    A ::= CHOICE {
+        d [0] EXPLICIT NULL,
+        e [1] EXPLICIT NULL
+    }
+
+    B ::= CHOICE {
+        d [0] EXPLICIT NULL,
+        e [1] EXPLICIT NULL
+    }
 
 
 

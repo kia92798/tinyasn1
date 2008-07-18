@@ -5,9 +5,9 @@ EXPORTS
 	OI2;
 
 
-	OI ::= OBJECT IDENTIFIER
+    OI ::= OBJECT IDENTIFIER
 
-	OI2 ::= OI
+    OI2 ::= OI
 
 
 

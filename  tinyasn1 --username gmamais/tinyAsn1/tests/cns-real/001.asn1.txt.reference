@@ -12,20 +12,28 @@ EXPORTS
 	myIntVar3;
 
 
-	MyInt ::= REAL (5..10)
+    MyInt ::= REAL (5..10)
 
-	MyInt2 ::= REAL (5..100.2)
+    MyInt2 ::= REAL (5..100.2)
 
-	MyInt3 ::= REAL (100.2)
+    MyInt3 ::= REAL (100.2)
 
-	MyInt4 ::= REAL (10)
+    MyInt4 ::= REAL (10)
 
-	MyInt5 ::= REAL ((5..100.2|(200..500^250..700)|ALL EXCEPT (200..500)))
+    MyInt5 ::= REAL ((5..100.2 | (200..500 ^ 250..700) | ALL EXCEPT (200..500)))
 
 
-	myIntVar REAL ::= 100.2
-	myIntVar1 REAL ::= 200
-	myIntVar2 REAL ::= 500
-	myIntVar3 REAL ::= 5000
+    myIntVar REAL ::= 100.2
+    --PER:0980D2190CCCCCCCCCCD
+
+    myIntVar1 REAL ::= 200
+    --PER:03800319
+
+    myIntVar2 REAL ::= 500
+    --PER:0380027D
+
+    myIntVar3 REAL ::= 5000
+    --PER:0480030271
+
 
 END

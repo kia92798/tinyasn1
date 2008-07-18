@@ -7,8 +7,14 @@ EXPORTS
 
 
 
-	internet-id OBJECT IDENTIFIER ::= {iso(1) identified-organization(3) dod(6) internet(1)  }
-	francetelecom-id OBJECT IDENTIFIER ::= {iso(1) member-body(2) f(250) type-org(1) ft(16)  }
-	ber-id OBJECT IDENTIFIER ::= {2 1 1  }
+    internet-id OBJECT IDENTIFIER ::= {iso(1) identified-organization(3) dod(6) internet(1)  }
+    --PER:02ACC0
+
+    francetelecom-id OBJECT IDENTIFIER ::= {iso(1) member-body(2) f(250) type-org(1) ft(16)  }
+    --PER:04A8BD0080
+
+    ber-id OBJECT IDENTIFIER ::= {2 1 1  }
+    --PER:0151
+
 
 END

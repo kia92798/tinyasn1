@@ -11,29 +11,35 @@ EXPORTS
 	bGreekCitizenWithTwoChildren;
 
 
-	ShortINTEGER ::= INTEGER  (0..6)
+    ShortINTEGER ::= INTEGER  (0..6)--[0..6]--
 
-	Citizen ::= SEQUENCE {
-		country [0] IMPLICIT ENUMERATED {
-			france(0),
-			greece(1),
-			italy(2),
-			germany(3)
-		},
-		yearOfBirth [1] IMPLICIT INTEGER ,
-		married [2] IMPLICIT BOOLEAN,
-		nOfChildren [3] IMPLICIT ShortINTEGER
-	}
+    Citizen ::= SEQUENCE {
+        country [0] IMPLICIT ENUMERATED {
+            france(0),
+            greece(1),
+            italy(2),
+            germany(3)
+        },
+        yearOfBirth [1] IMPLICIT INTEGER ,
+        married [2] IMPLICIT BOOLEAN,
+        nOfChildren [3] IMPLICIT ShortINTEGER
+    }
 
-	GreekCitizen ::= Citizen (WITH COMPONENTS {..., country (greece(1))})
+    GreekCitizen ::= Citizen (WITH COMPONENTS {..., country (greece(1))})
 
-	GreekCitizenTwoChildren ::= GreekCitizen (WITH COMPONENTS {..., nOfChildren (2)})
+    GreekCitizenTwoChildren ::= GreekCitizen (WITH COMPONENTS {..., nOfChildren (2)})
 
-	EquivGreekCitizenTwoChildren ::= Citizen (WITH COMPONENTS {..., country (greece(1)), nOfChildren (2)})
+    EquivGreekCitizenTwoChildren ::= Citizen (WITH COMPONENTS {..., country (greece(1)), nOfChildren (2)})
 
 
-	aGreekCitizen GreekCitizen ::= { country greece(1), yearOfBirth 1980, married TRUE, nOfChildren 4 }
-	aGreekCitizenWithTwoChildren GreekCitizenTwoChildren ::= { country greece(1), yearOfBirth 1980, married TRUE, nOfChildren 2 }
-	bGreekCitizenWithTwoChildren EquivGreekCitizenTwoChildren ::= { country greece(1), yearOfBirth 1980, married TRUE, nOfChildren 2 }
+    aGreekCitizen GreekCitizen ::= { country greece(1), yearOfBirth 1980, married TRUE, nOfChildren 4 }
+    --PER:4081EF30
+
+    aGreekCitizenWithTwoChildren GreekCitizenTwoChildren ::= { country greece(1), yearOfBirth 1980, married TRUE, nOfChildren 2 }
+    --PER:4081EF28
+
+    bGreekCitizenWithTwoChildren EquivGreekCitizenTwoChildren ::= { country greece(1), yearOfBirth 1980, married TRUE, nOfChildren 2 }
+    --PER:4081EF28
+
 
 END

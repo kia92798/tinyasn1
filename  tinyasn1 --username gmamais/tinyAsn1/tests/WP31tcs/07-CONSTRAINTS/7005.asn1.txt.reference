@@ -4,7 +4,7 @@ EXPORTS
 	Int;
 
 
-	Int ::= INTEGER  (MIN..5)
+    Int ::= INTEGER  (MIN..5)--[MIN..5]--
 
 
 

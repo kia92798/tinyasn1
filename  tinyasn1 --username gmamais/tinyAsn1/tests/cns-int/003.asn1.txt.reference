@@ -12,19 +12,29 @@ EXPORTS
 	myRealVar2;
 
 
-	MyInta ::= INTEGER 
+    MyInta ::= INTEGER 
 
-	MyInt ::= INTEGER  (5..MAX)
+    MyInt ::= INTEGER  (5..MAX)--[5..MAX]--
 
-	MyInt2 ::= MyInt (0..100)
+    MyInt2 ::= MyInt (0..100)--[5..100]--
 
-	MyInt3 ::= MyInt2 (ALL EXCEPT (10..50))
+    MyInt3 ::= MyInt2 (ALL EXCEPT (10..50))--[5..100]--
 
 
-	myIntVar INTEGER ::= 100
-	myIntVar1 INTEGER ::= 200
-	myIntVar2 INTEGER ::= 500
-	myIntVar3 INTEGER ::= 5000
-	myRealVar2 REAL ::= 500
+    myIntVar INTEGER  ::= 100
+    --PER:0164
+
+    myIntVar1 INTEGER  ::= 200
+    --PER:0200C8
+
+    myIntVar2 INTEGER  ::= 500
+    --PER:0201F4
+
+    myIntVar3 INTEGER  ::= 5000
+    --PER:021388
+
+    myRealVar2 REAL ::= 500
+    --PER:0380027D
+
 
 END

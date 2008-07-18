@@ -8,14 +8,20 @@ EXPORTS
 	oi2;
 
 
-	OI ::= OBJECT IDENTIFIER
+    OI ::= OBJECT IDENTIFIER
 
-	OI2 ::= OI
+    OI2 ::= OI
 
 
-	myInt INTEGER ::= 314
-	oi1 OBJECT IDENTIFIER ::= {1 2 3 4 5  }
-	oi2 OI2 ::= {2 myIntVar(314)  }
+    myInt INTEGER  ::= 314
+    --PER:02013A
+
+    oi1 OBJECT IDENTIFIER ::= {1 2 3 4 5  }
+    --PER:03A8C080
+
+    oi2 OI2 ::= {2 myIntVar(314)  }
+    --PER:02C280
+
 
 END
 MY-MODULE2 DEFINITIONS AUTOMATIC TAGS  ::=
@@ -26,6 +32,8 @@ EXPORTS
 
 
 
-	myIntVar INTEGER ::= 314
+    myIntVar INTEGER  ::= 314
+    --PER:02013A
+
 
 END

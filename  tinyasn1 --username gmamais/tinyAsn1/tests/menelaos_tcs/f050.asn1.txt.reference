@@ -6,11 +6,11 @@ EXPORTS
 	TwoDimensionalIntegerTableConstrained;
 
 
-	IntegerTable ::= SEQUENCE (SIZE (10)) OF INTEGER 
+    IntegerTable ::= SEQUENCE (SIZE (10))--SIZE [10..10]-- OF INTEGER 
 
-	TwoDimensionalIntegerTable ::= SEQUENCE (SIZE (10)) OF IntegerTable
+    TwoDimensionalIntegerTable ::= SEQUENCE (SIZE (10))--SIZE [10..10]-- OF IntegerTable
 
-	TwoDimensionalIntegerTableConstrained ::= TwoDimensionalIntegerTable (WITH COMPONENT (WITH COMPONENT (0..9)))
+    TwoDimensionalIntegerTableConstrained ::= TwoDimensionalIntegerTable (WITH COMPONENT (WITH COMPONENT (0..9)))--SIZE [10..10]--
 
 
 

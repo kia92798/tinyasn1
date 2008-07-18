@@ -5,9 +5,9 @@ EXPORTS
 	AnOctetBitString;
 
 
-	AnIntegerType ::= INTEGER 
+    AnIntegerType ::= INTEGER 
 
-	AnOctetBitString ::=  BIT STRING (SIZE (8))
+    AnOctetBitString ::=  BIT STRING (SIZE (8))--SIZE [8..8]--
 
 
 

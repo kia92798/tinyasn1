@@ -4,8 +4,8 @@ EXPORTS
 	MySeq;
 
 
-	MySeq ::= SET {
-	}
+    MySeq ::= SET {
+    }
 
 
 

@@ -7,11 +7,15 @@ EXPORTS
 	myIntVal2;
 
 
-	MyInt ::= INTEGER 
+    MyInt ::= INTEGER 
 
 
-	myIntVal INTEGER ::= 4
-	myIntVal2 MyInt2 ::= 4
+    myIntVal INTEGER  ::= 4
+    --PER:0104
+
+    myIntVal2 MyInt2 ::= 4
+    --PER:0104
+
 
 END
 MY-MODULE2 DEFINITIONS AUTOMATIC TAGS  ::=
@@ -21,9 +25,9 @@ EXPORTS
 	MyInt3;
 
 
-	MyInt2 ::= INTEGER 
+    MyInt2 ::= INTEGER 
 
-	MyInt3 ::= INTEGER 
+    MyInt3 ::= INTEGER 
 
 
 

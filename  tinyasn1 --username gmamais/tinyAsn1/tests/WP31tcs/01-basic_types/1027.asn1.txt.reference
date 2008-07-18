@@ -4,12 +4,12 @@ EXPORTS
 	MyEnum;
 
 
-	MyEnum ::= ENUMERATED {
-		monday(0),
-		tuesday(4),
-		...!5,
-		wed(7)
-	}
+    MyEnum ::= ENUMERATED {
+        monday(0),
+        tuesday(4),
+        ...!5,
+        wed(7)
+    }
 
 
 

@@ -5,9 +5,9 @@ EXPORTS
 	MyInt2;
 
 
-	MyInt ::= REAL (1..10 EXCEPT ((0..2|9..11)))
+    MyInt ::= REAL (1..10 EXCEPT ((0..2 | 9..11)))
 
-	MyInt2 ::= MyInt (MIN..MAX)
+    MyInt2 ::= MyInt (MIN..MAX)
 
 
 

@@ -8,8 +8,8 @@ log = open("log.txt", "w")
 for fname in os.popen("find . -type f -iname \*asn1 -a ! -iname \*IGNORE\*"):
 	fname = fname.strip()
 	
-	print "tinyAsn1.exe -debug `cygpath -w "+fname+"` 2>"+fname+".stderr"
-	res = os.system("tinyAsn1.exe -debug `cygpath -w "+fname+"` 2>"+fname+".stderr") / 256
+	print "asn1scc.exe -debug `cygpath -w "+fname+"` 2>"+fname+".stderr"
+	res = os.system("asn1scc.exe -debug `cygpath -w "+fname+"` 2>"+fname+".stderr") / 256
 	if res == 0 and fname.find("FAIL") != -1:
 		log.write("No error report: %s\n" % fname)
 	elif res == 1 and fname.find("FAIL") == -1:

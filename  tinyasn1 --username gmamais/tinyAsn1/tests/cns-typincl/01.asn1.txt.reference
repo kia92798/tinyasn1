@@ -8,23 +8,25 @@ EXPORTS
 	holiday;
 
 
-	Day ::= ENUMERATED {
-		monday(0),
-		tuesday(1),
-		wednesday(2),
-		thursday(3),
-		friday(4),
-		saturday(5),
-		sunday(6)
-	}
+    Day ::= ENUMERATED {
+        monday(0),
+        tuesday(1),
+        wednesday(2),
+        thursday(3),
+        friday(4),
+        saturday(5),
+        sunday(6)
+    }
 
-	Weekend ::= Day ((saturday(5)|sunday(6)))
+    Weekend ::= Day ((saturday(5) | sunday(6)))
 
-	FrenchWeekend ::= Day (Weekend)
+    FrenchWeekend ::= Day (Weekend)
 
-	LongWeekend ::= Day ((Weekend|friday(4)))
+    LongWeekend ::= Day ((Weekend | friday(4)))
 
 
-	holiday LongWeekend ::= sunday(6)
+    holiday LongWeekend ::= sunday(6)
+    --PER:C0
+
 
 END

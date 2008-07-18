@@ -5,12 +5,14 @@ EXPORTS
 	myVar;
 
 
-	MyType ::= CHOICE {
-		a1 [10] EXPLICIT INTEGER ,
-		a2 [11] EXPLICIT INTEGER 
-	}
+    MyType ::= CHOICE {
+        a1 [10] EXPLICIT INTEGER ,
+        a2 [11] EXPLICIT INTEGER 
+    }
 
 
-	myVar MyType ::= a1:10
+    myVar MyType ::= a1:10
+    --PER:008500
+
 
 END

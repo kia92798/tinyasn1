@@ -6,16 +6,20 @@ EXPORTS
 	client2;
 
 
-	Client ::= SEQUENCE {
-		name IA5String,
-		surname IA5String,
-		street IA5String,
-		number INTEGER ,
-		age INTEGER  OPTIONAL
-	}
+    Client ::= SEQUENCE {
+        name IA5String,
+        surname IA5String,
+        street IA5String,
+        number INTEGER ,
+        age INTEGER  OPTIONAL
+    }
 
 
-	client1 Client ::= { name "John", surname "Smith", street "Baker", number 122, age 23 }
-	client2 Client ::= { name "John", surname "Smith", street "Baker", number 122 }
+    client1 Client ::= { name "John", surname "Smith", street "Baker", number 122, age 23 }
+    --PER:824ADFA3702D3DBA7A680585875E5E402F4022E0
+
+    client2 Client ::= { name "John", surname "Smith", street "Baker", number 122 }
+    --PER:024ADFA3702D3DBA7A680585875E5E402F40
+
 
 END

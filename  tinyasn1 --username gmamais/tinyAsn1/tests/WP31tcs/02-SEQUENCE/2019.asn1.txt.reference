@@ -6,32 +6,34 @@ EXPORTS
 	var;
 
 
-	OneType ::= SEQUENCE {
-		one-1 INTEGER ,
-		one-2 [1] EXPLICIT BOOLEAN,
-		one-3 SEQUENCE {
-			alpha INTEGER ,
-			beta INTEGER 
-			,...		},
-		...,
-		ignored-in-SecondType [2] EXPLICIT INTEGER ,
-		...,
-		one-4 INTEGER 
-	}
+    OneType ::= SEQUENCE {
+        one-1 INTEGER ,
+        one-2 [1] EXPLICIT BOOLEAN,
+        one-3 SEQUENCE {
+            alpha INTEGER ,
+            beta INTEGER 
+            ,...        },
+        ...,
+        ignored-in-SecondType [2] EXPLICIT INTEGER ,
+        ...,
+        one-4 INTEGER 
+    }
 
-	SecondType ::= SEQUENCE {
-		a IA5String,
-		one-1 INTEGER ,
-		one-2 [1] EXPLICIT BOOLEAN,
-		one-3 SEQUENCE {
-			alpha INTEGER ,
-			beta INTEGER 
-			,...		},
-		one-4 INTEGER ,
-		b IA5String
-	}
+    SecondType ::= SEQUENCE {
+        a IA5String,
+        one-1 INTEGER ,
+        one-2 [1] EXPLICIT BOOLEAN,
+        one-3 SEQUENCE {
+            alpha INTEGER ,
+            beta INTEGER 
+            ,...        },
+        one-4 INTEGER ,
+        b IA5String
+    }
 
 
-	var SecondType ::= { a "george", one-1 1, one-2 TRUE, one-3 { alpha 1, beta 2 }, one-4 4, b "gm" }
+    var SecondType ::= { a "george", one-1 1, one-2 TRUE, one-3 { alpha 1, beta 2 }, one-4 4, b "gm" }
+    --PER:06CF977F2CF94040601010102010402CFB40
+
 
 END

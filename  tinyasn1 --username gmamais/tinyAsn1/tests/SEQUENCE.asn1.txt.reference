@@ -48,177 +48,233 @@ EXPORTS
 	myEnumVar2;
 
 
-	MyInt ::= INTEGER 
+    MyInt ::= INTEGER 
 
-	MyReal ::= REAL
+    MyReal ::= REAL
 
-	MyInt2 ::= [APPLICATION 1001] IMPLICIT INTEGER {
-		ab(1),
-		ac(3),
-		ad(4)
-	}
+    MyInt2 ::= [APPLICATION 1001] IMPLICIT INTEGER {
+        ab(1),
+        ac(3),
+        ad(4)
+    }
 
-	MyBitStr ::= BIT STRING {
-		a(1),
-		b(2),
-		c(4)
-	}
+    MyBitStr ::= BIT STRING {
+        a(1),
+        b(2),
+        c(4)
+    }
 
-	MyInt3 ::= [APPLICATION 1003] IMPLICIT MyInt2
+    MyInt3 ::= [APPLICATION 1003] IMPLICIT MyInt2
 
-	MySQ0 ::= SEQUENCE {
-		int1 [0] IMPLICIT INTEGER ,
-		int2 [1] IMPLICIT INTEGER 
-	}
+    MySQ0 ::= SEQUENCE {
+        int1 [0] IMPLICIT INTEGER ,
+        int2 [1] IMPLICIT INTEGER 
+    }
 
-	MyTest ::= SEQUENCE {
-		field1 [0] IMPLICIT INTEGER 
-	}
+    MyTest ::= SEQUENCE {
+        field1 [0] IMPLICIT INTEGER 
+    }
 
-	MyTest2 ::= SEQUENCE {
-		field1 [0] IMPLICIT MyTest
-	}
+    MyTest2 ::= SEQUENCE {
+        field1 [0] IMPLICIT MyTest
+    }
 
-	--This a special comment that must appear
-	--just before the definition MySQ22
-	MySQ22 ::= SEQUENCE {
-		a [0] IMPLICIT INTEGER {
-			red(0),
-			blue(1)
-		} ((0|1)) DEFAULT 0,
-		b [1] IMPLICIT MyReal,
-		c [2] IMPLICIT MyEnum DEFAULT red(0),
-		d [3] IMPLICIT MyBitStr OPTIONAL
-	}
+    ----	myTest2Var4 MyTest2 ::= {field1 myIntVal3}	error myIntVal3 is an integer
 
-	MySQ ::= SEQUENCE {
-		a [0] IMPLICIT INTEGER {
-			red(0),
-			blue(1)
-		} ((0|1)) DEFAULT 0,
-		b [1] IMPLICIT MyReal DEFAULT 3.1,
-		c [2] IMPLICIT MyEnum DEFAULT red(0),
-		d [3] IMPLICIT MyBitStr2 OPTIONAL,
-		e [4] IMPLICIT SEQUENCE {
-			a [0] IMPLICIT INTEGER {
-				red(0),
-				blue(1)
-			} ((0|1)) DEFAULT 0,
-			b [1] IMPLICIT MyReal DEFAULT 3.1,
-			c [2] IMPLICIT MyEnum DEFAULT red(0),
-			d [3] IMPLICIT MyBitStr2 OPTIONAL
-		}
-	}
+    ----@This a special comment that must appear
 
-	MySQ2 ::= SEQUENCE {
-		a [0] IMPLICIT INTEGER {
-			red(0),
-			blue(1)
-		} ((0|1)) DEFAULT 0,
-		b [1] IMPLICIT MyReal DEFAULT 3.1,
-		c [2] IMPLICIT MyEnum DEFAULT red(0),
-		d [3] IMPLICIT MyBitStr2 OPTIONAL,
-		e [4] EXPLICIT CHOICE {
-			a [0] IMPLICIT INTEGER {
-				red(0),
-				blue(1)
-			} ((0|1)),
-			b [1] IMPLICIT MyReal,
-			c [2] IMPLICIT MyEnum,
-			d [3] IMPLICIT MyBitStr2
-		}
-	}
+    ----@just before the definition MySQ22
 
-	MySQ2b ::= SEQUENCE {
-		a1 [3] IMPLICIT INTEGER {
-			red(0),
-			blue(1)
-		} ((0|1)) DEFAULT 0,
-		b1 [4] IMPLICIT MyReal DEFAULT 3.1,
-		c1 [5] IMPLICIT MyEnum DEFAULT red(0),
-		d1 [6] IMPLICIT MyBitStr2 OPTIONAL
-	}
+    MySQ22 ::= SEQUENCE {
+        a [0] IMPLICIT INTEGER {
+            red(0),
+            blue(1)
+        } ((0 | 1))--[0..1]-- DEFAULT 0,
+        b [1] IMPLICIT MyReal,
+        c [2] IMPLICIT MyEnum DEFAULT red(0),
+        d [3] IMPLICIT MyBitStr OPTIONAL
+    }
 
-	WITCOMPSEQ ::= SEQUENCE {
-		a [0] IMPLICIT INTEGER {
-			red(0),
-			blue(1)
-		} ((0|1)) DEFAULT 0,
-		b [1] IMPLICIT MyReal DEFAULT 3.1,
-		c [2] IMPLICIT MyEnum DEFAULT red(0),
-		a1 [3] IMPLICIT INTEGER {
-			red(0),
-			blue(1)
-		} ((0|1)) DEFAULT 0,
-		b1 [4] IMPLICIT MyReal DEFAULT 3.1,
-		c1 [5] IMPLICIT MyEnum DEFAULT red(0),
-		d1 [6] IMPLICIT MyBitStr2 OPTIONAL,
-		d [7] IMPLICIT MyBitStr2 OPTIONAL
-	}
+    ----mySQ23 MySQ22 ::= mySQvar1
 
-	MYCHOICE ::= CHOICE {
-		a [0] IMPLICIT INTEGER {
-			red(0),
-			blue(1)
-		} ((0|1)),
-		b [1] IMPLICIT MyReal,
-		c [2] IMPLICIT MyEnum,
-		d [3] IMPLICIT MyBitStr2,
-		e [4] IMPLICIT SEQUENCE {
-			a [0] IMPLICIT INTEGER {
-				red(0),
-				blue(1)
-			} ((0|1)) DEFAULT 0,
-			b [1] IMPLICIT MyReal DEFAULT 3.1,
-			c [2] IMPLICIT MyEnum DEFAULT red(0),
-			d [3] IMPLICIT MyBitStr2 OPTIONAL
-		}
-	}
+    MySQ ::= SEQUENCE {
+        a [0] IMPLICIT INTEGER {
+            red(0),
+            blue(1)
+        } ((0 | 1))--[0..1]-- DEFAULT 0,
+        b [1] IMPLICIT MyReal DEFAULT 3.1,
+        c [2] IMPLICIT MyEnum DEFAULT red(0),
+        d [3] IMPLICIT MyBitStr2 OPTIONAL,
+        e [4] IMPLICIT SEQUENCE {
+            a [0] IMPLICIT INTEGER {
+                red(0),
+                blue(1)
+            } ((0 | 1))--[0..1]-- DEFAULT 0,
+            b [1] IMPLICIT MyReal DEFAULT 3.1,
+            c [2] IMPLICIT MyEnum DEFAULT red(0),
+            d [3] IMPLICIT MyBitStr2 OPTIONAL
+        }
+    }
 
-	MYSQOFCHOICE ::= SEQUENCE OF MYCHOICE
+    MySQ2 ::= SEQUENCE {
+        a [0] IMPLICIT INTEGER {
+            red(0),
+            blue(1)
+        } ((0 | 1))--[0..1]-- DEFAULT 0,
+        b [1] IMPLICIT MyReal DEFAULT 3.1,
+        c [2] IMPLICIT MyEnum DEFAULT red(0),
+        d [3] IMPLICIT MyBitStr2 OPTIONAL,
+        e [4] EXPLICIT CHOICE {
+            a [0] IMPLICIT INTEGER {
+                red(0),
+                blue(1)
+            } ((0 | 1))--[0..1]--,
+            b [1] IMPLICIT MyReal,
+            c [2] IMPLICIT MyEnum,
+            d [3] IMPLICIT MyBitStr2
+        }
+    }
 
-	SQOF ::= SEQUENCE OF INTEGER 
+    MySQ2b ::= SEQUENCE {
+        a1 [3] IMPLICIT INTEGER {
+            red(0),
+            blue(1)
+        } ((0 | 1))--[0..1]-- DEFAULT 0,
+        b1 [4] IMPLICIT MyReal DEFAULT 3.1,
+        c1 [5] IMPLICIT MyEnum DEFAULT red(0),
+        d1 [6] IMPLICIT MyBitStr2 OPTIONAL
+    }
 
-	SQOFOF ::= SEQUENCE OF SEQUENCE OF INTEGER 
+    WITCOMPSEQ ::= SEQUENCE {
+        a [0] IMPLICIT INTEGER {
+            red(0),
+            blue(1)
+        } ((0 | 1))--[0..1]-- DEFAULT 0,
+        b [1] IMPLICIT MyReal DEFAULT 3.1,
+        c [2] IMPLICIT MyEnum DEFAULT red(0),
+        a1 [3] IMPLICIT INTEGER {
+            red(0),
+            blue(1)
+        } ((0 | 1))--[0..1]-- DEFAULT 0,
+        b1 [4] IMPLICIT MyReal DEFAULT 3.1,
+        c1 [5] IMPLICIT MyEnum DEFAULT red(0),
+        d1 [6] IMPLICIT MyBitStr2 OPTIONAL,
+        d [7] IMPLICIT MyBitStr2 OPTIONAL
+    }
 
-	SETOF ::= SET  OF INTEGER 
+    MYCHOICE ::= CHOICE {
+        a [0] IMPLICIT INTEGER {
+            red(0),
+            blue(1)
+        } ((0 | 1))--[0..1]--,
+        b [1] IMPLICIT MyReal,
+        c [2] IMPLICIT MyEnum,
+        d [3] IMPLICIT MyBitStr2,
+        e [4] IMPLICIT SEQUENCE {
+            a [0] IMPLICIT INTEGER {
+                red(0),
+                blue(1)
+            } ((0 | 1))--[0..1]-- DEFAULT 0,
+            b [1] IMPLICIT MyReal DEFAULT 3.1,
+            c [2] IMPLICIT MyEnum DEFAULT red(0),
+            d [3] IMPLICIT MyBitStr2 OPTIONAL
+        }
+    }
 
-	SETSETOF ::= SET  OF SET  OF INTEGER 
+    MYSQOFCHOICE ::= SEQUENCE OF MYCHOICE
 
-	MyEnum ::= ENUMERATED {
-		red(0),
-		blue(1),
-		green(4)
-	}
+    SQOF ::= SEQUENCE OF INTEGER 
 
-	MyBitStr2 ::= [APPLICATION 1002] IMPLICIT BIT STRING {
-		aha(1)
-	}
+    SQOFOF ::= SEQUENCE OF SEQUENCE OF INTEGER 
+
+    SETOF ::= SET  OF INTEGER 
+
+    SETSETOF ::= SET  OF SET  OF INTEGER 
+
+    ----	setof SETOF ::= {1,2,3,4,4,5}
+
+    MyEnum ::= ENUMERATED {
+        red(0),
+        blue(1),
+        green(4)
+    }
+
+    MyBitStr2 ::= [APPLICATION 1002] IMPLICIT BIT STRING {
+        aha(1)
+    }
 
 
-	myIntVal INTEGER ::= 4
-	pi REAL ::= 3.1
-	myIntVal3 MyInt3 ::= 1
-	mySQvar1 MySQ0 ::= { int1 10, int2 4 }
-	myTestVar MyTest ::= { field1 5 }
-	myTestVar2 MyTest ::= { field1 1 }
-	myTest2Var1 MyTest2 ::= { field1 { field1 5 } }
-	myTest2Var2 MyTest2 ::= { field1 { field1 1 } }
-	myTest2Var3 MyTest2 ::= { field1 { field1 1 } }
-	mySQ2 MySQ22 ::= { a 1, b 2.7, c green(4), d '011'B }
-	mySQ22 MySQ22 ::= { a 1, b 2.7, c green(4), d '011'B }
-	varMyso MySQ ::= { a 1, b 3.1, c green(4), d '011'B, e { a 0, b 45.2, c blue(1), d '001'B } }
-	myChoice MYCHOICE ::= e:{ a 1, c red(0) }
-	mysqofchoice MYSQOFCHOICE ::= { a:10, e:{ a 1, c red(0) }, e:{ a 1, b 3.1, c red(0) },d:'011'B }
-	sqof1 SQOF ::= {4 }
-	sqof2 SQOF ::= {10 }
-	sqof SQOF ::= { 1, 2, 3, 4, 1, 1,1 }
-	sqofof SQOFOF ::= { { 1, 2, 3, 4, 1, 1,1 },{ 10, 20, 4, 40, 10, 10,10 } }
-	setof2 SETOF ::= {4 }
-	setof1 SETOF ::= {12 }
-	setsetof SETSETOF ::= { { 1, 2, 3, 4,5 }, { 1, 2, 3, 4, 5,6 },{ 1, 2, 3, 4, 5, 6,7 } }
-	setof SETOF ::= { 1, 2, 3, 4,5 }
-	myEnumVar MyEnum ::= red(0)
-	myEnumVar2 MyEnum ::= red(0)
+    myIntVal INTEGER  ::= 4
+    --PER:0104
+
+    pi REAL ::= 3.1
+    --PER:0980CD18CCCCCCCCCCCD
+
+    myIntVal3 MyInt3 ::= 1
+    --PER:0101
+
+    mySQvar1 MySQ0 ::= { int1 10, int2 4 }
+    --PER:010A0104
+
+    myTestVar MyTest ::= { field1 5 }
+    --PER:0105
+
+    myTestVar2 MyTest ::= { field1 1 }
+    --PER:0101
+
+    myTest2Var1 MyTest2 ::= { field1 { field1 5 } }
+    --PER:0105
+
+    myTest2Var2 MyTest2 ::= { field1 { field1 1 } }
+    --PER:0101
+
+    myTest2Var3 MyTest2 ::= { field1 { field1 1 } }
+    --PER:0101
+
+    mySQ2 MySQ22 ::= { a 1, b 2.7, c green(4), d '011'B }
+    --PER:F0980CE0ACCCCCCCCCCCD80D80
+
+    mySQ22 MySQ22 ::= { a 1, b 2.7, c green(4), d '011'B }
+    --PER:F0980CE0ACCCCCCCCCCCD80D80
+
+    varMyso MySQ ::= { a 1, b 3.1, c green(4), d '011'B, e { a 0, b 45.2, c blue(1), d '001'B } }
+    --PER:BC06DC2603482D3333333333350320
+
+    myChoice MYCHOICE ::= e:{ a 1, c red(0) }
+    --PER:91
+
+    mysqofchoice MYSQOFCHOICE ::= { a:10, e:{ a 1, c red(0) }, e:{ a 1, b 3.1, c red(0) },d:'011'B }
+    --PER:Invalid!!!
+
+    sqof1 SQOF ::= {4 }
+    --PER:010104
+
+    sqof2 SQOF ::= {10 }
+    --PER:01010A
+
+    sqof SQOF ::= { 1, 2, 3, 4, 1, 1,1 }
+    --PER:070101010201030104010101010101
+
+    sqofof SQOFOF ::= { { 1, 2, 3, 4, 1, 1,1 },{ 10, 20, 4, 40, 10, 10,10 } }
+    --PER:0207010101020103010401010101010107010A011401040128010A010A010A
+
+    setof2 SETOF ::= {4 }
+    --PER:010104
+
+    setof1 SETOF ::= {12 }
+    --PER:01010C
+
+    setsetof SETSETOF ::= { { 1, 2, 3, 4,5 }, { 1, 2, 3, 4, 5,6 },{ 1, 2, 3, 4, 5, 6,7 } }
+    --PER:03050101010201030104010506010101020103010401050106070101010201030104010501060107
+
+    setof SETOF ::= { 1, 2, 3, 4,5 }
+    --PER:0501010102010301040105
+
+    myEnumVar MyEnum ::= red(0)
+    --PER:00
+
+    myEnumVar2 MyEnum ::= red(0)
+    --PER:00
+
 
 END

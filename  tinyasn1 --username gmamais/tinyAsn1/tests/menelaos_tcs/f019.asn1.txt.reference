@@ -7,23 +7,27 @@ EXPORTS
 	anotherValue;
 
 
-	ExtensibleEnumeration ::= ENUMERATED {
-		one(0),
-		two(1),
-		three(2)
-		,...
-	}
+    ExtensibleEnumeration ::= ENUMERATED {
+        one(0),
+        two(1),
+        three(2)
+        ,...
+    }
 
-	ExtensibleEnumeration2 ::= ENUMERATED {
-		one(0),
-		two(1),
-		three(2),
-		...,
-		four(3)
-	}
+    ExtensibleEnumeration2 ::= ENUMERATED {
+        one(0),
+        two(1),
+        three(2),
+        ...,
+        four(3)
+    }
 
 
-	anExtensibleEnumerationValue ExtensibleEnumeration ::= two(1)
-	anotherValue ExtensibleEnumeration2 ::= four(3)
+    anExtensibleEnumerationValue ExtensibleEnumeration ::= two(1)
+    --PER:20
+
+    anotherValue ExtensibleEnumeration2 ::= four(3)
+    --PER:80
+
 
 END

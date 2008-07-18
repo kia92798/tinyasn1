@@ -5,9 +5,9 @@ EXPORTS
 	MyIntb;
 
 
-	MyInta ::= REAL (2..4)
+    MyInta ::= REAL (2..4)
 
-	MyIntb ::= REAL (2..40000000000)
+    MyIntb ::= REAL (2..40000000000)
 
 
 

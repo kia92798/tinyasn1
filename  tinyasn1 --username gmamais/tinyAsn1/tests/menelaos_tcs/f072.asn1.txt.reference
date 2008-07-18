@@ -5,9 +5,9 @@ EXPORTS
 	IntegerTypeB;
 
 
-	IntegerTypeA ::= INTEGER  ((10|11),...)
+    IntegerTypeA ::= INTEGER  ((10 | 11),...)--[10..11,...]--
 
-	IntegerTypeB ::= INTEGER  (10..1100,...)
+    IntegerTypeB ::= INTEGER  (10..1100,...)--[10..1100,...]--
 
 
 

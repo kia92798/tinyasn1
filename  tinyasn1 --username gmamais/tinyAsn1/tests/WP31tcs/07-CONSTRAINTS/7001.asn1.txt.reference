@@ -4,7 +4,7 @@ EXPORTS
 	Int1;
 
 
-	Int1 ::= INTEGER  (0..MAX)
+    Int1 ::= INTEGER  (0..MAX)--[0..MAX]--
 
 
 

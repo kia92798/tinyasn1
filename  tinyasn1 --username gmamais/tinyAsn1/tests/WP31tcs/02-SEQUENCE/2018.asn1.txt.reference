@@ -5,16 +5,16 @@ EXPORTS
 	MySeq2;
 
 
-	MySeq1 ::= SEQUENCE {
-		a1 INTEGER ,
-		s1 OCTET STRING
-	}
+    MySeq1 ::= SEQUENCE {
+        a1 INTEGER ,
+        s1 OCTET STRING
+    }
 
-	MySeq2 ::= SEQUENCE {
-		a1 INTEGER ,
-		s1 OCTET STRING,
-		r REAL
-	}
+    MySeq2 ::= SEQUENCE {
+        a1 INTEGER ,
+        s1 OCTET STRING,
+        r REAL
+    }
 
 
 

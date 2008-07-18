@@ -15,25 +15,35 @@ EXPORTS
 	myRealVar2;
 
 
-	MyInta ::= REAL
+    MyInta ::= REAL
 
-	MyIntb ::= REAL (MIN..MAX)
+    MyIntb ::= REAL (MIN..MAX)
 
-	MyInt ::= REAL (5..MAX)
+    MyInt ::= REAL (5..MAX)
 
-	MyInt2 ::= REAL (5..100)
+    MyInt2 ::= REAL (5..100)
 
-	MyInt3 ::= REAL (100)
+    MyInt3 ::= REAL (100)
 
-	MyInt4 ::= REAL (10)
+    MyInt4 ::= REAL (10)
 
-	MyInt5 ::= REAL ((5..100|(200..500^250..700)|ALL EXCEPT (200..MAX)))
+    MyInt5 ::= REAL ((5..100 | (200..500 ^ 250..700) | ALL EXCEPT (200..MAX)))
 
 
-	myIntVar REAL ::= 100
-	myIntVar1 REAL ::= 200
-	myIntVar2 REAL ::= 500
-	myIntVar3 REAL ::= 500
-	myRealVar2 REAL ::= 500
+    myIntVar REAL ::= 100
+    --PER:03800219
+
+    myIntVar1 REAL ::= 200
+    --PER:03800319
+
+    myIntVar2 REAL ::= 500
+    --PER:0380027D
+
+    myIntVar3 REAL ::= 500
+    --PER:0380027D
+
+    myRealVar2 REAL ::= 500
+    --PER:0380027D
+
 
 END

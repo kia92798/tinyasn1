@@ -6,11 +6,11 @@ EXPORTS
 	MyInt3;
 
 
-	MyInt ::= INTEGER  (5..MAX)
+    MyInt ::= INTEGER  (5..MAX)--[5..MAX]--
 
-	MyInt2 ::= MyInt ((9|12|13|200))
+    MyInt2 ::= MyInt ((9 | 12 | 13 | 200))--[9..200]--
 
-	MyInt3 ::= MyInt2 (MIN..100)
+    MyInt3 ::= MyInt2 (MIN..100)--[9..100]--
 
 
 

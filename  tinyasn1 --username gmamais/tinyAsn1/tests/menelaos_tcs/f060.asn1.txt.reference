@@ -15,33 +15,33 @@ EXPORTS
 	Type10;
 
 
-	ShortINTEGER ::= INTEGER  (0..6)
+    ShortINTEGER ::= INTEGER  (0..6)--[0..6]--
 
-	AbstractType ::= CHOICE {
-		alpha [0] IMPLICIT INTEGER ,
-		beta [1] IMPLICIT INTEGER ,
-		gamma [2] IMPLICIT INTEGER 
-	}
+    AbstractType ::= CHOICE {
+        alpha [0] IMPLICIT INTEGER ,
+        beta [1] IMPLICIT INTEGER ,
+        gamma [2] IMPLICIT INTEGER 
+    }
 
-	Type1 ::= AbstractType (WITH COMPONENTS {alpha, beta ABSENT, gamma ABSENT})
+    Type1 ::= AbstractType (WITH COMPONENTS {alpha, beta ABSENT, gamma ABSENT})
 
-	Type2 ::= AbstractType (WITH COMPONENTS {alpha PRESENT, beta ABSENT, gamma ABSENT})
+    Type2 ::= AbstractType (WITH COMPONENTS {alpha PRESENT, beta ABSENT, gamma ABSENT})
 
-	Type3 ::= AbstractType (WITH COMPONENTS {beta ABSENT, alpha ABSENT, gamma ABSENT})
+    Type3 ::= AbstractType (WITH COMPONENTS {beta ABSENT, alpha ABSENT, gamma ABSENT})
 
-	Type4 ::= AbstractType (WITH COMPONENTS {beta ABSENT, gamma ABSENT, alpha ABSENT})
+    Type4 ::= AbstractType (WITH COMPONENTS {beta ABSENT, gamma ABSENT, alpha ABSENT})
 
-	Type5 ::= AbstractType (WITH COMPONENTS {beta PRESENT, gamma ABSENT, alpha ABSENT})
+    Type5 ::= AbstractType (WITH COMPONENTS {beta PRESENT, gamma ABSENT, alpha ABSENT})
 
-	Type6 ::= AbstractType (WITH COMPONENTS {..., alpha})
+    Type6 ::= AbstractType (WITH COMPONENTS {..., alpha})
 
-	Type7 ::= AbstractType (WITH COMPONENTS {..., alpha PRESENT})
+    Type7 ::= AbstractType (WITH COMPONENTS {..., alpha PRESENT})
 
-	Type8 ::= AbstractType (WITH COMPONENTS {..., beta ABSENT})
+    Type8 ::= AbstractType (WITH COMPONENTS {..., beta ABSENT})
 
-	Type9 ::= AbstractType (WITH COMPONENTS {..., beta ABSENT, gamma ABSENT})
+    Type9 ::= AbstractType (WITH COMPONENTS {..., beta ABSENT, gamma ABSENT})
 
-	Type10 ::= AbstractType (WITH COMPONENTS {..., beta PRESENT, gamma ABSENT})
+    Type10 ::= AbstractType (WITH COMPONENTS {..., beta PRESENT, gamma ABSENT})
 
 
 

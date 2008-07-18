@@ -5,9 +5,11 @@ EXPORTS
 	a;
 
 
-	MyInt ::= REAL (1..10 EXCEPT ((0..2|9..11)))
+    MyInt ::= REAL (1..10 EXCEPT ((0..2 | 9..11)))
 
 
-	a MyInt ::= 3
+    a MyInt ::= 3
+    --PER:03800003
+
 
 END

@@ -8,31 +8,37 @@ EXPORTS
 	clientMoreInfo;
 
 
-	Client ::= SEQUENCE {
-		name IA5String,
-		surname IA5String,
-		street IA5String,
-		number [12] IMPLICIT INTEGER  OPTIONAL,
-		age INTEGER  OPTIONAL
-	}
+    Client ::= SEQUENCE {
+        name IA5String,
+        surname IA5String,
+        street IA5String,
+        number [12] IMPLICIT INTEGER  OPTIONAL,
+        age INTEGER  OPTIONAL
+    }
 
-	ClientMoreInfo ::= SEQUENCE {
-		name IA5String,
-		surname IA5String,
-		street IA5String,
-		number [12] IMPLICIT INTEGER  OPTIONAL,
-		age INTEGER  OPTIONAL,
-		marital-status ENUMERATED {
-			single(0),
-			married(1),
-			divorced(2),
-			widowed(3)
-		}
-	}
+    ClientMoreInfo ::= SEQUENCE {
+        name IA5String,
+        surname IA5String,
+        street IA5String,
+        number [12] IMPLICIT INTEGER  OPTIONAL,
+        age INTEGER  OPTIONAL,
+        marital-status ENUMERATED {
+            single(0),
+            married(1),
+            divorced(2),
+            widowed(3)
+        }
+    }
 
 
-	client1 Client ::= { name "John", surname "Smith", street "Baker", number 122, age 23 }
-	client2 Client ::= { name "John", surname "Smith", street "Baker", number 122 }
-	clientMoreInfo ClientMoreInfo ::= { name "Menelaos", surname "Perdikeas", street "Serron", age 33, marital-status married(1) }
+    client1 Client ::= { name "John", surname "Smith", street "Baker", number 122, age 23 }
+    --PER:C1256FD1B8169EDD3D3402C2C3AF2F2017A01170
+
+    client2 Client ::= { name "John", surname "Smith", street "Baker", number 122 }
+    --PER:81256FD1B8169EDD3D3402C2C3AF2F2017A0
+
+    clientMoreInfo ClientMoreInfo ::= { name "Menelaos", surname "Perdikeas", street "Serron", age 33, marital-status married(1) }
+    --PER:4226E5DD97661DFCC26865E5934EBCB8798353CBCB96FDC02428
+
 
 END

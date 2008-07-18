@@ -4,10 +4,10 @@ EXPORTS
 	MyBitString;
 
 
-	MyBitString ::= BIT STRING {
-		alpha(1),
-		beta(2)
-	}
+    MyBitString ::= BIT STRING {
+        alpha(1),
+        beta(2)
+    }
 
 
 

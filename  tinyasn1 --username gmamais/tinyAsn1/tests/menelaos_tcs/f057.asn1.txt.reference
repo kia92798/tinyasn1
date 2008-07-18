@@ -7,23 +7,25 @@ EXPORTS
 	aGreek;
 
 
-	ShortINTEGER ::= INTEGER  (0..6)
+    ShortINTEGER ::= INTEGER  (0..6)--[0..6]--
 
-	Citizen ::= SEQUENCE {
-		country [0] IMPLICIT ENUMERATED {
-			france(0),
-			greece(1),
-			italy(2),
-			germany(3)
-		},
-		yearOfBirth [1] IMPLICIT INTEGER ,
-		married [2] IMPLICIT BOOLEAN OPTIONAL,
-		nOfChildren [3] IMPLICIT ShortINTEGER
-	}
+    Citizen ::= SEQUENCE {
+        country [0] IMPLICIT ENUMERATED {
+            france(0),
+            greece(1),
+            italy(2),
+            germany(3)
+        },
+        yearOfBirth [1] IMPLICIT INTEGER ,
+        married [2] IMPLICIT BOOLEAN OPTIONAL,
+        nOfChildren [3] IMPLICIT ShortINTEGER
+    }
 
-	GreekCitizenWithIndicationOfMarriage ::= Citizen (WITH COMPONENTS {..., country (greece(1)), married ABSENT})
+    GreekCitizenWithIndicationOfMarriage ::= Citizen (WITH COMPONENTS {..., country (greece(1)), married ABSENT})
 
 
-	aGreek GreekCitizenWithIndicationOfMarriage ::= { country greece(1), yearOfBirth 1980, nOfChildren 2 }
+    aGreek GreekCitizenWithIndicationOfMarriage ::= { country greece(1), yearOfBirth 1980, nOfChildren 2 }
+    --PER:2040F788
+
 
 END

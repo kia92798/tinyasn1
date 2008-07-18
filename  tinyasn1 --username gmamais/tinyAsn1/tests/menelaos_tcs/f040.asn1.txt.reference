@@ -7,13 +7,13 @@ EXPORTS
 	AListOfBITStrings;
 
 
-	AnIntegerType ::= INTEGER 
+    AnIntegerType ::= INTEGER 
 
-	AListOfIntegers ::= SEQUENCE (SIZE (2..10)) OF AnIntegerType
+    AListOfIntegers ::= SEQUENCE (SIZE (2..10))--SIZE [2..10]-- OF AnIntegerType
 
-	AListOfIntegers2 ::= SEQUENCE (SIZE (2..10)) OF AnIntegerType (23..3001)
+    AListOfIntegers2 ::= SEQUENCE (SIZE (2..10))--SIZE [2..10]-- OF AnIntegerType (23..3001)--[23..3001]--
 
-	AListOfBITStrings ::= SEQUENCE (SIZE (2..10)) OF  BIT STRING (SIZE (1..10))
+    AListOfBITStrings ::= SEQUENCE (SIZE (2..10))--SIZE [2..10]-- OF  BIT STRING (SIZE (1..10))--SIZE [1..10]--
 
 
 

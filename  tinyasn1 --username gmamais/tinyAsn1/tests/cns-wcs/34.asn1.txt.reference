@@ -7,15 +7,21 @@ EXPORTS
 	a2;
 
 
-	MYSQ ::= CHOICE {
-		a [0] IMPLICIT INTEGER  (1..10),
-		b [1] IMPLICIT INTEGER 
-	}
+    MYSQ ::= CHOICE {
+        a [0] IMPLICIT INTEGER  (1..10)--[1..10]--,
+        b [1] IMPLICIT INTEGER 
+    }
 
-	MYSQ2 ::= MYSQ (WITH COMPONENTS {..., a (1..8) PRESENT})
+    ---- PARTIAL, NONE, NONE
+
+    MYSQ2 ::= MYSQ (WITH COMPONENTS {..., a (1..8) PRESENT})
 
 
-	a1 MYSQ ::= a:9
-	a2 MYSQ2 ::= a:8
+    a1 MYSQ ::= a:9
+    --PER:40
+
+    a2 MYSQ2 ::= a:8
+    --PER:38
+
 
 END

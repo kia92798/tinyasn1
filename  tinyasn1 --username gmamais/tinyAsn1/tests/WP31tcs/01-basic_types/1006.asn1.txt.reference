@@ -4,7 +4,7 @@ EXPORTS
 	MyInt4;
 
 
-	MyInt4 ::= INTEGER  (3..40)
+    MyInt4 ::= INTEGER  (3..40)--[3..40]--
 
 
 

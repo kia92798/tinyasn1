@@ -5,9 +5,11 @@ EXPORTS
 	aStringOfCapitalLetters;
 
 
-	CapitalLetters ::= IA5String (FROM ("A".."Z"))
+    CapitalLetters ::= IA5String (FROM ("A".."Z"))--SIZE [0..MAX]FROM ["ABCDEFGHIJKLMNOPQRSTUVWXYZ"]--
 
 
-	aStringOfCapitalLetters CapitalLetters ::= "ABCXYZ"
+    aStringOfCapitalLetters CapitalLetters ::= "ABCXYZ"
+    --PER:0600457C64
+
 
 END
