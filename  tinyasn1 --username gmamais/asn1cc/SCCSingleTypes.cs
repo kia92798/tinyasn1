@@ -1,3 +1,15 @@
+/**=============================================================================
+Definition primitive ASN.1 types used in asn1scc project  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD application.
+See these sources for detailed information regarding the
+autoICD application.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -730,7 +742,6 @@ if ({3}+{1}>{4})
     {
         public void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
-#warning "Unimplemented method"
             throw new Exception("Unimplemented !!!");
         }
         public void PrintHConstraintConstant(StreamWriterLevel h, string name)
@@ -742,7 +753,6 @@ if ({3}+{1}>{4})
         }
         public void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
         {
-#warning "Unimplemented method"
             throw new Exception("Unimplemented !!!");
         }
         public void VarsNeededForIsConstraintValid(int lev, OrderedDictionary<string, CLocalVariable> existingVars)
@@ -755,13 +765,11 @@ if ({3}+{1}>{4})
         public void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) { }
         public void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
-#warning "Unimplemented method"
             throw new Exception("Unimplemented !!!");
         }
         public void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars) { }
         public void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
         {
-#warning "Unimplemented method"
             throw new Exception("Unimplemented !!!");
         }
     }
@@ -969,7 +977,7 @@ if ({3}+{1}>{4})
         }
         public void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {
-            ((ISCCType)Type).VarsNeededForEncode(cns, arrayDepth, existingVars);
+//            ((ISCCType)Type).VarsNeededForEncode(cns, arrayDepth, existingVars);
         }
         public void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
@@ -989,7 +997,7 @@ if ({3}+{1}>{4})
         }
         public void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {
-            ((ISCCType)Type).VarsNeededForDecode(cns, arrayDepth, existingVars);
+//            ((ISCCType)Type).VarsNeededForDecode(cns, arrayDepth, existingVars);
         }
         public void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
         {

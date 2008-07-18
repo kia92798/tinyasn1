@@ -1,4 +1,16 @@
-﻿using System;
+﻿/**=============================================================================
+Definition SCCChoiceType class used in asn1scc project  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD application.
+See these sources for detailed information regarding the
+autoICD application.
+==============================================================================*/
+using System;
 using System.Collections.Generic;
 using System.Text;
 using tinyAsn1;
@@ -153,6 +165,13 @@ namespace asn1scc
                 c.WriteLine("break;");
                 choiceIndex++;
             }
+            c.P(lev);
+            c.WriteLine("default:");
+            c.P(lev + 1);
+            c.WriteLine("*pErrCode = ERR_{0};", C.ID(errorCode));
+            c.P(lev + 1);
+            c.WriteLine("return FALSE;");
+
             c.P(lev); c.WriteLine("}");
         }
         public void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)

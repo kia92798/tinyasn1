@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("asn1scc")]
-[assembly: AssemblyDescription("Asn1 Space Certified Compiler")]
+[assembly: AssemblyTitle("Publish")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Semantix SA")]
-[assembly: AssemblyProduct("asn1scc")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("Publish")]
 [assembly: AssemblyCopyright("Copyright ©  2008")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("43550d53-4790-45cb-be23-dadc718eedf0")]
+[assembly: Guid("d351aba3-3d16-4bce-ad05-ffbd8beebd3d")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -29,5 +29,5 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("0.94.*")]
-[assembly: AssemblyFileVersion("0.94.0.0")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

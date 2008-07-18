@@ -15,56 +15,74 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_2FBAA930BFE6C81BA0CE4AC9AC4030AD"
+        "MsmKey" = "8:_0702142925974718A7D3ABA8237AA130"
         "OwnerKey" = "8:_EC7513A991D442B0889B8DD5DE75ED98"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_66727042F2628B0E72B1455D27F3769B"
-        "OwnerKey" = "8:_EC7513A991D442B0889B8DD5DE75ED98"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_66727042F2628B0E72B1455D27F3769B"
+        "MsmKey" = "8:_0702142925974718A7D3ABA8237AA130"
         "OwnerKey" = "8:_8A2A6135452A996D0B38D2F3135FCFF9"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_66727042F2628B0E72B1455D27F3769B"
-        "OwnerKey" = "8:_2FBAA930BFE6C81BA0CE4AC9AC4030AD"
+        "MsmKey" = "8:_0702142925974718A7D3ABA8237AA130"
+        "OwnerKey" = "8:_0904BC7A5104F5A2004D1A0B234821B2"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_0702142925974718A7D3ABA8237AA130"
+        "OwnerKey" = "8:_7E4FCCA3967AB2B76F0FF80A3C3F7699"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_0904BC7A5104F5A2004D1A0B234821B2"
+        "OwnerKey" = "8:_EC7513A991D442B0889B8DD5DE75ED98"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_0904BC7A5104F5A2004D1A0B234821B2"
+        "OwnerKey" = "8:_8A2A6135452A996D0B38D2F3135FCFF9"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_1832F34A4763903408698CED18C1D847"
+        "OwnerKey" = "8:_EC7513A991D442B0889B8DD5DE75ED98"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_1832F34A4763903408698CED18C1D847"
+        "OwnerKey" = "8:_3147EA66E78D2737EE5F9B0916066700"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_3147EA66E78D2737EE5F9B0916066700"
+        "OwnerKey" = "8:_7E4FCCA3967AB2B76F0FF80A3C3F7699"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_3147EA66E78D2737EE5F9B0916066700"
+        "OwnerKey" = "8:_EC7513A991D442B0889B8DD5DE75ED98"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7E4FCCA3967AB2B76F0FF80A3C3F7699"
+        "OwnerKey" = "8:_EC7513A991D442B0889B8DD5DE75ED98"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_8A2A6135452A996D0B38D2F3135FCFF9"
         "OwnerKey" = "8:_EC7513A991D442B0889B8DD5DE75ED98"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_A203BCB578F756AE9CEA765E73438D70"
-        "OwnerKey" = "8:_2FBAA930BFE6C81BA0CE4AC9AC4030AD"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_A203BCB578F756AE9CEA765E73438D70"
-        "OwnerKey" = "8:_EC7513A991D442B0889B8DD5DE75ED98"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_D11AA966EA4DBADF8FDD27C6CCCE01C9"
-        "OwnerKey" = "8:_EC7513A991D442B0889B8DD5DE75ED98"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_D11AA966EA4DBADF8FDD27C6CCCE01C9"
-        "OwnerKey" = "8:_A203BCB578F756AE9CEA765E73438D70"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -88,25 +106,31 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_2FBAA930BFE6C81BA0CE4AC9AC4030AD"
+        "OwnerKey" = "8:_0904BC7A5104F5A2004D1A0B234821B2"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_A203BCB578F756AE9CEA765E73438D70"
+        "OwnerKey" = "8:_7E4FCCA3967AB2B76F0FF80A3C3F7699"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_66727042F2628B0E72B1455D27F3769B"
+        "OwnerKey" = "8:_3147EA66E78D2737EE5F9B0916066700"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_D11AA966EA4DBADF8FDD27C6CCCE01C9"
+        "OwnerKey" = "8:_0702142925974718A7D3ABA8237AA130"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_1832F34A4763903408698CED18C1D847"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -255,45 +279,14 @@
         }
         "File"
         {
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_2FBAA930BFE6C81BA0CE4AC9AC4030AD"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Antlr3.Utility, Version=0.1.0.37314, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_2FBAA930BFE6C81BA0CE4AC9AC4030AD"
-                    {
-                    "Name" = "8:Antlr3.Utility.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:Antlr3.Utility.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_B7493165EB9B4D35A22B1B20A1F6D989"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_66727042F2628B0E72B1455D27F3769B"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_0702142925974718A7D3ABA8237AA130"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:Antlr3.Runtime, Version=0.3.0.37313, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_66727042F2628B0E72B1455D27F3769B"
+                    "_0702142925974718A7D3ABA8237AA130"
                     {
                     "Name" = "8:Antlr3.Runtime.dll"
                     "Attributes" = "3:512"
@@ -317,20 +310,20 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_8A2A6135452A996D0B38D2F3135FCFF9"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_0904BC7A5104F5A2004D1A0B234821B2"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:tinyAsn1, Version=0.94.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:AntrlParser, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_8A2A6135452A996D0B38D2F3135FCFF9"
+                    "_0904BC7A5104F5A2004D1A0B234821B2"
                     {
-                    "Name" = "8:tinyAsn1.dll"
+                    "Name" = "8:AntrlParser.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:tinyAsn1.dll"
+            "SourcePath" = "8:AntrlParser.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_B7493165EB9B4D35A22B1B20A1F6D989"
@@ -348,14 +341,45 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_A203BCB578F756AE9CEA765E73438D70"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_1832F34A4763903408698CED18C1D847"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:antlr.runtime, Version=2.7.7.1, Culture=neutral, PublicKeyToken=d7701e059243744f, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_1832F34A4763903408698CED18C1D847"
+                    {
+                    "Name" = "8:antlr.runtime.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:antlr.runtime.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_B7493165EB9B4D35A22B1B20A1F6D989"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_3147EA66E78D2737EE5F9B0916066700"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:StringTemplate, Version=3.0.1.21733, Culture=neutral, PublicKeyToken=beee492b52c41e85, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_A203BCB578F756AE9CEA765E73438D70"
+                    "_3147EA66E78D2737EE5F9B0916066700"
                     {
                     "Name" = "8:StringTemplate.dll"
                     "Attributes" = "3:512"
@@ -379,20 +403,51 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_D11AA966EA4DBADF8FDD27C6CCCE01C9"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_7E4FCCA3967AB2B76F0FF80A3C3F7699"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:antlr.runtime, Version=2.7.7.1, Culture=neutral, PublicKeyToken=d7701e059243744f, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:Antlr3.Utility, Version=0.1.0.37314, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_D11AA966EA4DBADF8FDD27C6CCCE01C9"
+                    "_7E4FCCA3967AB2B76F0FF80A3C3F7699"
                     {
-                    "Name" = "8:antlr.runtime.dll"
+                    "Name" = "8:Antlr3.Utility.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:antlr.runtime.dll"
+            "SourcePath" = "8:Antlr3.Utility.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_B7493165EB9B4D35A22B1B20A1F6D989"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_8A2A6135452A996D0B38D2F3135FCFF9"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:tinyAsn1, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_8A2A6135452A996D0B38D2F3135FCFF9"
+                    {
+                    "Name" = "8:tinyAsn1.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:tinyAsn1.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_B7493165EB9B4D35A22B1B20A1F6D989"
@@ -465,14 +520,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:asn1scc"
-        "ProductCode" = "8:{5D039B2D-FA50-4925-9A29-1626B5FEFCB8}"
-        "PackageCode" = "8:{BE973A42-EA08-4CE6-A49B-5E70D5D17CF2}"
+        "ProductCode" = "8:{5AD4A698-DB72-424A-836F-99CAFD2BE29E}"
+        "PackageCode" = "8:{24ED3549-08A5-4A20-921F-8D83E90C3C65}"
         "UpgradeCode" = "8:{25859DFA-0155-4F8D-9879-8A6A2BDF7972}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:0.93"
+        "ProductVersion" = "8:0.94"
         "Manufacturer" = "8:Semantix"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://www.semantix.gr/asn1scc/"
@@ -480,7 +535,7 @@
         "Subject" = "8:"
         "ARPCONTACT" = "8:Semantix SA"
         "Keywords" = "8:"
-        "ARPCOMMENTS" = "8:ASN.1 Space Certified Compiler (asn1scc)"
+        "ARPCOMMENTS" = "8:ASN.1 Space Certifiable Compiler (asn1scc)"
         "ARPURLINFOABOUT" = "8:www.semantix.gr"
         "ARPPRODUCTICON" = "8:"
         "ARPIconIndex" = "3:0"

@@ -1,4 +1,17 @@
-﻿using System;
+﻿/**=============================================================================
+Definition SCCTypeAssigment and SCCValueAssigment classes used in asn1scc project  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD application.
+See these sources for detailed information regarding the
+autoICD application.
+==============================================================================*/
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using tinyAsn1;
@@ -82,6 +95,8 @@ namespace asn1scc
             ((ISCCType)m_type).VarsNeededForIsConstraintValid(1, localVars);
             CLocalVariable.Print(c, localVars);
             ((ISCCType)m_type).PrintCIsConstraintValid(m_type.PEREffectiveConstraint, c, uniqueID, uniqueID, "pVal", 1, 1);
+            c.P(1); c.WriteLine("(void)pVal; /*Dummy statement, just to hide potential warning*/");
+            c.P(1); c.WriteLine("(void)pErrCode; /*Dummy statement, just to hide potential warning*/");
             c.P(1); c.WriteLine("return TRUE;");
             c.WriteLine("}");
             c.WriteLine();

@@ -1,4 +1,17 @@
-﻿using System;
+﻿/**=============================================================================
+Definition SCCFile class used in asn1scc project  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD application.
+See these sources for detailed information regarding the
+autoICD application.
+==============================================================================*/
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using tinyAsn1;
@@ -84,6 +97,7 @@ namespace asn1scc
                 }
 
 
+
                 h.WriteLine("#include \"asn1crt.h\"");
                 h.WriteLine();
                 h.WriteLine("#ifdef  __cplusplus");
@@ -98,6 +112,7 @@ namespace asn1scc
                     t.PrintH(h, uniqueID);
                 }
 
+
                 c.WriteLine();
                 foreach (Module m in m_modules)
                     foreach (SCCValueAssigment v in m.m_valuesAssigments.Values)
@@ -106,6 +121,8 @@ namespace asn1scc
 
                 h.WriteLine("#ifdef  __cplusplus");
                 h.WriteLine("}");
+                PrintUtilityDefines(h);
+
                 h.WriteLine("#endif");
                 h.WriteLine();
 
@@ -133,6 +150,36 @@ namespace asn1scc
                         v.PrintC(c);
 
             }
+        }
+
+        private void PrintUtilityDefines(StreamWriterLevel h)
+        {
+
+            foreach (Module m in m_modules)
+                foreach (SCCTypeAssigment t in m.m_typeAssigments.Values)
+                {
+                    string uniqueID = DefaultBackend.Instance.TypePrefix + DefaultBackend.Instance.GetUniqueID(C.ID(t.m_name));
+
+                    foreach (EnumeratedType en in t.m_type.GetMySelfAndAnyChildren<EnumeratedType>())
+                    {
+                        foreach (EnumeratedType.Item item in en.m_enumValues.Values)
+                        {
+                            if (t.m_type != en)
+                                h.WriteLine("#define\tENUM_{0}\t{1}::{0}", item.CID, uniqueID);
+                            else
+                                h.WriteLine("#define\tENUM_{0}\t{0}", item.CID);
+                        }
+                    }
+
+                    foreach (ChoiceType ch in t.m_type.GetMySelfAndAnyChildren<ChoiceType>())
+                    {
+                        foreach (ChoiceChild item in ch.m_children.Values)
+                        {
+                            h.WriteLine("#define\tCHOICE_{0}\t{1}::{0}", item.CID, uniqueID);
+                        }
+                    }
+                }
+
         }
 
     }

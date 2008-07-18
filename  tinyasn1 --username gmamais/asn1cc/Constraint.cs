@@ -1,3 +1,16 @@
+/**=============================================================================
+Definition constraint related classes used in asn1scc project  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD application.
+See these sources for detailed information regarding the
+autoICD application.
+==============================================================================*/
+
 using System;
 using System.Collections.Generic;
 using System.Text;
