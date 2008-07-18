@@ -14,27 +14,41 @@ EXPORTS
 	myInvBitStr;
 
 
-	MyInt ::= INTEGER 
+    MyInt ::= INTEGER 
 
-	MyBitStr ::= BIT STRING {
-		a(2),
-		b(3),
-		c(4)
-	}
+    MyBitStr ::= BIT STRING {
+        a(2),
+        b(3),
+        c(4)
+    }
 
-	MyBitStr2 ::= [APPLICATION 1002] IMPLICIT BIT STRING {
-		aha(6)
-	}
+    MyBitStr2 ::= [APPLICATION 1002] IMPLICIT BIT STRING {
+        aha(6)
+    }
 
-	MyBitStr3 ::= MyBitStr2 (SIZE (5))
+    MyBitStr3 ::= MyBitStr2 (SIZE (5))--SIZE [5..5]--
 
 
-	myIntVal INTEGER ::= 4
-	myIntVal3 MyInt ::= 6
-	myBitStr1 MyBitStr ::= '0011'B
-	myBitStr2 MyBitStr ::= '0011'B
-	myBitStr3 MyBitStr ::= '0011'B
-	myBitStr4 MyBitStr ::= '0011'B
-	myInvBitStr MyBitStr3 ::= '101011'B
+    myIntVal INTEGER  ::= 4
+    --PER:0104
+
+    myIntVal3 MyInt ::= 6
+    --PER:0106
+
+    myBitStr1 MyBitStr ::= '0011'B
+    --PER:0430
+
+    myBitStr2 MyBitStr ::= '0011'B
+    --PER:0430
+
+    myBitStr3 MyBitStr ::= '0011'B
+    --PER:0430
+
+    myBitStr4 MyBitStr ::= '0011'B
+    --PER:0430
+
+    myInvBitStr MyBitStr3 ::= '101011'B
+    --PER:Invalid!!!
+
 
 END

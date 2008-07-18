@@ -8,17 +8,23 @@ EXPORTS
 	myEnumVar2;
 
 
-	MyEnum ::= ENUMERATED {
-		red(0),
-		blue(1),
-		green(4)
-	}
+    MyEnum ::= ENUMERATED {
+        red(0),
+        blue(1),
+        green(4)
+    }
 
-	JustRed ::= MyEnum (red(0))
+    JustRed ::= MyEnum (red(0))
 
 
-	myIntVal INTEGER ::= 4
-	myEnumVar MyEnum ::= red(0)
-	myEnumVar2 MyEnum ::= red(0)
+    myIntVal INTEGER  ::= 4
+    --PER:0104
+
+    myEnumVar MyEnum ::= red(0)
+    --PER:00
+
+    myEnumVar2 MyEnum ::= red(0)
+    --PER:00
+
 
 END

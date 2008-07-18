@@ -5,9 +5,11 @@ EXPORTS
 	sos;
 
 
-	MorseCodeAlphabet ::= IA5String (FROM (("."|"-")))
+    MorseCodeAlphabet ::= IA5String (FROM (("." | "-")))--SIZE [0..MAX]FROM ["-."]--
 
 
-	sos MorseCodeAlphabet ::= "...---..."
+    sos MorseCodeAlphabet ::= "...---..."
+    --PER:09E380
+
 
 END

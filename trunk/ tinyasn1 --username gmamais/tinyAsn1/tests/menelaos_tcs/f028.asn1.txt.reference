@@ -4,12 +4,12 @@ EXPORTS
 	A;
 
 
-	A ::= SEQUENCE {
-		one [0] IMPLICIT INTEGER ,
-		two [1] IMPLICIT INTEGER ,
-		three [2] IMPLICIT INTEGER ,
-		ten [3] IMPLICIT INTEGER 
-	}
+    A ::= SEQUENCE {
+        one [0] IMPLICIT INTEGER ,
+        two [1] IMPLICIT INTEGER ,
+        three [2] IMPLICIT INTEGER ,
+        ten [3] IMPLICIT INTEGER 
+    }
 
 
 

@@ -5,24 +5,26 @@ EXPORTS
 	myvalue;
 
 
-	MySeq ::= SET {
-		a4 INTEGER ,
-		s4 OCTET STRING,
-		myNestedSeq1 SET {
-			a4 INTEGER ,
-			s4 OCTET STRING,
-			myNestedSeq1 SET {
-				a4 INTEGER ,
-				s4 OCTET STRING,
-				myNestedSeq1 SET {
-					a4 INTEGER ,
-					s4 OCTET STRING
-				}
-			}
-		}
-	}
+    MySeq ::= SET {
+        a4 INTEGER ,
+        s4 OCTET STRING,
+        myNestedSeq1 SET {
+            a4 INTEGER ,
+            s4 OCTET STRING,
+            myNestedSeq1 SET {
+                a4 INTEGER ,
+                s4 OCTET STRING,
+                myNestedSeq1 SET {
+                    a4 INTEGER ,
+                    s4 OCTET STRING
+                }
+            }
+        }
+    }
 
 
-	myvalue INTEGER ::= 10
+    myvalue INTEGER  ::= 10
+    --PER:010A
+
 
 END

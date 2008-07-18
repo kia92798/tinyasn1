@@ -5,12 +5,12 @@ EXPORTS
 	MITSOS;
 
 
-	ExoticString ::= IA5String ((SIZE (1..4)|FROM ("abc")))
+    ExoticString ::= IA5String ((SIZE (1..4) | FROM ("abc")))--SIZE [0..MAX]--
 
-	MITSOS ::= SEQUENCE {
-		a [0] IMPLICIT ExoticString DEFAULT "ababcabbaccc",
-		b [1] IMPLICIT ExoticString DEFAULT "HAXH"
-	}
+    MITSOS ::= SEQUENCE {
+        a [0] IMPLICIT ExoticString DEFAULT "ababcabbaccc",
+        b [1] IMPLICIT ExoticString DEFAULT "HAXH"
+    }
 
 
 

@@ -4,7 +4,9 @@ EXPORTS
 	MyType;
 
 
-	MyType ::= [PRIVATE 1] EXPLICIT INTEGER 
+    ---- Tagging
+
+    MyType ::= [PRIVATE 1] EXPLICIT INTEGER 
 
 
 

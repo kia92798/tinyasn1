@@ -6,12 +6,14 @@ EXPORTS
 	oi2;
 
 
-	OI ::= OBJECT IDENTIFIER
+    OI ::= OBJECT IDENTIFIER
 
-	OI2 ::= OI
+    OI2 ::= OI
 
 
-	oi2 OI2 ::= {itu-t(0) recommendation(0) b(2) 5  }
+    oi2 OI2 ::= {itu-t(0) recommendation(0) b(2) 5  }
+    --PER:0180
+
 
 END
 MY-MODULE2 DEFINITIONS AUTOMATIC TAGS  ::=
@@ -22,7 +24,11 @@ EXPORTS
 
 
 
-	myIntVar INTEGER ::= 5
-	oi1 OBJECT IDENTIFIER ::= {itu-t(0) recommendation(0) b(2)  }
+    myIntVar INTEGER  ::= 5
+    --PER:0105
+
+    oi1 OBJECT IDENTIFIER ::= {itu-t(0) recommendation(0) b(2)  }
+    --PER:00
+
 
 END

@@ -6,11 +6,13 @@ EXPORTS
 	matrix;
 
 
-	IntegerMatrix ::= SEQUENCE (SIZE (2)) OF SEQUENCE OF INTEGER  (1..10)
+    IntegerMatrix ::= SEQUENCE (SIZE (2))--SIZE [2..2]-- OF SEQUENCE OF INTEGER  (1..10)--[1..10]--
 
-	CM ::= IntegerMatrix (WITH COMPONENT (SIZE (3)))
+    CM ::= IntegerMatrix (WITH COMPONENT (SIZE (3)))--SIZE [2..2]--
 
 
-	matrix CM ::= { { 5, 1,2 },{ 10, 10, 5,10 } }
+    matrix CM ::= { { 5, 1,2 },{ 10, 10, 5,10 } }
+    --PER:Invalid!!!
+
 
 END

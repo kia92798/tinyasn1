@@ -5,9 +5,11 @@ EXPORTS
 	setOfNumbers;
 
 
-	SetOfNumbers ::= SET  OF INTEGER 
+    SetOfNumbers ::= SET  OF INTEGER 
 
 
-	setOfNumbers SetOfNumbers ::= { 32, 23, 5, 6,7 }
+    setOfNumbers SetOfNumbers ::= { 32, 23, 5, 6,7 }
+    --PER:0501200117010501060107
+
 
 END

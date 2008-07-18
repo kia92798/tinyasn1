@@ -5,9 +5,11 @@ EXPORTS
 	anInteger;
 
 
-	StrangeIntegerType ::= SEQUENCE OF INTEGER  ((1..100^30..1050))
+    StrangeIntegerType ::= SEQUENCE OF INTEGER  ((1..100 ^ 30..1050))--[30..100]--
 
 
-	anInteger StrangeIntegerType ::= {50 }
+    anInteger StrangeIntegerType ::= {50 }
+    --PER:0128
+
 
 END

@@ -5,9 +5,11 @@ EXPORTS
 	anInteger;
 
 
-	StrangeIntegerType ::= SEQUENCE OF INTEGER  ((1..3|5|12))
+    StrangeIntegerType ::= SEQUENCE OF INTEGER  ((1..3 | 5 | 12))--[1..12]--
 
 
-	anInteger StrangeIntegerType ::= {12 }
+    anInteger StrangeIntegerType ::= {12 }
+    --PER:01B0
+
 
 END

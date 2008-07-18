@@ -5,9 +5,11 @@ EXPORTS
 	myvar;
 
 
-	MyVar ::= SEQUENCE (SIZE (4..10)) OF INTEGER 
+    MyVar ::= SEQUENCE (SIZE (4..10))--SIZE [4..10]-- OF INTEGER 
 
 
-	myvar MyVar ::= { 1, 1, 4, 5, 5, 6,6 }
+    myvar MyVar ::= { 1, 1, 4, 5, 5, 6,6 }
+    --PER:6020202020208020A020A020C020C0
+
 
 END

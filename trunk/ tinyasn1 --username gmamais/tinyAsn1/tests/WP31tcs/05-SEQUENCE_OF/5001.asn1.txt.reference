@@ -4,7 +4,7 @@ EXPORTS
 	MyVar;
 
 
-	MyVar ::= SEQUENCE OF INTEGER 
+    MyVar ::= SEQUENCE OF INTEGER 
 
 
 

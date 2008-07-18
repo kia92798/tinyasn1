@@ -7,12 +7,16 @@ EXPORTS
 	aNumber;
 
 
-	CapitalLettersOrMorse ::= IA5String (FROM (("-"|"."|"A".."Z")))
+    CapitalLettersOrMorse ::= IA5String (FROM (("-" | "." | "A".."Z")))--SIZE [0..MAX]FROM ["-.ABCDEFGHIJKLMNOPQRSTUVWXYZ"]--
 
-	TelephoneNumbers ::= IA5String (FROM (("0".."9"|"#"|"*")))
+    TelephoneNumbers ::= IA5String (FROM (("0".."9" | "#" | "*")))--SIZE [0..MAX]FROM ["#*0123456789"]--
 
 
-	aStringOfCapitalLettersAndSOS CapitalLettersOrMorse ::= "ABCXYZ...---..."
-	aNumber TelephoneNumbers ::= "2102342##*"
+    aStringOfCapitalLettersAndSOS CapitalLettersOrMorse ::= "ABCXYZ...---..."
+    --PER:0F10C99D6C210800008420
+
+    aNumber TelephoneNumbers ::= "2102342##*"
+    --PER:0A4324564001
+
 
 END

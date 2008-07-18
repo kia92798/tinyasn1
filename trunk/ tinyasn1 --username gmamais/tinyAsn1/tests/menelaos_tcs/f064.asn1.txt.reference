@@ -5,9 +5,11 @@ EXPORTS
 	shortBinNumString;
 
 
-	ShortBinaryNumericStrings ::= NumericString (FROM (("0"|"1")))(SIZE (1..5))
+    ShortBinaryNumericStrings ::= NumericString (FROM (("0" | "1")))(SIZE (1..5))--SIZE [1..5]FROM ["01"]--
 
 
-	shortBinNumString ShortBinaryNumericStrings ::= "0101"
+    shortBinNumString ShortBinaryNumericStrings ::= "0101"
+    --PER:6A
+
 
 END

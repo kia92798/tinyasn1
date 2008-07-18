@@ -5,9 +5,9 @@ EXPORTS
 	PeculiarOctetBitString;
 
 
-	AnIntegerType ::= INTEGER 
+    AnIntegerType ::= INTEGER 
 
-	PeculiarOctetBitString ::=  BIT STRING (SIZE (3..8))
+    PeculiarOctetBitString ::=  BIT STRING (SIZE (3..8))--SIZE [3..8]--
 
 
 

@@ -8,15 +8,15 @@ EXPORTS
 	MoreConstrainedC;
 
 
-	AnIntegerType ::= INTEGER 
+    AnIntegerType ::= INTEGER 
 
-	ARangeConstrainedInteger ::= AnIntegerType (1..10)
+    ARangeConstrainedInteger ::= AnIntegerType (1..10)--[1..10]--
 
-	MoreConstrained ::= ARangeConstrainedInteger (2..MAX)
+    MoreConstrained ::= ARangeConstrainedInteger (2..MAX)--[2..10]--
 
-	MoreConstrainedB ::= MoreConstrained (MIN..7)
+    MoreConstrainedB ::= MoreConstrained (MIN..7)--[2..7]--
 
-	MoreConstrainedC ::= MoreConstrainedB (MIN..MAX)
+    MoreConstrainedC ::= MoreConstrainedB (MIN..MAX)--[2..7]--
 
 
 

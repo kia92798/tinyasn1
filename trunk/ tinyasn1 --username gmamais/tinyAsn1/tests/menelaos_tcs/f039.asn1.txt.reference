@@ -6,11 +6,11 @@ EXPORTS
 	ConstrainedList;
 
 
-	AnIntegerType ::= INTEGER 
+    AnIntegerType ::= INTEGER 
 
-	AListOfIntegers ::= SEQUENCE OF AnIntegerType
+    AListOfIntegers ::= SEQUENCE OF AnIntegerType
 
-	ConstrainedList ::= AListOfIntegers (SIZE (2..10))
+    ConstrainedList ::= AListOfIntegers (SIZE (2..10))--SIZE [2..10]--
 
 
 

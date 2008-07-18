@@ -4,11 +4,11 @@ EXPORTS
 	MySeq;
 
 
-	MySeq ::= SEQUENCE {
-		a1 INTEGER ,
-		s1 OCTET STRING
-		,...!5
-	}
+    MySeq ::= SEQUENCE {
+        a1 INTEGER ,
+        s1 OCTET STRING
+        ,...!5
+    }
 
 
 

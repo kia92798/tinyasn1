@@ -5,15 +5,17 @@ EXPORTS
 	client;
 
 
-	Client ::= SEQUENCE {
-		name [0] IMPLICIT IA5String,
-		surname [1] IMPLICIT IA5String,
-		street [2] IMPLICIT IA5String,
-		number [3] IMPLICIT INTEGER ,
-		age [4] IMPLICIT INTEGER 
-	}
+    Client ::= SEQUENCE {
+        name [0] IMPLICIT IA5String,
+        surname [1] IMPLICIT IA5String,
+        street [2] IMPLICIT IA5String,
+        number [3] IMPLICIT INTEGER ,
+        age [4] IMPLICIT INTEGER 
+    }
 
 
-	client Client ::= { name "John", surname "Smith", street "Baker", number 122, age 23 }
+    client Client ::= { name "John", surname "Smith", street "Baker", number 122, age 23 }
+    --PER:0495BF46E05A7B74F4D00B0B0EBCBC805E8045C0
+
 
 END

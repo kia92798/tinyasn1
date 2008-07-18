@@ -5,9 +5,9 @@ EXPORTS
 	DigitBlock;
 
 
-	TextBlock ::= [1] EXPLICIT SEQUENCE OF IA5String
+    TextBlock ::= [1] EXPLICIT SEQUENCE OF IA5String
 
-	DigitBlock ::= [2] EXPLICIT TextBlock (WITH COMPONENT (NumericString))
+    DigitBlock ::= [2] EXPLICIT TextBlock (WITH COMPONENT (NumericString))--SIZE [0..MAX]--
 
 
 

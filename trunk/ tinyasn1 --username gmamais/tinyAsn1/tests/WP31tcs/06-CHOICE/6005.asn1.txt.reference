@@ -4,11 +4,11 @@ EXPORTS
 	MyType;
 
 
-	MyType ::= CHOICE {
-		a1 [10] EXPLICIT INTEGER ,
-		a2 [11] EXPLICIT INTEGER 
-		,...!5
-	}
+    MyType ::= CHOICE {
+        a1 [10] EXPLICIT INTEGER ,
+        a2 [11] EXPLICIT INTEGER 
+        ,...!5
+    }
 
 
 

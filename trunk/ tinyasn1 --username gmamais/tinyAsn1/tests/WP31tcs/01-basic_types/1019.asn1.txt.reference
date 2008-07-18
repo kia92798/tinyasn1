@@ -10,15 +10,29 @@ EXPORTS
 	ahead-time;
 
 
-	Now ::= GeneralizedTime
+    ---- local hour:
 
-	Utc ::= [101] EXPLICIT GeneralizedTime
+    Now ::= GeneralizedTime
+
+    ---- UTC hour:
+
+    Utc ::= [101] EXPLICIT GeneralizedTime
 
 
-	now Now ::= "19980528142905.1"
-	now2 Now ::= "19980528142905,1"
-	utc-time Utc ::= "1998052814Z"
-	utc-time2 Utc ::= "199805281429Z"
-	ahead-time Utc ::= "199805281629+0200"
+    now Now ::= "19980528142905.1"
+    --PER:1062E5CB860D593862D193960D5731
+
+    now2 Now ::= "19980528142905,1"
+    --PER:1062E5CB860D593862D193960D5631
+
+    utc-time Utc ::= "1998052814Z"
+    --PER:0B62E5CB860D593862D2D0
+
+    utc-time2 Utc ::= "199805281429Z"
+    --PER:0D62E5CB860D593862D1939B40
+
+    ahead-time Utc ::= "199805281629+0200"
+    --PER:1162E5CB860D593862D993956C193060
+
 
 END

@@ -5,9 +5,9 @@ EXPORTS
 	Str2;
 
 
-	Str1 ::= IA5String
+    Str1 ::= IA5String
 
-	Str2 ::= Str1 (SIZE ((MIN..20|25..30)))
+    Str2 ::= Str1 (SIZE ((MIN..20 | 25..30)))--SIZE [0..30]--
 
 
 

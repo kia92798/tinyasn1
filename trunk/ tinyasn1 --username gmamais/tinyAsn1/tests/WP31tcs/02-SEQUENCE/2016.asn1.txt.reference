@@ -5,12 +5,14 @@ EXPORTS
 	mySeqValue;
 
 
-	MySeq ::= SEQUENCE {
-		a1 INTEGER ,
-		s1 OCTET STRING
-	}
+    MySeq ::= SEQUENCE {
+        a1 INTEGER ,
+        s1 OCTET STRING
+    }
 
 
-	mySeqValue MySeq ::= { a1 10, s1 'A10F'H }
+    mySeqValue MySeq ::= { a1 10, s1 'A10F'H }
+    --PER:010A02A10F
+
 
 END

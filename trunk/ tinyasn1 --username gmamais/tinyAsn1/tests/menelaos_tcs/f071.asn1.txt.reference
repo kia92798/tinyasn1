@@ -6,10 +6,14 @@ EXPORTS
 	exoticStringB;
 
 
-	ExoticStringType ::= IA5String ((SIZE (1..5)|FROM ("abcd")))
+    ExoticStringType ::= IA5String ((SIZE (1..5) | FROM ("abcd")))--SIZE [0..MAX]--
 
 
-	exoticStringA ExoticStringType ::= "abacdadaadadadadada"
-	exoticStringB ExoticStringType ::= "floor"
+    exoticStringA ExoticStringType ::= "abacdadaadadadadada"
+    --PER:13C38B0E3C987261C3930E4C3930E4C39308
+
+    exoticStringB ExoticStringType ::= "floor"
+    --PER:05CDB37EFE40
+
 
 END

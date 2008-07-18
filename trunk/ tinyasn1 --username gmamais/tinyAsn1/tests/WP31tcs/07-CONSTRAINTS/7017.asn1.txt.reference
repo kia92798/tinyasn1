@@ -4,7 +4,7 @@ EXPORTS
 	Str;
 
 
-	Str ::= IA5String (FROM ("A".."Z"))
+    Str ::= IA5String (FROM ("A".."Z"))--SIZE [0..MAX]FROM ["ABCDEFGHIJKLMNOPQRSTUVWXYZ"]--
 
 
 

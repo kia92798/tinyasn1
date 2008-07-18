@@ -5,9 +5,11 @@ EXPORTS
 	myRealVal;
 
 
-	MyReal ::= REAL
+    MyReal ::= REAL
 
 
-	myRealVal REAL ::= 3.14
+    myRealVal REAL ::= 3.14
+    --PER:0980CD191EB851EB851F
+
 
 END

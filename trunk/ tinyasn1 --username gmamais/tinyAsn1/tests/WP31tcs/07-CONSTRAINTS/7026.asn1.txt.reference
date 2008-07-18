@@ -5,18 +5,18 @@ EXPORTS
 	Quadruple1;
 
 
-	Quadruple ::= SEQUENCE {
-		alpha ENUMERATED {
-			state1(0),
-			state2(1),
-			state3(2)
-		},
-		beta IA5String OPTIONAL,
-		gamma SEQUENCE OF INTEGER ,
-		delta BOOLEAN DEFAULT TRUE
-	}
+    Quadruple ::= SEQUENCE {
+        alpha ENUMERATED {
+            state1(0),
+            state2(1),
+            state3(2)
+        },
+        beta IA5String OPTIONAL,
+        gamma SEQUENCE OF INTEGER ,
+        delta BOOLEAN DEFAULT TRUE
+    }
 
-	Quadruple1 ::= Quadruple (WITH COMPONENTS {..., alpha (state1(0)), gamma (SIZE (5))})
+    Quadruple1 ::= Quadruple (WITH COMPONENTS {..., alpha (state1(0)), gamma (SIZE (5))})
 
 
 

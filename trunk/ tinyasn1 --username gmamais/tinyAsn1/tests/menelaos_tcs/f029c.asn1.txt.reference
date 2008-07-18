@@ -9,37 +9,39 @@ EXPORTS
 	TradeOccupation;
 
 
-	Ten ::= INTEGER  (10)
+    Ten ::= INTEGER  (10)--[10..10]--
 
-	StreetAddress ::= IA5String ("K. Tsaldari 62")
+    StreetAddress ::= IA5String ("K. Tsaldari 62")--SIZE [0..MAX]--
 
-	Months ::= ENUMERATED {
-		january(1),
-		february(2),
-		march(3),
-		april(4),
-		may(5),
-		june(6),
-		july(7),
-		august(8),
-		september(9),
-		october(10),
-		november(11),
-		december(12)
-	}
+    Months ::= ENUMERATED {
+        january(1),
+        february(2),
+        march(3),
+        april(4),
+        may(5),
+        june(6),
+        july(7),
+        august(8),
+        september(9),
+        october(10),
+        november(11),
+        december(12)
+    }
 
-	January ::= Months (january(1))
+    January ::= Months (january(1))
 
-	Occupation ::= CHOICE {
-		calling [0] IMPLICIT IA5String,
-		trade [1] IMPLICIT ENUMERATED {
-			plumber(1),
-			carpenter(2),
-			builder(3)
-		}
-	}
+    Occupation ::= CHOICE {
+        calling [0] IMPLICIT IA5String,
+        trade [1] IMPLICIT ENUMERATED {
+            plumber(1),
+            carpenter(2),
+            builder(3)
+        }
+    }
 
-	TradeOccupation ::= Occupation (trade:builder(3))
+    ----CallingOccupation ::= Occupation (calling: "writing")
+
+    TradeOccupation ::= Occupation (trade:builder(3))
 
 
 

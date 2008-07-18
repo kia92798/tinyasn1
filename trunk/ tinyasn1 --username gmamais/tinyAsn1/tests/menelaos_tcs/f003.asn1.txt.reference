@@ -4,10 +4,10 @@ EXPORTS
 	TagClash;
 
 
-	TagClash ::= CHOICE {
-		cheese [0] IMPLICIT IA5String,
-		dessert [1] IMPLICIT IA5String
-	}
+    TagClash ::= CHOICE {
+        cheese [0] IMPLICIT IA5String,
+        dessert [1] IMPLICIT IA5String
+    }
 
 
 

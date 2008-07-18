@@ -4,7 +4,7 @@ EXPORTS
 	Str;
 
 
-	Str ::= IA5String (("ABCD"|SIZE (4)))
+    Str ::= IA5String (("ABCD" | SIZE (4)))--SIZE [0..MAX]--
 
 
 

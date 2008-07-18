@@ -6,10 +6,12 @@ EXPORTS
 	myIntVal3;
 
 
-	MyInt3 ::= [APPLICATION 1003] IMPLICIT MyInt2
+    MyInt3 ::= [APPLICATION 1003] IMPLICIT MyInt2
 
 
-	myIntVal3 MyInt3 ::= 1
+    myIntVal3 MyInt3 ::= 1
+    --PER:0101
+
 
 END
 MY-MODULE2 DEFINITIONS AUTOMATIC TAGS  ::=
@@ -21,16 +23,20 @@ EXPORTS
 	myIntVal3;
 
 
-	MyInt2 ::= [APPLICATION 1001] IMPLICIT INTEGER {
-		ab(1),
-		ac(3),
-		ad(4)
-	}
+    MyInt2 ::= [APPLICATION 1001] IMPLICIT INTEGER {
+        ab(1),
+        ac(3),
+        ad(4)
+    }
 
-	MyInt3 ::= [APPLICATION 1003] IMPLICIT MyInt2
+    MyInt3 ::= [APPLICATION 1003] IMPLICIT MyInt2
 
 
-	myIntVal INTEGER ::= 4
-	myIntVal3 MyInt3 ::= 1
+    myIntVal INTEGER  ::= 4
+    --PER:0104
+
+    myIntVal3 MyInt3 ::= 1
+    --PER:0101
+
 
 END

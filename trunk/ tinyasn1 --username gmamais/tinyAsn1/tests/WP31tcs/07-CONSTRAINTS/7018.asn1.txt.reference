@@ -5,9 +5,9 @@ EXPORTS
 	Str1;
 
 
-	Str ::= IA5String (FROM ("A".."Z"))
+    Str ::= IA5String (FROM ("A".."Z"))--SIZE [0..MAX]FROM ["ABCDEFGHIJKLMNOPQRSTUVWXYZ"]--
 
-	Str1 ::= Str (FROM (("A".."Z"|"a".."z")))
+    Str1 ::= Str (FROM (("A".."Z" | "a".."z")))--SIZE [0..MAX]FROM ["ABCDEFGHIJKLMNOPQRSTUVWXYZ"]--
 
 
 

@@ -6,10 +6,14 @@ EXPORTS
 	anInteger2;
 
 
-	StrangeIntegerType ::= SEQUENCE OF INTEGER  (1..100 EXCEPT (30..40))
+    StrangeIntegerType ::= SEQUENCE OF INTEGER  (1..100 EXCEPT (30..40))--[1..100]--
 
 
-	anInteger StrangeIntegerType ::= {50 }
-	anInteger2 StrangeIntegerType ::= {30 }
+    anInteger StrangeIntegerType ::= {50 }
+    --PER:0162
+
+    anInteger2 StrangeIntegerType ::= {30 }
+    --PER:Invalid!!!
+
 
 END

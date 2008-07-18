@@ -6,10 +6,16 @@ EXPORTS
 	other-ten;
 
 
-	Int3 ::= INTEGER  (MIN..10)
+    ---- Means (0..10)
+
+    Int3 ::= INTEGER  (MIN..10)--[MIN..10]--
 
 
-	ten INTEGER ::= 10
-	other-ten INTEGER ::= 10
+    ten INTEGER  ::= 10
+    --PER:010A
+
+    other-ten INTEGER  ::= 10
+    --PER:010A
+
 
 END

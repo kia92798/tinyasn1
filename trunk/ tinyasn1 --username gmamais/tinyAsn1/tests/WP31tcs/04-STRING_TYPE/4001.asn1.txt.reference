@@ -7,13 +7,13 @@ EXPORTS
 	MyVr4;
 
 
-	MyVr ::= IA5String
+    MyVr ::= IA5String
 
-	MyVr2 ::= [100] EXPLICIT IA5String (SIZE (5))
+    MyVr2 ::= [100] EXPLICIT IA5String (SIZE (5))--SIZE [5..5]--
 
-	MyVr3 ::= [101] EXPLICIT IA5String (SIZE (5..10))
+    MyVr3 ::= [101] EXPLICIT IA5String (SIZE (5..10))--SIZE [5..10]--
 
-	MyVr4 ::= [102] EXPLICIT IA5String (FROM ("A".."Z"))
+    MyVr4 ::= [102] EXPLICIT IA5String (FROM ("A".."Z"))--SIZE [0..MAX]FROM ["ABCDEFGHIJKLMNOPQRSTUVWXYZ"]--
 
 
 

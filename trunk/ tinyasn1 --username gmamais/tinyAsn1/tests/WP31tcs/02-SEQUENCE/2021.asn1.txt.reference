@@ -4,12 +4,12 @@ EXPORTS
 	Type;
 
 
-	Type ::= SEQUENCE {
-		other SEQUENCE {
-			member-1 INTEGER ,
-			member-2 NumericString
-		} DEFAULT { member-1 5, member-2 "123" }
-	}
+    Type ::= SEQUENCE {
+        other SEQUENCE {
+            member-1 INTEGER ,
+            member-2 NumericString
+        } DEFAULT { member-1 5, member-2 "123" }
+    }
 
 
 

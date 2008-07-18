@@ -7,13 +7,15 @@ EXPORTS
 	myIntVae;
 
 
-	MyInt3 ::= REAL (WITH COMPONENTS {mantissa (-1000..100), base (2), exponent (-10..10)})
+    MyInt3 ::= REAL (WITH COMPONENTS {mantissa (-1000..100), base (2), exponent (-10..10)})
 
-	MyInt ::= INTEGER  (1..1000)
+    MyInt ::= INTEGER  (1..1000)--[1..1000]--
 
-	MyInt2 ::= MyInt (5..200)
+    MyInt2 ::= MyInt (5..200)--[5..200]--
 
 
-	myIntVae MyInt2 ::= 100
+    myIntVae MyInt2 ::= 100
+    --PER:5F
+
 
 END

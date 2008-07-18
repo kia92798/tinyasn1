@@ -4,7 +4,7 @@ EXPORTS
 	Int;
 
 
-	Int ::= INTEGER  (5..MAX,...,1..4!100)
+    Int ::= INTEGER  (5..MAX,...,1..4!100)--[5..MAX,...,1..4]--
 
 
 

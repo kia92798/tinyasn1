@@ -4,7 +4,7 @@ EXPORTS
 	MyBitString;
 
 
-	MyBitString ::=  BIT STRING (SIZE (5..15))
+    MyBitString ::=  BIT STRING (SIZE (5..15))--SIZE [5..15]--
 
 
 

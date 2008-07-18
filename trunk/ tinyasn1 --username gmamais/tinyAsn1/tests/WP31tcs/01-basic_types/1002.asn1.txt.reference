@@ -5,9 +5,11 @@ EXPORTS
 	myNullVal;
 
 
-	MyNull ::= NULL
+    MyNull ::= NULL
 
 
-	myNullVal NULL ::= NULL
+    myNullVal NULL ::= NULL
+    --PER:
+
 
 END

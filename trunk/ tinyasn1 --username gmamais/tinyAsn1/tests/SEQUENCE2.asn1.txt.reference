@@ -4,10 +4,10 @@ EXPORTS
 	MySQ0;
 
 
-	MySQ0 ::= SEQUENCE {
-		int1 [0] IMPLICIT INTEGER ,
-		int2 [1] IMPLICIT INTEGER 
-	}
+    MySQ0 ::= SEQUENCE {
+        int1 [0] IMPLICIT INTEGER ,
+        int2 [1] IMPLICIT INTEGER 
+    }
 
 
 

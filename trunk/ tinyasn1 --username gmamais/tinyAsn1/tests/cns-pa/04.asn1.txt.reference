@@ -5,12 +5,12 @@ EXPORTS
 	MITSOS;
 
 
-	MyStr ::= IA5String ((FROM ("A".."Z")|FROM ("a".."z")))
+    MyStr ::= IA5String ((FROM ("A".."Z") | FROM ("a".."z")))--SIZE [0..MAX]FROM ["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"]--
 
-	MITSOS ::= SEQUENCE {
-		a [0] IMPLICIT MyStr DEFAULT "THANASSIS",
-		b [1] IMPLICIT MyStr DEFAULT "thanassis"
-	}
+    MITSOS ::= SEQUENCE {
+        a [0] IMPLICIT MyStr DEFAULT "THANASSIS",
+        b [1] IMPLICIT MyStr DEFAULT "thanassis"
+    }
 
 
 

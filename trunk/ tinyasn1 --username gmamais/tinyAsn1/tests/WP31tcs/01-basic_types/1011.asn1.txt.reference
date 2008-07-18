@@ -6,10 +6,14 @@ EXPORTS
 	myBitStrVal2;
 
 
-	MyBitString ::=  BIT STRING
+    MyBitString ::=  BIT STRING
 
 
-	myBitStrVal BIT STRING ::= '101101'B
-	myBitStrVal2 BIT STRING ::= '101011111100000100011101'B
+    myBitStrVal  BIT STRING ::= '101101'B
+    --PER:06B4
+
+    myBitStrVal2  BIT STRING ::= '101011111100000100011101'B
+    --PER:18AFC11D
+
 
 END

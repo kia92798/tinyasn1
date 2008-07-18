@@ -5,13 +5,15 @@ EXPORTS
 	myIntVal2;
 
 
-	MyInt2 ::= INTEGER {
-		one(1),
-		two(2),
-		minusone(-1)
-	}
+    MyInt2 ::= INTEGER {
+        one(1),
+        two(2),
+        minusone(-1)
+    }
 
 
-	myIntVal2 MyInt2 ::= 1
+    myIntVal2 MyInt2 ::= 1
+    --PER:0101
+
 
 END

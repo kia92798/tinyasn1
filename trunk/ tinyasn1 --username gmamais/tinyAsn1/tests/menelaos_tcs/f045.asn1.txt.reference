@@ -5,9 +5,11 @@ EXPORTS
 	aStringOfCapitalLettersAndSOS;
 
 
-	CapitalLettersOrMorse ::= IA5String (FROM ("ABCDEFGHIJKLMNOPQRSTUVXWYZ.-"))
+    CapitalLettersOrMorse ::= IA5String (FROM ("ABCDEFGHIJKLMNOPQRSTUVXWYZ.-"))--SIZE [0..MAX]FROM ["ABCDEFGHIJKLMNOPQRSTUVXWYZ.-"]--
 
 
-	aStringOfCapitalLettersAndSOS CapitalLettersOrMorse ::= "ABCXYZ...---..."
+    aStringOfCapitalLettersAndSOS CapitalLettersOrMorse ::= "ABCXYZ...---..."
+    --PER:0F00456C675AD6F7BD6B40
+
 
 END

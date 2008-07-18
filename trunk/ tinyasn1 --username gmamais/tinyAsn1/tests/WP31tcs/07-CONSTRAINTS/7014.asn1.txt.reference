@@ -4,7 +4,7 @@ EXPORTS
 	Str;
 
 
-	Str ::= IA5String (FROM ("AB"),...)
+    Str ::= IA5String (FROM ("AB"),...)--SIZE [0..MAX,...]--
 
 
 

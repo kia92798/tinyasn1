@@ -6,11 +6,13 @@ EXPORTS
 	shortWordLimit;
 
 
-	TextBlock ::= SEQUENCE OF IA5String
+    TextBlock ::= SEQUENCE OF IA5String
 
-	TextBlockOfShortWords ::= TextBlock (WITH COMPONENT (SIZE (1..5)))
+    TextBlockOfShortWords ::= TextBlock (WITH COMPONENT (SIZE (1..5)))--SIZE [0..MAX]--
 
 
-	shortWordLimit INTEGER ::= 5
+    shortWordLimit INTEGER  ::= 5
+    --PER:0105
+
 
 END

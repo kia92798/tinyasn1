@@ -5,9 +5,9 @@ EXPORTS
 	AddressBlock;
 
 
-	TextBlock ::= [1] EXPLICIT SEQUENCE OF IA5String
+    TextBlock ::= [1] EXPLICIT SEQUENCE OF IA5String
 
-	AddressBlock ::= [2] EXPLICIT TextBlock (WITH COMPONENT (SIZE (1..32)))
+    AddressBlock ::= [2] EXPLICIT TextBlock (WITH COMPONENT (SIZE (1..32)))--SIZE [0..MAX]--
 
 
 

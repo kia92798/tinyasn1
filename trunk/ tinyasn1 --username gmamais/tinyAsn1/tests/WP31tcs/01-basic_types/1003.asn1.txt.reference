@@ -5,9 +5,11 @@ EXPORTS
 	myIntVal;
 
 
-	MyInt ::= INTEGER 
+    MyInt ::= INTEGER 
 
 
-	myIntVal INTEGER ::= 12
+    myIntVal INTEGER  ::= 12
+    --PER:010C
+
 
 END

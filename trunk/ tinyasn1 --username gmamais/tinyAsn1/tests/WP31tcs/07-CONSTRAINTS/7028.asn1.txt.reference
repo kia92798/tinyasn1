@@ -5,14 +5,14 @@ EXPORTS
 	Choice2;
 
 
-	Choice ::= CHOICE {
-		a [1] EXPLICIT INTEGER ,
-		b [2] EXPLICIT INTEGER ,
-		c [3] EXPLICIT INTEGER ,
-		d [4] EXPLICIT INTEGER 
-	}
+    Choice ::= CHOICE {
+        a [1] EXPLICIT INTEGER ,
+        b [2] EXPLICIT INTEGER ,
+        c [3] EXPLICIT INTEGER ,
+        d [4] EXPLICIT INTEGER 
+    }
 
-	Choice2 ::= Choice (WITH COMPONENTS {a ABSENT, b ABSENT, c ABSENT, d ABSENT})
+    Choice2 ::= Choice (WITH COMPONENTS {a ABSENT, b ABSENT, c ABSENT, d ABSENT})
 
 
 

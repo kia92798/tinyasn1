@@ -4,7 +4,7 @@ EXPORTS
 	MyVr;
 
 
-	MyVr ::= NumericString
+    MyVr ::= NumericString
 
 
 

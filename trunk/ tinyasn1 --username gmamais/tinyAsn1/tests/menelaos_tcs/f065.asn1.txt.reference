@@ -5,9 +5,9 @@ EXPORTS
 	IntegerMatric;
 
 
-	IntegerSequence ::= SEQUENCE OF INTEGER 
+    IntegerSequence ::= SEQUENCE OF INTEGER 
 
-	IntegerMatric ::= SEQUENCE (SIZE (10)) OF IntegerSequence (SIZE (10))(WITH COMPONENT (-100..100))
+    IntegerMatric ::= SEQUENCE (SIZE (10))--SIZE [10..10]-- OF IntegerSequence (SIZE (10))(WITH COMPONENT (-100..100))--SIZE [10..10]--
 
 
 

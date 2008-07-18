@@ -6,20 +6,22 @@ EXPORTS
 	B;
 
 
-	MySQ0 ::= SET {
-		a [0] EXPLICIT A,
-		b [1] EXPLICIT B
-	}
+    ---- not tag glass thanks to AUTOMATIC TAGS
 
-	A ::= CHOICE {
-		d [0] IMPLICIT NULL,
-		e [1] IMPLICIT NULL
-	}
+    MySQ0 ::= SET {
+        a [0] EXPLICIT A,
+        b [1] EXPLICIT B
+    }
 
-	B ::= CHOICE {
-		d [0] IMPLICIT NULL,
-		e [1] IMPLICIT NULL
-	}
+    A ::= CHOICE {
+        d [0] IMPLICIT NULL,
+        e [1] IMPLICIT NULL
+    }
+
+    B ::= CHOICE {
+        d [0] IMPLICIT NULL,
+        e [1] IMPLICIT NULL
+    }
 
 
 

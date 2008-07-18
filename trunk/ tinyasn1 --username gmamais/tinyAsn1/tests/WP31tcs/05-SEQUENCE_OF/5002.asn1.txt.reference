@@ -5,9 +5,11 @@ EXPORTS
 	myvar;
 
 
-	MyVar ::= SEQUENCE OF INTEGER 
+    MyVar ::= SEQUENCE OF INTEGER 
 
 
-	myvar MyVar ::= { 1, 1, 4,5 }
+    myvar MyVar ::= { 1, 1, 4,5 }
+    --PER:040101010101040105
+
 
 END

@@ -5,9 +5,11 @@ EXPORTS
 	myBoolVal;
 
 
-	MyBool ::= BOOLEAN
+    MyBool ::= BOOLEAN
 
 
-	myBoolVal BOOLEAN ::= TRUE
+    myBoolVal BOOLEAN ::= TRUE
+    --PER:80
+
 
 END

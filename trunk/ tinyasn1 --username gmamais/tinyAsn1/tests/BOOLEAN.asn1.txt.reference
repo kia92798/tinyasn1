@@ -10,14 +10,26 @@ EXPORTS
 	mybool6;
 
 
-	MyBOOL ::= BOOLEAN
+    MyBOOL ::= BOOLEAN
 
 
-	mybool1 BOOLEAN ::= TRUE
-	mybool2 BOOLEAN ::= FALSE
-	mybool3 MyBOOL ::= TRUE
-	mybool4 MyBOOL ::= FALSE
-	mybool5 MyBOOL ::= FALSE
-	mybool6 MyBOOL ::= TRUE
+    mybool1 BOOLEAN ::= TRUE
+    --PER:80
+
+    mybool2 BOOLEAN ::= FALSE
+    --PER:00
+
+    mybool3 MyBOOL ::= TRUE
+    --PER:80
+
+    mybool4 MyBOOL ::= FALSE
+    --PER:00
+
+    mybool5 MyBOOL ::= FALSE
+    --PER:00
+
+    mybool6 MyBOOL ::= TRUE
+    --PER:80
+
 
 END

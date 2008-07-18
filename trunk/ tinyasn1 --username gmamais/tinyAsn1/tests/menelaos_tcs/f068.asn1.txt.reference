@@ -7,12 +7,16 @@ EXPORTS
 	aString;
 
 
-	StrangeIntegerType ::= SEQUENCE OF INTEGER  ((1..100^30..1050))
+    StrangeIntegerType ::= SEQUENCE OF INTEGER  ((1..100 ^ 30..1050))--[30..100]--
 
-	StrangeStringType ::= IA5String ((FROM ("abcdefg")^FROM ("fghijk")))
+    StrangeStringType ::= IA5String ((FROM ("abcdefg") ^ FROM ("fghijk")))--SIZE [0..MAX]FROM ["fg"]--
 
 
-	anInteger StrangeIntegerType ::= {50 }
-	aString StrangeStringType ::= "fgfgfg"
+    anInteger StrangeIntegerType ::= {50 }
+    --PER:0128
+
+    aString StrangeStringType ::= "fgfgfg"
+    --PER:0654
+
 
 END

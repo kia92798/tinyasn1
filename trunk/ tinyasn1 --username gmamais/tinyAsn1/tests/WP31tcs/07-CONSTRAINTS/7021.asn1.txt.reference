@@ -4,7 +4,7 @@ EXPORTS
 	SequenceOf;
 
 
-	SequenceOf ::= SEQUENCE (SIZE (1..2)) OF INTEGER 
+    SequenceOf ::= SEQUENCE (SIZE (1..2))--SIZE [1..2]-- OF INTEGER 
 
 
 
