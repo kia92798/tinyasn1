@@ -22,6 +22,7 @@ def Work(fname):
 	#sys.exit(res);
 
 
+
     cmd = 'ssh gmamais@192.168.0.145 "cd tinyAsn1/asn1cc.regression/oss && rm ossSample1.exe sample1.asn1  sample1.c sample1.h oss.per_out.dat"'
     print cmd
     res = os.system(cmd) / 256

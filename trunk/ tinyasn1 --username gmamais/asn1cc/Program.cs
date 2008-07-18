@@ -1,3 +1,15 @@
+/**=============================================================================
+Main program  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD application.
+See these sources for detailed information regarding the
+autoICD application.
+==============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -142,17 +154,20 @@ namespace asn1scc
             {
                 compInv.debug();
             }
-            try
+            else
             {
-                compInv.printC();
-                File.WriteAllText(DefaultBackend.m_outDirectory + "asn1crt.h", Properties.Resources.asn1crt);
-                File.WriteAllText(DefaultBackend.m_outDirectory + "asn1crt.c", Properties.Resources.asn1crt1);
-                File.WriteAllText(DefaultBackend.m_outDirectory + "real.c", Properties.Resources.real);
-            }
-            catch (SemanticErrorException ex)
-            {
-                Console.Error.WriteLine(ex.Message);
-                return 2;
+                try
+                {
+                    compInv.printC();
+                    File.WriteAllText(DefaultBackend.m_outDirectory + "asn1crt.h", Properties.Resources.asn1crt);
+                    File.WriteAllText(DefaultBackend.m_outDirectory + "asn1crt.c", Properties.Resources.asn1crt1);
+                    File.WriteAllText(DefaultBackend.m_outDirectory + "real.c", Properties.Resources.real);
+                }
+                catch (SemanticErrorException ex)
+                {
+                    Console.Error.WriteLine(ex.Message);
+                    return 2;
+                }
             }
 
             DefaultBackend.CheckRecursiveFuncSetIsEmpty();
@@ -163,13 +178,13 @@ namespace asn1scc
         {
             Console.Error.WriteLine();
             Console.Error.WriteLine("ASN.1 Space Certified Compiler");
-            Console.Error.WriteLine("Current Version is: 0.93");
+            Console.Error.WriteLine("Current Version is: 0.94");
             Console.Error.WriteLine("Usage:");
             Console.Error.WriteLine();
             Console.Error.WriteLine("asn1scc [-debug] [-typePrefix prefix] [-useSpecialComments] [-o outdir] file1, file2, ..., fileN ");
             Console.Error.WriteLine();
             Console.Error.WriteLine("\t -debug\t\t\tre-prints the AST using ASN.1.");
-            Console.Error.WriteLine("\t\t\t\tUseful only for debug purposes.");
+            Console.Error.WriteLine("\t\t\t\tUseful only for debug purposes. (No encoders/decoders are produced)");
             Console.Error.WriteLine();
             Console.Error.WriteLine("\t -typePrefix\t\tadds 'prefix' to all generated C data types.");
             Console.Error.WriteLine();

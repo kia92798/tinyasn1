@@ -3,3 +3,4 @@
 02-real/001.asn1 precision errors
 ./05-struct/006.asn1 (due to DEFAULT)
 ./12-set/006.asn1 (due to DEFAULT)
+./12-set/007.asn1 --> This is a known bug that appears in sets when no AUTOMATIC TAGs is used
