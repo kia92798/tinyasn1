@@ -23,7 +23,8 @@ namespace asn1scc
     {
         string PrintCIsConstraintValid(string varName, int lev);
         string PrintCIsRootConstraintValid(string varName, int lev);
-        void PrintCIsConstraintValidAux(StreamWriterLevel c);
+        void PrintCIsConstraintValidAux(string args, StreamWriterLevel c);
+        void PrintCIsConstraintValidAuxBody(StreamWriterLevel c);
     }
 
 	public class SCCExceptionSpec : ExceptionSpec	
@@ -44,7 +45,8 @@ namespace asn1scc
             return ((ISCConstraint)m_constr).PrintCIsConstraintValid(varName, lev);
         }
 
-		public void PrintCIsConstraintValidAux(StreamWriterLevel c) {}
+		public void PrintCIsConstraintValidAux(string args, StreamWriterLevel c) {}
+        public void PrintCIsConstraintValidAuxBody(StreamWriterLevel c) { }
     }
 
 	public class SCCUnionConstraint : UnionConstraint, ISCConstraint
@@ -70,8 +72,9 @@ namespace asn1scc
 			 throw new Exception("The method or operation is not implemented.");
 		}
 
-		public void PrintCIsConstraintValidAux(StreamWriterLevel c) {}
-	}
+		public void PrintCIsConstraintValidAux(string args, StreamWriterLevel c) {}
+        public void PrintCIsConstraintValidAuxBody(StreamWriterLevel c) { }
+    }
 
 	public class SCCAndConstraint : AndConstraint, ISCConstraint
 	{
@@ -96,8 +99,9 @@ namespace asn1scc
 			 throw new Exception("The method or operation is not implemented.");
 		}
 
-		public void PrintCIsConstraintValidAux(StreamWriterLevel c) {}
-	}
+		public void PrintCIsConstraintValidAux(string args, StreamWriterLevel c) {}
+        public void PrintCIsConstraintValidAuxBody(StreamWriterLevel c) { }
+    }
 
 	public class SCCExceptConstraint : ExceptConstraint, ISCConstraint
 	{
@@ -111,8 +115,9 @@ namespace asn1scc
 			 throw new Exception("The method or operation is not implemented.");
 		}
 
-		public void PrintCIsConstraintValidAux(StreamWriterLevel c) {}
-	}
+		public void PrintCIsConstraintValidAux(string args, StreamWriterLevel c) {}
+        public void PrintCIsConstraintValidAuxBody(StreamWriterLevel c) { }
+    }
 
 	public class SCCAllExceptConstraint : AllExceptConstraint, ISCConstraint
 	{
@@ -126,13 +131,18 @@ namespace asn1scc
 			 throw new Exception("The method or operation is not implemented.");
 		}
 
-		public void PrintCIsConstraintValidAux(StreamWriterLevel c) {}
-	}
+		public void PrintCIsConstraintValidAux(string args, StreamWriterLevel c) {}
+        public void PrintCIsConstraintValidAuxBody(StreamWriterLevel c) { }
+    }
 
 	public class SCCSingleValueConstraint : SingleValueConstraint, ISCConstraint
 	{
         public string PrintCIsConstraintValid(string varName, int lev)
         {
+            INonPrimitiveCType wscc = m_type as INonPrimitiveCType;
+            if (wscc!=null)
+                return wscc.CompareTo(varName, ConstraintValue);
+
             return "(" + varName + " == " + m_val.ToStringC() + ")";
         }
 
@@ -141,8 +151,9 @@ namespace asn1scc
 			 throw new Exception("The method or operation is not implemented.");
 		}
 
-		public void PrintCIsConstraintValidAux(StreamWriterLevel c) {}
-	}
+		public void PrintCIsConstraintValidAux(string args, StreamWriterLevel c) {}
+        public void PrintCIsConstraintValidAuxBody(StreamWriterLevel c) { }
+    }
 
 	public class SCCSinglePAValueConstraint : SinglePAValueConstraint, ISCConstraint
 	{
@@ -160,8 +171,9 @@ namespace asn1scc
 			 throw new Exception("The method or operation is not implemented.");
 		}
 
-		public void PrintCIsConstraintValidAux(StreamWriterLevel c) {}
-	}
+		public void PrintCIsConstraintValidAux(string args, StreamWriterLevel c) {}
+        public void PrintCIsConstraintValidAuxBody(StreamWriterLevel c) { }
+    }
 
 	public class SCCRangeConstraint : RangeConstraint, ISCConstraint
 	{
@@ -200,8 +212,9 @@ namespace asn1scc
 			 throw new Exception("The method or operation is not implemented.");
 		}
 
-		public void PrintCIsConstraintValidAux(StreamWriterLevel c) {}
-	}
+		public void PrintCIsConstraintValidAux(string args, StreamWriterLevel c) {}
+        public void PrintCIsConstraintValidAuxBody(StreamWriterLevel c) { }
+    }
 
 	public class SCCRangePAConstraint : RangePAConstraint, ISCConstraint
 	{
@@ -249,8 +262,9 @@ namespace asn1scc
 			 throw new Exception("The method or operation is not implemented.");
 		}
 
-		public void PrintCIsConstraintValidAux(StreamWriterLevel c) {}
-	}
+		public void PrintCIsConstraintValidAux(string args, StreamWriterLevel c) {}
+        public void PrintCIsConstraintValidAuxBody(StreamWriterLevel c) { }
+    }
 
 	public class SCCSizeConstraint : SizeConstraint, ISCConstraint
 	{
@@ -283,8 +297,9 @@ namespace asn1scc
 			 throw new Exception("The method or operation is not implemented.");
 		}
 
-		public void PrintCIsConstraintValidAux(StreamWriterLevel c) {}
-	}
+		public void PrintCIsConstraintValidAux(string args, StreamWriterLevel c) {}
+        public void PrintCIsConstraintValidAuxBody(StreamWriterLevel c) { }
+    }
 
 	public class SCCPermittedAlphabetConstraint : PermittedAlphabetConstraint, ISCConstraint
 	{
@@ -296,9 +311,16 @@ namespace asn1scc
 
         static int nCount = 0;
         int AuxFunctionID;
-        public void PrintCIsConstraintValidAux(StreamWriterLevel c)
+        public void PrintCIsConstraintValidAux(string args, StreamWriterLevel c)
         {
             nCount++;
+            AuxFunctionID = nCount;
+
+            c.WriteLine("flag CheckString{0}(const char* str);", AuxFunctionID);
+        }
+
+        public void PrintCIsConstraintValidAuxBody(StreamWriterLevel c)
+        {
             AuxFunctionID = nCount;
 
             c.WriteLine("flag CheckString{0}(const char* str)", AuxFunctionID);
@@ -313,7 +335,7 @@ namespace asn1scc
             c.Write("if (!");
             for (int i = 0; i < allowed_char_set.m_constraints.Count; i++)
             {
-                c.Write( ((ISCConstraint)allowed_char_set.m_constraints[i]).PrintCIsConstraintValid("str[i]", 0));
+                c.Write(((ISCConstraint)allowed_char_set.m_constraints[i]).PrintCIsConstraintValid("str[i]", 0));
                 if (i != allowed_char_set.m_constraints.Count - 1)
                     c.Write(" && ");
             }
@@ -344,22 +366,75 @@ namespace asn1scc
 			 throw new Exception("The method or operation is not implemented.");
 		}
 
-		public void PrintCIsConstraintValidAux(StreamWriterLevel c) {}
+		public void PrintCIsConstraintValidAux(string args, StreamWriterLevel c) {}
+        public void PrintCIsConstraintValidAuxBody(StreamWriterLevel c) { }
 	}
 
 	public class SCCWithComponentConstraint : WithComponentConstraint, ISCConstraint
 	{
-		public string PrintCIsConstraintValid(string varName, int lev)
-		{
-			 throw new Exception("The method or operation is not implemented.");
-		}
+
+
+
+        static int nCount = 0;
+        int AuxFunctionID;
+        string variableName = string.Empty;
+        string m_args = string.Empty;
+        public void PrintCIsConstraintValidAux(string args, StreamWriterLevel c)
+        {
+            nCount++;
+            AuxFunctionID = nCount;
+            m_args = args;
+            c.WriteLine("flag WithComponentAux{0}({1});", AuxFunctionID, args);
+        }
+        public void PrintCIsConstraintValidAuxBody(StreamWriterLevel c) 
+        {
+            c.WriteLine("flag WithComponentAux{0}({1})", AuxFunctionID, m_args);
+            c.WriteLine("{");
+            c.P(1); c.WriteLine("size_t i;");
+            c.P(1); c.WriteLine("size_t n = {0}nCount;", variableName);
+            c.P(1);
+            c.WriteLine("for(i=0;i<n;i++)");
+            c.P(1); c.WriteLine("{");
+
+            c.P(2);
+
+
+            string varName = variableName + "arr[i]";
+            
+            c.Write("if (!");
+
+            c.Write(((ISCConstraint)m_innerTypeConstraint).PrintCIsConstraintValid(varName, 0));
+
+            c.WriteLine(")");
+            c.P(3);
+            c.WriteLine("return FALSE;");
+            c.P(1); c.WriteLine("}");
+
+            c.P(1); c.WriteLine("return TRUE;");
+            c.WriteLine("}");
+        }
+
+        public string PrintCIsConstraintValid(string varName, int lev)
+        {
+
+            string varName2 = varName.Replace("*", "");
+            if (!varName.Contains("->"))
+                varName2 += "->";
+            else
+                varName2 += ".";
+
+            variableName = varName2;
+
+            return "WithComponentAux" + AuxFunctionID.ToString() + "(" + varName2.Substring(0,varName2.IndexOf("->")) + ")";
+        }
+
+
 
 		public string PrintCIsRootConstraintValid(string varName, int lev)
 		{
 			 throw new Exception("The method or operation is not implemented.");
 		}
 
-		public void PrintCIsConstraintValidAux(StreamWriterLevel c) {}
 	}
 
 	public class SCCWithComponentsConstraint : WithComponentsConstraint, ISCConstraint
@@ -374,8 +449,9 @@ namespace asn1scc
 			 throw new Exception("The method or operation is not implemented.");
 		}
 
-		public void PrintCIsConstraintValidAux(StreamWriterLevel c) {}
-	}
+		public void PrintCIsConstraintValidAux(string args, StreamWriterLevel c) {}
+        public void PrintCIsConstraintValidAuxBody(StreamWriterLevel c) { }
+    }
 
 	public class SCCWithComponentsConstraintComponent : WithComponentsConstraint.Component
 	{
@@ -386,7 +462,52 @@ namespace asn1scc
 	{
 		public string PrintCIsConstraintValid(string varName, int lev)
 		{
-			 throw new Exception("The method or operation is not implemented.");
+            string ret = "";
+
+            string varName2 = varName.Replace("*","");
+            if (!varName.Contains("->"))
+                varName2 += "->";
+            else
+                varName2 += ".";
+
+            // Check presence constraint
+            foreach (Component c in m_components.Values)
+            {
+
+                if (c.m_presenceConstraint == Component.PresenseConstraint.PRESENT)
+                {
+                    if (ret != "")
+                        ret += " && ";
+                    ret += varName2 +"exist." + C.ID(c.m_name);
+                }
+                if (c.m_presenceConstraint == Component.PresenseConstraint.ABSENT)
+                {
+                    if (ret != "")
+                        ret += " && ";
+                    ret += "!" + varName2 + "exist." + C.ID(c.m_name);
+                }
+            }
+
+
+            
+            //check value constraint
+            foreach (string id in this.Type.m_children.Keys)
+            {
+                Asn1Type v = this.Type.m_children[id].m_type;
+                if (m_components.ContainsKey(id))
+                {
+                    Component c = m_components[id];
+                    if (c.m_valueConstraint != null) 
+                    {
+                        if (ret != "")
+                            ret += " && ";
+                        ret += ((ISCConstraint)c.m_valueConstraint).PrintCIsConstraintValid(varName2 + C.ID(id), lev);
+                    }
+                }
+
+            }
+
+            return ret;
 		}
 
 		public string PrintCIsRootConstraintValid(string varName, int lev)
@@ -394,23 +515,70 @@ namespace asn1scc
 			 throw new Exception("The method or operation is not implemented.");
 		}
 
-		public void PrintCIsConstraintValidAux(StreamWriterLevel c) {}
-	}
+		public void PrintCIsConstraintValidAux(string args, StreamWriterLevel c) {}
+        public void PrintCIsConstraintValidAuxBody(StreamWriterLevel c) { }
+    }
 
 	public class SCCWithComponentsChConstraint : WithComponentsChConstraint, ISCConstraint
 	{
 		public string PrintCIsConstraintValid(string varName, int lev)
 		{
-			 throw new Exception("The method or operation is not implemented.");
-		}
+            string ret = "";
+
+            string varName2 = varName.Replace("*", "");
+            if (!varName.Contains("->"))
+                varName2 += "->";
+            else
+                varName2 += ".";
+
+            // Check presence constraint
+            foreach (Component c in m_components.Values)
+            {
+
+                if (c.m_presenceConstraint == Component.PresenseConstraint.PRESENT)
+                {
+                    if (ret != "")
+                        ret += " && ";
+                    ret += "("+ varName2 + "kind == " +  this.Type.m_children[c.m_name].CID +")";
+                }
+                if (c.m_presenceConstraint == Component.PresenseConstraint.ABSENT)
+                {
+                    if (ret != "")
+                        ret += " && ";
+                    ret += "("+varName2 + "kind != " + this.Type.m_children[c.m_name].CID+")";
+                }
+            }
+
+            //check value constraint
+            foreach (string id in this.Type.m_children.Keys)
+            {
+                Asn1Type v = this.Type.m_children[id].m_type;
+                if (m_components.ContainsKey(id))
+                {
+                    Component c = m_components[id];
+                    if (c.m_valueConstraint != null)
+                    {
+                        if (ret != "")
+                            ret += " && ";
+                        ret += "(" + varName2 + "kind == " + this.Type.m_children[c.m_name].CID + "?" +
+                            ((ISCConstraint)c.m_valueConstraint).PrintCIsConstraintValid(varName2 + "u." + C.ID(id), lev) + ":TRUE)";
+                    }
+                }
+
+            }
+
+
+            return ret;
+        }
 
 		public string PrintCIsRootConstraintValid(string varName, int lev)
 		{
 			 throw new Exception("The method or operation is not implemented.");
 		}
 
-		public void PrintCIsConstraintValidAux(StreamWriterLevel c) {}
-	}
+		public void PrintCIsConstraintValidAux(string args, StreamWriterLevel c) {}
+        public void PrintCIsConstraintValidAuxBody(StreamWriterLevel c) { }
+    }
 
 	public class SCCWithComponentsRealConstraint : WithComponentsRealConstraint, ISCConstraint
 	{
@@ -424,8 +592,9 @@ namespace asn1scc
 			 throw new Exception("The method or operation is not implemented.");
 		}
 
-		public void PrintCIsConstraintValidAux(StreamWriterLevel c) {}
-	}
+		public void PrintCIsConstraintValidAux(string args, StreamWriterLevel c) {}
+        public void PrintCIsConstraintValidAuxBody(StreamWriterLevel c) { }
+    }
 
 
 

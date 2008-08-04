@@ -515,7 +515,7 @@ namespace tinyAsn1
                     smallestChild = ch.m_type.MinBitsInPER;
                 nRootChildren++;
             }
-            ret+=PER.GetNumberOfBitsForNonNegativeInteger(nRootChildren);
+            ret+=PER.GetNumberOfBitsForNonNegativeInteger((UInt16)(nRootChildren-1));
             ret += smallestChild;
 
             DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
@@ -549,7 +549,7 @@ namespace tinyAsn1
                         largestChild = ch.m_type.MaxBitsInPER;
                     nRootChildren++;
                 }
-                ret += PER.GetNumberOfBitsForNonNegativeInteger(nRootChildren);
+                ret += PER.GetNumberOfBitsForNonNegativeInteger((UInt16)(nRootChildren-1));
                 ret += largestChild;
             }
 

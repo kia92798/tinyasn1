@@ -32,6 +32,17 @@ namespace tinyAsn1
         public ExceptionSpec m_exceptionSpec;
         public bool m_extMarkPresent2 = false;
 
+
+        public override IEnumerable<Asn1Value> GetVariables()
+        {
+            foreach (Child ch in m_children.Values)
+                if (ch.m_defaultValue != null)
+                    yield return ch.m_defaultValue;
+            foreach (IConstraint con in m_constraints)
+                foreach (Asn1Value v in con.GetVariables())
+                    yield return v;
+            yield break;
+        }
         public override IEnumerable<T> GetMySelfAndAnyChildren<T>()
         {
             if (this is T)

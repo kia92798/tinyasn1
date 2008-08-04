@@ -48,12 +48,32 @@ namespace tinyAsn1
             yield break;
         }
 
+        
+
         public virtual IEnumerable<KeyValuePair<string,T>> GetMySelfAndAnyChildrenWithPath<T>(string pathUpToHere) where T : Asn1Type
         {
             if (this is T)
                 yield return new KeyValuePair<string,T>(pathUpToHere, this as T);
             yield break;
         }
+
+        public IEnumerable<Asn1Value> GetAllVariables()
+        {
+            foreach (Asn1Type t in GetMySelfAndAnyChildren<Asn1Type>())
+                foreach (Asn1Value v in t.GetVariables())
+                    yield return v;
+            yield break;
+        }
+
+        public virtual IEnumerable<Asn1Value> GetVariables()
+        {
+            foreach(IConstraint con in m_constraints)
+                foreach (Asn1Value v in con.GetVariables())
+                    yield return v;
+            yield break;
+
+        }
+
 
         string _uniquePath = "";
 
@@ -807,6 +827,9 @@ namespace tinyAsn1
         public Module m_module;
         internal Asn1Type m_type = null;
 
+
+        string m_cname=string.Empty;
+        public string CName { get { return m_cname; } set { m_cname = value; } }
 
         static public Asn1Value CreateFromAntlrAst(ITree tree)
         {

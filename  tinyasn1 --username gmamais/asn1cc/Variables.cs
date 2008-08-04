@@ -73,11 +73,11 @@ namespace asn1scc
             c.WriteLine("{");
             lev++;
 
-            List<byte> val = OctetStringValue.ConvertToOctetArray(this);
+            List<byte> val = OctetStringValue.ConvertToOctetArray(this,false);
 
             int cnt = val.Count;
 
-            c.P(lev); c.WriteLine("{0},", cnt*8);
+            c.P(lev); c.WriteLine("{0},", this.Value.Length);
 
             c.P(lev); c.WriteLine("{");
             for (int i = 0; i < cnt; i++)

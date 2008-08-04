@@ -17,23 +17,24 @@ extern "C" {
 #define WORD_SIZE	8
 #endif
 
-typedef long sint32;
-typedef unsigned long uint32;
+typedef long asn1SccSint32;
+typedef unsigned long asn1SccUint32;
 
 typedef unsigned char byte;
 
 #if WORD_SIZE==8
-typedef long long sint64;
-typedef unsigned long long uint64;
-typedef uint64 uint;
-typedef sint64 sint;
+typedef long long asn1SccSint64;
+typedef unsigned long long asn1SccUint64;
+typedef asn1SccUint64 asn1SccUint;
+typedef asn1SccSint64 asn1SccSint;
 #else
-typedef uint32 uint;
-typedef sint32 sint;
+typedef asn1SccUint32 asn1SccUint;
+typedef asn1SccSint32 asn1SccSint;
+
 #endif
 
 
-typedef uint flag;
+typedef int flag;
 typedef int BOOL;
 
 typedef char NullType;
@@ -46,42 +47,46 @@ typedef struct {
 	int currentBit; 
 } BitStream;
 
-typedef struct {
-	uint m_min;
-    flag m_minIsInfinite;
-    flag m_minIsIncluded;    
-    uint m_max;            
-    flag m_maxIsIncluded;
-    flag m_maxIsInfinite;
-} IntegerRange;
-
-typedef struct {
-	int nCount;
-	char pCharArray[];
-} CharSet;
 
 
+#define ERR_INSUFFICIENT_DATA	101
+#define ERR_INCORRECT_PER_STREAM	102
 
+/* Bit strean functions */
 
 void BitStream_Init(BitStream* pBitStrm, unsigned char* buf, long count);
+void BitStream_AttachBuffer(BitStream* pBitStrm, unsigned char* buf, long count);
 void BitStream_AppendBit(BitStream* pBitStrm, flag v);
-sint BitStream_GetLength(BitStream* pBitStrm);
-void BitStream_EncodeNonNegativeInteger32(BitStream* pBitStrm, uint32 v);
+void BitStream_AppendBits(BitStream* pBitStrm, byte* srcBuffer, int nBitsToWrite);
+void BitStream_AppendByte(BitStream* pBitStrm, byte v, flag negate);
+void BitStream_AppendByte0(BitStream* pBitStrm, byte v);
 
-#if WORD_SIZE==8
-void BitStream_EncodeNonNegativeInteger64(BitStream* pBitStrm, uint64 v);
-#endif
+asn1SccSint BitStream_GetLength(BitStream* pBitStrm);
+void BitStream_AppendBitOne(BitStream* pBitStrm);
+void BitStream_AppendBitZero(BitStream* pBitStrm);
+flag BitStream_ReadBit(BitStream* pBitStrm, flag* v);
+flag BitStream_ReadBits(BitStream* pBitStrm, byte* BuffToWrite, int nBitsToRead);
+flag BitStream_ReadByte(BitStream* pBitStrm, byte* v);
 
-void BitStream_EncodeNonNegativeInteger(BitStream* pBitStrm, uint v);
-void BitStream_Encode2ndComplementInteger(BitStream* pBitStrm, sint v);
-void BitStream_EncodeConstraintWholeNumber(BitStream* pBitStrm, sint v, sint min, sint max);
+/* Integer functions */
 
-BOOL BitStream_DecodeConstraintWholeNumber(BitStream* pBitStrm, sint* v, sint min, sint max, int* pErrCode);
+
+void BitStream_EncodeUnConstraintWholeNumber(BitStream* pBitStrm, asn1SccSint v);
+void BitStream_EncodeSemiConstraintWholeNumber(BitStream* pBitStrm, asn1SccSint v, asn1SccSint min);
+void BitStream_EncodeConstraintWholeNumber(BitStream* pBitStrm, asn1SccSint v, asn1SccSint min, asn1SccSint max);
+
+flag BitStream_DecodeUnConstraintWholeNumber(BitStream* pBitStrm, asn1SccSint* v);
+flag BitStream_DecodeSemiConstraintWholeNumber(BitStream* pBitStrm, asn1SccSint* v, asn1SccSint min);
+flag BitStream_DecodeConstraintWholeNumber(BitStream* pBitStrm, asn1SccSint* v, asn1SccSint min, asn1SccSint max);
+
+
+
 
 
 void BitStream_EncodeReal(BitStream* pBitStrm, double v);
 flag BitStream_DecodeReal(BitStream* pBitStrm, double* v);
 
+/*
 void BitStream_EncodeBitString(BitStream* pBitStrm, byte* pBitString, long nBitsCount);
 flag BitStream_DecodeBitString(BitStream* pBitStrm, byte* pBitString, long* nBitsCount);
 
@@ -91,7 +96,13 @@ flag BitStream_DecodeOctetString(BitStream* pBitStrm, byte* pOctString, long* nO
 void BitStream_EncodeSingleChar(BitStream* pBitStrm, char ch, CharSet* pCharSet);
 
 void BitStream_EncodeIA5String(BitStream* pBitStrm, char* string, IntegerRange* pIR1, flag ext, IntegerRange* pIR2, CharSet* pCharSet);
+*/
 
+
+void CalculateMantissaAndExponent(double d, int* exp, asn1SccUint* mantissa);
+int GetNumberOfBitsForNonNegativeInteger(asn1SccUint v);
+
+int GetCharIndex(char ch, byte allowedCharSet[], int setLen);
 
 #ifdef  __cplusplus
 }
