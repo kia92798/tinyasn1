@@ -39,11 +39,30 @@ namespace tinyAsn1
         //It return the maximum allowed value for a REAL type. If associated is not a RAEL type, it throws an exception
         double m_MaxRealValue { get;}
 
+        IEnumerable<T> GetMySelfAndAnyChildren<T>() where T : class, IConstraint;
+        IEnumerable<Asn1Value> GetVariables();
     }
 
     // base class for all constraints
     public abstract class BaseConstraint : IConstraint
     {
+
+
+        public virtual IEnumerable<Asn1Value> GetVariables()
+        {
+            yield break;
+        }
+        public virtual IEnumerable<T> GetMySelfAndAnyChildren<T>() where T : class, IConstraint
+        {
+
+            if (this is T)
+                yield return this as T;
+
+            yield break;
+        }
+
+
+
         public static string AsString(List<IConstraint> cons)
         {
             string ret = string.Empty;
@@ -178,6 +197,37 @@ namespace tinyAsn1
         protected IConstraint m_extConstr;
         protected ExceptionSpec m_exceptionSpec;
         protected bool m_extended = false;
+
+        public override IEnumerable<Asn1Value> GetVariables()
+        {
+            foreach (Asn1Value v in m_constr.GetVariables())
+                yield return v;
+
+            if (m_extConstr != null)
+                foreach (Asn1Value v in m_extConstr.GetVariables())
+                    yield return v;
+
+            if (m_exceptionSpec != null && m_exceptionSpec.m_value != null)
+                yield return m_exceptionSpec.m_value;
+            
+            yield break;
+        }
+
+        public override IEnumerable<T> GetMySelfAndAnyChildren<T>()
+        {
+
+            if (this is T)
+                yield return this as T;
+
+            foreach (T t in m_constr.GetMySelfAndAnyChildren<T>())
+                yield return t;
+
+            if (m_extConstr != null)
+                foreach (T t in m_extConstr.GetMySelfAndAnyChildren<T>())
+                    yield return t;
+
+            yield break;
+        }
 
         
         public static IConstraint Create(ITree tree, Asn1Type type)
@@ -333,6 +383,29 @@ namespace tinyAsn1
     {
         protected List<IConstraint> m_items;
 
+        public override IEnumerable<Asn1Value> GetVariables()
+        {
+            foreach (IConstraint con in m_items)
+                foreach (Asn1Value v in con.GetVariables())
+                    yield return v;
+
+            yield break;
+        }
+
+
+        public override IEnumerable<T> GetMySelfAndAnyChildren<T>()
+        {
+
+            if (this is T)
+                yield return this as T;
+
+            foreach(IConstraint item in m_items)
+                foreach (T t in item.GetMySelfAndAnyChildren<T>())
+                    yield return t;
+
+
+            yield break;
+        }
 
         public static UnionConstraint Create(ITree tree, Asn1Type type)
         {
@@ -493,6 +566,29 @@ namespace tinyAsn1
     {
         protected List<IConstraint> m_items;
 
+        public override IEnumerable<Asn1Value> GetVariables()
+        {
+            foreach (IConstraint con in m_items)
+                foreach (Asn1Value v in con.GetVariables())
+                    yield return v;
+
+            yield break;
+        }
+
+        public override IEnumerable<T> GetMySelfAndAnyChildren<T>()
+        {
+
+            if (this is T)
+                yield return this as T;
+
+            foreach (IConstraint item in m_items)
+                foreach (T t in item.GetMySelfAndAnyChildren<T>())
+                    yield return t;
+
+
+            yield break;
+        }
+
         public static AndConstraint Create(ITree tree, Asn1Type type)
         {
             if (tree == null || type == null )
@@ -639,6 +735,33 @@ namespace tinyAsn1
         protected IConstraint m_c1;
         protected IConstraint m_c2;
 
+        public override IEnumerable<Asn1Value> GetVariables()
+        {
+            if (m_c1!=null)
+                foreach (Asn1Value v in m_c1.GetVariables())
+                    yield return v;
+
+            if (m_c2 != null)
+                foreach (Asn1Value v in m_c2.GetVariables())
+                    yield return v;
+
+            yield break;
+        }
+
+        public override IEnumerable<T> GetMySelfAndAnyChildren<T>()
+        {
+
+            if (this is T)
+                yield return this as T;
+
+            foreach (T t in m_c1.GetMySelfAndAnyChildren<T>())
+                yield return t;
+            foreach (T t in m_c2.GetMySelfAndAnyChildren<T>())
+                yield return t;
+
+            yield break;
+        }
+
         public static ExceptConstraint Create(ITree tree, Asn1Type type)
         {
             if (tree == null || type == null )
@@ -733,6 +856,28 @@ namespace tinyAsn1
     {
         protected IConstraint m_c;
 
+        public override IEnumerable<Asn1Value> GetVariables()
+        {
+            if (m_c != null)
+                foreach (Asn1Value v in m_c.GetVariables())
+                    yield return v;
+
+
+            yield break;
+        }
+
+        public override IEnumerable<T> GetMySelfAndAnyChildren<T>()
+        {
+
+            if (this is T)
+                yield return this as T;
+
+            foreach (T t in m_c.GetMySelfAndAnyChildren<T>())
+                yield return t;
+
+            yield break;
+        }
+
         public static AllExceptConstraint Create(ITree tree, Asn1Type type)
         {
             if (tree == null || type == null)
@@ -819,6 +964,14 @@ namespace tinyAsn1
     public class SingleValueConstraint : BaseConstraint
     {
         protected Asn1Value m_val;
+
+        public override IEnumerable<Asn1Value> GetVariables()
+        {
+            yield return m_val;
+        }
+
+
+        public Asn1Value ConstraintValue { get { return m_val; } }
 
         public override bool isValueAllowed(Asn1Value val)
         {
@@ -978,6 +1131,14 @@ namespace tinyAsn1
         public Asn1Value m_max;
         public bool m_minValIsInluded = true;
         public bool m_maxValIsInluded = true;
+
+
+        public override IEnumerable<Asn1Value> GetVariables()
+        {
+            yield return m_min;
+            yield return m_max;
+        }
+
 
         public override bool isValueAllowed(Asn1Value val)
         {
@@ -1293,6 +1454,26 @@ namespace tinyAsn1
     /// </summary>
     public class SizeConstraint : BaseConstraint
     {
+        public override IEnumerable<T> GetMySelfAndAnyChildren<T>()
+        {
+            if (this is T)
+                yield return this as T;
+
+            foreach(IConstraint con in sizeCon.m_constraints)
+                foreach (T t in con.GetMySelfAndAnyChildren<T>())
+                    yield return t;
+
+            yield break;
+        }
+
+        public override IEnumerable<Asn1Value> GetVariables()
+        {
+            foreach (IConstraint con in sizeCon.m_constraints)
+                foreach (Asn1Value v in con.GetVariables())
+                    yield return v;
+            yield break;
+        }
+
         public /*not need to be abstract*/ class DummyReferenceType : ReferenceType
         {
             IntegerType dummyInterger;
@@ -1403,6 +1584,28 @@ namespace tinyAsn1
     public class PermittedAlphabetConstraint : BaseConstraint
     {
         protected IA5StringType allowed_char_set;
+
+
+        public override IEnumerable<Asn1Value> GetVariables()
+        {
+            foreach (IConstraint con in allowed_char_set.m_constraints)
+                foreach (Asn1Value v in con.GetVariables())
+                    yield return v;
+            yield break;
+        }
+
+        public override IEnumerable<T> GetMySelfAndAnyChildren<T>()
+        {
+            if (this is T)
+                yield return this as T;
+
+            foreach (IConstraint con in allowed_char_set.m_constraints)
+                foreach (T t in con.GetMySelfAndAnyChildren<T>())
+                    yield return t;
+
+            yield break;
+        }
+
 
         internal static IConstraint Create(ITree tree, Asn1Type type)
         {
@@ -1594,8 +1797,27 @@ namespace tinyAsn1
 
     public class WithComponentConstraint : BaseConstraint
     {
-        IConstraint m_innerTypeConstraint;
-        Asn1Type m_innerType;
+        protected IConstraint m_innerTypeConstraint;
+        protected Asn1Type m_innerType;
+
+
+        public override IEnumerable<Asn1Value> GetVariables()
+        {
+            foreach (Asn1Value v in m_innerTypeConstraint.GetVariables())
+                yield return v;
+            yield break;
+        }
+
+        public override IEnumerable<T> GetMySelfAndAnyChildren<T>()
+        {
+            if (this is T)
+                yield return this as T;
+
+            foreach (T t in m_innerTypeConstraint.GetMySelfAndAnyChildren<T>())
+                    yield return t;
+
+            yield break;
+        }
 
 
         internal static IConstraint Create(ITree tree, Asn1Type type)
@@ -1714,6 +1936,32 @@ namespace tinyAsn1
         public bool m_partialSpecification = false; //i.e. ... are not present
         public OrderedDictionary<string, Component> m_components = new OrderedDictionary<string, Component>();
 
+
+
+        public override IEnumerable<Asn1Value> GetVariables()
+        {
+            foreach (Component c in m_components.Values)
+                if (c.m_valueConstraint != null)
+                    foreach (Asn1Value v in c.m_valueConstraint.GetVariables())
+                        yield return v;
+            yield break;
+        }
+
+        public override IEnumerable<T> GetMySelfAndAnyChildren<T>()
+        {
+            if (this is T)
+                yield return this as T;
+
+            foreach (Component c in m_components.Values)
+                if (c.m_valueConstraint != null)
+                    foreach (T t in c.m_valueConstraint.GetMySelfAndAnyChildren<T>())
+                        yield return t;
+
+            yield break;
+        }
+
+
+
         internal static IConstraint Create(ITree tree, Asn1Type type)
         {
             if (tree == null || type == null)
@@ -1792,7 +2040,7 @@ namespace tinyAsn1
         //    : base(type, partialSpecification, components)
         //{
         //}
-        SequenceOrSetType  Type
+        protected SequenceOrSetType  Type
         {
             get { return (SequenceOrSetType)m_type; }
         }
@@ -1949,7 +2197,7 @@ namespace tinyAsn1
 
     public class WithComponentsChConstraint : WithComponentsConstraint
     {
-        ChoiceType Type
+        protected ChoiceType Type
         {
             get { return (ChoiceType)m_type; }
         }

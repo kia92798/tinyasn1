@@ -33,6 +33,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.publichICD = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // rootPath
@@ -78,11 +79,22 @@
             this.textBox1.Size = new System.Drawing.Size(100, 20);
             this.textBox1.TabIndex = 4;
             // 
+            // publichICD
+            // 
+            this.publichICD.Location = new System.Drawing.Point(151, 316);
+            this.publichICD.Name = "publichICD";
+            this.publichICD.Size = new System.Drawing.Size(120, 23);
+            this.publichICD.TabIndex = 5;
+            this.publichICD.Text = "Publish ICD";
+            this.publichICD.UseVisualStyleBackColor = true;
+            this.publichICD.Click += new System.EventHandler(this.publichICD_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(625, 351);
+            this.Controls.Add(this.publichICD);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -102,6 +114,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button publichICD;
     }
 }
 

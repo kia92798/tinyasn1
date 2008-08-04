@@ -309,6 +309,7 @@ namespace tinyAsn1
         public virtual string Value
         {
             get { return m_value; }
+            set { m_value = value; }
         }
         public List<bool> ContentData
         {
@@ -332,8 +333,8 @@ namespace tinyAsn1
                 m_value = m_value.Remove(m_value.Length - 2);
                 m_value = m_value.Replace("\r", "").Replace("\n", "").Replace("\t", "").Replace(" ", "");
 
-                while (m_value.Length > 0 && m_value[m_value.Length - 1] == '0')
-                    m_value = m_value.Remove(m_value.Length - 1);
+                //while (m_value.Length > 0 && m_value[m_value.Length - 1] == '0')
+                //    m_value = m_value.Remove(m_value.Length - 1);
             }
             else if (tree.Type == asn1Parser.OctectStringLiteral)
             {

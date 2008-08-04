@@ -174,7 +174,11 @@ namespace tinyAsn1
             return ret;
         }
 
-        static public List<byte> ConvertToOctetArray(BitStringValue tmp)
+        public string ToStringNaked()
+        {
+            return ToString().Replace("'", "").Replace("H", "");
+        }
+        static public List<byte> ConvertToOctetArray(BitStringValue tmp, bool forOctStrUse)
         {
             List<byte> ret = new List<byte>();
             string bitString = tmp.Value;
@@ -195,7 +199,12 @@ namespace tinyAsn1
                 bitString = bitString.Substring(4);
             }
             if (nibles.Count % 2 != 0)
-                nibles.Insert(0, 0);
+            {
+                if (forOctStrUse)
+                    nibles.Insert(0, 0);
+                else
+                    nibles.Add(0);
+            }
 
             while (nibles.Count > 0)
             {
@@ -218,7 +227,10 @@ namespace tinyAsn1
 
             BitStringValue tmp = DefaultBackend.Instance.Factory.CreateBitStringValue(tree, mod, type);
 
-            m_value = ConvertToOctetArray(tmp);
+            while (tmp.Value.EndsWith("0"))
+                tmp.Value = tmp.Value.Substring(0, tmp.Value.Length - 1);
+
+            m_value = ConvertToOctetArray(tmp, true);
 
         }
 
@@ -237,7 +249,12 @@ namespace tinyAsn1
             OctetStringValue oth = obj as OctetStringValue;
             if (oth == null)
                 return false;
-            return oth.m_value == m_value;
+            if (oth.m_value.Count != m_value.Count)
+                return false;
+            for (int i = 0; i < m_value.Count; i++)
+                if (oth.m_value[i] != m_value[i])
+                    return false;
+            return true;
         }
 
         public override int GetHashCode()

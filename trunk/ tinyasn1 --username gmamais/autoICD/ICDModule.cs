@@ -50,9 +50,9 @@ namespace autoICD
         {
             wr.WriteLine("<div style=\"width: 100%\">");
             wr.WriteLine(string.Format("<h2 >Module : {0}</h2>", m_moduleID));
-            wr.WriteLine("<font face=\"Verdana\" color=\"DimGray\">");
+            wr.WriteLine("<font face=\"Courier\" color=\"DimGray\"><pre>");
             wr.WriteLine(wr.BR(m_comments));
-            wr.WriteLine("</font>");
+            wr.WriteLine("</pre></font>");
 
             List<TypeAssigment> topLevelPDUs = GetTopLevelTypes();
 

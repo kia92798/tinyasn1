@@ -28,7 +28,7 @@ def Work(fname):
     res = os.system(cmd) / 256
     if res != 0:
 	log.write("[%s]command %s failed!\n" % (fname,cmd))
-	return
+#	return
 
     cmd = "scp "+ fname +" gmamais@192.168.0.145:tinyAsn1/asn1cc.regression/oss/sample1.asn1"
     print cmd

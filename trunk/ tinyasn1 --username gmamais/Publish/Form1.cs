@@ -48,7 +48,8 @@ namespace Publish
             Cursor = Cursors.Default;
                         
         }
-        
+
+
 
         bool fileSel(string file)
         {
@@ -86,6 +87,80 @@ namespace Publish
                 return true;
             if (dir.Contains(@"asn1cc.regression\asn1cc"))
                 return true;
+
+            return false;
+        }
+
+
+
+        private void publichICD_Click(object sender, EventArgs e)
+        {
+            Cursor = Cursors.WaitCursor;
+
+            using (ZipOutputStream s = new ZipOutputStream(File.Create(rootPath.Text + "\\Publish\\autoICD\\autoICD_src.zip")))
+            {
+                ZipDir(s, rootPath.Text, rootPath.Text, false, fileSel2, dirSel2);
+                s.Finish();
+                s.Close();
+            }
+
+
+            using (ZipOutputStream s = new ZipOutputStream(File.Create(rootPath.Text + "\\Publish\\autoICD\\autoICD_binaries.zip")))
+            {
+                string setupFolder = rootPath.Text + @"\autoICD\bin\Debug";
+                ZipDir(s, setupFolder, setupFolder, false, fileSel3, delegate(string f) { return true; });
+                s.Finish();
+                s.Close();
+            }
+
+
+            Cursor = Cursors.Default;
+
+        }
+
+
+        bool fileSel2(string file)
+        {
+            List<string> fls = new List<string>(new string[] { "autoICD.sln", "csproj", "cs", "g", 
+                "dll", "jar", "vcproj", "asn1scc_setup.vdproj", ".resx" });
+
+            if (file.Contains(@".svn"))
+                return false;
+
+            foreach (string okfile in fls)
+                if (file.EndsWith(okfile))
+                    return true;
+
+            if (file.Contains(@"tinyAsn1\tests"))
+                return true;
+
+            return false;
+        }
+        bool dirSel2(string dir)
+        {
+            List<string> dirs = new List<string>(new string[] { "AntrlParser", "tinyAsn1",
+                "antrl", "Properties", "Resources", "autoICD" });
+
+            foreach (string okDir in dirs)
+                if (dir.EndsWith(okDir))
+                    return true;
+            if (dir.Contains(@"tinyAsn1\tests"))
+                return true;
+
+            return false;
+        }
+
+
+        bool fileSel3(string file)
+        {
+            List<string> fls = new List<string>(new string[] { ".dll", "autoICD.exe", "sample1.asn1" });
+
+            if (file.Contains(@".svn"))
+                return false;
+
+            foreach (string okfile in fls)
+                if (file.EndsWith(okfile))
+                    return true;
 
             return false;
         }
@@ -140,6 +215,7 @@ namespace Publish
                     ZipDir(zip, rootDirName, dir, true, fileSelector, dirSelector);
 
         }
+
 
 
     }

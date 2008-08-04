@@ -20,7 +20,19 @@ using System.IO;
 
 namespace asn1scc
 {
-    public class SCCBitStringType : BitStringType, ISCCType
+
+    //public interface WriteSingleConstraintCode
+    //{
+    //    string WriteCode(string varName, int lev, Asn1Value constValue);
+    //}
+
+    public interface INonPrimitiveCType
+    {
+        string CompareTo(string varName, Asn1Value constValue);
+        string AssignTo(string varName, Asn1Value constValue, int lev);
+    }
+
+    public class SCCBitStringType : BitStringType, ISCCType, INonPrimitiveCType
     {
         public void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
@@ -39,8 +51,9 @@ namespace asn1scc
         }
         public void VarsNeededForPrintCInitialize(int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {
+
         }
-        public void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel c, string typeName, string varName, int lev, int arrayDepth)
+        public void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defaultValue, StreamWriterLevel c, string typeName, string varName, int lev, int arrayDepth)
         {
             long max = (long)Math.Ceiling((double)maxItems(cns) / 8.0);
             string i = "i" + lev.ToString();
@@ -51,12 +64,48 @@ namespace asn1scc
             else
                 prefix = varName + ".";
 
-            c.P(lev); c.WriteLine("{0}nCount = 0;", prefix);
-            c.P(lev); c.WriteLine("memset({0}arr,0x0,{1});", prefix, max);
+            
+            BitStringValue defVal = defaultValue as BitStringValue;
+            if (defVal != null)
+            {
+                c.P(lev); c.WriteLine("{0}nCount = {1};", prefix, defVal.Value.Length);
+                c.P(lev); c.WriteLine("memcpy({0}arr,{1}.arr,{2});", prefix, defVal.CName, (long)Math.Ceiling((double)defVal.Value.Length / 8.0));
+            }
+            else
+            {
+                c.P(lev); c.WriteLine("{0}nCount = 0;", prefix);
+                c.P(lev); c.WriteLine("memset({0}arr,0x0,{1});", prefix, max);
+            }
         }
         public void VarsNeededForIsConstraintValid(int lev, OrderedDictionary<string, CLocalVariable> existingVars)
         {
         }
+
+        public string CompareTo(string varName, Asn1Value constValue)
+        {
+            SCCBitStringValue btVal = constValue as SCCBitStringValue;
+            return string.Format("( ({0}.nCount == {1}.nCount) && !memcmp({0}.arr, {1}.arr, {2}) )", varName, constValue.CName, 
+                (long)Math.Ceiling((double)btVal.Value.Length / 8.0));
+        }
+        
+        public string AssignTo(string varName, Asn1Value constValue, int lev)
+        {
+            return "";
+        }
+
+
+        //public string WriteCode(string varName, int lev, Asn1Value constValue)
+        //{
+        //    SCCBitStringValue btVal = constValue as SCCBitStringValue;
+        //    string bitStr_nCount = "bsc_" + btVal.Value;
+        //    string bitStr_arr = "bsa_" + btVal.Value;
+
+        //    return string.Format("( ({0}.nCount == {1}) && !memcmp({0}.arr, {2}, {3}) )", varName, bitStr_nCount, bitStr_arr, (long)Math.Ceiling((double)btVal.Value.Length / 8.0));
+
+        //}
+
+
+
         public void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev, int arrayDepth)
         {
             CSSType.PrintCIsConstraintValid(this, cns, c, errorCode, typeName, varName, lev, arrayDepth);
@@ -593,7 +642,10 @@ if ({3}+{1}>{4})
             if (!cn.m_rootRange.m_minIsInfinite && !cn.m_rootRange.m_maxIsInfinite)
             {
                 c.P(lev);
-                c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, {0}, {1}, {2});", var, C.L(cn.m_rootRange.m_min), C.L(cn.m_rootRange.m_max));
+                if (cn.m_rootRange.m_min == cn.m_rootRange.m_max)
+                    c.WriteLine("/* No need to encode value since it will always be {0}*/", cn.m_rootRange.m_min);
+                else
+                    c.WriteLine("BitStream_EncodeConstraintWholeNumber(pBitStrm, {0}, {1}, {2});", var, C.L(cn.m_rootRange.m_min), C.L(cn.m_rootRange.m_max));
             }
             else if (!cn.m_rootRange.m_minIsInfinite && cn.m_rootRange.m_maxIsInfinite)
             {
@@ -671,27 +723,36 @@ if ({3}+{1}>{4})
 
         private void DecodeNormal(PERIntegerEffectiveConstraint cn, StreamWriterLevel c, string var, int lev)
         {
-            if (!cn.m_rootRange.m_minIsInfinite && !cn.m_rootRange.m_maxIsInfinite)
+            if (!cn.m_rootRange.m_minIsInfinite && !cn.m_rootRange.m_maxIsInfinite && (cn.m_rootRange.m_max == cn.m_rootRange.m_min))
             {
+
                 c.P(lev);
-                c.WriteLine("if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, {0}, {1}, {2})) {{", var, C.L(cn.m_rootRange.m_min), C.L(cn.m_rootRange.m_max));
-            }
-            else if (!cn.m_rootRange.m_minIsInfinite && cn.m_rootRange.m_maxIsInfinite)
-            {
-                c.P(lev);
-                c.WriteLine("if (!BitStream_DecodeSemiConstraintWholeNumber(pBitStrm, {0}, {1})) {{", var, C.L(cn.m_rootRange.m_min));
+                c.WriteLine("{0} = {1};", var.Replace("&", ""), C.L(cn.m_rootRange.m_min));
             }
             else
             {
+                if (!cn.m_rootRange.m_minIsInfinite && !cn.m_rootRange.m_maxIsInfinite)
+                {
+                    c.P(lev);
+                    c.WriteLine("if (!BitStream_DecodeConstraintWholeNumber(pBitStrm, {0}, {1}, {2})) {{", var, C.L(cn.m_rootRange.m_min), C.L(cn.m_rootRange.m_max));
+                }
+                else if (!cn.m_rootRange.m_minIsInfinite && cn.m_rootRange.m_maxIsInfinite)
+                {
+                    c.P(lev);
+                    c.WriteLine("if (!BitStream_DecodeSemiConstraintWholeNumber(pBitStrm, {0}, {1})) {{", var, C.L(cn.m_rootRange.m_min));
+                }
+                else
+                {
+                    c.P(lev);
+                    c.WriteLine("if (!BitStream_DecodeUnConstraintWholeNumber(pBitStrm, {0})) {{", var);
+                }
+                c.P(lev + 1);
+                c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
+                c.P(lev + 1);
+                c.WriteLine("return FALSE;");
                 c.P(lev);
-                c.WriteLine("if (!BitStream_DecodeUnConstraintWholeNumber(pBitStrm, {0})) {{", var);
+                c.WriteLine("}");
             }
-            c.P(lev + 1);
-            c.WriteLine("*pErrCode = ERR_INSUFFICIENT_DATA;");
-            c.P(lev + 1);
-            c.WriteLine("return FALSE;");
-            c.P(lev);
-            c.WriteLine("}");
         }
     
     }
@@ -774,7 +835,7 @@ if ({3}+{1}>{4})
         }
     }
 
-    public class SCCOctetStringType : OctetStringType, ISCCType, ISCCSizeable
+    public class SCCOctetStringType : OctetStringType, ISCCType, ISCCSizeable, INonPrimitiveCType
     {
         public void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
@@ -794,7 +855,7 @@ if ({3}+{1}>{4})
         public void VarsNeededForPrintCInitialize(int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {
         }
-        public void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel c, string typeName, string varName, int lev, int arrayDepth)
+        public void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defaultValue, StreamWriterLevel c, string typeName, string varName, int lev, int arrayDepth)
         {
             long max = maxItems(cns);
             string i = "i" + lev.ToString();
@@ -805,13 +866,37 @@ if ({3}+{1}>{4})
             else
                 prefix = varName + ".";
 
-            c.P(lev); c.WriteLine("{0}nCount = 0;", prefix);
-            c.P(lev); c.WriteLine("memset({0}arr,0x0,{1});", prefix, max);
+            OctetStringValue defVal = defaultValue as OctetStringValue;
+            if (defVal != null)
+            {
+                c.P(lev); c.WriteLine("{0}nCount = {1};", prefix, defVal.Value.Count);
+                c.P(lev); c.WriteLine("memcpy({0}arr,{1}.arr,{2});", prefix, defVal.CName, defVal.Value.Count);
+            }
+            else
+            {
+                c.P(lev); c.WriteLine("{0}nCount = 0;", prefix);
+                c.P(lev); c.WriteLine("memset({0}arr,0x0,{1});", prefix, max);
+            }
         }
         public void VarsNeededForIsConstraintValid(int lev, OrderedDictionary<string, CLocalVariable> existingVars)
         {
 
         }
+
+
+        public string CompareTo(string varName, Asn1Value constValue)
+        {
+            SCCBitStringValue btVal = constValue as SCCBitStringValue;
+            return string.Format("( ({0}.nCount == {1}.nCount) && !memcmp({0}.arr, {1}.arr, {1}.nCount) )", varName, constValue.CName);
+        }
+
+        public string AssignTo(string varName, Asn1Value constValue, int lev)
+        {
+            return "";
+        }
+
+        
+
         public void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev, int arrayDepth)
         {
             CSSType.PrintCIsConstraintValid(this, cns, c, errorCode, typeName, varName, lev, arrayDepth);
@@ -933,8 +1018,10 @@ if ({3}+{1}>{4})
             if (nCount > 0)
                 h.WriteLine("#define ERR_{0}\t\t{1} /* {2} */", C.ID(name), DefaultBackend.Instance.ConstraintErrorID++, conConstraints);
         }
+        
         public void VarsNeededForPrintCInitialize(int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {
+            ((ISCCType)Type).VarsNeededForPrintCInitialize(arrayDepth, existingVars);
         }
         public void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
         {
@@ -954,6 +1041,7 @@ if ({3}+{1}>{4})
         }
         public void VarsNeededForIsConstraintValid(int lev, OrderedDictionary<string, CLocalVariable> existingVars)
         {
+            ((ISCCType)Type).VarsNeededForIsConstraintValid(lev, existingVars);
         }
         public void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev, int arrayDepth)
         {
@@ -977,7 +1065,7 @@ if ({3}+{1}>{4})
         }
         public void VarsNeededForEncode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {
-//            ((ISCCType)Type).VarsNeededForEncode(cns, arrayDepth, existingVars);
+            ((ISCCType)Type).VarsNeededForEncode(cns, arrayDepth, existingVars);
         }
         public void PrintCEncode(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string varName, int lev)
         {
@@ -997,7 +1085,7 @@ if ({3}+{1}>{4})
         }
         public void VarsNeededForDecode(PEREffectiveConstraint cns, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {
-//            ((ISCCType)Type).VarsNeededForDecode(cns, arrayDepth, existingVars);
+            ((ISCCType)Type).VarsNeededForDecode(cns, arrayDepth, existingVars);
         }
         public void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
         {

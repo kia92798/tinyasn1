@@ -74,19 +74,11 @@ namespace asn1scc
             c.WriteLine("}");
             c.WriteLine();
 
-            //            m_type.PrintCIsConstraintValidAux(c);
-            //print Constraints aux (used for FROM constraints)
+            //print Constraints aux protypes
             foreach (Asn1Type t in m_type.GetMySelfAndAnyChildren<Asn1Type>())
-            {
-                if (t.m_constraints.Count > 0)
-                {
-                    for (int i = 0; i < t.m_constraints.Count; i++)
-                    {
-                        ((ISCConstraint)t.m_constraints[i]).PrintCIsConstraintValidAux(c);
-                    }
-                }
+                for (int i = 0; i < t.m_constraints.Count; i++)
+                    ((ISCConstraint)t.m_constraints[i]).PrintCIsConstraintValidAux(uniqueID + star + " pVal", c);
 
-            }
 
             c.WriteLine();
             c.WriteLine("flag {0}_IsConstraintValid({0}{1} pVal, int* pErrCode)", uniqueID, star);
@@ -100,6 +92,12 @@ namespace asn1scc
             c.P(1); c.WriteLine("return TRUE;");
             c.WriteLine("}");
             c.WriteLine();
+
+            //print Constraints aux body functions
+            foreach (Asn1Type t in m_type.GetMySelfAndAnyChildren<Asn1Type>())
+                for (int i = 0; i < t.m_constraints.Count; i++)
+                    ((ISCConstraint)t.m_constraints[i]).PrintCIsConstraintValidAuxBody(c);
+
 
             c.WriteLine("flag {0}_Encode({0}{1} pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints)", uniqueID, star);
             c.WriteLine("{");

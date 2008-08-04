@@ -318,16 +318,17 @@ for({0}=0;{0}<{1};{0}++)
         {
             long min = pThis.minItems(cns);
             long max = pThis.maxItems(cns);
+
             h.WriteLine("struct {");
             //            h.WriteLine("struct {0} {{", typeName);
             //            if (min != max)
             {
-                h.P(lev + 1);
+                h.P(lev + 2);
                 h.WriteLine("long nCount;");
             }
-            h.P(lev + 1); ((ISCCType)pThis.m_type).PrintHTypeDeclaration(pThis.m_type.PEREffectiveConstraint, h, typeName + "_arr"/*+varName*/, "arr", lev + 1);
+            h.P(lev + 2); ((ISCCType)pThis.m_type).PrintHTypeDeclaration(pThis.m_type.PEREffectiveConstraint, h, typeName + "_arr"/*+varName*/, "arr", lev + 1);
             h.WriteLine(" arr[{0}];", max);
-            h.P(lev);
+            h.P(lev+1);
             h.Write("}");
         }
      
