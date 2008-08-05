@@ -23,14 +23,14 @@ CAR-PARTS DEFINITIONS AUTOMATIC TAGS::= BEGIN
 	testPDU MyTestPDU ::=  { 
 							{int1 10, int2 200, enm one, buf '00112233445566778899'H}, 
 							{int1 15, int2 3200, enm two, buf '00112233445566778899'H, gg {int1 10, int2 200, enm one, buf '00112233445566778899'H }},
-							{int1 15, int2 3200, enm two, buf '00112233445566778899'H, gg {int1 10, int2 200, enm one, buf '00112233445566778899'H }},
-							{int1 15, int2 3200, enm two, buf '00112233445566778899'H, gg {int1 10, int2 200, enm one, buf '00112233445566778899'H }},
-							{int1 15, int2 3200, enm two, buf '00112233445566778899'H, gg {int1 10, int2 200, enm one, buf '00112233445566778899'H }},
-							{int1 15, int2 3200, enm two, buf '00112233445566778899'H, gg {int1 10, int2 200, enm one, buf '00112233445566778899'H }},
-							{int1 15, int2 3200, enm two, buf '00112233445566778899'H, gg {int1 10, int2 200, enm one, buf '00112233445566778899'H }},
-							{int1 15, int2 3200, enm two, buf '00112233445566778899'H, gg {int1 10, int2 200, enm one, buf '00112233445566778899'H }},
-							{int1 15, int2 3200, enm two, buf '00112233445566778899'H, gg {int1 10, int2 200, enm one, buf '00112233445566778899'H }},
-							{int1 15, int2 3200, enm two, buf '00112233445566778899'H, gg {int1 10, int2 200, enm one, buf '00112233445566778899'H }}
+							{int1 15, int2 3201, enm two, buf '00112233445566778899'H, gg {int1 10, int2 200, enm one, buf '00112233445566778899'H }},
+							{int1 15, int2 3202, enm two, buf '00112233445566778899'H, gg {int1 10, int2 200, enm one, buf '00112233445566778899'H }},
+							{int1 15, int2 3203, enm two, buf '00112233445566778899'H, gg {int1 10, int2 200, enm one, buf '00112233445566778899'H }},
+							{int1 15, int2 3204, enm two, buf '00112233445566778899'H, gg {int1 10, int2 200, enm one, buf '00112233445566778899'H }},
+							{int1 15, int2 3205, enm two, buf '00112233445566778899'H, gg {int1 10, int2 200, enm one, buf '00112233445566778899'H }},
+							{int1 15, int2 3206, enm two, buf '00112233445566778899'H, gg {int1 10, int2 200, enm one, buf '00112233445566778899'H }},
+							{int1 15, int2 3207, enm two, buf '00112233445566778899'H, gg {int1 10, int2 200, enm one, buf '00112233445566778899'H }},
+							{int1 15, int2 3208, enm two, buf '00112233445566778899'H, gg {int1 10, int2 200, enm one, buf '00112233445566778899'H }}
 							}
 
 	MyInt ::= INTEGER
