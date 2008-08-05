@@ -95,6 +95,25 @@ namespace asn1scc
                             return Usage();
                         }
                     }
+                    else if (args[i] == "-wordSize")
+                    {
+                        try
+                        {
+                            i++;
+                            Config.IntegerSize = int.Parse(args[i]);
+                        }
+                        catch (FormatException)
+                        {
+                            Console.Error.WriteLine("Error in argument -wordSize: {0} is not a number", args[i]);
+                            return Usage();
+                        }
+                        catch (Exception)
+                        {
+                            Console.Error.WriteLine("Error in argument -wordSize: No value specified");
+                            return Usage();
+                        }
+
+                    }
                     else
                     {
                         Console.Error.WriteLine("Unrecognized option: " + args[i]);
@@ -159,7 +178,10 @@ namespace asn1scc
                 try
                 {
                     compInv.printC();
-                    File.WriteAllText(DefaultBackend.m_outDirectory + "asn1crt.h", Properties.Resources.asn1crt);
+                    string asn1crth = Properties.Resources.asn1crt;
+                    if (Config.IntegerSize != 8)
+                        asn1crth = asn1crth.Replace("#define WORD_SIZE	8", "#define WORD_SIZE	4");
+                    File.WriteAllText(DefaultBackend.m_outDirectory + "asn1crt.h", asn1crth);
                     File.WriteAllText(DefaultBackend.m_outDirectory + "asn1crt.c", Properties.Resources.asn1crt1);
                     File.WriteAllText(DefaultBackend.m_outDirectory + "real.c", Properties.Resources.real);
                 }
@@ -178,13 +200,17 @@ namespace asn1scc
         {
             Console.Error.WriteLine();
             Console.Error.WriteLine("ASN.1 Space Certified Compiler");
-            Console.Error.WriteLine("Current Version is: 0.95");
+            Console.Error.WriteLine("Current Version is: 0.96");
             Console.Error.WriteLine("Usage:");
             Console.Error.WriteLine();
-            Console.Error.WriteLine("asn1scc [-debug] [-typePrefix prefix] [-useSpecialComments] [-o outdir] file1, file2, ..., fileN ");
+            Console.Error.WriteLine("asn1scc [-debug] [-wordSize N] [-typePrefix prefix] [-useSpecialComments] [-o outdir] file1, file2, ..., fileN ");
             Console.Error.WriteLine();
             Console.Error.WriteLine("\t -debug\t\t\tre-prints the AST using ASN.1.");
             Console.Error.WriteLine("\t\t\t\tUseful only for debug purposes. (No encoders/decoders are produced)");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("\t -wordSize N\t\tthe word size of the target machine in bytes.");
+            Console.Error.WriteLine("\t\t\t\tPossible values are 2,4 and 8");
+            Console.Error.WriteLine("\t\t\t\tIf omitted, N is equal to 8");
             Console.Error.WriteLine();
             Console.Error.WriteLine("\t -typePrefix\t\tadds 'prefix' to all generated C data types.");
             Console.Error.WriteLine();

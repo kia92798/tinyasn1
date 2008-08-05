@@ -822,6 +822,20 @@ namespace tinyAsn1
             }
         }
 
+        public override IEnumerable<T> GetMySelfAndAnyChildren<T>()
+        {
+
+            if (this is T)
+                yield return this as T;
+
+            foreach (Asn1Value v in m_children.Values)
+                if (v is T)
+                    yield return v as T;
+
+            yield break;
+        }
+
+
         public override bool IsResolved()
         {
             foreach (Asn1Value v in m_children.Values)

@@ -363,14 +363,30 @@ for({0}=0;{0}<{1};{0}++)
                 prefix = varName + ".";
             }
 
-            c.P(lev);
-            c.WriteLine("{0}nCount = 0;", prefix);
+            ArrayValue arVal = defauleVal as ArrayValue;
+            if (arVal == null)
+            {
+                c.P(lev);
+                c.WriteLine("{0}nCount = 0;", prefix);
 
-            c.P(lev); c.WriteLine("for({0}=0;{0}<{1};{0}++)", i, pThis.maxItems(cns));
-            c.P(lev); c.WriteLine("{");
-            ((ISCCType)pThis.m_type).PrintCInitialize(pThis.m_type.PEREffectiveConstraint, null, c,
-                typeName + "_arr", prefix + "arr[" + i + "]", lev + 1, arrayDepth + 1);
-            c.P(lev); c.WriteLine("}");
+                c.P(lev); c.WriteLine("for({0}=0;{0}<{1};{0}++)", i, pThis.maxItems(cns));
+                c.P(lev); c.WriteLine("{");
+                ((ISCCType)pThis.m_type).PrintCInitialize(pThis.m_type.PEREffectiveConstraint, null, c,
+                    typeName + "_arr", prefix + "arr[" + i + "]", lev + 1, arrayDepth + 1);
+                c.P(lev); c.WriteLine("}");
+            }
+            else
+            {
+                c.P(lev);
+                c.WriteLine("{0}nCount = {1};", prefix, arVal.m_children.Count);
+                for (int k = 0; k < arVal.m_children.Count; k++)
+                {
+                    c.P(lev); c.WriteLine("{");
+                    ((ISCCType)pThis.m_type).PrintCInitialize(pThis.m_type.PEREffectiveConstraint, arVal.m_children[k], c,
+                        typeName + "_arr", prefix + "arr[" + k.ToString() + "]", lev + 1, arrayDepth + 1);
+                    c.P(lev); c.WriteLine("}");
+                }
+            }
         }
 
         public static void VarsNeededForIsConstraintValid(ArrayType pThis, int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)

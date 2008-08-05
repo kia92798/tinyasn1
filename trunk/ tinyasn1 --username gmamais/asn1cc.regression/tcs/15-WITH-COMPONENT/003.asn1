@@ -1,0 +1,27 @@
+MyModule DEFINITIONS ::= 
+BEGIN
+
+
+MyType ::= SEQUENCE (SIZE(1..100)) OF SEQUENCE {
+	a INTEGER (1..20) (5),
+	a1 SEQUENCE (SIZE(1..10)) OF INTEGER (1..10),
+	b BOOLEAN DEFAULT TRUE,
+	c INTEGER (0..7) OPTIONAL,
+	d OCTET STRING (SIZE (3)) ('CCFFDD'H) OPTIONAL
+}
+
+MyTestPDU ::= MyType (WITH COMPONENT (WITH COMPONENTS { ..., a1 (SIZE(5)), c (3) PRESENT, d PRESENT }))
+
+
+
+testPDU MyTestPDU ::= {
+				{ a 5, a1 {1,2,3,4,5}, b TRUE, c 3, d 'CCFFDD'H},
+				{ a 5, a1 {1,2,3,4,5}, b TRUE, c 3, d 'CCFFDD'H},
+				{ a 5, a1 {1,2,3,4,5}, b TRUE, c 3, d 'CCFFDD'H},
+				{ a 5, a1 {1,2,3,4,5}, b TRUE, c 3, d 'CCFFDD'H},
+				{ a 5, a1 {1,2,3,4,5}, b TRUE, c 3, d 'CCFFDD'H},
+				{ a 5, a1 {1,2,3,4,5}, b TRUE, c 3, d 'CCFFDD'H}
+			    }
+
+
+END

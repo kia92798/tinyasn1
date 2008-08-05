@@ -17,7 +17,7 @@ using tinyAsn1;
 
 namespace asn1scc
 {
-    class SCCChoiceType : ChoiceType, ISCCType
+    class SCCChoiceType : ChoiceType, ISCCType, INonPrimitiveCType
     {
         public void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
@@ -78,7 +78,7 @@ namespace asn1scc
         public void VarsNeededForPrintCInitialize(int arrayDepth, OrderedDictionary<string, CLocalVariable> existingVars)
         {
         }
-        public void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel c, string typeName, string varName, int lev, int arrayDepth)
+        public void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defaultValue, StreamWriterLevel c, string typeName, string varName, int lev, int arrayDepth)
         {
             bool topLevel = !varName.Contains("->");
             string prefix = "";
@@ -87,7 +87,20 @@ namespace asn1scc
             else
                 prefix = varName + ".";
 
-            c.P(lev); c.WriteLine("{0}kind = {1};", prefix, CID_NONE);
+            ChoiceValue chVal = defaultValue as ChoiceValue;
+            if (chVal == null)
+            {
+                c.P(lev); c.WriteLine("{0}kind = {1};", prefix, CID_NONE);
+            }
+            else
+            {
+                Asn1Type altType = ((ChoiceType)chVal.Type).m_children[chVal.AlternativeName].m_type;
+                c.P(lev); c.WriteLine("{0}kind = {1};", prefix, ((ChoiceType)chVal.Type).m_children[chVal.AlternativeName].CID);
+                c.P(lev); c.WriteLine("{");
+                ((ISCCType)altType).PrintCInitialize(altType.PEREffectiveConstraint, chVal.Value, c,
+                    typeName + "_" + C.ID(chVal.AlternativeName), prefix + "u." + C.ID(chVal.AlternativeName), lev + 1, arrayDepth + 1);
+                c.P(lev); c.WriteLine("}");
+            }
             //            c.P(lev); c.WriteLine("{0}kind = {1}_NONE;", prefix, typeName);
         }
         public void VarsNeededForIsConstraintValid(int lev, OrderedDictionary<string, CLocalVariable> existingVars)
@@ -97,6 +110,39 @@ namespace asn1scc
                 ((ISCCType)ch.m_type).VarsNeededForIsConstraintValid(lev, existingVars);
             }
         }
+
+        public string CompareTo(string varName, Asn1Value constValue)
+        {
+            string ret = string.Empty;
+
+            string varName2 = varName;
+            if (varName.Contains("->"))
+                varName2 += ".";
+            else
+                varName2 += "->";
+
+            ret += "(";
+
+            ChoiceValue val = constValue as ChoiceValue;
+
+            Asn1Value chVal = val.Value;
+            chVal.CName = val.CName + "." + val.AlternativeName;
+            INonPrimitiveCType chType = chVal.Type as INonPrimitiveCType;
+
+            ret += "(" +  varName2+"kind == " + m_children[val.AlternativeName].CID + ") && ";
+
+            
+            if (chType != null)
+                ret += chType.CompareTo(varName2 + "u." + C.ID(val.AlternativeName), chVal);
+            else
+            {
+                ret += "(" + varName2 + "u." + C.ID(val.AlternativeName) + " == " + chVal.ToStringC() + ")";
+            }
+
+            ret += ")";
+            return ret;
+        }
+
         public void PrintCIsConstraintValid(PEREffectiveConstraint cns, StreamWriterLevel c, string errorCode, string typeName, string varName, int lev, int arrayDepth)
         {
             string varName2 = varName;
@@ -104,6 +150,9 @@ namespace asn1scc
                 varName2 += "->";
             else
                 varName2 += ".";
+
+            CSSType.PrintCIsConstraintValid(this, cns, c, errorCode, typeName, varName, lev, arrayDepth);
+
 
             c.P(lev);
             c.WriteLine("switch({0}kind)", varName2);
@@ -168,7 +217,7 @@ namespace asn1scc
             c.P(lev);
             c.WriteLine("default:");
             c.P(lev + 1);
-            c.WriteLine("*pErrCode = ERR_{0};", C.ID(errorCode));
+            c.WriteLine("*pErrCode = ERR_INVALID_CHOICE_ALTERNATIVE;");
             c.P(lev + 1);
             c.WriteLine("return FALSE;");
 

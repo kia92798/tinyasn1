@@ -705,6 +705,19 @@ namespace tinyAsn1
             get { return m_value; }
         }
 
+        public override IEnumerable<T> GetMySelfAndAnyChildren<T>()
+        {
+
+            if (this is T)
+                yield return this as T;
+
+            if (m_value is T)
+                yield return m_value as T;
+
+            yield break;
+        }
+
+
         string m_alternativeName;
         public virtual string AlternativeName
         {

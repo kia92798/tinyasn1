@@ -1,0 +1,19 @@
+MyModule DEFINITIONS ::= 
+BEGIN
+
+x INTEGER ::= 5
+
+MyType ::= SEQUENCE {
+	a INTEGER (1..20) (5),
+	b BOOLEAN DEFAULT TRUE,
+	c INTEGER (0..7),
+	d BIT STRING (SIZE (3)) ('010'B)
+}
+
+MyTestPDU ::= MyType (WITH COMPONENTS { ..., c (3) })
+
+
+
+testPDU MyTestPDU ::= { a 5, b TRUE, c 3, d '010'B}
+
+END
