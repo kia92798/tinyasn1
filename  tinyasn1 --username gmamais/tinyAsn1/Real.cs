@@ -325,7 +325,8 @@ namespace tinyAsn1
         }
         public override string ToString()
         {
-            return Value.ToString(NumberFormatInfo.InvariantInfo);
+            string ret = Value.ToString(NumberFormatInfo.InvariantInfo);
+            return ret;
         }
         public override bool Equals(object obj)
         {

@@ -146,30 +146,39 @@ namespace asn1scc
 
                 int indx = 0;
                 foreach (SCCTypeAssigment t in tmp)
-                    foreach (Asn1Value v in t.m_type.GetAllVariables())
-                    {
-                        if (v.Type is INonPrimitiveCType)
+                    foreach (Asn1Value vtop in t.m_type.GetAllVariables())
+                        foreach (Asn1Value v in vtop.GetMySelfAndAnyChildren<Asn1Value>())
                         {
-                            indx++;
-                            ((ISCCType)v.Type).PrintHTypeDeclaration(v.Type.PEREffectiveConstraint, c, "", "", 0);
-                            v.CName = "var" + indx.ToString();
-                            c.Write(" {0} = ", v.CName);
-                            ((ISCCVariable)v).PrintC(c, 0);
-                            c.WriteLine(";");
-                        }
+                            if ( (v.Type is OctetStringType) || (v.Type is BitStringType))
+                            {
+                                indx++;
+                                ((ISCCType)v.Type).PrintHTypeDeclaration(v.Type.PEREffectiveConstraint, c, "", "", 0);
+                                v.CName = "var" + indx.ToString();
+                                c.Write(" {0} = ", v.CName);
+                                ((ISCCVariable)v).PrintC(c, 0);
+                                c.WriteLine(";");
+                            }
 
+                        }
+                
+                // print variable assigments
+                c.WriteLine();
+                foreach (Module m in m_modules)
+                    foreach (SCCValueAssigment v in m.m_valuesAssigments.Values)
+                    {
+                        v.m_value.CName = C.ID(v.m_name);
+                        v.PrintC(c);
                     }
 
+
+                //print various methods
+                c.WriteLine();
                 foreach (SCCTypeAssigment t in tmp)
                 {
                     string uniqueID = DefaultBackend.Instance.TypePrefix + DefaultBackend.Instance.GetUniqueID(C.ID(t.m_name));
                     t.PrintC(c, uniqueID);
                 }
 
-                c.WriteLine();
-                foreach (Module m in m_modules)
-                    foreach (SCCValueAssigment v in m.m_valuesAssigments.Values)
-                        v.PrintC(c);
 
             }
         }

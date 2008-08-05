@@ -307,6 +307,21 @@ namespace tinyAsn1
     public abstract partial class ArrayValue : Asn1Value, ISize
     {
         public List<Asn1Value> m_children = new List<Asn1Value>();
+
+        public override IEnumerable<T> GetMySelfAndAnyChildren<T>()
+        {
+
+            if (this is T)
+                yield return this as T;
+
+            foreach (Asn1Value v in m_children)
+                if (v is T)
+                    yield return v as T;
+
+            yield break;
+        }
+
+
         public virtual List<Asn1Value> Value
         {
             get { return m_children; }

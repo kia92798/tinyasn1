@@ -257,7 +257,7 @@ type	: typeTag?
 	|stringType constraint*									-> ^(TYPE_DEF typeTag? stringType constraint*)
 	|referencedType	constraint*								-> ^(TYPE_DEF typeTag? referencedType constraint*)
 	|sequenceOfType 										-> ^(TYPE_DEF typeTag? sequenceOfType)
-	|choiceType	constraint*											-> ^(TYPE_DEF typeTag? choiceType)
+	|choiceType	constraint*									-> ^(TYPE_DEF typeTag? choiceType constraint*)
     |sequenceType constraint*								-> ^(TYPE_DEF typeTag? sequenceType constraint*)
     |setType	constraint*											-> ^(TYPE_DEF typeTag? setType)
     |setOfType												-> ^(TYPE_DEF typeTag? setOfType)

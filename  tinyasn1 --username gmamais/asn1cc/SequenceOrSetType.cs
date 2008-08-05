@@ -19,6 +19,42 @@ namespace asn1scc
 {
     public static class CSSSequenceOrSetType
     {
+
+
+        public static string CompareTo(SequenceOrSetType pThis, string varName, Asn1Value constValue)
+        {
+            string ret = string.Empty;
+
+            string varName2 = varName;
+            if (varName.Contains("->"))
+                varName2 += ".";
+            else
+                varName2 += "->";
+
+            ret += "(";
+
+            SequenceOrSetValue val = constValue as SequenceOrSetValue;
+
+            foreach (string id in val.m_children.Keys)
+            {
+                Asn1Value chVal = val.m_children[id];
+                chVal.CName = val.CName + "." + id;
+                INonPrimitiveCType chType = chVal.Type as INonPrimitiveCType;
+                if (chType != null)
+                    ret += chType.CompareTo(varName2 + id, chVal);
+                else
+                {
+                    if (ret.EndsWith(")"))
+                        ret += " && ";
+                    ret += "(" + varName2+id + " == " + chVal.ToStringC() + ")";
+                }
+            }
+
+            ret += ")";
+            return ret;
+        }
+
+
         public static void PrintHTypeDeclaration(SequenceOrSetType pThis, PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
             h.WriteLine("struct {");
@@ -69,7 +105,7 @@ namespace asn1scc
             }
         }
 
-        public static void PrintCInitialize(SequenceOrSetType pThis, PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel c, string typeName, string varName, int lev, int arrayDepth)
+        public static void PrintCInitialize(SequenceOrSetType pThis, PEREffectiveConstraint cns, Asn1Value defaultValue, StreamWriterLevel c, string typeName, string varName, int lev, int arrayDepth)
         {
             bool topLevel = !varName.Contains("->");
             string prefix = "";
@@ -78,10 +114,26 @@ namespace asn1scc
             else
                 prefix = varName + ".";
 
-            foreach (SequenceOrSetType.Child ch in pThis.m_children.Values)
+            SCCSequenceOrSetValue defVal = defaultValue as SCCSequenceOrSetValue;
+            if (defVal == null)
             {
-                ((ISCCType)ch.m_type).PrintCInitialize(ch.m_type.PEREffectiveConstraint, ch.m_defaultValue, c,
-                    typeName + "_" + C.ID(ch.m_childVarName), prefix + C.ID(ch.m_childVarName), lev, arrayDepth);
+                foreach (SequenceOrSetType.Child ch in pThis.m_children.Values)
+                {
+                    ((ISCCType)ch.m_type).PrintCInitialize(ch.m_type.PEREffectiveConstraint, ch.m_defaultValue, c,
+                        typeName + "_" + C.ID(ch.m_childVarName), prefix + C.ID(ch.m_childVarName), lev, arrayDepth);
+                }
+            }
+            else
+            {
+                foreach (string chName in defVal.m_children.Keys)
+                {
+                    Asn1Value chVal = defVal.m_children[chName];
+                    chVal.CName = defVal.CName + "." + C.ID(chName);
+                    Asn1Type chType = pThis.m_children[chName].m_type;
+                    ((ISCCType)chType).PrintCInitialize(chType.PEREffectiveConstraint, chVal, c,
+                        typeName + "_" + C.ID(chName), prefix + C.ID(chName), lev, arrayDepth);
+                    
+                }
             }
         }
 
@@ -100,6 +152,8 @@ namespace asn1scc
                 varName2 += "->";
             else
                 varName2 += ".";
+
+            CSSType.PrintCIsConstraintValid(pThis, cns, c, errorCode, typeName, varName, lev, arrayDepth);
 
             foreach (SequenceOrSetType.Child ch in pThis.m_children.Values)
             {
@@ -274,7 +328,7 @@ namespace asn1scc
         public SCCSequenceOrSetTypeChild(SequenceOrSetType.Child o) : base(o) { }
     }
 
-    public class SCCSequenceType : SequenceType, ISCCType
+    public class SCCSequenceType : SequenceType, ISCCType, INonPrimitiveCType
     {
         public void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
@@ -316,10 +370,18 @@ namespace asn1scc
         {
             CSSSequenceOrSetType.PrintCDecode(this, cns, c, varName, lev);
         }
+
+
+
+        public string CompareTo(string varName, Asn1Value constValue)
+        {
+            return CSSSequenceOrSetType.CompareTo(this, varName, constValue);
+        }
+
 
     }
 
-    public class SCCSetType : SetType, ISCCType
+    public class SCCSetType : SetType, ISCCType, INonPrimitiveCType
     {
         public void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
@@ -360,6 +422,11 @@ namespace asn1scc
         public void PrintCDecode(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
         {
             CSSSequenceOrSetType.PrintCDecode(this, cns, c, varName, lev);
+        }
+
+        public string CompareTo(string varName, Asn1Value constValue)
+        {
+            return CSSSequenceOrSetType.CompareTo(this, varName, constValue);
         }
     }
 

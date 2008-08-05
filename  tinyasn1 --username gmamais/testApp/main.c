@@ -33,19 +33,19 @@ int main(int argc, char* argv[])
 	char dummy[] = {0x40};
 
 #ifdef MSVC
-MyTestPDU testPDU;
-testPDU.a = 5;
-testPDU.a1.nCount = 5;
-testPDU.a1.arr[0] = 1;
-testPDU.a1.arr[1] = 2;
-testPDU.a1.arr[2] = 3;
-testPDU.a1.arr[3] = 4;
-testPDU.a1.arr[4] = 5;
-testPDU.b = TRUE;
-testPDU.c = 3;
-testPDU.d.nCount = 3;
-memcpy(testPDU.d.arr, dummy,1);
-testPDU.exist.b=1;
+//MyTestPDU testPDU;
+//testPDU.a = 5;
+//testPDU.a1.nCount = 5;
+//testPDU.a1.arr[0] = 1;
+//testPDU.a1.arr[1] = 2;
+//testPDU.a1.arr[2] = 3;
+//testPDU.a1.arr[3] = 4;
+//testPDU.a1.arr[4] = 5;
+//testPDU.b = TRUE;
+//testPDU.c = 3;
+//testPDU.d.nCount = 3;
+//memcpy(testPDU.d.arr, dummy,1);
+//testPDU.exist.b=1;
 #endif
 /*
 = {

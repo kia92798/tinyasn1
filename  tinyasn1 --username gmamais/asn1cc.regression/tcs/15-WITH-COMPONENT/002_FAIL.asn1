@@ -1,0 +1,14 @@
+MyModule DEFINITIONS ::= 
+BEGIN
+
+x INTEGER ::= 5
+
+MyType ::= SEQUENCE (SIZE(1..100)) OF INTEGER
+
+MyTestPDU ::= MyType (WITH COMPONENT (1..10))
+
+
+
+testPDU MyTestPDU ::= {1,2,3,4,50}
+
+END

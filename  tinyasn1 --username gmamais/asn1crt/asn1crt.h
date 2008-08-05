@@ -13,6 +13,8 @@ extern "C" {
 #define TRUE	1
 #define FALSE	0
 
+
+
 #ifndef WORD_SIZE
 #define WORD_SIZE	8
 #endif
@@ -21,6 +23,7 @@ typedef long asn1SccSint32;
 typedef unsigned long asn1SccUint32;
 
 typedef unsigned char byte;
+
 
 #if WORD_SIZE==8
 typedef long long asn1SccSint64;
@@ -51,6 +54,7 @@ typedef struct {
 
 #define ERR_INSUFFICIENT_DATA	101
 #define ERR_INCORRECT_PER_STREAM	102
+#define ERR_INVALID_CHOICE_ALTERNATIVE	103
 
 /* Bit strean functions */
 

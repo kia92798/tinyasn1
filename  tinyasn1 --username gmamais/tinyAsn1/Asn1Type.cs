@@ -831,6 +831,17 @@ namespace tinyAsn1
         string m_cname=string.Empty;
         public string CName { get { return m_cname; } set { m_cname = value; } }
 
+
+        public virtual IEnumerable<T> GetMySelfAndAnyChildren<T>() where T : Asn1Value
+        {
+
+            if (this is T)
+                yield return this as T;
+
+            yield break;
+        }
+
+
         static public Asn1Value CreateFromAntlrAst(ITree tree)
         {
 

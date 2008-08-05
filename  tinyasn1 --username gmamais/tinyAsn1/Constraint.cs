@@ -967,7 +967,9 @@ namespace tinyAsn1
 
         public override IEnumerable<Asn1Value> GetVariables()
         {
-            yield return m_val;
+            if (m_val!=null)
+                yield return m_val;
+            yield break;
         }
 
 
@@ -1135,8 +1137,11 @@ namespace tinyAsn1
 
         public override IEnumerable<Asn1Value> GetVariables()
         {
-            yield return m_min;
-            yield return m_max;
+            if (m_min!=null)
+                yield return m_min;
+            if (m_max != null)
+                yield return m_max;
+            yield break;
         }
 
 

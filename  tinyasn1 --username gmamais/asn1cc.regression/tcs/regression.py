@@ -26,8 +26,8 @@ def Work(fname):
     cmd = 'ssh gmamais@192.168.0.145 "cd tinyAsn1/asn1cc.regression/oss && rm ossSample1.exe sample1.asn1  sample1.c sample1.h oss.per_out.dat"'
     print cmd
     res = os.system(cmd) / 256
-    if res != 0:
-	log.write("[%s]command %s failed!\n" % (fname,cmd))
+#    if res != 0:
+#	log.write("[%s]command %s failed!\n" % (fname,cmd))
 #	return
 
     cmd = "scp "+ fname +" gmamais@192.168.0.145:tinyAsn1/asn1cc.regression/oss/sample1.asn1"

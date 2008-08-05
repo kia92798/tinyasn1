@@ -17,6 +17,7 @@ using Antlr.Runtime.Tree;
 using Antlr.Runtime;
 using tinyAsn1;
 using System.IO;
+using System.Globalization;
 
 namespace asn1scc
 {
@@ -29,7 +30,6 @@ namespace asn1scc
     public interface INonPrimitiveCType
     {
         string CompareTo(string varName, Asn1Value constValue);
-        string AssignTo(string varName, Asn1Value constValue, int lev);
     }
 
     public class SCCBitStringType : BitStringType, ISCCType, INonPrimitiveCType
@@ -88,21 +88,8 @@ namespace asn1scc
                 (long)Math.Ceiling((double)btVal.Value.Length / 8.0));
         }
         
-        public string AssignTo(string varName, Asn1Value constValue, int lev)
-        {
-            return "";
-        }
 
 
-        //public string WriteCode(string varName, int lev, Asn1Value constValue)
-        //{
-        //    SCCBitStringValue btVal = constValue as SCCBitStringValue;
-        //    string bitStr_nCount = "bsc_" + btVal.Value;
-        //    string bitStr_arr = "bsa_" + btVal.Value;
-
-        //    return string.Format("( ({0}.nCount == {1}) && !memcmp({0}.arr, {2}, {3}) )", varName, bitStr_nCount, bitStr_arr, (long)Math.Ceiling((double)btVal.Value.Length / 8.0));
-
-        //}
 
 
 
@@ -890,10 +877,6 @@ if ({3}+{1}>{4})
             return string.Format("( ({0}.nCount == {1}.nCount) && !memcmp({0}.arr, {1}.arr, {1}.nCount) )", varName, constValue.CName);
         }
 
-        public string AssignTo(string varName, Asn1Value constValue, int lev)
-        {
-            return "";
-        }
 
         
 
@@ -958,9 +941,9 @@ if ({3}+{1}>{4})
 
             h.P(lev);
             if (topLevel)
-                h.WriteLine("*{0} = {1};", varName, defValue);
+                h.WriteLine("*{0} = {1};", varName, defValue.ToString(NumberFormatInfo.InvariantInfo));
             else
-                h.WriteLine("{0} = {1};", varName, defValue);
+                h.WriteLine("{0} = {1};", varName, defValue.ToString(NumberFormatInfo.InvariantInfo));
 
         }
         public void VarsNeededForIsConstraintValid(int lev, OrderedDictionary<string, CLocalVariable> existingVars)
@@ -1222,13 +1205,14 @@ if ({3}+{1}>{4})
                     c.P(lev);
                     c.WriteLine("}");
 
+                    c.P(lev); c.WriteLine("for({0}=0;{0}<nCount;{0}++)", i);
                 }
                 else
                 {
-                    c.P(lev);
-                    c.WriteLine("nCount = {0};", max);
+                    //c.P(lev);
+                    //c.WriteLine("nCount = {0};", max);
+                    c.P(lev); c.WriteLine("for({0}=0;{0}<{1};{0}++)", i,max);
                 }
-                c.P(lev); c.WriteLine("for({0}=0;{0}<nCount;{0}++)", i);
                 c.P(lev); c.WriteLine("{");
                 ((ISCCSizeable)pThis).PrintCDecodeItem(cns, c, prefix + "[" + i + "]", lev + 1);
                 c.P(lev); c.WriteLine("}");
@@ -1284,10 +1268,14 @@ if ({3}+{1}>{4})
             c.WriteLine("{0} = allowedCharSet[charIndex];", varName);
         }
 
+        public static string CompareTo(IA5StringType pThis, string varName, Asn1Value constValue)
+        {
+            return string.Format("strcmp({0},{1})", varName, constValue.ToStringC());
+        }
     }
 
 
-    public class SCCIA5StringType : IA5StringType, ISCCType, ISCCSizeable
+    public class SCCIA5StringType : IA5StringType, ISCCType, ISCCSizeable, INonPrimitiveCType
     {
         public void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
@@ -1336,9 +1324,16 @@ if ({3}+{1}>{4})
         {
             SCCStringBase.PrintCDecodeItem(this, cns, c, varName, lev);
         }
+
+
+        public string CompareTo(string varName, Asn1Value constValue)
+        {
+            return SCCStringBase.CompareTo(this, varName, constValue);
+        }
+
     }
 
-    public class SCCNumericStringType : NumericStringType, ISCCType, ISCCSizeable
+    public class SCCNumericStringType : NumericStringType, ISCCType, ISCCSizeable, INonPrimitiveCType
     {
         public void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
@@ -1386,9 +1381,13 @@ if ({3}+{1}>{4})
         {
             SCCStringBase.PrintCDecodeItem(this, cns, c, varName, lev);
         }
+        public string CompareTo(string varName, Asn1Value constValue)
+        {
+            return SCCStringBase.CompareTo(this, varName, constValue);
+        }
     }
 
-    public class SCCGeneralizedTimeType : GeneralizedTimeType, ISCCType, ISCCSizeable
+    public class SCCGeneralizedTimeType : GeneralizedTimeType, ISCCType, ISCCSizeable, INonPrimitiveCType 
     {
         public void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
@@ -1436,9 +1435,13 @@ if ({3}+{1}>{4})
         {
             SCCStringBase.PrintCDecodeItem(this, cns, c, varName, lev);
         }
+        public string CompareTo(string varName, Asn1Value constValue)
+        {
+            return SCCStringBase.CompareTo(this, varName, constValue);
+        }
     }
 
-    public class SCCUTCTimeType : UTCTimeType, ISCCType, ISCCSizeable
+    public class SCCUTCTimeType : UTCTimeType, ISCCType, ISCCSizeable, INonPrimitiveCType
     {
         public void PrintHTypeDeclaration(PEREffectiveConstraint cns, StreamWriterLevel h, string typeName, string varName, int lev)
         {
@@ -1485,6 +1488,10 @@ if ({3}+{1}>{4})
         public void PrintCDecodeItem(PEREffectiveConstraint cns, StreamWriterLevel c, string varName, int lev)
         {
             SCCStringBase.PrintCDecodeItem(this, cns, c, varName, lev);
+        }
+        public string CompareTo(string varName, Asn1Value constValue)
+        {
+            return SCCStringBase.CompareTo(this, varName, constValue);
         }
     }
 }
