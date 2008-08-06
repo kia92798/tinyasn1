@@ -41,6 +41,7 @@ namespace tinyAsn1
 
         IEnumerable<T> GetMySelfAndAnyChildren<T>() where T : class, IConstraint;
         IEnumerable<Asn1Value> GetVariables();
+
     }
 
     // base class for all constraints
@@ -74,6 +75,7 @@ namespace tinyAsn1
 
             return ret;
         }
+
 
         public virtual bool isValueAllowed(Asn1Value val)
         {
@@ -311,6 +313,8 @@ namespace tinyAsn1
                 m_extConstr.Simplify();
             return this;
         }
+
+
         public override string ToString()
         {
             string ret = "";
@@ -460,6 +464,8 @@ namespace tinyAsn1
             // e.g. 1..5 | 4..10 --> 1..10  quite excotic!
             return this;
         }
+
+
         public override string ToString()
         {
             string ret ="";
@@ -1802,7 +1808,7 @@ namespace tinyAsn1
 
     public class WithComponentConstraint : BaseConstraint
     {
-        protected IConstraint m_innerTypeConstraint;
+        public IConstraint m_innerTypeConstraint;
         protected Asn1Type m_innerType;
 
 
