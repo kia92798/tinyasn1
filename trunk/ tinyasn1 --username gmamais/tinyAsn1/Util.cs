@@ -109,7 +109,8 @@ namespace tinyAsn1
         {
             if (constraint == "")
                 return "N.A.";
-            if (constraint.StartsWith("(") && constraint.EndsWith(")"))
+            
+            if (constraint.StartsWith("(") && constraint.EndsWith(")") && !constraint.Substring(1, constraint.Length - 2).Contains("("))
                 return constraint.Substring(1, constraint.Length - 2);
             return constraint;
         }

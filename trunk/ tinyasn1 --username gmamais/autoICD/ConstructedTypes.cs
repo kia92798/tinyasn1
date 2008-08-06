@@ -31,6 +31,9 @@ namespace autoICD
 
     public static class ICDBType
     {
+        public static string WithComponentWhy = "<a href=\"#WITH_COMPONENT_EXPLAINED123\"><span style=\"vertical-align: super\">?</span></a>";
+        public static string ZeroBitsWhy = "<a href=\"#ZERO_BITS_EXPLAINED123\"><span style=\"vertical-align: super\">?</span></a>";
+
         //Default implementation of PrintHtml for all types
         public static void PrintHtml(Asn1Type pThis, PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas, List<IConstraint> additonalConstraints)
         {
@@ -107,6 +110,11 @@ namespace autoICD
 
         public void PrintHtml(PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas, List<IConstraint> additonalConstraints)
         {
+
+            WithComponentsChConstraint withCom = null;
+            if (additonalConstraints != null && additonalConstraints.Count > 0)
+                withCom = additonalConstraints[0] as WithComponentsChConstraint;
+
             o.WriteLine("<a name=\"{0}\"></a>", "ICD_" + tas.m_name.Replace("-", "_"));
             o.WriteLine("<table border=\"0\" width=\"100%\" >");
             o.WriteLine("<tbody>");
@@ -159,7 +167,11 @@ namespace autoICD
             }
             foreach (ICDChoiceChild ch in m_children.Values)
             {
-                ch.PrintHtml(o, lev + 1, index, chFldNo);
+                WithComponentsConstraint.Component component = null;
+                if (withCom != null && withCom.m_components.ContainsKey(ch.m_childVarName))
+                    component = withCom.m_components[ch.m_childVarName];
+
+                ch.PrintHtml(o, lev + 1, index, chFldNo, component);
                 index++;
             }
 
@@ -216,7 +228,7 @@ namespace autoICD
 
     public class ICDChoiceChild : ChoiceChild
     {
-        internal void PrintHtml(StreamWriterLevel o, int p, int index, int fieldNo)
+        internal void PrintHtml(StreamWriterLevel o, int p, int index, int fieldNo, WithComponentsConstraint.Component cmp)
         {
             IInternalContentsInHtml intCont = m_type as IInternalContentsInHtml;
 
@@ -236,9 +248,32 @@ namespace autoICD
             else
                 o.WriteLine("<td class=\"type\">{0}</td>", m_type.Name);
 
-            o.WriteLine("<td class=\"constraint\">{0}</td>", o.Constraint(m_type.Constraints));
-            o.WriteLine("<td class=\"min\">{0}</td>", (m_type.MinBitsInPER == -1 ? "&#8734" : m_type.MinBitsInPER.ToString()));
-            o.WriteLine("<td class=\"max\">{0}{1}</td>", (m_type.MaxBitsInPER == -1 ? "&#8734" : m_type.MaxBitsInPER.ToString()), m_type.MaxBitsInPER_Explained);
+            string withComponentPart = string.Empty;
+            if (cmp != null)
+            {
+                withComponentPart = "<span style=\"color: yellow\">";
+                if (cmp.m_valueConstraint != null)
+                    withComponentPart += " (" + cmp.m_valueConstraint.ToString() + ")";
+                if (cmp.m_presenceConstraint != WithComponentsConstraint.Component.PresenseConstraint.None)
+                    withComponentPart += " " + cmp.m_presenceConstraint.ToString();
+                withComponentPart += "</span>" + ICDBType.WithComponentWhy;
+                ICDBackend.m_WithComponentMustBeExplained = true;
+            }
+
+
+            o.WriteLine("<td class=\"constraint\">{0}</td>", o.Constraint(m_type.Constraints + withComponentPart));
+
+            if (m_type.GetFinalType() is IntegerType && m_type.MinBitsInPER == 0 && m_type.MaxBitsInPER == 0)
+            {
+                o.WriteLine("<td class=\"min\">0{0}</td>", ICDBType.ZeroBitsWhy);
+                o.WriteLine("<td class=\"max\">0{0}</td>", ICDBType.ZeroBitsWhy);
+                ICDBackend.m_ZeroBitsMustBeExplained = true;
+            }
+            else
+            {
+                o.WriteLine("<td class=\"min\">{0}</td>", (m_type.MinBitsInPER == -1 ? "&#8734" : m_type.MinBitsInPER.ToString()));
+                o.WriteLine("<td class=\"max\">{0}{1}</td>", (m_type.MaxBitsInPER == -1 ? "&#8734" : m_type.MaxBitsInPER.ToString()), m_type.MaxBitsInPER_Explained);
+            }
             o.WriteLine("</tr>");
         }
     }
@@ -247,7 +282,7 @@ namespace autoICD
     {
         public ICDSequenceOrSetTypeChild() : base() { }
         public ICDSequenceOrSetTypeChild(SequenceOrSetType.Child o) : base(o) { }
-        public void PrintHtml(StreamWriterLevel o, int p, int index)
+        public void PrintHtml(StreamWriterLevel o, int p, int index, WithComponentsConstraint.Component cmp)
         {
             IInternalContentsInHtml intCont = m_type as IInternalContentsInHtml;
 
@@ -273,10 +308,32 @@ namespace autoICD
             else
                 o.WriteLine("<td class=\"type\">{0}</td>", m_type.Name);
 
-            o.WriteLine("<td class=\"constraint\">{0}</td>", o.Constraint(m_type.Constraints));
 
-            o.WriteLine("<td class=\"min\">{0}</td>", (m_type.MinBitsInPER == -1 ? "&#8734" : m_type.MinBitsInPER.ToString()));
-            o.WriteLine("<td class=\"max\">{0}{1}</td>", (m_type.MaxBitsInPER == -1 ? "&#8734" : m_type.MaxBitsInPER.ToString()), m_type.MaxBitsInPER_Explained);
+            string withComponentPart = string.Empty;
+            if (cmp != null)
+            {
+                withComponentPart = "<span style=\"color: yellow\">";
+                if (cmp.m_valueConstraint != null)
+                    withComponentPart += " (" + cmp.m_valueConstraint.ToString() + ")";
+                if (cmp.m_presenceConstraint != WithComponentsConstraint.Component.PresenseConstraint.None)
+                    withComponentPart += " " + cmp.m_presenceConstraint.ToString();
+                withComponentPart += "</span>" + ICDBType.WithComponentWhy;
+                ICDBackend.m_WithComponentMustBeExplained = true;
+            }
+
+            o.WriteLine("<td class=\"constraint\">{0}</td>", o.Constraint(m_type.Constraints + withComponentPart));
+
+            if (m_type.GetFinalType() is IntegerType && m_type.MinBitsInPER == 0 && m_type.MaxBitsInPER == 0)
+            {
+                o.WriteLine("<td class=\"min\">0{0}</td>", ICDBType.ZeroBitsWhy);
+                o.WriteLine("<td class=\"max\">0{0}</td>", ICDBType.ZeroBitsWhy);
+                ICDBackend.m_ZeroBitsMustBeExplained = true;
+            }
+            else
+            {
+                o.WriteLine("<td class=\"min\">{0}</td>", (m_type.MinBitsInPER == -1 ? "&#8734" : m_type.MinBitsInPER.ToString()));
+                o.WriteLine("<td class=\"max\">{0}{1}</td>", (m_type.MaxBitsInPER == -1 ? "&#8734" : m_type.MaxBitsInPER.ToString()), m_type.MaxBitsInPER_Explained);
+            }
             o.WriteLine("</tr>");
         }
 
@@ -301,6 +358,12 @@ namespace autoICD
 
         public static void PrintHtml(SequenceOrSetType pThis, PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas, List<IConstraint> additonalConstraints)
         {
+
+            WithComponentsSeqConstraint withCom = null;
+
+            if (additonalConstraints!=null && additonalConstraints.Count > 0)
+                withCom = additonalConstraints[0] as WithComponentsSeqConstraint;
+
             o.WriteLine("<a name=\"{0}\"></a>", "ICD_" + tas.m_name.Replace("-", "_"));
             o.WriteLine("<table border=\"0\" width=\"100%\" >");
             o.WriteLine("<tbody>");
@@ -344,7 +407,10 @@ namespace autoICD
             }
             foreach (ICDSequenceOrSetTypeChild ch in pThis.m_children.Values)
             {
-                ch.PrintHtml(o, lev + 1, ++index);
+                WithComponentsConstraint.Component component = null;
+                if (withCom != null && withCom.m_components.ContainsKey(ch.m_childVarName))
+                    component = withCom.m_components[ch.m_childVarName];
+                ch.PrintHtml(o, lev + 1, ++index, component);
             }
             o.WriteLine("</tbody>");
             o.WriteLine("</table>");
@@ -422,6 +488,11 @@ namespace autoICD
     {
         public static void PrintHtml(SizeableType pThis, PEREffectiveConstraint cns, StreamWriterLevel o, int lev, List<string> comment, TypeAssigment tas, List<IConstraint> additonalConstraints)
         {
+            WithComponentConstraint withComp = null;
+            if (additonalConstraints != null && additonalConstraints.Count > 0)
+                withComp = additonalConstraints[0] as WithComponentConstraint;
+
+
             o.WriteLine("<a name=\"{0}\"></a>", "ICD_" + tas.m_name.Replace("-", "_"));
             o.WriteLine("<table border=\"0\" width=\"100%\" >");
             o.WriteLine("<tbody>");
@@ -459,8 +530,12 @@ namespace autoICD
             o.WriteLine("</tr>");
 
 
+            IConstraint innerTypeConstraint = null;
+            if (withComp != null)
+                innerTypeConstraint = withComp.m_innerTypeConstraint;
+
             PrintSizeLengthHtml(pThis, cns, o, lev + 1, BaseConstraint.AsString(additonalConstraints));
-            PrintItemHtml(pThis, cns, o, 1);
+            PrintItemHtml(pThis, cns, o, 1, innerTypeConstraint);
 
             long mxItems = pThis.maxItems(cns);
             if (mxItems > 2 || mxItems==-1)
@@ -469,8 +544,10 @@ namespace autoICD
                 o.WriteLine("<td class=\"threeDots\" colspan=\"7\"> <p>. . .</p> </td>");
                 o.WriteLine("</tr>");
             }
+
+
             if (pThis.maxItems(cns) >= 2 || mxItems==-1)
-                PrintItemHtml(pThis, cns, o, pThis.maxItems(cns));
+                PrintItemHtml(pThis, cns, o, pThis.maxItems(cns), innerTypeConstraint);
 
             o.WriteLine("</tbody>");
             o.WriteLine("</table>");
@@ -504,7 +581,7 @@ namespace autoICD
             o.WriteLine("</tr>");
         }
 
-        private static void PrintItemHtml(SizeableType pThis, PEREffectiveConstraint cns, StreamWriterLevel o, long itemNo)
+        private static void PrintItemHtml(SizeableType pThis, PEREffectiveConstraint cns, StreamWriterLevel o, long itemNo, IConstraint innerTypeConstraint)
         {
             int inc = ((pThis.minItems(cns) == pThis.maxItems(cns) ? 0 : 1));
             string cssClass = "EvenRow";
@@ -514,9 +591,30 @@ namespace autoICD
             o.WriteLine("<td class=\"comment\">{0}</td>", "");
             o.WriteLine("<td class=\"type\">{0}</td>", InternalTypeName(pThis));
 
-            o.WriteLine("<td class=\"constraint\">{0}</td>", o.Constraint(pThis.ItemConstraint(cns)));
-            o.WriteLine("<td class=\"min\">{0}</td>", (pThis.minItemBitsInPER(cns) == -1 ? "&#8734" : pThis.minItemBitsInPER(cns).ToString()));
-            o.WriteLine("<td class=\"max\">{0}</td>", (pThis.maxItemBitsInPER(cns) == -1 ? "&#8734" : pThis.maxItemBitsInPER(cns).ToString()));
+            string withComponentPart = string.Empty;
+            if (innerTypeConstraint!=null)
+            {
+                withComponentPart = "<span style=\"color: yellow\">";
+                withComponentPart += " (" + innerTypeConstraint.ToString() + ")";
+                withComponentPart += "</span>" + ICDBType.WithComponentWhy;
+                ICDBackend.m_WithComponentMustBeExplained = true;
+            }
+
+
+            o.WriteLine("<td class=\"constraint\">{0}</td>", o.Constraint(pThis.ItemConstraint(cns) + withComponentPart));
+
+            ArrayType ppthis = pThis as ArrayType;
+            if (ppthis != null && ppthis.m_type.GetFinalType() is IntegerType && ppthis.m_type.MinBitsInPER == 0 && ppthis.m_type.MaxBitsInPER == 0)
+            {
+                o.WriteLine("<td class=\"min\">0{0}</td>", ICDBType.ZeroBitsWhy);
+                o.WriteLine("<td class=\"max\">0{0}</td>", ICDBType.ZeroBitsWhy);
+                ICDBackend.m_ZeroBitsMustBeExplained = true;
+            }
+            else
+            {
+                o.WriteLine("<td class=\"min\">{0}</td>", (pThis.minItemBitsInPER(cns) == -1 ? "&#8734" : pThis.minItemBitsInPER(cns).ToString()));
+                o.WriteLine("<td class=\"max\">{0}</td>", (pThis.maxItemBitsInPER(cns) == -1 ? "&#8734" : pThis.maxItemBitsInPER(cns).ToString()));
+            }
             o.WriteLine("</tr>");
         }
 

@@ -158,6 +158,11 @@ namespace autoICD
     public class ICDBackend : DefaultBackend
     {
         ICDBackendFactory _factory = new ICDBackendFactory();
+
+        public static bool m_WithComponentMustBeExplained = false;
+        public static bool m_ZeroBitsMustBeExplained = false;
+
+        
         public override IAsn1AbstractFactory Factory
         {
             get
@@ -219,7 +224,7 @@ namespace autoICD
                 foreach (ICDFile file in m_files)
                     file.PrintHtml(wr, 0);
 
-                if (m_HtmlIntegerSizeMustBeExplained || m_HtmlLengthSizeMustBeExplained || m_HtmlRealSizeMustBeExplained)
+                if (m_HtmlIntegerSizeMustBeExplained || m_HtmlLengthSizeMustBeExplained || m_HtmlRealSizeMustBeExplained || m_WithComponentMustBeExplained)
                 {
 
                     wr.WriteLine("<hr />");
@@ -244,6 +249,19 @@ namespace autoICD
                         wr.WriteLine("<a name=\"ARRAYS_SIZE_EXPLAINED123\"></a>");
                         wr.WriteLine("<em>Length's size explained</em><br/>");
                         wr.WriteLine("In uPER, the length determinant field, which used in the encoding of sizeable types such as SEQUENCE OFs, SET OFs, BIT STRINGs, OCTET STRINGs and character types, is at most two octets provided that (a) there is a SIZE constraint which limits the length count to a value less than 64K or (b) there is no size constraint, but in the given instance of the sizeable type the number of the elements is less than 16K. In all other cases, the sizeable type is encoded using fragmentation where the length determinant is encoded interstitially with the actual data. In this particular case (i.e. when fragmentation is applicable), the table produced by the autoICD generator does not represent correctly the physical PER encoding.");
+                    }
+
+                    if (m_WithComponentMustBeExplained)
+                    {
+                        wr.WriteLine("<a name=\"WITH_COMPONENT_EXPLAINED123\"></a>");
+                        wr.WriteLine("<em>Constraint ignored in encoding</em><br/>");
+                        wr.WriteLine("The constraint with the yellow color is not PER visible, as it derives from a WITH COMPONENT or WITH COMPONENTS contraint in the parent type, and therefore is ignored in the encoding/decoding.");
+                    }
+                    if (m_ZeroBitsMustBeExplained)
+                    {
+                        wr.WriteLine("<a name=\"ZERO_BITS_EXPLAINED123\"></a>");
+                        wr.WriteLine("<em>Field with zero size explained</em><br/>");
+                        wr.WriteLine("An integer type that is contraint to a single value (i.e. INTEGER (5) or INTEGER (1..10)(10..20)) requires zero bits when encoded in uPER since the decoder can always determine its value. In other words, a integer field which is contraint to a single value is never transmitted in uPER.");
                     }
 
                     wr.WriteLine("<hr />");
