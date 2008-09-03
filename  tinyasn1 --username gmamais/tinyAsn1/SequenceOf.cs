@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Text;
 using Antlr.Runtime.Tree;
 using Antlr.Runtime;
+using MB = System.Reflection.MethodBase;
 
 namespace tinyAsn1
 {
@@ -135,7 +136,14 @@ namespace tinyAsn1
         }
         public override bool AreConstraintsResolved()
         {
-            return base.AreConstraintsResolved() && m_type.AreConstraintsResolved();
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return true;
+
+            bool ret = base.AreConstraintsResolved() && m_type.AreConstraintsResolved();
+
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+
+            return ret;
         }
         public override bool isValueAllowed(Asn1Value val)
         {

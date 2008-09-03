@@ -1,0 +1,15 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MySQ,
+	a;
+
+
+    MySQ ::= IA5String (SIZE (1))--SIZE [1..1]--
+
+
+    a MySQ ::= "9"
+    --PER:72
+
+
+END

@@ -17,6 +17,8 @@ using System.Collections.Generic;
 using System.Text;
 using Antlr.Runtime.Tree;
 using Antlr.Runtime;
+using MB = System.Reflection.MethodBase;
+using System.Diagnostics;
 
 namespace tinyAsn1
 {
@@ -32,56 +34,103 @@ namespace tinyAsn1
         //see base class for more information
         public override long maxBitsInPER(PEREffectiveConstraint cns)
         {
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return -1;
+
+            long ret = 0;
+
             PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
 
             if (cn == null)
+            {
+                DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
                 return -1;
+            }
             if (cn.Extensible)
+            {
+                DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
                 return -1;
+            }
             if (cn.m_size.m_rootRange.m_maxIsInfinite)
+            {
+                DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
                 return -1;
+            }
             if (maxItemBitsInPER(cns) == -1)
+            {
+                DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
                 return -1;
+            }
 
             if (cn.m_size.m_rootRange.m_max < 0x10000 &&
                 cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
-                return cn.m_size.m_rootRange.m_max * maxItemBitsInPER(cns);
+            {
+                ret =  cn.m_size.m_rootRange.m_max * maxItemBitsInPER(cns);
+            } 
+            else if (cn.m_size.m_rootRange.m_max < 0x10000)
+            {
+                ret = cn.m_size.m_rootRange.m_max * maxItemBitsInPER(cns) + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
+            } else 
+                ret = cn.m_size.m_rootRange.m_max * maxItemBitsInPER(cns) + (cn.m_size.m_rootRange.m_max / 0x10000 + 3) * 8;
 
-            if (cn.m_size.m_rootRange.m_max < 0x10000)
-                return cn.m_size.m_rootRange.m_max * maxItemBitsInPER(cns) + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
-
-            return cn.m_size.m_rootRange.m_max * maxItemBitsInPER(cns) + (cn.m_size.m_rootRange.m_max / 0x10000 + 3) * 8;
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            return ret;
         }
         
         //see base class for more information
         public override long minBitsInPER(PEREffectiveConstraint cns)
         {
+
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return 0;
+            
+
             PERSizeEffectiveConstraint cn = (PERSizeEffectiveConstraint)cns;
             int extBit = 0;
             if (cn.Extensible)
                 extBit++;
 
             if (cn == null)
+            {
+                DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
                 return extBit + 8;
+            }
 
             if (!cn.m_size.m_rootRange.m_maxIsInfinite)
             {
                 if (cn.m_size.m_rootRange.m_max < 0x10000 &&
                     cn.m_size.m_rootRange.m_max == cn.m_size.m_rootRange.m_min)
-                    return extBit + cn.m_size.m_rootRange.m_min * minItemBitsInPER(cns);
+                {
+                    long ret = extBit + cn.m_size.m_rootRange.m_min * minItemBitsInPER(cns);
+                    DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+                    return ret;
+                }
 
                 if (cn.m_size.m_rootRange.m_max < 0x10000)
-                    return extBit + cn.m_size.m_rootRange.m_min * minItemBitsInPER(cns) + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
+                {
+                    long ret = extBit + cn.m_size.m_rootRange.m_min * minItemBitsInPER(cns) + PER.GetNumberOfBitsForNonNegativeInteger((ulong)(cn.m_size.m_rootRange.m_max - cn.m_size.m_rootRange.m_min));
+                    DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+                    return ret;
+                }
             }
 
 
             if (cn.m_size.m_rootRange.m_min <= 0x7F)
-                return extBit + cn.m_size.m_rootRange.m_min * minItemBitsInPER(cns) + 8;
+            {
+                long ret = extBit + cn.m_size.m_rootRange.m_min * minItemBitsInPER(cns) + 8;
+                DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+                return ret;
+            }
             if (cn.m_size.m_rootRange.m_min <= 0x3FFF)
-                return extBit + cn.m_size.m_rootRange.m_min * minItemBitsInPER(cns) + 16;
+            {
+                long ret = extBit + cn.m_size.m_rootRange.m_min * minItemBitsInPER(cns) + 16;
+                DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+                return ret;
+            }
 
-
-            return extBit + cn.m_size.m_rootRange.m_min * minItemBitsInPER(cns) + (cn.m_size.m_rootRange.m_min / 0x10000 + 3) * 8;
+            long ret2 = extBit + cn.m_size.m_rootRange.m_min * minItemBitsInPER(cns) + (cn.m_size.m_rootRange.m_min / 0x10000 + 3) * 8;
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            return ret2;
         }
 
         /// <summary>
@@ -225,12 +274,20 @@ namespace tinyAsn1
 
         public override void CheckChildrensTags()
         {
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return;
             m_type.CheckChildrensTags();
+
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+
         }
 
         public override void PerformAutomaticTagging()
         {
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return;
             m_type.PerformAutomaticTagging();
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
         }
         public override bool Compatible(Asn1Type other)
         {
@@ -261,12 +318,22 @@ namespace tinyAsn1
         
         public override long maxItemBitsInPER(PEREffectiveConstraint cns)
         {
-            return m_type.MaxBitsInPER;
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return -1;
+            long ret =  m_type.MaxBitsInPER;
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+
+            return ret;
         }
 
         public override long minItemBitsInPER(PEREffectiveConstraint cns)
         {
-            return m_type.MinBitsInPER;
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return -1;
+            long ret = m_type.MinBitsInPER;
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+
+            return ret;
         }
 
 

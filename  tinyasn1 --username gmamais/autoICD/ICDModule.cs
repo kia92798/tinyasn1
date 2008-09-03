@@ -64,7 +64,9 @@ namespace autoICD
 
             foreach (ICDTypeAssigment tas in m_typeAssigments.Values)
                 if (!topLevelPDUs.Contains(tas))
+                {
                     tas.PrintHtml(wr, p + 1);
+                }
 
             wr.WriteLine("</div>");
         }

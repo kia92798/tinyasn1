@@ -1,0 +1,9 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+	Days ::= BIT STRING ('0010'B | '0011'B) 
+
+	GG ::= Days (SIZE(1..4)) 
+
+
+
+END

@@ -411,12 +411,44 @@ namespace tinyAsn1
             return ret;
         }
 
+        private List<EnumeratedValue> m_allEnumValues = null;
+        private List<EnumeratedValue> AllEnumValues
+        {
+            get
+            {
+                if (m_allEnumValues == null)
+                {
+                    m_allEnumValues = new List<EnumeratedValue>();
+
+                    foreach (EnumeratedType.Item item in m_enumValues.Values)
+                    {
+                        EnumeratedValue val = DefaultBackend.Instance.Factory.CreateEnumeratedValue(
+                            item.m_value, item.m_id, item.antlrNode, m_module, this);
+
+                        m_allEnumValues.Add(val);
+                    }
+
+                }
+
+                return m_allEnumValues;
+            }
+        }
+
+        public override ISet GetSet(Asn1Value val)
+        {
+            DiscreetValueSetWithFiniteUniverse<EnumeratedValue> ret = new DiscreetValueSetWithFiniteUniverse<EnumeratedValue>(AllEnumValues);
+
+            ret.AddValue((EnumeratedValue)val);
+
+            return ret;
+        }
+
     }
 
 
 
 
-    public partial class EnumeratedValue : Asn1Value
+    public partial class EnumeratedValue : Asn1Value, IEquatable<EnumeratedValue>
     {
         Int64 m_value;
         public virtual Int64 Value
@@ -451,6 +483,11 @@ namespace tinyAsn1
         public override string ToString()
         {
             return ID + "(" + Value.ToString() + ")";
+        }
+
+        public bool Equals(EnumeratedValue v)
+        {
+            return v.m_value == m_value;
         }
 
         public override bool Equals(object obj)

@@ -1,0 +1,20 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MySQ,
+	a;
+
+
+    MySQ ::= SEQUENCE {
+        name [0] IMPLICIT IA5String (SIZE (1..10))(FROM ("A".."Z"))--SIZE [1..10]FROM ["ABCDEFGHIJKLMNOPQRSTUVWXYZ"]-- OPTIONAL,
+        lastName [1] IMPLICIT IA5String (SIZE (1..10))(FROM ("A".."Z"))--SIZE [1..10]FROM ["ABCDEFGHIJKLMNOPQRSTUVWXYZ"]--,
+        aFM [2] IMPLICIT NumericString (SIZE (9))(FROM ("0".."9"))--SIZE [9..9]FROM ["0123456789"]--,
+        deg [3] IMPLICIT SEQUENCE (SIZE (1..5))--SIZE [1..5]-- OF INTEGER  (1..8)--[1..8]--
+    }
+
+
+    a MySQ ::= { name "GEORGE", lastName "MAMAIS", aFM "059461880", deg { 1, 4,4 } }
+    --PER:A988E8988AC03008902CA30C4020D8
+
+
+END

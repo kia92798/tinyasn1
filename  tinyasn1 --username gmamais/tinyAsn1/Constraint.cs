@@ -42,6 +42,11 @@ namespace tinyAsn1
         IEnumerable<T> GetMySelfAndAnyChildren<T>() where T : class, IConstraint;
         IEnumerable<Asn1Value> GetVariables();
 
+        ISet GetSet();
+
+        List<KeyValuePair<string, ISet>> GetSetWithComponent();
+
+
     }
 
     // base class for all constraints
@@ -187,6 +192,16 @@ namespace tinyAsn1
 
         public virtual double m_MinRealValue { get { throw new Exception("The method or operation is not implemented."); } }
         public virtual double m_MaxRealValue { get { throw new Exception("The method or operation is not implemented."); } }
+
+        public virtual ISet GetSet()
+        {
+            return new UniversalSet();
+        }
+
+        public virtual List<KeyValuePair<string, ISet>> GetSetWithComponent()
+        {
+            return new List<KeyValuePair<string, ISet>>();
+        }
 
     }
 
@@ -378,6 +393,13 @@ namespace tinyAsn1
                 return m_constr.m_MaxRealValue;
             }
         }
+
+        public override ISet GetSet() 
+        {
+            if (m_extConstr != null)
+                return m_constr.GetSet().Simplify().Union(m_extConstr.GetSet().Simplify()).Simplify();
+            return m_constr.GetSet().Simplify();
+        }
     }
     
     /// <summary>
@@ -562,6 +584,18 @@ namespace tinyAsn1
                 return ret;
             }
         }
+
+        public override ISet GetSet()
+        {
+            if (m_items.Count == 1)
+                return m_items[0].GetSet().Simplify();
+
+            UnionSet ret = new UnionSet();
+            foreach(IConstraint c in m_items)
+                ret.AddUnionItem(c.GetSet().Simplify());
+
+            return ret.Simplify();
+        }
     }
 
     /// <summary>
@@ -731,6 +765,19 @@ namespace tinyAsn1
                 return ret;
             }
         }
+
+        public override ISet GetSet()
+        {
+            if (m_items.Count == 1)
+                return m_items[0].GetSet().Simplify();
+
+            IntersectionSet ret = new IntersectionSet();
+            foreach (IConstraint c in m_items)
+                ret.AddItem(c.GetSet().Simplify());
+
+            return ret.Simplify();
+        }
+
     }
 
     /// <summary>
@@ -854,6 +901,11 @@ namespace tinyAsn1
             }
         }
 
+        public override ISet GetSet()
+        {
+            return m_c1.GetSet().Simplify().Minus(m_c2.GetSet().Simplify()).Simplify();
+        }
+
     }
     /// <summary>
     /// All Except constraint
@@ -963,6 +1015,10 @@ namespace tinyAsn1
                 return double.PositiveInfinity;
             }
         }
+        public override ISet GetSet()
+        {
+            return m_c.GetSet().Complement().Simplify();
+        }
     }
     /// <summary>
     /// Single value constraint
@@ -970,6 +1026,11 @@ namespace tinyAsn1
     public class SingleValueConstraint : BaseConstraint
     {
         protected Asn1Value m_val;
+
+        public override ISet GetSet()
+        {
+            return m_type.GetSet(m_val);
+        }
 
         public override IEnumerable<Asn1Value> GetVariables()
         {
@@ -1105,6 +1166,14 @@ namespace tinyAsn1
             return true;
         }
 
+        public override ISet GetSet()
+        {
+            ICharacterString set = m_val as ICharacterString;
+            if (set == null)
+                throw new Exception("Internal Error");
+            return m_type.GetAlphabetSet(set.Value);
+        }
+
         public override PERIntegerEffectiveConstraint PEREffectiveIntegerRange
         {
             get
@@ -1140,6 +1209,10 @@ namespace tinyAsn1
         public bool m_minValIsInluded = true;
         public bool m_maxValIsInluded = true;
 
+        public override ISet GetSet()
+        {
+            return m_type.GetSet(m_min, m_minValIsInluded, m_max, m_maxValIsInluded);
+        }
 
         public override IEnumerable<Asn1Value> GetVariables()
         {
@@ -1381,6 +1454,11 @@ namespace tinyAsn1
             }
             
         }
+
+        public override ISet GetSet()
+        {
+            return m_type.GetAlphabetSet(m_min, m_minValIsInluded, m_max, m_maxValIsInluded);
+        }
         protected ICharacterString Lo
         {
             get { return (ICharacterString)m_min; }
@@ -1562,6 +1640,11 @@ namespace tinyAsn1
             return sizeCon.isValueAllowed(DefaultBackend.Instance.Factory.CreateIntegerValue(size.Size, m_type.m_module, null, sizeCon));
         }
 
+        public override ISet GetSet()
+        {
+            return ((IntegerValueSet)sizeCon.GetSet()).ToSizeSet();
+        }
+
         public override string ToString()
         {
             return sizeCon.ToString();
@@ -1644,7 +1727,11 @@ namespace tinyAsn1
         {
             allowed_char_set.ResolveConstraints();
         }
-        
+        public override ISet GetSet()
+        {
+            return allowed_char_set.GetSet();
+        }
+
         public override bool isValueAllowed(Asn1Value val)
         {
             ICharacterString str = val as ICharacterString;
@@ -1750,6 +1837,10 @@ namespace tinyAsn1
         public override bool isValueAllowed(Asn1Value val)
         {
             return m_otherType.isValueAllowed(val);
+        }
+        public override ISet GetSet()
+        {
+            return m_otherType.GetSet();
         }
         public override string ToString()
         {
@@ -1882,6 +1973,16 @@ namespace tinyAsn1
             return true;
         }
 
+        public override List<KeyValuePair<string, ISet>> GetSetWithComponent()
+        {
+            List<KeyValuePair<string, ISet>> ret = new List<KeyValuePair<string, ISet>>();
+
+            ISet retSet = m_innerType.GetSet().Simplify().Intersect(m_innerTypeConstraint.GetSet().Simplify()).Simplify();
+            ret.Add(new KeyValuePair<string, ISet>("", retSet));
+
+            return ret;
+        }
+
         public override string ToString()
         {
             return "WITH COMPONENT (" + m_innerTypeConstraint.ToString() + ")";
@@ -1911,6 +2012,8 @@ namespace tinyAsn1
                 return null;
             }
         }
+
+        
     }
 
     public class WithComponentsConstraint : BaseConstraint
@@ -1942,6 +2045,7 @@ namespace tinyAsn1
                     ret += " " + m_presenceConstraint.ToString();
                 return ret;
             }
+
         }
 
         public bool m_partialSpecification = false; //i.e. ... are not present
@@ -2174,6 +2278,25 @@ namespace tinyAsn1
             }
         }
 
+        public override List<KeyValuePair<string, ISet>> GetSetWithComponent()
+        {
+            List<KeyValuePair<string, ISet>> ret = new List<KeyValuePair<string, ISet>>();
+
+            foreach (Component c in m_components.Values)
+            {
+                if (c.m_valueConstraint != null)
+                {
+                    Asn1Type m_innerType = Type.m_children[c.m_name].m_type;
+                    IConstraint m_innerTypeConstraint = c.m_valueConstraint;
+                    ISet retSet = m_innerType.GetSet().Simplify().Intersect(m_innerTypeConstraint.GetSet().Simplify()).Simplify();
+                    ret.Add(new KeyValuePair<string, ISet>(c.m_name, retSet));
+                    
+                }
+            }
+
+            return ret;
+        }
+
         public override bool isValueAllowed(Asn1Value val)
         {
 
@@ -2216,6 +2339,26 @@ namespace tinyAsn1
         //    : base(type, partialSpecification, components)
         //{
         //}
+
+        public override List<KeyValuePair<string, ISet>> GetSetWithComponent()
+        {
+            List<KeyValuePair<string, ISet>> ret = new List<KeyValuePair<string, ISet>>();
+
+            foreach (Component c in m_components.Values)
+            {
+                if (c.m_valueConstraint != null)
+                {
+                    Asn1Type m_innerType = Type.m_children[c.m_name].m_type;
+                    IConstraint m_innerTypeConstraint = c.m_valueConstraint;
+                    ISet retSet = m_innerType.GetSet().Simplify().Intersect(m_innerTypeConstraint.GetSet().Simplify()).Simplify();
+                    ret.Add(new KeyValuePair<string, ISet>(c.m_name, retSet));
+
+                }
+            }
+
+            return ret;
+        }
+
         internal static IConstraint Create2(ITree tree, ChoiceType type)
         {
             OrderedDictionary<string, Component> components = new OrderedDictionary<string, Component>();
@@ -2435,7 +2578,7 @@ namespace tinyAsn1
                     "You must either use partial specification (i.e. use ...) or specify mantissa and base and exponent");
             }
 
-            WithComponentsChConstraint ret = DefaultBackend.Instance.Factory.CreateWithComponentsChConstraint();
+            WithComponentsRealConstraint ret = DefaultBackend.Instance.Factory.CreateWithComponentsRealConstraint();
             ret.m_type = type;
             ret.m_partialSpecification = partialSpecification;
             ret.m_components = components;
@@ -2524,6 +2667,23 @@ tryWithBase10:
 
             return true;
         }
+
+        public override List<KeyValuePair<string, ISet>> GetSetWithComponent()
+        {
+            List<KeyValuePair<string, ISet>> ret = new List<KeyValuePair<string, ISet>>();
+
+            foreach (Component c in m_components.Values)
+            {
+                if (c.m_valueConstraint != null)
+                {
+                    ISet retSet = c.m_valueConstraint.GetSet();
+                    ret.Add(new KeyValuePair<string, ISet>(c.m_name, retSet));
+                }
+            }
+
+            return ret;
+        }
+
     }
     /// <summary>
     /// This class represent the exception specification associated with a constraint

@@ -310,13 +310,42 @@ namespace tinyAsn1
         }
 
 
+        public override ISet GetSet(Asn1Value val)
+        {
+            IntegerValueSet ret = new IntegerValueSet();
+
+            long v = ((IntegerValue)val).Value;
+            ret.AddRange(v, v);
+            return ret;
+
+        }
+
+        public override ISet GetSet(Asn1Value min, bool minIsIncluded, Asn1Value max, bool maxIsIncluded)
+        {
+            IntegerValueSet ret = new IntegerValueSet();
+
+            long vmin = long.MinValue;
+            long vmax = long.MaxValue;
+
+            if (min != null)
+                vmin = ((IntegerValue)min).Value;
+            if (max != null)
+                vmax = ((IntegerValue)max).Value;
+            if (!minIsIncluded)
+                vmin++;
+            if (!maxIsIncluded)
+                vmax--;
+
+            ret.AddRange(vmin, vmax);
+            return ret;
+        }
 
 
     }
 
 
 
-    public partial class IntegerValue : Asn1Value
+    public partial class IntegerValue : Asn1Value, IComparable<IntegerValue>, IEquatable<IntegerValue>
     {
         Int64 m_value;
         public virtual Int64 Value
@@ -435,6 +464,24 @@ namespace tinyAsn1
         }
 
 
+
+        #region IComparable<IntegerValue> Members
+
+        public int CompareTo(IntegerValue other)
+        {
+            return Value.CompareTo(other.Value);
+        }
+
+        #endregion
+
+        #region IEquatable<IntegerValue> Members
+
+        public bool Equals(IntegerValue other)
+        {
+            return Value.Equals(other.Value);
+        }
+
+        #endregion
     }
 
 

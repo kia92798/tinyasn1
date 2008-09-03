@@ -1,0 +1,9 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+	Days ::= ENUMERATED { mon, tue, wed, thu, fri, sat, sun}
+
+	WorkingDay ::=Days (ALL EXCEPT (sat|sun))
+
+	NoDay ::=Days(WorkingDay)(sat|sun)
+
+END

@@ -1,0 +1,14 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyInt,
+	MyInt2;
+
+
+    MyInt ::= INTEGER  (1..32,...,33..128)(1..128)--[1..32,...,33..128]--
+
+    MyInt2 ::= INTEGER  ((MyInt | 15))--[1..32,...,33..128]--
+
+
+
+END

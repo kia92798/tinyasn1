@@ -1,0 +1,52 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyStr,
+	MITSOS,
+	nl,
+	cr,
+	sentence,
+	sentence2,
+	sentence3,
+	myStr2;
+
+
+    MyStr ::= IA5String
+
+    MITSOS ::= SEQUENCE {
+        a [0] IMPLICIT MyStr DEFAULT "Thanassis",
+        b [1] IMPLICIT IA5String DEFAULT "This is the first line
+This is the second line",
+        c [2] IMPLICIT IA5String DEFAULT "This is string contains a "string""
+    }
+
+
+    nl MyStr ::= "
+"
+    --PER:0114
+
+    cr MyStr ::= "
+"
+    --PER:011A
+
+    sentence MyStr ::= "This is the first line
+This is the second line"
+    --PER:2FA9A34F341A79A0E9A32A0CDA7973E883669DD9468AA9A34F341A79A0E9A32A0E7971EFDD9106CD3BB280
+
+    sentence2 MyStr ::= "This is the first line
+This is the second line"
+    --PER:2FA9A34F341A79A0E9A32A0CDA7973E883669DD9468AA9A34F341A79A0E9A32A0E7971EFDD9106CD3BB280
+
+    sentence3 MyStr ::= "This is the first line
+This is the second line
+
+This is the first line
+This is the second line"
+    --PER:62A9A34F341A79A0E9A32A0CDA7973E883669DD9468AA9A34F341A79A0E9A32A0E7971EFDD9106CD3BB28D1434554D1A79A0D3CD074D195066D3CB9F441B34EECA34554D1A79A0D3CD074D195073CB8F7EEC883669DD94
+
+    myStr2 MyStr ::= "This is the first line
+This is the second line"
+    --PER:2FA9A34F341A79A0E9A32A0CDA7973E883669DD9468AA9A34F341A79A0E9A32A0E7971EFDD9106CD3BB280
+
+
+END

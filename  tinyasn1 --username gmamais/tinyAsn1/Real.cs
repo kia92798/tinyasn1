@@ -156,6 +156,33 @@ namespace tinyAsn1
             }
         }
 
+        public override ISet GetSet(Asn1Value val)
+        {
+            RealValueSet ret = new RealValueSet();
+
+            double v = ((RealValue)val).Value;
+            ret.AddRange(v, v);
+
+            return ret;
+
+        }
+
+        public override ISet GetSet(Asn1Value min, bool minIsIncluded, Asn1Value max, bool maxIsIncluded)
+        {
+            RealValueSet ret = new RealValueSet();
+
+            double vmin = double.NegativeInfinity;
+            double vmax = double.PositiveInfinity;
+
+            if (min != null)
+                vmin = ((RealValue)min).Value;
+            if (max != null)
+                vmax = ((RealValue)max).Value;
+
+            ret.AddRange(vmin, vmax);
+            return ret;
+        }
+
     }
 
     public partial class RealValue : Asn1Value

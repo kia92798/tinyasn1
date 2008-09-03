@@ -93,9 +93,33 @@ namespace tinyAsn1
             return 1;
         }
 
+        static List<BooleanValue> _UniverseSet = new List<BooleanValue>();
+
+        public IEnumerable<BooleanValue> UniverseValues
+        {
+            get
+            {
+                if (_UniverseSet.Count == 0)
+                {
+                    _UniverseSet.Add(new BooleanValue(true));
+                    _UniverseSet.Add(new BooleanValue(false));
+                }
+                return _UniverseSet;
+            }
+        }
+
+        public override ISet GetSet(Asn1Value val)
+        {
+            DiscreetValueSetWithFiniteUniverse<BooleanValue> ret = new DiscreetValueSetWithFiniteUniverse<BooleanValue>(UniverseValues);
+
+            ret.AddValue((BooleanValue)val);
+
+            return ret;
+        }
+
     }
 
-    public partial class BooleanValue : Asn1Value
+    public partial class BooleanValue : Asn1Value, IEquatable<BooleanValue>
     {
         bool m_value = false;
         public virtual bool Value
@@ -109,6 +133,9 @@ namespace tinyAsn1
                 return "TRUE";
             return "FALSE";
         }
+
+        internal BooleanValue(bool value) { m_value = value; }
+
         public BooleanValue(ITree tree, Module mod, Asn1Type type)
         {
             m_TypeID = Asn1Value.TypeID.BOOLEAN;
@@ -151,6 +178,13 @@ namespace tinyAsn1
             ret.Add(Value);
             return ret;
         }
+
+
+        public bool Equals(BooleanValue other)
+        {
+            return m_value == other.m_value;
+        }
+
     }
 
 }

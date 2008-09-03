@@ -1,5 +1,5 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <StartArguments>-icd C:\prj\DataModeling\tinyAsn1\asn1cc\tests\asn1constant.asn</StartArguments>
+    <StartArguments>-debug C:\prj\DataModeling\tinyAsn1\tinyAsn1\tests\PER\03-string\03.asn1</StartArguments>
   </PropertyGroup>
 </Project>

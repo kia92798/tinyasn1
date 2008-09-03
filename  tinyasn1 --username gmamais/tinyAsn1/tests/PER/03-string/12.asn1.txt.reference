@@ -1,0 +1,11 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyStr;
+
+
+    MyStr ::= IA5String ((FROM ("A".."D") ^ SIZE (1..10)),...)--SIZE [1..10,...]--
+
+
+
+END

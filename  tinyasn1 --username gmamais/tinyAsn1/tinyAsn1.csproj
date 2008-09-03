@@ -62,6 +62,7 @@
     <Compile Include="DefaultBackend.cs" />
     <Compile Include="Enumerated.cs" />
     <Compile Include="Integer.cs" />
+    <Compile Include="ISet.cs" />
     <Compile Include="Module.cs" />
     <Compile Include="Null.cs" />
     <Compile Include="NumberedItem.cs" />

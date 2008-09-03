@@ -51,9 +51,9 @@ namespace asn1scc
             if (!(m_type is IA5StringType))
                 star = "*";
             h.WriteLine("void {0}_Initialize({0}{1} pVal);", uniqueID, star);
-            h.WriteLine("flag {0}_IsConstraintValid({0}{1} val, int* pErrCode);", uniqueID, star);
-            h.WriteLine("flag {0}_Encode({0}{1} val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);", uniqueID, star);
-            h.WriteLine("flag {0}_Decode({0}{1} val, BitStream* pBitStrm, int* pErrCode);", uniqueID, star);
+            h.WriteLine("flag {0}_IsConstraintValid(const {0}{1} val, int* pErrCode);", uniqueID, star);
+            h.WriteLine("flag {0}_Encode(const {0}{1} val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);", uniqueID, star);
+            h.WriteLine("flag {0}_Decode({0}{1} pVal, BitStream* pBitStrm, int* pErrCode);", uniqueID, star);
             h.WriteLine();
             h.WriteLine();
         }
@@ -81,7 +81,7 @@ namespace asn1scc
 
 
             c.WriteLine();
-            c.WriteLine("flag {0}_IsConstraintValid({0}{1} pVal, int* pErrCode)", uniqueID, star);
+            c.WriteLine("flag {0}_IsConstraintValid(const {0}{1} pVal, int* pErrCode)", uniqueID, star);
             c.WriteLine("{");
             localVars.Clear();
             ((ISCCType)m_type).VarsNeededForIsConstraintValid(1, localVars);
@@ -99,7 +99,7 @@ namespace asn1scc
                     ((ISCConstraint)t.m_constraints[i]).PrintCIsConstraintValidAuxBody(c);
 
 
-            c.WriteLine("flag {0}_Encode({0}{1} pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints)", uniqueID, star);
+            c.WriteLine("flag {0}_Encode(const {0}{1} pVal, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints)", uniqueID, star);
             c.WriteLine("{");
             localVars.Clear();
             ((ISCCType)m_type).VarsNeededForEncode(m_type.PEREffectiveConstraint, 1, localVars);

@@ -10,7 +10,7 @@ fname = "sample1.asn1"
 #os.system("cp ../../asn1crt/real.c .")
 
 baseName = os.path.splitext(fname)[0]
-cmd = "../../asn1cc/bin/Debug/asn1scc.exe -wordSize 4 "+fname
+cmd = "../../asn1cc/bin/Debug/asn1scc.exe "+fname
 print cmd
 res = os.system(cmd) / 256
 if res != 0:

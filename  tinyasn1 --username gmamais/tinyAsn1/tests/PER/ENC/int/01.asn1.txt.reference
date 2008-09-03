@@ -1,0 +1,35 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyInt,
+	myInt,
+	myInt2,
+	myInt3,
+	myInt4,
+	myInt41,
+	myInt5;
+
+
+    MyInt ::= INTEGER 
+
+
+    myInt MyInt ::= 51
+    --PER:0133
+
+    myInt2 MyInt ::= 2
+    --PER:0102
+
+    myInt3 MyInt ::= 3
+    --PER:0103
+
+    myInt4 MyInt ::= 16777215
+    --PER:0400FFFFFF
+
+    myInt41 MyInt (0..MAX)--[0..MAX]-- ::= 16777215
+    --PER:03FFFFFF
+
+    myInt5 MyInt ::= 16777216
+    --PER:0401000000
+
+
+END

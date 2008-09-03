@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Text;
 using Antlr.Runtime.Tree;
 using Antlr.Runtime;
+using MB = System.Reflection.MethodBase;
 
 namespace tinyAsn1
 {
@@ -203,12 +204,24 @@ namespace tinyAsn1
 
         public override long minItemBitsInPER(PEREffectiveConstraint cns)
         {
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return 0;
             PERAlphabetAndSizeEffectiveConstraint cn = (PERAlphabetAndSizeEffectiveConstraint)cns;
-            return BitsPerSingleChar(cn.m_from);
+            long ret = BitsPerSingleChar(cn.m_from);
+
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+
+            return ret;
         }
         public override long maxItemBitsInPER(PEREffectiveConstraint cns)
         {
-            return minItemBitsInPER(cns);
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return -1;
+            long ret = minItemBitsInPER(cns);
+
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+
+            return ret;
         }
         public override string ItemConstraint(PEREffectiveConstraint cns)
         {
@@ -221,6 +234,37 @@ namespace tinyAsn1
 
 
 
+        public override ISet GetAlphabetSet(string val)
+        {
+            AlphabetSet ret = new AlphabetSet(AllowedCharSet);
+
+            foreach (Char c in val.ToCharArray())
+                ret.AddRange(c, c);
+            
+            return ret;
+        }
+
+        public override ISet GetAlphabetSet(Asn1Value min, bool minIsIncluded, Asn1Value max, bool maxIsIncluded)
+        {
+            AlphabetSet ret = new AlphabetSet(AllowedCharSet);
+
+            char vmin = AllowedCharSet[0];
+            char vmax = AllowedCharSet[AllowedCharSet.Length - 1];
+
+            if (min != null)
+                vmin = ((IA5StringValue)min).Value.ToCharArray()[0];
+            if (max != null)
+                vmax = ((IA5StringValue)max).Value.ToCharArray()[0];
+            if (!minIsIncluded)
+                vmin++;
+            if (!maxIsIncluded)
+                vmax--;
+
+            ret.AddRange(vmin, vmax);
+
+
+            return ret;
+        }
 
     }
     /// <summary>

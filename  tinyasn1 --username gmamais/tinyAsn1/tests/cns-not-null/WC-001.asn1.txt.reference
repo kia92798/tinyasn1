@@ -1,0 +1,17 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MySq,
+	MySq2;
+
+
+    MySq ::= SEQUENCE {
+        a [0] IMPLICIT INTEGER  (0..100)--[0..100]--,
+        b [1] IMPLICIT  BIT STRING (SIZE (5))--SIZE [5..5]--
+    }
+
+    MySq2 ::= MySq (WITH COMPONENTS {..., a (1..10), b (('01010'B | '00000'B))})
+
+
+
+END
