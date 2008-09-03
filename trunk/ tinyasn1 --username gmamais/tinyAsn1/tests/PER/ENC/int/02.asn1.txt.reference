@@ -1,0 +1,64 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	myIntA,
+	myIntB,
+	myIntC,
+	myInt2,
+	myInt3,
+	myInt4,
+	myInt41,
+	myInt5,
+	myInt61,
+	myInt62,
+	myInt63,
+	myInt64,
+	myInt65,
+	myInt66;
+
+
+
+    myIntA INTEGER  (0..3)--[0..3]-- ::= 0
+    --PER:00
+
+    myIntB INTEGER  (250..257)--[250..257]-- ::= 250
+    --PER:00
+
+    myIntC INTEGER  (250..257)--[250..257]-- ::= 257
+    --PER:E0
+
+    myInt2 INTEGER  ::= 2
+    --PER:0102
+
+    myInt3 INTEGER  ::= 3
+    --PER:0103
+
+    myInt4 INTEGER  ::= 16777215
+    --PER:0400FFFFFF
+
+    myInt41 INTEGER  (0..MAX)--[0..MAX]-- ::= 16777215
+    --PER:03FFFFFF
+
+    myInt5 INTEGER  ::= 16777216
+    --PER:0401000000
+
+    myInt61 INTEGER  ::= 255
+    --PER:0200FF
+
+    myInt62 INTEGER  (0..MAX)--[0..MAX]-- ::= 255
+    --PER:01FF
+
+    myInt63 INTEGER  ::= 127
+    --PER:017F
+
+    myInt64 INTEGER  (0..MAX)--[0..MAX]-- ::= 127
+    --PER:017F
+
+    myInt65 INTEGER  ::= 128
+    --PER:020080
+
+    myInt66 INTEGER  (0..MAX)--[0..MAX]-- ::= 128
+    --PER:0180
+
+
+END

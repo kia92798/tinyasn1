@@ -416,6 +416,10 @@ namespace tinyAsn1
         public List<Asn1Type.TagSequence> getChildrenTags()
         {
             List<TagSequence> ret = new List<TagSequence>();
+
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return ret; ;
+
             foreach (ChoiceChild ch in m_children.Values)
             {
                 ChoiceType chChild = ch.m_type.GetFinalType() as ChoiceType;
@@ -424,7 +428,11 @@ namespace tinyAsn1
                 else
                     ret.Add(ch.m_type.Tags);
             }
+
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            
             return ret;
+
         }
 
         public override void CheckChildrensTags()

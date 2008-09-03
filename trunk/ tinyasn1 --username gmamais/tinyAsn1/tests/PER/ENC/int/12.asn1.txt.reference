@@ -1,0 +1,15 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MySQ,
+	a;
+
+
+    MySQ ::= NumericString (SIZE (1))--SIZE [1..1]--
+
+
+    a MySQ ::= "9"
+    --PER:A0
+
+
+END

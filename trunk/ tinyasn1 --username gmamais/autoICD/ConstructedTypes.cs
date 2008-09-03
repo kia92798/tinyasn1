@@ -373,7 +373,9 @@ namespace autoICD
             o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\"><a href=\"#{0}\">ASN.1</a></font>", "ASN1_" + tas.m_name.Replace("-", "_"));
             o.WriteLine("</td>");
             o.WriteLine("<td height=\"35\" colspan=\"2\"  align=\"center\">");
-            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">min = {0} bytes</font>", (pThis.MinBytesInPER == -1 ? "&#8734" : pThis.MinBytesInPER.ToString()));
+
+            long minBytesInPER = pThis.MinBytesInPER;
+            o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">min = {0} bytes</font>", (minBytesInPER == -1 ? "&#8734" : minBytesInPER.ToString()));
             o.WriteLine("</td>");
             o.WriteLine("<td height=\"35\" colspan=\"2\" align=\"center\">");
             o.WriteLine("<font face=\"Verdana\" color=\"#FFFFFF\" size=\"2\">max = {0} bytes</font>", (pThis.MaxBytesInPER == -1 ? "&#8734" : pThis.MaxBytesInPER.ToString()));

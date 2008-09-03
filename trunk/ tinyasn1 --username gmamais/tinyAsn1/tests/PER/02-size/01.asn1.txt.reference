@@ -1,0 +1,11 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyInt;
+
+
+    MyInt ::= SEQUENCE (SIZE (5))--SIZE [5..5]-- OF INTEGER  (1..32)--[1..32]--
+
+
+
+END

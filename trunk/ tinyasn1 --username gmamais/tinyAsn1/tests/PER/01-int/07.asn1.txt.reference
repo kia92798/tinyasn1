@@ -1,0 +1,11 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyInt;
+
+
+    MyInt ::= INTEGER  ((8 | 9 | 10))--[8..10]--
+
+
+
+END

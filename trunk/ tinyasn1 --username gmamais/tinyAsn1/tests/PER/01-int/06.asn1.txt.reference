@@ -1,0 +1,14 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyInt,
+	MyInt2;
+
+
+    MyInt ::= INTEGER  (MIN..-2)--[MIN..-2]--
+
+    MyInt2 ::= MyInt (-20..MAX)--[-20..-2]--
+
+
+
+END

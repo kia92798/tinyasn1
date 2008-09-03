@@ -44,8 +44,8 @@ EXPORTS
     myIntVal3 MyInt ::= 6
     --PER:0106
 
-    myBitStr1 MyBitStr ::= '0011'B
-    --PER:0430
+    myBitStr1 MyBitStr ::= '00110'B
+    --PER:0530
 
     myBitStr2 MyBitStr ::= '0011'B
     --PER:0430

@@ -1,0 +1,44 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	myIntA,
+	myIntAx,
+	myIntAx2,
+	myIntB,
+	myIntBx,
+	myIntBx2,
+	myIntC,
+	myIntCx,
+	myIntCx2;
+
+
+
+    myIntA INTEGER  (0..3)--[0..3]-- ::= 0
+    --PER:00
+
+    myIntAx INTEGER  (0..3,...)--[0..3,...]-- ::= 0
+    --PER:00
+
+    myIntAx2 INTEGER  (0..3,...,8..12)--[0..3,...,8..12]-- ::= 8
+    --PER:808400
+
+    myIntB INTEGER  (250..257)--[250..257]-- ::= 250
+    --PER:00
+
+    myIntBx INTEGER  (250..257,...)--[250..257,...]-- ::= 250
+    --PER:00
+
+    myIntBx2 INTEGER  (250..257,...,(280 | 281))--[250..257,...,280..281]-- ::= 280
+    --PER:81008C00
+
+    myIntC INTEGER  (250..257)--[250..257]-- ::= 257
+    --PER:E0
+
+    myIntCx INTEGER  (250..257,...)--[250..257,...]-- ::= 257
+    --PER:70
+
+    myIntCx2 INTEGER  (250..257,...,1000)--[250..257,...,1000..1000]-- ::= 1000
+    --PER:8101F400
+
+
+END

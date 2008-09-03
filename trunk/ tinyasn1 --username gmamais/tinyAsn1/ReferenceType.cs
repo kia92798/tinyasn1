@@ -332,12 +332,27 @@ namespace tinyAsn1
 
         public override long minBitsInPER(PEREffectiveConstraint cns)
         {
-            return Type.minBitsInPER(cns);
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return 0;
+
+
+            long ret =  Type.minBitsInPER(cns);
+
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            return ret;
+
+
         }
 
         public override long maxBitsInPER(PEREffectiveConstraint cns)
         {
-            return Type.maxBitsInPER(cns);
+            if (!DefaultBackend.EnterRecursiveFunc(MB.GetCurrentMethod().Name, this))
+                return 1;
+            
+            long ret = Type.maxBitsInPER(cns);
+            
+            DefaultBackend.LeaveRecursiveFunc(MB.GetCurrentMethod().Name, this);
+            return ret;
         }
 
 
@@ -402,5 +417,63 @@ namespace tinyAsn1
             return ret;
         }
 
+        public override ISet GetSet()
+        {
+            Asn1Type  curType = this;
+            ISet curSet = new UniversalSet();
+            while (curType != null)
+            {
+                curSet = curSet.Intersect(curType.GetSet(curType.m_constraints).Simplify());
+                curType = curType.ParentType;
+            }
+
+            return curSet;
+        }
+
+
+
+        public override OrderedDictionary<string, ISet> GetSetWithComponent()
+        {
+            OrderedDictionary<string, ISet> ret = new OrderedDictionary<string, ISet>();
+            Asn1Type curType = this;
+            while (curType != null)
+            {
+                foreach (IConstraint con in curType.m_constraints)
+                {
+                    List<KeyValuePair<string, ISet>> list = con.GetSetWithComponent();
+                    foreach (KeyValuePair<string, ISet> p in list)
+                    {
+                        if (!ret.ContainsKey(p.Key))
+                            ret.Add(p.Key, p.Value);
+                        else
+                            ret[p.Key] = ret[p.Key].Intersect(p.Value);
+                    }
+                }
+
+                curType = curType.ParentType;
+            }
+            return ret;
+        }
+
+
+
+        public override ISet GetSet(Asn1Value val)
+        {
+            return Type.GetSet(val);
+        }
+        public override ISet GetSet(Asn1Value min, bool minIsIncluded, Asn1Value max, bool maxIsIncluded)
+        {
+            return Type.GetSet(min, minIsIncluded, max, maxIsIncluded);
+        }
+
+        public override ISet GetAlphabetSet(string val)
+        {
+            return Type.GetAlphabetSet(val);
+        }
+
+        public override ISet GetAlphabetSet(Asn1Value min, bool minIsIncluded, Asn1Value max, bool maxIsIncluded)
+        {
+            return Type.GetAlphabetSet(min, minIsIncluded, max, maxIsIncluded);
+        }
     }
 }

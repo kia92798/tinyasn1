@@ -17,9 +17,21 @@ typedef char MyTestPDU[21];
 #define ERR_MyTestPDU		1000 /* (SIZE (20))(FROM (("A".."Z" | "a".."z" | " "))) */
 
 void MyTestPDU_Initialize(MyTestPDU pVal);
-flag MyTestPDU_IsConstraintValid(MyTestPDU val, int* pErrCode);
-flag MyTestPDU_Encode(MyTestPDU val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
-flag MyTestPDU_Decode(MyTestPDU val, BitStream* pBitStrm, int* pErrCode);
+flag MyTestPDU_IsConstraintValid(const MyTestPDU val, int* pErrCode);
+flag MyTestPDU_Encode(const MyTestPDU val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag MyTestPDU_Decode(MyTestPDU pVal, BitStream* pBitStrm, int* pErrCode);
+
+
+typedef char AAA[21];
+
+#define AAA_REQUIRED_BYTES_FOR_ENCODING		19
+
+#define ERR_AAA		1001 /* (SIZE (1..20))(("George" | "Thanassis")) */
+
+void AAA_Initialize(AAA pVal);
+flag AAA_IsConstraintValid(const AAA val, int* pErrCode);
+flag AAA_Encode(const AAA val, BitStream* pBitStrm, int* pErrCode, flag bCheckConstraints);
+flag AAA_Decode(AAA pVal, BitStream* pBitStrm, int* pErrCode);
 
 
 extern MyTestPDU testPDU;

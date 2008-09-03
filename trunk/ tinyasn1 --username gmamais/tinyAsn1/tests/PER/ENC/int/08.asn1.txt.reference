@@ -1,0 +1,19 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyRe,
+	a1,
+	a2;
+
+
+    MyRe ::= REAL
+
+
+    a1 MyRe ::= 10
+    --PER:03800105
+
+    a2 MyRe ::= 1.1
+    --PER:0980CD08CCCCCCCCCCCD
+
+
+END

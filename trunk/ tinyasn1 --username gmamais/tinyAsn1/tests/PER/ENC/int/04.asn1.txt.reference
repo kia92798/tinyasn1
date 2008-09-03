@@ -1,0 +1,42 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyEnum,
+	myVar1,
+	myVar2,
+	myVar3,
+	myVar4,
+	myVar5,
+	myVar6;
+
+
+    MyEnum ::= ENUMERATED {
+        one(0),
+        two(1),
+        three(2),
+        four(3),
+        five(4),
+        six(5)
+    }
+
+
+    myVar1 MyEnum ::= one(0)
+    --PER:00
+
+    myVar2 MyEnum ::= two(1)
+    --PER:20
+
+    myVar3 MyEnum ::= three(2)
+    --PER:40
+
+    myVar4 MyEnum ::= four(3)
+    --PER:60
+
+    myVar5 MyEnum ::= five(4)
+    --PER:80
+
+    myVar6 MyEnum ::= six(5)
+    --PER:A0
+
+
+END

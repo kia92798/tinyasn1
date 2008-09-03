@@ -1,0 +1,11 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyInt;
+
+
+    MyInt ::= INTEGER  ((5..10 | 21))(ALL EXCEPT (0..20))--[5..21]--
+
+
+
+END

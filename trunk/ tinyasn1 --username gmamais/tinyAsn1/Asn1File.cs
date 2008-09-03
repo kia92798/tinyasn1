@@ -19,6 +19,7 @@ using Antlr.Runtime.Tree;
 using Antlr.Runtime;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace tinyAsn1
 {
@@ -242,6 +243,8 @@ namespace tinyAsn1
             }
 
 
+
+
 //Phase 2: Resolve constraints
 //The AST may be traversed multiple times during phase 2
             while (!Phase2Finished())
@@ -255,7 +258,6 @@ namespace tinyAsn1
                             vas.m_type.ResolveConstraints();
                     }
             }
-
             
 //Phase 3: Check default vaules
             foreach (Asn1File f in m_files)
@@ -266,6 +268,7 @@ namespace tinyAsn1
                     foreach (ValueAssigment vas in m.m_valuesAssigments.Values)
                         vas.m_type.CheckDefaultValues();
                 }
+
 
 //Phase 4: Apply AUTOMATIC TAGGING if necessary
             foreach (Asn1File f in m_files)
@@ -279,6 +282,7 @@ namespace tinyAsn1
                             vas.m_type.PerformAutomaticTagging();
                     }
                 }
+
 
 //Phase 5: Check Tags
             foreach (Asn1File f in m_files)
@@ -306,6 +310,35 @@ namespace tinyAsn1
 
             foreach (KeyValuePair<string, Asn1Type> v in GetTypesWithPath<Asn1Type>())
                 v.Value.UniquePath = v.Key;
+
+
+//Phase 8: Check Sets i.e. check that no type has contraints that allow no values
+
+            foreach (Asn1Type t in GetTypes<Asn1Type>())
+            {
+                ISet s = t.GetSet();
+                //Console.WriteLine("== Set for type defined in line {0}", t.antlrNode.Line);
+                //Console.WriteLine(s.ToString());
+                if (s.isNull())
+                {
+                    throw new SemanticErrorException(String.Format("Error in line {0}. The contraints applied in this type do not allow any values.", t.antlrNode.Line));
+                }
+
+                OrderedDictionary<string, ISet> compSet = t.GetSetWithComponent();
+                foreach (string comp in compSet.Keys)
+                {
+                    ISet cs = compSet[comp];
+                    //Console.WriteLine("== \t With Component(s) set {0}", comp);
+                    //Console.WriteLine(cs.ToString());
+                    if (cs.isNull())
+                    {
+                        throw new SemanticErrorException(String.Format("Error in line {0}. The contraints applied in the inner type {1} do not allow any values.", t.antlrNode.Line, comp));
+                    }
+                }
+
+            }
+
+
 
 
             FixComments();

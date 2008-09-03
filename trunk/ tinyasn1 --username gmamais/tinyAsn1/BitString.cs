@@ -283,7 +283,7 @@ namespace tinyAsn1
     }
 
 
-    public partial class BitStringValue : Asn1Value, ISize
+    public partial class BitStringValue : Asn1Value, ISize, IEquatable<BitStringValue>
     {
         static Dictionary<char, string> lookup = new Dictionary<char, string>();
         static BitStringValue()
@@ -390,6 +390,13 @@ namespace tinyAsn1
                 return false;
             return oth.m_value == m_value;
         }
+
+
+        public bool Equals(BitStringValue other)
+        {
+            return m_value == other.m_value;
+        }
+
 
         public override int GetHashCode()
         {
@@ -516,6 +523,9 @@ namespace tinyAsn1
 
             return ret;
         }
+
+
+
 
 
     }

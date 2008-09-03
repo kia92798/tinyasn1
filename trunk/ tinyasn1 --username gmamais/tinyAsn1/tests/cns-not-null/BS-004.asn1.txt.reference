@@ -1,0 +1,14 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	Days,
+	GG;
+
+
+    Days ::=  BIT STRING (('0010'B | '0011'B))--SIZE [0..MAX]--
+
+    GG ::= Days (SIZE (1..4))--SIZE [1..4]--
+
+
+
+END

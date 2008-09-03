@@ -1,0 +1,11 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS::= BEGIN
+
+	MySq ::= SEQUENCE {
+		a INTEGER (0..100),
+		b BIT STRING (SIZE(5))
+	}
+
+	MySq2 ::= MySq (WITH COMPONENTS {..., a (1..10), b ('01010'B | '00000'B)})
+
+
+END

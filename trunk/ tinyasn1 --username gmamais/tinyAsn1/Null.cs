@@ -93,11 +93,25 @@ namespace tinyAsn1
         }
 
 
+        public override ISet GetSet(Asn1Value val)
+        {
+            List<NullValue> d = new List<NullValue>();
+            d.Add(new NullValue());
+            DiscreetValueSetWithFiniteUniverse<NullValue> ret = new DiscreetValueSetWithFiniteUniverse<NullValue>(d);
+
+            ret.AddValue((NullValue)val);
+
+            return ret;
+
+        }
+
     }
 
 
-    public partial class NullValue : Asn1Value
+    public partial class NullValue : Asn1Value, IEquatable<NullValue>
     {
+
+        internal NullValue() { }
         public NullValue(ITree tree, Module mod, Asn1Type type)
         {
             m_TypeID = TypeID.NULL;
@@ -138,6 +152,13 @@ namespace tinyAsn1
         public override string ToStringC()
         {
             return "0";
+        }
+
+
+
+        public bool Equals(NullValue other)
+        {
+            return true;
         }
 
     }

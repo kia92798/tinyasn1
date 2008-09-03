@@ -1,0 +1,23 @@
+MY-MODULE DEFINITIONS AUTOMATIC TAGS  ::=
+BEGIN
+EXPORTS
+	MyRe,
+	a1,
+	a2,
+	a3;
+
+
+    MyRe ::= REAL
+
+
+    a1 MyRe ::= 0
+    --PER:00
+
+    a2 MyRe ::= Infinity
+    --PER:0140
+
+    a3 MyRe ::= -Infinity
+    --PER:0141
+
+
+END

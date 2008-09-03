@@ -718,20 +718,31 @@ namespace tinyAsn1
         /// <summary>
         /// Return -1 if infinite
         /// </summary>
+        /// 
+        private long _minBitsInPer = -314;
         public long MinBitsInPER
         {
             get
             {
-                return minBitsInPER(PEREffectiveConstraint);
+                if (_minBitsInPer == -314)
+                    _minBitsInPer = minBitsInPER(PEREffectiveConstraint);
+
+                return _minBitsInPer;
             }
         }
 
         /// <summary>
         /// Return -1 if infinite
         /// </summary>
+        /// 
+        private long _maxBitsInPER = -314;
         public long MaxBitsInPER
         {
-            get { return maxBitsInPER(PEREffectiveConstraint); }
+            get { 
+                if (_maxBitsInPER == -314)
+                    _maxBitsInPER = maxBitsInPER(PEREffectiveConstraint); 
+                return _maxBitsInPER;
+            }
         }
 
         /// <summary>
@@ -798,6 +809,63 @@ namespace tinyAsn1
             return new List<string>();
         }
 
+        public virtual ISet GetSet()
+        {
+            return GetSet(m_constraints);
+        }
+
+        public ISet GetSet(IEnumerable<IConstraint> constraints)
+        {
+            ISet curSet = new UniversalSet();
+            foreach (IConstraint con in m_constraints)
+                curSet = curSet.Intersect(con.GetSet().Simplify());
+            return curSet;
+        }
+
+
+        public virtual ISet GetSet(Asn1Value val)
+        {
+            DiscreetValueSetWithInfiniteUniverseNorm<Asn1Value> ret = new DiscreetValueSetWithInfiniteUniverseNorm<Asn1Value>();
+            ret.AddValue(val);
+
+            return ret;
+        }
+
+
+        public virtual ISet GetSet(Asn1Value min, bool minIsIncluded, Asn1Value max, bool maxIsIncluded)
+        {
+            throw new Exception("abstract method called");
+        }
+
+        public virtual ISet GetAlphabetSet(string val)
+        {
+            throw new Exception("abstract method called");
+        }
+
+        public virtual ISet GetAlphabetSet(Asn1Value min, bool minIsIncluded, Asn1Value max, bool maxIsIncluded)
+        {
+            throw new Exception("abstract method called");
+        }
+
+
+        public virtual OrderedDictionary<string, ISet> GetSetWithComponent()
+        {
+            OrderedDictionary<string, ISet> ret = new OrderedDictionary<string, ISet>();
+            foreach (IConstraint con in m_constraints)
+            {
+                List<KeyValuePair<string, ISet>> list = con.GetSetWithComponent();
+                foreach (KeyValuePair<string, ISet> p in list)
+                {
+                    if (!ret.ContainsKey(p.Key))
+                        ret.Add(p.Key, p.Value);
+                    else
+                        ret[p.Key] = ret[p.Key].Intersect(p.Value);
+                }
+            }
+            return ret;
+        }
+
+
 
 
     }
@@ -820,7 +888,7 @@ namespace tinyAsn1
     /// <summary>
     /// Base class for all ASN.1 values
     /// </summary>
-    public partial class Asn1Value : IComparable
+    public partial class Asn1Value : IComparable, IEquatable<Asn1Value>
     {
         internal ITree antlrNode;
         //m_module is the module where the variable is declared where it can be different to the module of the type
@@ -942,6 +1010,12 @@ namespace tinyAsn1
         {
             return ToString();
         }
+
+        public virtual bool Equals(Asn1Value obj)
+        {
+            return Equals((object)obj);
+        }
+
     }
 
 

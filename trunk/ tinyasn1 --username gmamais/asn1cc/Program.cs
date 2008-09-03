@@ -199,7 +199,7 @@ namespace asn1scc
         static int Usage()
         {
             Console.Error.WriteLine();
-            Console.Error.WriteLine("ASN.1 Space Certified Compiler");
+            Console.Error.WriteLine("ASN.1 Space Certifiable Compiler");
             Console.Error.WriteLine("Current Version is: 0.96");
             Console.Error.WriteLine("Usage:");
             Console.Error.WriteLine();
