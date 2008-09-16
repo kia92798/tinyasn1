@@ -200,7 +200,7 @@ namespace asn1scc
         {
             Console.Error.WriteLine();
             Console.Error.WriteLine("ASN.1 Space Certifiable Compiler");
-            Console.Error.WriteLine("Current Version is: 0.96");
+            Console.Error.WriteLine("Current Version is: 1.00");
             Console.Error.WriteLine("Usage:");
             Console.Error.WriteLine();
             Console.Error.WriteLine("asn1scc [-debug] [-wordSize N] [-typePrefix prefix] [-useSpecialComments] [-o outdir] file1, file2, ..., fileN ");

@@ -119,8 +119,9 @@ namespace asn1scc
             {
                 foreach (SequenceOrSetType.Child ch in pThis.m_children.Values)
                 {
-                    ((ISCCType)ch.m_type).PrintCInitialize(ch.m_type.PEREffectiveConstraint, ch.m_defaultValue, c,
-                        typeName + "_" + C.ID(ch.m_childVarName), prefix + C.ID(ch.m_childVarName), lev, arrayDepth);
+                    ((ISCCType)ch.m_type).PrintCInitialize(ch.m_type.PEREffectiveConstraint, 
+                        (ch.m_defaultValue!=null?ch.m_defaultValue:ch.m_type.GetOneValidValue()), 
+                        c, typeName + "_" + C.ID(ch.m_childVarName), prefix + C.ID(ch.m_childVarName), lev, arrayDepth);
                 }
             }
             else

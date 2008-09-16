@@ -1008,7 +1008,7 @@ if ({3}+{1}>{4})
         }
         public void PrintCInitialize(PEREffectiveConstraint cns, Asn1Value defauleVal, StreamWriterLevel h, string typeName, string varName, int lev, int arrayDepth)
         {
-            if (m_constraints.Count == 0)
+            if (m_constraints.Count == 0 && defauleVal==null)
             {
                 h.P(lev);
                 if ((Type is IA5StringType) || !varName.Contains("->"))
