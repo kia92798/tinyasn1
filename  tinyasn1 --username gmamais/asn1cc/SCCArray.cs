@@ -371,7 +371,7 @@ for({0}=0;{0}<{1};{0}++)
 
                 c.P(lev); c.WriteLine("for({0}=0;{0}<{1};{0}++)", i, pThis.maxItems(cns));
                 c.P(lev); c.WriteLine("{");
-                ((ISCCType)pThis.m_type).PrintCInitialize(pThis.m_type.PEREffectiveConstraint, null, c,
+                ((ISCCType)pThis.m_type).PrintCInitialize(pThis.m_type.PEREffectiveConstraint, pThis.m_type.GetOneValidValue(), c,
                     typeName + "_arr", prefix + "arr[" + i + "]", lev + 1, arrayDepth + 1);
                 c.P(lev); c.WriteLine("}");
             }

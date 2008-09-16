@@ -70,7 +70,7 @@ namespace asn1scc
             OrderedDictionary<string, CLocalVariable> localVars = new OrderedDictionary<string, CLocalVariable>();
             ((ISCCType)m_type).VarsNeededForPrintCInitialize(1, localVars);
             CLocalVariable.Print(c, localVars);
-            ((ISCCType)m_type).PrintCInitialize(m_type.PEREffectiveConstraint, null, c, uniqueID, "pVal", 1, 1);
+            ((ISCCType)m_type).PrintCInitialize(m_type.PEREffectiveConstraint, m_type.GetOneValidValue(), c, uniqueID, "pVal", 1, 1);
             c.WriteLine("}");
             c.WriteLine();
 
