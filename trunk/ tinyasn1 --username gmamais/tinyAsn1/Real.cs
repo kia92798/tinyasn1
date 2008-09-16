@@ -273,6 +273,11 @@ namespace tinyAsn1
             set { m_value = value; }
         }
 
+        public RealValue(double value)
+        {
+            m_TypeID = Asn1Value.TypeID.REAL;
+            m_value = value;
+        }
 
         public RealValue(ITree tree, Module module, Asn1Type type)
         {

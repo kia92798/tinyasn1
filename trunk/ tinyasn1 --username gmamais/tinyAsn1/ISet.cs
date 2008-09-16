@@ -1,4 +1,17 @@
-﻿using System;
+﻿/**=============================================================================
+Definitions of all classes related to ASN.1 constraints semantic checking
+in autoICD and asn1scc projects  
+================================================================================
+Copyright(c) Semantix Information Technologies S.A www.semantix.gr
+All rights reserved.
+
+This source code is only intended as a supplement to the
+Semantix Technical Reference and related electronic documentation 
+provided with the autoICD and asn1scc applications.
+See these sources for detailed information regarding the
+asn1scc and autoICD applications.
+==============================================================================*/
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -16,6 +29,13 @@ namespace tinyAsn1
         bool isNull();
         SetDimension Dimension { get;}
         ISet Simplify();
+
+        /// <summary>
+        /// returns one (random) value from the set.
+        /// It returns null, if no value can be calcualted
+        /// </summary>
+        /// <returns></returns>
+        Asn1Value GetOneValue();
     }
 
 
@@ -64,6 +84,11 @@ namespace tinyAsn1
         {
             return "NULL_SET";
         }
+
+        public Asn1Value GetOneValue()
+        {
+            return null;
+        }
         #endregion
     }
 
@@ -109,6 +134,10 @@ namespace tinyAsn1
         {
             return "UNIVERSAL_SET";
         }
+        public Asn1Value GetOneValue()
+        {
+            return null;
+        }
     }
 
 
@@ -118,19 +147,6 @@ namespace tinyAsn1
         Size,
         Alphabet,
         Mixed
-    }
-
-    public static class SetAlgebra
-    {
-        public static ISet Union(ISet s1, ISet s2)
-        {
-            throw new Exception();
-        }
-
-        public static ISet Intersection(ISet s1, ISet s2)
-        {
-            throw new Exception();
-        }
     }
 
 
@@ -288,6 +304,10 @@ namespace tinyAsn1
 
 
         #endregion
+        public Asn1Value GetOneValue()
+        {
+            return null;
+        }
     }
 
 
@@ -308,10 +328,6 @@ namespace tinyAsn1
 
         public static IntersectionSet Create(ISet s1, ISet s2)
         {
-            //if (s1.Dimension == SetDimension.Mixed || s2.Dimension == SetDimension.Mixed)
-            //    throw new Exception("Internal Error: Can not create IntersectionSet with non primitives");
-            //if (s1.Dimension == s2.Dimension)
-            //    throw new Exception("Internal Error: Can not create IntersectionSet for primitives of the same dimension. Use intersection between them!");
 
             IntersectionSet ret = new IntersectionSet();
             ret.m_items.Add(s1);
@@ -355,11 +371,6 @@ namespace tinyAsn1
         {
         }
 
-        //public IntersectionSet(IEnumerable<ISet> items)
-        //{
-        //    foreach (ISet s in items)
-        //        AddItem(s);
-        //}
 
         #region ISet Members
 
@@ -488,6 +499,10 @@ namespace tinyAsn1
                 ret = ret.Substring(0, ret.Length - 1);
             ret += ")";
             return ret;
+        }
+        public Asn1Value GetOneValue()
+        {
+            return null;
         }
     }
     
@@ -899,6 +914,19 @@ namespace tinyAsn1
                     return true;
             return false;
         }
+
+        protected T GetAValidValue()
+        {
+            if (m_ranges.Count > 0)
+                return m_ranges[0].min;
+            return default(T);
+        }
+
+        public virtual Asn1Value GetOneValue()
+        {
+            return null;
+        }
+
         
     }
 
@@ -1041,6 +1069,11 @@ namespace tinyAsn1
         {
             return v - 1;
         }
+
+        public override Asn1Value GetOneValue()
+        {
+            return new IntegerValue(GetAValidValue());
+        }
     }
 
     public class RealValueSet : RangeSet<double>
@@ -1089,11 +1122,59 @@ namespace tinyAsn1
             }
             return ret;
         }
+        public override Asn1Value GetOneValue()
+        {
+            return new RealValue(GetAValidValue());
+        }
+
     }
 
 
+    //DiscreetSet
+    public abstract class DiscreetValueSetWithInfiniteUniverse<T> : DiscreetValueSet<T>, ISet where T : Asn1Value, IEquatable<T> 
+    {
 
-    public class DiscreetValueSetWithInfiniteUniverseNorm<T> : DiscreetValueSetWithInfiniteUniverse<T> where T : IEquatable<T> 
+        protected List<T> m_values = new List<T>();
+
+        public virtual IEnumerable<T> Values { get { return m_values; } }
+
+        public virtual bool HasInfiniteValues { get { return false; } }
+
+        public abstract void AddValue(T v);
+
+        public abstract bool Contains(T v);
+
+        public virtual SetDimension Dimension
+        {
+            get { return SetDimension.Value; }
+        }
+
+        public abstract DiscreetValueSetWithInfiniteUniverse<T> Clone();
+
+
+        public abstract bool isNull();
+
+        public abstract ISet Union(ISet s);
+
+        public abstract ISet Intersect(ISet s2);
+
+        public abstract ISet Minus(ISet s2);
+
+        public abstract ISet Complement();
+
+        public ISet Simplify()
+        {
+            return this;
+        }
+        public virtual Asn1Value GetOneValue()
+        {
+            return null;
+        }
+
+    }
+
+
+    public class DiscreetValueSetWithInfiniteUniverseNorm<T> : DiscreetValueSetWithInfiniteUniverse<T> where T : Asn1Value, IEquatable<T> 
     {
         public override void AddValue(T v)
         {
@@ -1186,11 +1267,17 @@ namespace tinyAsn1
             ret += ")";
             return ret;
         }
+
+        public override Asn1Value GetOneValue()
+        {
+            if (m_values.Count > 0)
+                return m_values[0];
+            return null;
+        }
     }
 
 
-
-    public class DiscreetValueSetWithInfiniteUniverseComp<T> : DiscreetValueSetWithInfiniteUniverse<T> where T : IEquatable<T>
+    public class DiscreetValueSetWithInfiniteUniverseComp<T> : DiscreetValueSetWithInfiniteUniverse<T> where T : Asn1Value, IEquatable<T>
     {
         public override void AddValue(T v)
         {
@@ -1263,6 +1350,7 @@ namespace tinyAsn1
     }
 
 
+
     public interface DiscreetValueSet<T>
     {
         IEnumerable<T> Values { get;  }
@@ -1271,47 +1359,7 @@ namespace tinyAsn1
 
     }
 
-
-    //DiscreetSet
-    public abstract class DiscreetValueSetWithInfiniteUniverse<T> : DiscreetValueSet<T>, ISet where T : IEquatable<T>
-    {
-
-        protected List<T> m_values = new List<T>();
-
-        public virtual IEnumerable<T> Values { get { return m_values; } }
-
-        public virtual bool HasInfiniteValues { get { return false; } }
-
-        public abstract void AddValue(T v);
-
-        public abstract bool Contains(T v);
-
-        public virtual SetDimension Dimension
-        {
-            get { return SetDimension.Value; }
-        }
-
-        public abstract DiscreetValueSetWithInfiniteUniverse<T> Clone();
-
-
-        public abstract bool isNull();
-
-        public abstract ISet Union(ISet s);
-
-        public abstract ISet Intersect(ISet s2);
-
-        public abstract ISet Minus(ISet s2);
-
-        public abstract ISet Complement();
-
-        public ISet Simplify()
-        {
-            return this;
-        }
-
-    }
-
-    public class DiscreetValueSetWithFiniteUniverse<T> : DiscreetValueSet<T>, ISet where T : IEquatable<T>
+    public class DiscreetValueSetWithFiniteUniverse<T> : DiscreetValueSet<T>, ISet where T : Asn1Value, IEquatable<T>
     {
         protected List<T> m_values = new List<T>();
 
@@ -1427,65 +1475,21 @@ namespace tinyAsn1
             ret += ")";
             return ret;
         }
+        public Asn1Value GetOneValue()
+        {
+            if (m_values.Count > 0)
+                return m_values[0];
+            return null;
+        }
     }
     
     
 
 
 
-#if ggg
-
-    SEQUENCE OF -> SizeSet, DiscreetValueSetWithInfiniteUniverseNorm<Asn1Value>
-    SET OF -> the same
-    SEQUENCE -> DiscreetValueSetWithInfiniteUniverseNorm<Asn1Value>
-    SET  -> the same
-    CHOICE ->DiscreetValueSetWithInfiniteUniverseNorm<Asn1Value>
-    BIT STRING -> SizeSet, DiscreetValueSetWithInfiniteUniverseNorm<Asn1Value>
-    BOOLEAN -> DiscreetValueSetWithFiniteUniverse<BooleanValue>
-    ENUMERATED ->DiscreetValueSetWithFiniteUniverse<EnumeratedValue>
-    INTEGER -> IntegerValueSet
-    NULL -> DiscreetValueSetWithFiniteUniverse<NullValue>
-    OBJECT IDENTIFIER -> DiscreetValueSetWithInfiniteUniverseNorm<Asn1Value>
-    OCTET STRING -> SizeSet, DiscreetValueSetWithInfiniteUniverseNorm<Asn1Value>
-    REAL -> RealValueSet
-    ReferencedType -> GetFinalType()
-    IA5StringType -> SizeSet, AlphabetSet, DiscreetValueSetWithInfiniteUniverseNorm<Asn1Value>
-    etc
-
-#endif
 
 
-#if gggg
 
-    public class Asn1ValueSet : SingleValueSet<Asn1Value>
-    {
-        public override IEnumerable<Asn1Value> Universe
-        {
-            get
-            {
-                return base.Universe;
-            }
-        }
-
-        public override SetDimension Dimension
-        {
-            get
-            {
-                return SetDimension.Value;
-            }
-        }
-        
-    }
-#endif
-
-    public class Dummy
-    {
-        //public static SingleValueSet<Asn1Value> Create()
-        //{
-        //    return new SingleValueSet<Asn1Value>();
-        //}
-
-    }
 
 
 }
