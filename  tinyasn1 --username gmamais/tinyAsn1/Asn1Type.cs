@@ -809,6 +809,11 @@ namespace tinyAsn1
             return new List<string>();
         }
 
+
+        public Asn1Value GetOneValidValue()
+        {
+            return GetSet().GetOneValue();
+        }
         public virtual ISet GetSet()
         {
             return GetSet(m_constraints);

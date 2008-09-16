@@ -188,7 +188,7 @@ namespace autoICD
         {
             Console.Error.WriteLine();
             Console.Error.WriteLine("Automatic ICD Generator");
-            Console.Error.WriteLine("Current Version is: 1.02");
+            Console.Error.WriteLine("Current Version is: 1.03");
             Console.Error.WriteLine("Usage:");
             Console.Error.WriteLine();
             Console.Error.WriteLine("autoICD [-o fileName.html] [-wordSize N] [-debug] [-encodeVariables] [-icd] [-useSpecialComments] file1.asn1, file2.asn1, ..., fileN.asn1 ");

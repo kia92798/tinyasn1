@@ -385,6 +385,11 @@ namespace tinyAsn1
         public static string L(long i)
         {
             string sx = "";
+
+            //Math.Abs(long.MinValue) throws an exception 
+            if (i == long.MinValue)
+                return i.ToString() + "LL";
+
             if (Math.Abs(i) > Int32.MaxValue)
                 sx = "LL";
             return i.ToString() + sx;

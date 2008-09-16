@@ -354,6 +354,12 @@ namespace tinyAsn1
             set { m_value = value; }
         }
 
+        public IntegerValue(Int64 value)
+        {
+            m_value = value;
+            m_TypeID = Asn1Value.TypeID.INT;
+        }
+
         public IntegerValue(ITree antlrNode, Module module, Asn1Type type)
         {
             m_TypeID = Asn1Value.TypeID.INT;
