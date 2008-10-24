@@ -36,6 +36,7 @@
   <ItemGroup>
     <Compile Include="Asn1Class.cs" />
     <Compile Include="BER.cs" />
+    <Compile Include="BERDump.cs" />
     <Compile Include="CSharpTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Test.cs" />

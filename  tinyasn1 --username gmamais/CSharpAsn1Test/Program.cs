@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TAP_0310;
+using TAP_0311;
 using CSharpAsn1CRT;
 namespace CSharpAsn1Test
 {
     class Program
     {
-
 
 
         static void Main(string[] args)
@@ -17,12 +16,19 @@ namespace CSharpAsn1Test
 
 //            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.4\CDDEUD2GRCPF13110";
 //            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.10\CDDEUD2GRCPF11000.131072.tap310\CDDEUD2GRCPF10000.gprs";
-            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.10\CDDEUD2GRCPF11000.131072.tap310\CDDEUD2GRCPF10000.10K";
+//            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.10\CDDEUD2GRCPF11000.131072.tap310\CDDEUD2GRCPF10000.10K";
+//            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.11\TDBHSBHPANCW00265";
+
+            string tapFile = @"\\192.168.0.145\vmware\home\gmamais\tap3oss\oss.ber_out.dat_OK_extra_field_present_in_grammar";
             if (args.Length > 0)
                 tapFile = args[0];
 
+
             
-            
+
+
+            BERDump.dump(tapFile);
+            return;
 
 
 //            using (System.IO.FileStream f = new System.IO.FileStream(tapFile, System.IO.FileMode.Open))
@@ -53,8 +59,11 @@ namespace CSharpAsn1Test
 
     public class Parents : Stack<Asn1Object>
     {
+
         public TRes GetParentOfType<TRes>() where TRes : Asn1Object
         {
+
+
             foreach (Asn1Object obj in this) 
                 if (obj is TRes)
                     return obj as TRes;
