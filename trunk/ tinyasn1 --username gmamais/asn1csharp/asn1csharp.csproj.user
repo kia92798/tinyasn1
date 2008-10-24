@@ -1,5 +1,5 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <StartArguments>-o C:\prj\DataModeling\tinyAsn1\CSharpAsn1Test\ C:\prj\DataModeling\tinyAsn1\asn1csharp\test\gm.asn1</StartArguments>
+    <StartArguments>C:\TAPKIT-nrtrde\Grammars\tap311.asn -o c:\prj\DataModeling\tinyAsn1\CSharpAsn1Test</StartArguments>
   </PropertyGroup>
 </Project>

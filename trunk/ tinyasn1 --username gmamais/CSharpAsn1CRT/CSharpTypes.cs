@@ -100,6 +100,30 @@ namespace CSharpAsn1CRT
         public abstract bool IsConstraintValid();
 
         public abstract IEnumerable<Asn1Object> GetChildren(bool includeMyself);
+
+        public virtual IEnumerable<T> GetChildren<T>() where T : Asn1Object
+        {
+            foreach (Asn1Object cu in GetChildren(false))
+            {
+                if (cu is T)
+                    yield return cu as T;
+            }
+        }
+
+        public virtual List<Asn1Object> PossibleChildren { get { return new List<Asn1Object>(); } }
+
+        public class Path
+        {
+            List<Asn1Object> nodes = new List<Asn1Object>();
+        }
+
+        public virtual IEnumerable<T> GetChildren<T>(Func<bool,Path> selector) where T : Asn1Object
+        {
+            
+            throw new Exception();
+            
+        }
+
         public virtual bool IsPrimitive { get { return true; } }
 
 

@@ -97,47 +97,47 @@ namespace CSharpAsn1CRT
         }
 
 
-//        public static Tag DecodeTag(Stream strm)
-//        {
-//            Tag ret = null;
+        public static Tag DecodeTag(Stream strm)
+        {
+            Tag ret = null;
 
 
-////            long curPos = strm.Position;
-//            int rdVal = 0;
-//            uint tagNo = 0;
-//            int i = 0;
-//            while (true)
-//            {
-//                rdVal = strm.ReadByte();
+            //            long curPos = strm.Position;
+            int rdVal = 0;
+            uint tagNo = 0;
+            int i = 0;
+            while (true)
+            {
+                rdVal = strm.ReadByte();
 
-//                if (rdVal == -1)
-//                    return ret; // null
+                if (rdVal == -1)
+                    return ret; // null
 
-//                byte b = (byte)rdVal;
-//                if (i == 0)
-//                {
-//                    ret = new Tag();
-//                    //                    ret.m_tgClass = (TagClass)Enum.ToObject(typeof(TagClass), b >> 6);
-//                    ret.m_tgClass = (TagClass)(b >> 6);
-//                    ret.isPrimitive = (b & 0x20) == 0;
-//                    ret.m_tagNo = (uint)((uint)0x1F & b);
-//                    if (ret.m_tagNo < 31)
-//                        return ret;
-//                    i++;
-//                    continue;
-//                }
+                byte b = (byte)rdVal;
+                if (i == 0)
+                {
+                    ret = new Tag();
+                    //                    ret.m_tgClass = (TagClass)Enum.ToObject(typeof(TagClass), b >> 6);
+                    ret.m_tgClass = (TagClass)(b >> 6);
+                    ret.isPrimitive = (b & 0x20) == 0;
+                    ret.m_tagNo = (uint)((uint)0x1F & b);
+                    if (ret.m_tagNo < 31)
+                        return ret;
+                    i++;
+                    continue;
+                }
 
-//                tagNo = tagNo << 7;
-//                tagNo = tagNo | (byte)(b & (byte)0x7F);
+                tagNo = tagNo << 7;
+                tagNo = tagNo | (byte)(b & (byte)0x7F);
 
-//                if ( (b & 0x80) == 0)
-//                    break;
+                if ((b & 0x80) == 0)
+                    break;
 
-//            }
-//            ret.m_tagNo = tagNo;
+            }
+            ret.m_tagNo = tagNo;
 
-//            return ret;
-//        }
+            return ret;
+        }
 
 
 //        public static int EncodeTag(Stream strm, TagClass tagClass, bool primitive, uint tagNumber)
