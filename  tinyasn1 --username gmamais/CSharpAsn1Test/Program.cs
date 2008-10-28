@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TAP_0311;
 using CSharpAsn1CRT;
+using RAP_0104;
 namespace CSharpAsn1Test
 {
     class Program
@@ -17,29 +18,36 @@ namespace CSharpAsn1Test
 //            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.4\CDDEUD2GRCPF13110";
 //            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.10\CDDEUD2GRCPF11000.131072.tap310\CDDEUD2GRCPF10000.gprs";
 //            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.10\CDDEUD2GRCPF11000.131072.tap310\CDDEUD2GRCPF10000.10K";
-//            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.11\TDBHSBHPANCW00265";
+            string tapFile = @"C:\prj\DataModeling\tinyAsn1\CSharpAsn1Test\RCCHNCMINDHR00293.dat";
 
-            string tapFile = @"\\192.168.0.145\vmware\home\gmamais\tap3oss\oss.ber_out.dat_OK_extra_field_present_in_grammar";
-            if (args.Length > 0)
-                tapFile = args[0];
+            //string tapFile = @"\\192.168.0.145\vmware\home\gmamais\tap3oss\oss.ber_out.dat_OK_extra_field_present_in_grammar";
+            //if (args.Length > 0)
+            //    tapFile = args[0];
 
 
             
 
 
-            BERDump.dump(tapFile);
-            return;
+            //BERDump.dump(tapFile);
+            //return;
 
 
 //            using (System.IO.FileStream f = new System.IO.FileStream(tapFile, System.IO.FileMode.Open))
             using (System.IO.MemoryStream f = new System.IO.MemoryStream(System.IO.File.ReadAllBytes(tapFile),false))
             {
-                DataInterChange di = new DataInterChange();
+//                DataInterChange di = new DataInterChange();
+                RapDataInterChange di = new RapDataInterChange();
                 di.Decode(f, CSharpAsn1CRT.EncodingRules.CER);
                 long t2 = Environment.TickCount;
 
 
-                
+                using (System.IO.StreamWriter oo = new System.IO.StreamWriter(tapFile + ".xml"))
+                {
+
+                    di.ToXml(oo, "RAP");
+                }
+
+
 
                 using (System.IO.FileStream w = new System.IO.FileStream(tapFile + ".new", System.IO.FileMode.Create))
                 {
