@@ -184,6 +184,11 @@ namespace CSharpAsn1CRT
 
         }
 
+        public virtual void ToXml(StreamWriter o, string tag)
+        {
+           
+        }
+
 
     }
 
@@ -220,12 +225,23 @@ namespace CSharpAsn1CRT
             if (includeMyself)
                 yield return this;
         }
+
+        public override void ToXml(StreamWriter o, string tag)
+        {
+            o.WriteLine("<{0}>NULL</{0}>", tag);
+
+        }
     }
 
     public abstract class Asn1PrimitiveObject<T> : Asn1Object
     {
         public T Value;
 
+        public override void ToXml(StreamWriter o, string tag)
+        {
+            o.WriteLine("<{0}>{1}</{0}>", tag, Value.ToString());
+
+        }
 
 
         public override bool IsConstraintValid()
@@ -429,6 +445,17 @@ namespace CSharpAsn1CRT
 
         //    }
         //}
+
+
+        public override void ToXml(StreamWriter o, string tag)
+        {
+            string tmp = string.Empty;
+
+            foreach (byte b in _Data)
+                tmp += b.ToString("X2");
+            o.WriteLine("<{0}>{1}</{0}>", tag,tmp);
+
+        }
 
 
         public override uint Encode(Stream strm, EncodingRules encRule, bool primitive, uint tag)
@@ -638,6 +665,17 @@ namespace CSharpAsn1CRT
                     yield return gch;
         }
 
+        
+        public override void ToXml(StreamWriter o, string tag)
+        {
+            o.WriteLine("<{0}>", tag);
+            foreach (Asn1Object ch in m_children)
+            {
+                ch.ToXml(o, "Item");
+            }
+            o.WriteLine("</{0}>", tag);
+        }
+
     }
 
     public abstract class Asn1SequenceOfObject<T> : Asn1ArrayObject<T> where T : Asn1Object
@@ -776,6 +814,17 @@ namespace CSharpAsn1CRT
             return m_children[ch.m_index];
         }
 
+        public override void ToXml(StreamWriter o, string tag)
+        {
+            o.WriteLine("<{0}>", tag);
+            foreach (NamedChild ch in ClassDef.m_children.Values)
+            {
+                if (m_children[ch.m_index]!=null)
+                    m_children[ch.m_index].ToXml(o, ch.m_name);
+            }
+            o.WriteLine("</{0}>", tag);
+        }
+
     }
 
 
@@ -885,6 +934,7 @@ namespace CSharpAsn1CRT
             }
             throw new Exception();
         }
+
 
     }
 
