@@ -274,9 +274,9 @@ namespace CSharpAsn1CRT
 
         }
 
-        public static void  DecodeLength(Stream strm, out uint length)
+        public static void  DecodeLength(Stream strm, out uint length, out bool indefiniteForm)
         {
-
+            indefiniteForm = false;
             int rdVal = 0;
             rdVal = strm.ReadByte();
 
@@ -292,8 +292,9 @@ namespace CSharpAsn1CRT
             }
 
             byte lenlen = (byte)(b &0x7F);
-            
+            indefiniteForm = (lenlen == 0);
             length  = 0;
+
 
             for (int i = 0; i < lenlen; i++)
             {
@@ -320,7 +321,10 @@ namespace CSharpAsn1CRT
         {
             long curPos = strm.Position;
 
-            bool ret = (strm.ReadByte() == 0 && strm.ReadByte() == 0);
+            int rdVal1 = strm.ReadByte();
+            int rdVal2 = strm.ReadByte();
+
+            bool ret = (rdVal1 == 0 && rdVal2 == 0);
 
             strm.Position = curPos;
 

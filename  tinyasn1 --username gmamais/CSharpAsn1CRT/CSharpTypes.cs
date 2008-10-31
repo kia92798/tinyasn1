@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using tinyAsn1;
 
 namespace CSharpAsn1CRT
 {
@@ -82,11 +83,15 @@ namespace CSharpAsn1CRT
 
 
     public delegate TResult Func<TResult>();
-    public delegate TResult Func<TResult, T>();
+    public delegate TResult Func<TResult, T>(T arg);
+
+    public delegate void Action();
+    public delegate void Action<T1>(T1 arg1);
+    public delegate void Action<T1,T2>(T1 arg1, T2 arg2);
     
     public abstract class Asn1Object
     {
-
+        
         
 
         public abstract uint Decode(Stream strm, EncodingRules encRule);
@@ -96,10 +101,24 @@ namespace CSharpAsn1CRT
         public abstract uint EncodeContent(Stream strm, EncodingRules encRule);
         //Decodes only the content, not tag and length
         //returns the length of bytes decoded
-        public abstract uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen);
+        public abstract uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen, bool indefiniteForm);
         public abstract bool IsConstraintValid();
 
         public abstract IEnumerable<Asn1Object> GetChildren(bool includeMyself);
+
+
+        Asn1Object _parent = null;
+        public Asn1Object Parent
+        {
+            get
+            {
+                return _parent;
+            }
+            set
+            {
+                _parent = value;
+            }
+        }
 
         public virtual IEnumerable<T> GetChildren<T>() where T : Asn1Object
         {
@@ -166,17 +185,18 @@ namespace CSharpAsn1CRT
                 throw new UnexpectedTagException();
 
             uint length = 0;
-            BER.DecodeLength(strm, out length);
+            bool indefiniteForm;
+            BER.DecodeLength(strm, out length, out indefiniteForm);
             long sPos = strm.Position;
 
-            DecodeContent(strm, encRule, length);
+            DecodeContent(strm, encRule, length, indefiniteForm);
 
             long decodedData = strm.Position - sPos;
 
-            if (length != 0 && decodedData != length)
-                throw new LengthMismatchException();
-            else if (length == 0 && decodedData > 0)
+            if (indefiniteForm)
                 BER.DecodeTwoZeros(strm); // throws LengthMismatchException if no two zeros found
+            else if (decodedData != length)
+                throw new LengthMismatchException();
 
 
 
@@ -184,7 +204,7 @@ namespace CSharpAsn1CRT
 
         }
 
-        public virtual void ToXml(StreamWriter o, string tag)
+        public virtual void ToXml(StreamWriterLevel o, string tag, int l)
         {
            
         }
@@ -196,7 +216,7 @@ namespace CSharpAsn1CRT
     public class Asn1NullObject : Asn1Object
     {
 
-        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen, bool indefiniteForm)
         {
             return 0;
         }
@@ -226,8 +246,9 @@ namespace CSharpAsn1CRT
                 yield return this;
         }
 
-        public override void ToXml(StreamWriter o, string tag)
+        public override void ToXml(StreamWriterLevel o, string tag, int l)
         {
+            o.P(l);
             o.WriteLine("<{0}>NULL</{0}>", tag);
 
         }
@@ -237,8 +258,9 @@ namespace CSharpAsn1CRT
     {
         public T Value;
 
-        public override void ToXml(StreamWriter o, string tag)
+        public override void ToXml(StreamWriterLevel o, string tag, int l)
         {
+            o.P(l);
             o.WriteLine("<{0}>{1}</{0}>", tag, Value.ToString());
 
         }
@@ -284,7 +306,7 @@ namespace CSharpAsn1CRT
         }
 
 
-        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen, bool indefiniteForm)
         {
 
             if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
@@ -303,7 +325,7 @@ namespace CSharpAsn1CRT
         {
             throw new Exception("The method or operation is not implemented.");
         }
-        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen, bool indefiniteForm)
         {
             throw new Exception("The method or operation is not implemented.");
         }
@@ -330,7 +352,7 @@ namespace CSharpAsn1CRT
             
             return 1;
         }
-        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen, bool indefiniteForm)
         {
             int n = strm.ReadByte();
             if (n == -1)
@@ -360,13 +382,23 @@ namespace CSharpAsn1CRT
             Value = string.Empty;
         }
 
-        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen, bool indefiniteForm)
         {
-            throw new Exception("The method or operation is not implemented.");
+            if (strm.Length - strm.Position < dataLen)
+                throw new UnexpectedEndOfStreamException();
+
+            byte[] _Data = new byte[dataLen];
+            strm.Read(_Data, 0, (int)dataLen);
+
+            Value = ASCIIEncoding.ASCII.GetString(_Data);
+
+            return dataLen;
         }
         public override uint EncodeContent(Stream strm, EncodingRules encRule)
         {
-            throw new Exception("The method or operation is not implemented.");
+            Byte[] _Data = ASCIIEncoding.ASCII.GetBytes(Value);
+            strm.Write(_Data, 0, _Data.Length);
+            return (uint)_Data.Length;
         }
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
@@ -414,7 +446,7 @@ namespace CSharpAsn1CRT
             return BER.EncodeInteger(strm, ValueAsLong);
         }
 
-        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen, bool indefiniteForm)
         {
             long decodedVal = BER.DecodeInteger(strm, dataLen);
             Value = (T)Enum.ToObject(Value.GetType(), decodedVal);
@@ -447,12 +479,13 @@ namespace CSharpAsn1CRT
         //}
 
 
-        public override void ToXml(StreamWriter o, string tag)
+        public override void ToXml(StreamWriterLevel o, string tag, int l)
         {
             string tmp = string.Empty;
 
             foreach (byte b in _Data)
                 tmp += b.ToString("X2");
+            o.P(l);
             o.WriteLine("<{0}>{1}</{0}>", tag,tmp);
 
         }
@@ -467,7 +500,7 @@ namespace CSharpAsn1CRT
 
             return (uint)(strm.Position - sPos);
         }
-        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen, bool indefiniteForm)
         {
             if (strm.Length - strm.Position < dataLen)
                 throw new UnexpectedEndOfStreamException();
@@ -530,7 +563,7 @@ namespace CSharpAsn1CRT
     {
         public System.Collections.BitArray m_Data = new System.Collections.BitArray(0);
 
-        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen, bool indefiniteForm)
         {
             throw new Exception("The method or operation is not implemented.");
         }
@@ -571,64 +604,52 @@ namespace CSharpAsn1CRT
         protected abstract List<UInt32> ChildTags { get;}
 
         protected abstract Func<T> CreateEmptyChild { get;}
+
+        public event Action<T> childAdded = null;
+
         public T AppendNewChild()
         {
-//            T ret = new T();
             T ret = CreateEmptyChild();
             m_children.Add(ret);
+            ret.Parent = this;
+            if (childAdded)
+                childAdded(ret);
             return ret;
         }
+
+
+        public T this[int indx] { get { return m_children[indx]; } set { m_children[indx] = value; } }
 
 
         public override bool IsPrimitive { get { return false; } }
 
 
-        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen, bool indefiniteForm)
         {
-            long decodedData = 0;
+            uint decodedData = 0;
+
             if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
             {
 
-                //Decode Length
-                uint length = dataLen;
-                long curStrPos = strm.Position;
-                //Decode content (i.e. children)
-
-                UInt32 nextTag = UInt32.MaxValue;
-                while (BER.GetNextTag(strm, out nextTag))   //on end of file or ZERO tag return 0
-//                    while (true)
+                Func<bool> cont = delegate()
                 {
-                    
-                    decodedData = strm.Position - curStrPos;
-                    if (length == 0)
-                    {
-                        if (!ChildTags.Contains(nextTag) || BER.AreNextTwoBytesZeros(strm))
-                            break;
-                        
-                    } 
-                    else if (length > 0 && decodedData >= length)
-                    {
-                        if (decodedData == length)
-                            break;
-                        throw new LengthMismatchException();
-                    }
+                    if (!indefiniteForm)
+                        return decodedData < dataLen;
+                    else
+                        return !BER.AreNextTwoBytesZeros(strm);
+                };
 
+                while (cont())
+                {
                     T ch = AppendNewChild();
-                    ch.Decode(strm, encRule);
-
-                    //if (m_children.Count > 1000)
-                    //    if (m_children.Count % 1000 == 0)
-                    //        Console.WriteLine(m_children.Count);
-
-
-
-                    // in SET OF we must check for unique values
+                    decodedData += ch.Decode(strm, encRule);
                 }
+
             }
             else
                 throw new ArgumentException("Unimplemented encoding rule");
 
-            return (uint)decodedData;
+            return decodedData;
 
         }
         public override uint EncodeContent(Stream strm, EncodingRules encRule)
@@ -665,14 +686,29 @@ namespace CSharpAsn1CRT
                     yield return gch;
         }
 
-        
-        public override void ToXml(StreamWriter o, string tag)
+
+        string _internalTypeName = null;
+        protected string InternalTypeName
         {
+            get
+            {
+                if (_internalTypeName == null)
+                    _internalTypeName = typeof(T).Name;
+                return _internalTypeName;
+            }
+        }
+
+        public override void ToXml(StreamWriterLevel o, string tag, int l)
+        {
+            o.P(l);
             o.WriteLine("<{0}>", tag);
+
+
             foreach (Asn1Object ch in m_children)
             {
-                ch.ToXml(o, "Item");
+                ch.ToXml(o, InternalTypeName,l+1);
             }
+            o.P(l);
             o.WriteLine("</{0}>", tag);
         }
 
@@ -788,6 +824,7 @@ namespace CSharpAsn1CRT
 
 
 
+
         public override IEnumerable<Asn1Object> GetChildren(bool includeMyself)
         {
             if (includeMyself)
@@ -810,18 +847,20 @@ namespace CSharpAsn1CRT
         {
             NamedChild ch = ClassDef.m_children[childName];
             m_children[ch.m_index] = ch.createObj();
-
+            m_children[ch.m_index].Parent = this;
             return m_children[ch.m_index];
         }
 
-        public override void ToXml(StreamWriter o, string tag)
+        public override void ToXml(StreamWriterLevel o, string tag, int l)
         {
+            o.P(l);
             o.WriteLine("<{0}>", tag);
             foreach (NamedChild ch in ClassDef.m_children.Values)
             {
                 if (m_children[ch.m_index]!=null)
-                    m_children[ch.m_index].ToXml(o, ch.m_name);
+                    m_children[ch.m_index].ToXml(o, ch.m_name,l+1);
             }
+            o.P(l);
             o.WriteLine("</{0}>", tag);
         }
 
@@ -858,79 +897,33 @@ namespace CSharpAsn1CRT
         }
 
         
-        //public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
-        //{
-        //    if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
-        //    {
-        //        uint ret = 0;
-        //        Tag nextTag = null;
-        //        while (BER.GetNextTag(strm, out nextTag))
-        //        {
-        //            OptionalNamedChild childClass = ClassDef.getChildByTag(nextTag);
-        //            if (childClass == null)
-        //                break;
-        //            m_children[childClass.m_index] = childClass.createObj();
-        //            ret += m_children[childClass.m_index].Decode(strm, encRule);
-        //            if (dataLen == ret)
-        //                return ret;
-        //            if (ret > dataLen)
-        //                throw new LengthMismatchException();
-        //        }
-
-
-        //        return ret;
-        //    }
-        //    throw new Exception();
-        //}
-        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen, bool indefiniteForm)
         {
             if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
             {
-                uint ret = 0;
+                uint decodedData = 0;
                 UInt32 nextTag = UInt32.MaxValue;
 
-                long pos1 = strm.Position;
-                if (dataLen > 0)
+                Func<bool, bool> terminateCond = delegate(bool indFrm)
                 {
-                    while ( BER.GetNextTag(strm, out nextTag) )   //on end of file or ZERO tag return 0
-                    {
-                        OptionalNamedChild childClass = ClassDef.getChildByTag2(nextTag);
+                    if (!indFrm)    //i.e. definite form
+                        return (decodedData < dataLen);
+                    else
+                        return !BER.AreNextTwoBytesZeros(strm);
+                };
 
-                        m_children[childClass.m_index] = childClass.createObj();
-                        ret += m_children[childClass.m_index].Decode(strm, encRule);
-                        
-                        if (dataLen == ret)
-                            return ret;
-                        if (ret > dataLen)
-                            throw new LengthMismatchException();
-                    }
-                }
-                else
+                while (terminateCond(indefiniteForm))
                 {
-                    while ( BER.GetNextTag(strm, out nextTag))   //return false on end of file or on ZERO tag
-                    {
-                        OptionalNamedChild childClass = ClassDef.getChildByTag2(nextTag);
-                        m_children[childClass.m_index] = childClass.createObj();
-                        ret += m_children[childClass.m_index].Decode(strm, encRule);
+                    BER.GetNextTag(strm, out nextTag);
+                    OptionalNamedChild childClass = ClassDef.getChildByTag2(nextTag);
 
-                    }
+                    m_children[childClass.m_index] = childClass.createObj();
+                    m_children[childClass.m_index].Parent = this;
+                    decodedData += m_children[childClass.m_index].Decode(strm, encRule);
                 }
 
+                return decodedData;
 
-                //while (BER.GetNextTag(strm, out nextTag))   //return false on end of file or on ZERO tag
-                //{
-                //    OptionalNamedChild childClass = ClassDef.getChildByTag2(nextTag);
-
-                //    m_children[childClass.m_index] = childClass.createObj();
-                //    ret += m_children[childClass.m_index].Decode(strm, encRule);
-                //    if (dataLen == ret && dataLen!=0)
-                //        return ret;
-                //    if (ret > dataLen && dataLen!=0)
-                //        throw new LengthMismatchException();
-                //}
-
-
-                return ret;
             }
             throw new Exception();
         }
@@ -975,38 +968,30 @@ namespace CSharpAsn1CRT
     {
         public Asn1ChoiceObject() : base() { }
 
-        //public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
-        //{
-        //    if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
-        //    {
 
-        //        uint ret = 0;
-        //        Tag nextTag = null;
-        //        if (BER.GetNextTag(strm, out nextTag))
-        //        {
-        //            NamedChild childClass = ClassDef.getChildByTag(nextTag);
-        //            m_children[childClass.m_index] = childClass.createObj();
-        //            m_AlternativeName = childClass.m_name;
-        //            ret += m_children[childClass.m_index].Decode(strm, encRule);
-        //        }
-                
-        //        return ret;
-        //    }
-        //    else
-        //        throw new ArgumentException("Unimplemented encoding rule");
-        //}
-
-        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen)
+        public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen, bool indefiniteForm)
         {
             if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
             {
 
                 uint ret = 0;
                 UInt32 nextTag = UInt32.MaxValue;
-                if ( BER.GetNextTag(strm, out nextTag))
+
+                Func<bool> ifCond = delegate()
                 {
+                    if (!indefiniteForm)    //i.e. definite form
+                        return dataLen>0;
+                    else
+                        return !BER.AreNextTwoBytesZeros(strm);
+                };
+
+
+                if (ifCond())
+                {
+                    BER.GetNextTag(strm, out nextTag);
                     NamedChild childClass = ClassDef.getChildByTag2(nextTag);
                     m_children[childClass.m_index] = childClass.createObj();
+                    m_children[childClass.m_index].Parent = this;
                     m_AlternativeName = childClass.m_name;
                     ret += m_children[childClass.m_index].Decode(strm, encRule);
                 }
@@ -1031,7 +1016,7 @@ namespace CSharpAsn1CRT
 
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
-            return DecodeContent(strm, encRule, uint.MaxValue);
+            return DecodeContent(strm, encRule, uint.MaxValue, false);
         }
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
@@ -1079,8 +1064,7 @@ namespace CSharpAsn1CRT
     }
 
 
-
-    
+  
 
     // The difference with the normal dictionary is that
     // the Values property retains order (as inserted)

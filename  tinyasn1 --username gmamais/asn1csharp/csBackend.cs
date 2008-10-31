@@ -63,7 +63,7 @@ namespace asn1csharp
         }
         public override NumericStringType CreateNumericStringType()
         {
-            return new NumericStringType();
+            return new CSharpNumericStringType();
         }
 
         public override SequenceType CreateSequenceType()

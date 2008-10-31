@@ -8,10 +8,10 @@ namespace CSharpAsn1CRT
 {
     public static class BERDump
     {
-        public static void dump(string fileName)
+        public static void dump(string fileName, string outFileName)
         {
             using (MemoryStream f = new MemoryStream(File.ReadAllBytes(fileName), false))
-            using (StreamWriterLevel w = new StreamWriterLevel(fileName + ".txt"))
+            using (StreamWriterLevel w = new StreamWriterLevel(outFileName))
             {
                 BERNode root = BERNode.Create(f);
                 root.dump(w, 0);
@@ -40,7 +40,8 @@ namespace CSharpAsn1CRT
             BERNode ret = null;
             Tag tg = BER.DecodeTag(strm);
             uint lenght = 0;
-            BER.DecodeLength(strm, out lenght);
+            bool indefiniteForm;
+            BER.DecodeLength(strm, out lenght, out indefiniteForm);
             if (tg.isPrimitive)
             {
                 byte[] data = new byte[lenght];
@@ -52,10 +53,12 @@ namespace CSharpAsn1CRT
             {
                 BERNodeConstructed retCon = new BERNodeConstructed(tg);
                 ret = retCon;
-                if (lenght == 0)
+//                if (lenght == 0 && (strm.Position != strm.Length))
+                if (indefiniteForm)
                 {
                     while (!BER.AreNextTwoBytesZeros(strm))
                     {
+
                         retCon.m_children.Add(Create(strm));
                     }
                     BER.DecodeTwoZeros(strm);

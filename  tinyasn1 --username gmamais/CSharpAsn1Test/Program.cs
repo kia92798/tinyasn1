@@ -4,65 +4,140 @@ using System.Text;
 using TAP_0311;
 using CSharpAsn1CRT;
 using RAP_0104;
+using tinyAsn1;
+
+
 namespace CSharpAsn1Test
 {
     class Program
     {
 
 
-        static void Main(string[] args)
+        static void usage()
         {
+            Console.WriteLine("TAP3.11 decoder");
+            Console.WriteLine("\tusage:");
 
-            long t1 = Environment.TickCount;
-
-//            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.4\CDDEUD2GRCPF13110";
-//            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.10\CDDEUD2GRCPF11000.131072.tap310\CDDEUD2GRCPF10000.gprs";
-//            string tapFile = @"C:\TAPKIT-nrtrde\SampleData\3.10\CDDEUD2GRCPF11000.131072.tap310\CDDEUD2GRCPF10000.10K";
-            string tapFile = @"C:\prj\DataModeling\tinyAsn1\CSharpAsn1Test\RCCHNCMINDHR00293.dat";
-
-            //string tapFile = @"\\192.168.0.145\vmware\home\gmamais\tap3oss\oss.ber_out.dat_OK_extra_field_present_in_grammar";
-            //if (args.Length > 0)
-            //    tapFile = args[0];
-
-
+            string appShortName = System.IO.Path.GetFileName(Environment.GetCommandLineArgs()[0]);
             
+            Console.WriteLine("{0} -i tap311file -o outFile -f BER|xml|enc", appShortName);
+
+            Environment.Exit(1);
+        }
 
 
-            //BERDump.dump(tapFile);
-            //return;
+        static void ProcessArgs(string[] args, out string inFileName, out string outFileName,
+            out bool dumpBER, out bool convertToXml, out bool encode)
+        {
+            inFileName = string.Empty;
+            outFileName = string.Empty;
+            dumpBER = false;
+            convertToXml = false;
+            encode = false;
 
-
-//            using (System.IO.FileStream f = new System.IO.FileStream(tapFile, System.IO.FileMode.Open))
-            using (System.IO.MemoryStream f = new System.IO.MemoryStream(System.IO.File.ReadAllBytes(tapFile),false))
+            for (int i = 0; i < args.Length; i++)
             {
-//                DataInterChange di = new DataInterChange();
-                RapDataInterChange di = new RapDataInterChange();
-                di.Decode(f, CSharpAsn1CRT.EncodingRules.CER);
-                long t2 = Environment.TickCount;
-
-
-                using (System.IO.StreamWriter oo = new System.IO.StreamWriter(tapFile + ".xml"))
+                if (args[i].StartsWith("-"))
                 {
-
-                    di.ToXml(oo, "RAP");
+                    if (args[i] == "-i")
+                    {
+                        i++;
+                        inFileName = args[i];
+                    }
+                    else if (args[i] == "-o")
+                    {
+                        i++;
+                        outFileName = args[i];
+                    }
+                    else if (args[i] == "-f")
+                    {
+                        i++;
+                        if (args[i] == "BER")
+                            dumpBER = true;
+                        else if (args[i] == "xml")
+                            convertToXml = true;
+                        else if (args[i] == "xml")
+                            encode = true;
+                        else
+                            usage();
+                    }
+                    else
+                        usage();
                 }
-
-
-
-                using (System.IO.FileStream w = new System.IO.FileStream(tapFile + ".new", System.IO.FileMode.Create))
-                {
-                    di.Encode(w, CSharpAsn1CRT.EncodingRules.CER);
-                    long t3 = Environment.TickCount;
-
-                    Console.WriteLine("Time for decoding: {0}", t2 - t1);
-                    Console.WriteLine("Time for encoding: {0}", t3 - t2);
-                    Console.WriteLine("Total time : {0}", t3 - t1);
-
-                }
+                else
+                    usage();
             }
 
+            if (inFileName == string.Empty || outFileName == string.Empty || 
+                (convertToXml == false && dumpBER == false && encode==false))
+                usage();
         }
+
+        static int Main2(string[] args)
+        {
+            string inFileName;
+            string outFileName;
+            bool dumpBER;
+            bool convertToXml;
+            bool encode;
+
+
+            ProcessArgs(args, out inFileName, out outFileName, out dumpBER, out convertToXml, out encode);
+            if (dumpBER)
+            {
+                BERDump.dump(inFileName, outFileName);
+            }
+            else if (convertToXml || encode)
+            {
+                using (System.IO.MemoryStream f = new System.IO.MemoryStream(System.IO.File.ReadAllBytes(inFileName), false))
+                {
+                    DataInterChange di = new DataInterChange();
+                    di.Decode(f, CSharpAsn1CRT.EncodingRules.CER);
+
+                    if (convertToXml)
+                    {
+                        using (StreamWriterLevel oo = new StreamWriterLevel(outFileName))
+                        {
+                            di.ToXml(oo, "TAP", 0);
+                        }
+                    }
+                    else
+                    {
+                        using (System.IO.FileStream w = new System.IO.FileStream(outFileName, System.IO.FileMode.Create))
+                        {
+                            di.Encode(w, CSharpAsn1CRT.EncodingRules.CER);
+                        }
+                    }
+                }
+
+            }
+            return 0;
+
+        }
+
+
+
+        static int Main(string[] args)
+        {
+            if (System.Diagnostics.Debugger.IsAttached)
+                return Main2(args);
+            try
+            {
+                return Main2(args);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine("Unkown exception ...");
+                Console.Error.WriteLine(ex.Message);
+                Console.Error.WriteLine(ex.StackTrace);
+                return 3;
+            }
+        }
+    
+    
     }
+
+
 
 
     public class Parents : Stack<Asn1Object>
