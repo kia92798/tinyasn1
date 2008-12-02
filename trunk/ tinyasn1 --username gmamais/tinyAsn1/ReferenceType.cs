@@ -17,6 +17,7 @@ using System.Text;
 using Antlr.Runtime.Tree;
 using Antlr.Runtime;
 using MB = System.Reflection.MethodBase;
+using semantix.util;
 
 namespace tinyAsn1
 {
@@ -474,6 +475,19 @@ namespace tinyAsn1
         public override ISet GetAlphabetSet(Asn1Value min, bool minIsIncluded, Asn1Value max, bool maxIsIncluded)
         {
             return Type.GetAlphabetSet(min, minIsIncluded, max, maxIsIncluded);
+        }
+
+        public override void ToXml2(StreamWriterLevel o, int p)
+        {
+            string mod = string.Empty;
+            if (m_referencedModName!="")
+                mod = string.Format(" ReferencedModName=\"{0}\"", m_referencedModName);
+
+            string min = string.Empty;
+            string max = string.Empty;
+
+            o.P(p); o.WriteLine("<ReferenceType ReferencedTypeName=\"{0}\"{1}{2}{2} />",
+                m_referencedTypeName, mod, min, max);
         }
     }
 }

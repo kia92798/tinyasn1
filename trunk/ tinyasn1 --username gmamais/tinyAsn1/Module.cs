@@ -18,6 +18,7 @@ using System.Text;
 using Antlr.Runtime.Tree;
 using Antlr.Runtime;
 using System.IO;
+using semantix.util;
 
 namespace tinyAsn1
 {
@@ -392,6 +393,64 @@ namespace tinyAsn1
 
 
 
+
+        public void ToXml(StreamWriterLevel o, int p)
+        {
+            o.P(p);o.WriteLine("<Asn1Module ID=\"{0}\" TaggingMode=\"{1}\" ExtensibilityImplied=\"{2}\" >",
+                m_moduleID, m_taggingMode.ToString(), m_extensibilityImplied.ToString() );
+
+            o.P(p); o.WriteLine("<ExportedTypes>");
+            foreach (string expType in m_exportedTypes)
+            {
+                o.P(p + 1); o.WriteLine("<ExportedType Name=\"{0}\" />",expType);
+            }
+            o.P(p); o.WriteLine("</ExportedTypes>");
+
+            o.P(p); o.WriteLine("<ExportedVariables>");
+            foreach (string expVar in m_exportedVariables)
+            {
+                o.P(p + 1); o.WriteLine("<ExportedVariable Name=\"{0}\" />", expVar);
+            }
+            o.P(p); o.WriteLine("</ExportedVariables>");
+
+            o.P(p); o.WriteLine("<ImportedModules>");
+            foreach (ImportedModule imp in m_imports)
+            {
+                o.P(p + 1); o.WriteLine("<ImportedModule ID=\"{0}\">", imp.m_moduleID);
+
+                o.P(p+1); o.WriteLine("<ImportedTypes>");
+                foreach (string expType in imp.m_importedTypes)
+                {
+                    o.P(p + 2); o.WriteLine("<ImportedType Name=\"{0}\" />", expType);
+                }
+                o.P(p+1); o.WriteLine("</ImportedTypes>");
+
+                o.P(p+1); o.WriteLine("<ImportedVariables>");
+                foreach (string expVar in imp.m_importedVariables)
+                {
+                    o.P(p + 2); o.WriteLine("<ImportedVariable Name=\"{0}\" />", expVar);
+                }
+                o.P(p+1); o.WriteLine("</ImportedVariables>");
+
+                o.P(p + 1); o.WriteLine("</ImportedModule>");
+            }
+            o.P(p); o.WriteLine("</ImportedModules>");
+
+            
+            o.P(p); o.WriteLine("<TypeAssignments>");
+
+            foreach (TypeAssigment tas in m_typeAssigments.Values)
+            {
+                o.P(p + 1); o.WriteLine("<TypeAssignment Name=\"{0}\" Line=\"{1}\" CharPositionInLine=\"{2}\">",
+                    tas.m_name, tas.antlrNode.Line, tas.antlrNode.CharPositionInLine);
+                tas.m_type.ToXml(o, p + 2);
+                o.P(p + 1); o.WriteLine("</TypeAssignment>");
+            }
+
+            o.P(p); o.WriteLine("</TypeAssignments>");
+
+            o.P(p); o.WriteLine("</Asn1Module>");
+        }
     }
 
     /// <summary>

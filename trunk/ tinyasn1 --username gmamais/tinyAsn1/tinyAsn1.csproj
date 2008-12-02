@@ -86,6 +86,10 @@
       <Project>{029A06B3-D105-43EE-847B-30456C9F1F48}</Project>
       <Name>AntrlParser</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Util\Util.csproj">
+      <Project>{EA7C291B-8B03-4D02-906A-87561F46278F}</Project>
+      <Name>Util</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
