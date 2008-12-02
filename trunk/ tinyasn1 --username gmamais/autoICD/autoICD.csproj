@@ -65,6 +65,10 @@
       <Project>{AA87CFEC-3291-4F26-8ACC-3FDD380805D5}</Project>
       <Name>tinyAsn1</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Util\Util.csproj">
+      <Project>{EA7C291B-8B03-4D02-906A-87561F46278F}</Project>
+      <Name>Util</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
