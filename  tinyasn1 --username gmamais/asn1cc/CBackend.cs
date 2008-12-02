@@ -17,6 +17,7 @@ using System.Text;
 using Antlr.Runtime.Tree;
 using Antlr.Runtime;
 using tinyAsn1;
+using semantix.util;
 
 namespace asn1scc
 {
