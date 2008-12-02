@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Antlr.Runtime.Tree;
+using semantix.util;
 
 namespace tinyAsn1
 {
@@ -873,6 +874,30 @@ namespace tinyAsn1
 
 
 
+
+        public void ToXml(StreamWriterLevel o, int p)
+        {
+            if (Tags.m_tags.Count > 0)
+            {
+                Tag prTag = Tags.m_tags[0];
+                o.P(p); o.WriteLine("<Type Line=\"{0}\" CharPositionInLine=\"{1}\" TagClass=\"{2}\" TaggingMode=\"{3}\" TagNo=\"{4}\">",
+    antlrNode.Line, antlrNode.CharPositionInLine, prTag.m_class.ToString(), prTag.m_taggingMode.ToString(), prTag.m_tag);
+            }
+            else
+            {
+                o.P(p); o.WriteLine("<Type Line=\"{0}\" CharPositionInLine=\"{1}\">",antlrNode.Line, antlrNode.CharPositionInLine);
+            }
+
+            ToXml2(o, p + 1);
+
+            
+            o.P(p); o.WriteLine("</Type>");
+        }
+
+        public virtual void ToXml2(StreamWriterLevel o, int p)
+        {
+
+        }
     }
 
 

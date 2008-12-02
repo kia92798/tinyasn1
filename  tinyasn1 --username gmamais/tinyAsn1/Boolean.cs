@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Text;
 using Antlr.Runtime.Tree;
 using Antlr.Runtime;
+using semantix.util;
 
 namespace tinyAsn1
 {
@@ -116,7 +117,10 @@ namespace tinyAsn1
 
             return ret;
         }
-
+        public override void ToXml2(StreamWriterLevel o, int p)
+        {
+            o.P(p); o.WriteLine("<BooleanType />");
+        }
     }
 
     public partial class BooleanValue : Asn1Value, IEquatable<BooleanValue>

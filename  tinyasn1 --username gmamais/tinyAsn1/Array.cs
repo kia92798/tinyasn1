@@ -19,6 +19,7 @@ using Antlr.Runtime.Tree;
 using Antlr.Runtime;
 using MB = System.Reflection.MethodBase;
 using System.Diagnostics;
+using semantix.util;
 
 namespace tinyAsn1
 {
@@ -225,6 +226,33 @@ namespace tinyAsn1
             return -1;
         }
 
+
+        public override void ToXml2(StreamWriterLevel o, int p)
+        {
+
+            string nodeName = GetType().BaseType.Name;
+            long mn = minItems(PEREffectiveConstraint);
+            long mx = maxItems(PEREffectiveConstraint);
+
+            string min = "MIN";
+            string max = "MAX";
+            if (mn != -1)
+                min = mn.ToString();
+            if (mx != -1)
+                max = mx.ToString();
+
+            o.P(p); o.WriteLine("<{0} Min=\"{1}\" Max=\"{2}\">", nodeName, min, max);
+            ToXml3(o, p + 1);
+            o.P(p); o.WriteLine("</{0}>", nodeName);
+
+        }
+
+        protected virtual void ToXml3(StreamWriterLevel o, int p)
+        {
+            
+        }
+
+
     }
 
 
@@ -363,6 +391,10 @@ namespace tinyAsn1
             return m_type.TypesIDepend();
         }
 
+        protected override void ToXml3(StreamWriterLevel o, int p)
+        {
+            m_type.ToXml(o, p);
+        }
 
     }
 

@@ -17,6 +17,7 @@ using System.Text;
 using Antlr.Runtime.Tree;
 using Antlr.Runtime;
 using System.Globalization;
+using semantix.util;
 
 namespace tinyAsn1
 {
@@ -183,6 +184,18 @@ namespace tinyAsn1
             return ret;
         }
 
+        public override void ToXml2(StreamWriterLevel o, int p)
+        {
+            string min = "MIN";
+            string max = "MAX";
+            if (m_MinRealValue != double.NegativeInfinity)
+                min = m_MinRealValue.ToString();
+            if (m_MaxRealValue != double.PositiveInfinity)
+                max = m_MaxRealValue.ToString();
+
+
+            o.P(p); o.WriteLine("<RealType Min=\"{0}\" Max=\"{1}\" />", min, max);
+        }
     }
 
     public partial class RealValue : Asn1Value

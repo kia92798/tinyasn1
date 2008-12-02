@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Text;
 using Antlr.Runtime.Tree;
 using Antlr.Runtime;
+using semantix.util;
 
 namespace tinyAsn1
 {
@@ -340,7 +341,21 @@ namespace tinyAsn1
             return ret;
         }
 
+        public override void ToXml2(StreamWriterLevel o, int p)
+        {
 
+          
+            PERIntegerEffectiveConstraint ec = (PERIntegerEffectiveConstraint)PEREffectiveConstraint;
+            string min = "MIN";
+            string max = "MAX";
+            if (!ec.m_rootRange.m_maxIsInfinite)
+                max = (ec.m_rootRange.m_maxIsIncluded ? ec.m_rootRange.m_max : ec.m_rootRange.m_max - 1).ToString();
+            if (!ec.m_rootRange.m_minIsInfinite)
+                min = (ec.m_rootRange.m_minIsIncluded ? ec.m_rootRange.m_min : ec.m_rootRange.m_min + 1).ToString();
+            
+
+            o.P(p); o.WriteLine("<IntegerType Min=\"{0}\" Max=\"{1}\" />", min, max);
+        }
     }
 
 

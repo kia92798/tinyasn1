@@ -17,6 +17,7 @@ using System.Text;
 using Antlr.Runtime.Tree;
 using Antlr.Runtime;
 using MB = System.Reflection.MethodBase;
+using semantix.util;
 
 namespace tinyAsn1
 {
@@ -801,7 +802,28 @@ namespace tinyAsn1
         }
 
 
+        public override void ToXml2(StreamWriterLevel o, int p)
+        {
+            string nodeName = GetType().BaseType.Name;
 
+            o.P(p); o.WriteLine("<{0}>", nodeName);
+
+
+            foreach (Child ch in m_children.Values)
+            {
+                string defaultValue = string.Empty;
+                if (ch.m_defaultValue!=null)
+                    defaultValue = string.Format("DefaultValue=\"{2}\"", ch.m_defaultValue.ToString());
+
+                o.P(p + 1); o.WriteLine("<SequenceOrSetChild VarName=\"{0}\" Optional=\"{1}\" {2} Line=\"{3}\" CharPositionInLine=\"{4}\">",
+                    ch.m_childVarName, ch.m_optional.ToString(), defaultValue, ch.antlrNode.Line,ch.antlrNode.CharPositionInLine);
+                ch.m_type.ToXml(o, p + 2);
+                o.P(p + 1); o.WriteLine("</SequenceOrSetChild>");
+            }
+
+            o.P(p); o.WriteLine("</{0}>", nodeName);
+
+        }
 
 
 

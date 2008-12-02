@@ -20,6 +20,7 @@ using Antlr.Runtime;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using semantix.util;
 
 namespace tinyAsn1
 {
@@ -130,7 +131,9 @@ namespace tinyAsn1
 
                 List<IToken> tokenslst = new List<IToken>();
                 foreach (IToken token in tokens.GetTokens())
+                {
                     tokenslst.Add(token);
+                }
 
 
 
@@ -549,6 +552,17 @@ namespace tinyAsn1
         int _constraintErrorID = 1000;
         public int ConstraintErrorID { get { return _constraintErrorID; } set { _constraintErrorID = value; } }
 
+
+        public void ToXml(StreamWriterLevel o, int lev)
+        {
+            o.WriteLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+            o.WriteLine("<ASN1AST>");
+            foreach (Asn1File f in m_files)
+                f.ToXml(o, lev + 1);
+
+            o.WriteLine("</ASN1AST>");
+        }
+
     }
 
 
@@ -641,6 +655,14 @@ namespace tinyAsn1
             return true;
         }
 
+
+        public void ToXml(StreamWriterLevel o, int p)
+        {
+            o.P(p); o.WriteLine("<Asn1File FileName=\"{0}\">", m_fileName);
+            foreach (Module m in m_modules)
+                m.ToXml(o, p + 1);
+            o.P(p); o.WriteLine("</Asn1File>");
+        }
     }
 
 

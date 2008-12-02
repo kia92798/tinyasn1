@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Text;
 using Antlr.Runtime.Tree;
 using Antlr.Runtime;
+using semantix.util;
 
 namespace tinyAsn1
 {
@@ -441,6 +442,19 @@ namespace tinyAsn1
             ret.AddValue((EnumeratedValue)val);
 
             return ret;
+        }
+
+        public override void ToXml2(StreamWriterLevel o, int p)
+        {
+            o.P(p); o.WriteLine("<EnumeratedType Extensible=\"{0}\">", m_extMarkPresent.ToString());
+            o.P(p + 1); o.WriteLine("<EnumValues>");
+            foreach (Item it in m_enumValues.Values)
+            {
+                o.P(p + 2); o.WriteLine("<EnumValue StringValue=\"{0}\" IntValue=\"{1}\" Line=\"{2}\" CharPositionInLine=\"{3}\" />",
+                    it.m_id, it.m_value,it.antlrNode.Line, it.antlrNode.CharPositionInLine);
+            }
+            o.P(p + 1); o.WriteLine("</EnumValues>");
+            o.P(p); o.WriteLine("</EnumeratedType>");
         }
 
     }
