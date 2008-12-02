@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using tinyAsn1;
 using System.Diagnostics;
+using semantix.util;
 
 namespace asn1csharp
 {
@@ -29,7 +30,7 @@ namespace asn1csharp
                     internalTypeName += (--levCount).ToString();
                 
 
-                csFile.WL(level, "public class {0} : {1}<{0}.{2}>", TypeName, baseClassName, internalTypeName);
+                csFile.WL(level, "public partial class {0} : {1}<{0}.{2}>", TypeName, baseClassName, internalTypeName);
                 csFile.WL(level++, "{");
 
                 childType.DeclareType(csFile, internalTypeName, level);
@@ -38,7 +39,7 @@ namespace asn1csharp
             else
             {
                 DeclaredTypeName = baseClassName + "<" + childType.DeclaredTypeName + ">";
-                csFile.WL(level, "public class {0} : {1}<{2}>", TypeName, baseClassName, childType.DeclaredTypeName);
+                csFile.WL(level, "public partial class {0} : {1}<{2}>", TypeName, baseClassName, childType.DeclaredTypeName);
                 csFile.WL(level++, "{");
             }
 

@@ -10,6 +10,7 @@ namespace asn1csharp
 {
 
     using MyInt = System.Int32;
+    using semantix.util;
 
 
     class CSharpFile : Asn1File

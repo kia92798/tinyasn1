@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using tinyAsn1;
+using semantix.util;
 
 namespace asn1csharp
 {
@@ -51,7 +52,7 @@ namespace asn1csharp
 
         public static void DeclareType(SequenceOrSetType pThis, StreamWriterLevel csFile, string TypeName, int level, string baseClassName)
         {
-            csFile.WL(level, "public class {0} : {1}", TypeName, baseClassName);
+            csFile.WL(level, "public partial class {0} : {1}", TypeName, baseClassName);
             csFile.WL(level++, "{");
 
             foreach (SequenceOrSetType.Child ch in pThis.m_children.Values)
@@ -289,7 +290,7 @@ namespace asn1csharp
         public void DeclareType(StreamWriterLevel csFile, string TypeName, int level)
         {
             _declaredTypeName = TypeName;
-            csFile.WL(level, "public class {0} : Asn1ChoiceObject", TypeName);
+            csFile.WL(level, "public partial class {0} : Asn1ChoiceObject", TypeName);
             csFile.WL(level++, "{");
 
             foreach (ChoiceChild ch in m_children.Values)
