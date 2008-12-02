@@ -22,6 +22,7 @@ using Antlr.Utility.Tree;
 using Antlr.Runtime.Tree;
 using System.IO;
 using tinyAsn1;
+using semantix.util;
 
 namespace asn1scc
 {
@@ -52,6 +53,7 @@ namespace asn1scc
             SCCBackend compInv = new SCCBackend();
 
             bool debug = false;
+            string astXml = string.Empty;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -114,6 +116,22 @@ namespace asn1scc
                         }
 
                     }
+                    else if (args[i] == "-ast")
+                    {
+                        try
+                        {
+                            i++;
+                            astXml = args[i];
+                            FileStream dummy = System.IO.File.Create(astXml);
+                            dummy.Close();
+                            System.IO.File.Delete(astXml);
+                        }
+                        catch (Exception)
+                        {
+                            Console.Error.WriteLine("Can not create file {0}", astXml);
+                            return Usage();
+                        }
+                    }
                     else
                     {
                         Console.Error.WriteLine("Unrecognized option: " + args[i]);
@@ -168,6 +186,16 @@ namespace asn1scc
                 return 2;
             }
 
+            if (astXml != string.Empty)
+            {
+                using (StreamWriterLevel xmlstream = new StreamWriterLevel(astXml))
+                {
+                    compInv.ToXml(xmlstream, 0);
+                }
+
+                return 0;
+
+            }
 
             if (debug)
             {
@@ -203,10 +231,12 @@ namespace asn1scc
             Console.Error.WriteLine("Current Version is: 1.00");
             Console.Error.WriteLine("Usage:");
             Console.Error.WriteLine();
-            Console.Error.WriteLine("asn1scc [-debug] [-wordSize N] [-typePrefix prefix] [-useSpecialComments] [-o outdir] file1, file2, ..., fileN ");
+            Console.Error.WriteLine("asn1scc [-debug] [-ast ast.xml] [-wordSize N] [-typePrefix prefix] [-useSpecialComments] [-o outdir] file1, file2, ..., fileN ");
             Console.Error.WriteLine();
             Console.Error.WriteLine("\t -debug\t\t\tre-prints the AST using ASN.1.");
             Console.Error.WriteLine("\t\t\t\tUseful only for debug purposes. (No encoders/decoders are produced)");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("\t -ast\t\tProduces an XML file of the parsed input ASN.1 grammar.");
             Console.Error.WriteLine();
             Console.Error.WriteLine("\t -wordSize N\t\tthe word size of the target machine in bytes.");
             Console.Error.WriteLine("\t\t\t\tPossible values are 2,4 and 8");

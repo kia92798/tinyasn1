@@ -18,6 +18,7 @@ using Antlr.Runtime;
 using tinyAsn1;
 using System.IO;
 using System.Globalization;
+using semantix.util;
 
 namespace asn1scc
 {
