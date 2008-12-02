@@ -38,13 +38,14 @@
     <Compile Include="BER.cs" />
     <Compile Include="BERDump.cs" />
     <Compile Include="CSharpTypes.cs" />
+    <Compile Include="IEncoding.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Test.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\tinyAsn1\tinyAsn1.csproj">
-      <Project>{AA87CFEC-3291-4F26-8ACC-3FDD380805D5}</Project>
-      <Name>tinyAsn1</Name>
+    <ProjectReference Include="..\Util\Util.csproj">
+      <Project>{EA7C291B-8B03-4D02-906A-87561F46278F}</Project>
+      <Name>Util</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

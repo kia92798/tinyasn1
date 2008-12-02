@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using tinyAsn1;
+using semantix.util;
 
 namespace CSharpAsn1CRT
 {
@@ -20,6 +20,9 @@ namespace CSharpAsn1CRT
         }
     }
 
+
+
+
     public abstract class BERNode
     {
         public Tag m_tag = null;
@@ -35,6 +38,11 @@ namespace CSharpAsn1CRT
             w.WriteLine("[{0} {1} {2}]", m_tag.m_tgClass.ToString(), m_tag.isPrimitive, m_tag.m_tagNo);
         }
 
+
+        public override string ToString()
+        {
+            return string.Format("[{0} {1} {2}]", m_tag.m_tgClass.ToString(), m_tag.isPrimitive, m_tag.m_tagNo);
+        }
         public static BERNode Create(Stream strm)
         {
             BERNode ret = null;
@@ -78,6 +86,53 @@ namespace CSharpAsn1CRT
 
             return ret;
         }
+
+
+        public static IEnumerable<BERNode> GetNodes(Stream strm)
+        {
+            BERNode ret = null;
+            Tag tg = BER.DecodeTag(strm);
+            uint lenght = 0;
+            bool indefiniteForm;
+            BER.DecodeLength(strm, out lenght, out indefiniteForm);
+            if (tg.isPrimitive)
+            {
+                byte[] data = new byte[lenght];
+                if (strm.Read(data, 0, (int)lenght) != lenght)
+                    throw new LengthMismatchException();
+                ret = new BERNodePrimitive(tg, data);
+                yield return ret;
+            }
+            else
+            {
+                yield return new BERNodeConstructed(tg);
+                if (indefiniteForm)
+                {
+                    while (!BER.AreNextTwoBytesZeros(strm))
+                    {
+
+                        foreach(BERNode n in GetNodes(strm))
+                            yield return n;
+                    }
+                    BER.DecodeTwoZeros(strm);
+                }
+                else
+                {
+                    long initPos = strm.Position;
+                    while (strm.Position < initPos + lenght)
+                    {
+                        foreach (BERNode n in GetNodes(strm))
+                            yield return n;
+                    }
+                    if (strm.Position != initPos + lenght)
+                        throw new LengthMismatchException();
+                }
+
+            }
+
+
+        }
+
     }
 
     public class BERNodePrimitive : BERNode
@@ -99,6 +154,15 @@ namespace CSharpAsn1CRT
                 w.Write("{0} ", b.ToString("X2"));
             w.WriteLine();
         }
+
+        public override string ToString()
+        {
+            string tmp = string.Empty;
+            foreach (byte b in m_data)
+                tmp+= string.Format("{0} ", b.ToString("X2"));
+            return base.ToString() + " " + tmp;
+        }
+
     }
 
     public class BERNodeConstructed : BERNode

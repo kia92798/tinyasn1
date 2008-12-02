@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using tinyAsn1;
+using semantix.util;
 
 namespace CSharpAsn1CRT
 {
@@ -83,7 +83,7 @@ namespace CSharpAsn1CRT
 
 
     public delegate TResult Func<TResult>();
-    public delegate TResult Func<TResult, T>(T arg);
+    public delegate TResult Func<T, TResult>(T arg);
 
     public delegate void Action();
     public delegate void Action<T1>(T1 arg1);
@@ -136,12 +136,12 @@ namespace CSharpAsn1CRT
             List<Asn1Object> nodes = new List<Asn1Object>();
         }
 
-        public virtual IEnumerable<T> GetChildren<T>(Func<bool,Path> selector) where T : Asn1Object
-        {
+        //public virtual IEnumerable<T> GetChildren<T>(Func<bool,Path> selector) where T : Asn1Object
+        //{
             
-            throw new Exception();
+        //    throw new Exception();
             
-        }
+        //}
 
         public virtual bool IsPrimitive { get { return true; } }
 
@@ -213,6 +213,9 @@ namespace CSharpAsn1CRT
     }
 
 
+
+
+
     public class Asn1NullObject : Asn1Object
     {
 
@@ -258,11 +261,16 @@ namespace CSharpAsn1CRT
     {
         public T Value;
 
-        public override void ToXml(StreamWriterLevel o, string tag, int l)
+        public virtual string ValueAsString
         {
-            o.P(l);
-            o.WriteLine("<{0}>{1}</{0}>", tag, Value.ToString());
-
+            get
+            {
+                return Value.ToString();
+            }
+            set
+            {
+                throw new AbstractMethodCalledException();
+            }
         }
 
 
@@ -280,29 +288,22 @@ namespace CSharpAsn1CRT
 
     }
 
-
-
     public class Asn1IntegerObject : Asn1PrimitiveObject<Int64>
     {
 
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
             return Encode(strm, encRule, true, 2);
-//            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 2);
         }
 
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
             return Decode(strm, encRule, true, 2);
-//            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 2);
         }
 
         public override uint EncodeContent(Stream strm, EncodingRules encRule)
         {
-//            if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
-                return BER.EncodeInteger(strm, Value);
-
-            throw new Exception("Unsupported encoding");
+            return BER.EncodeInteger(strm, Value);
         }
 
 
@@ -332,12 +333,10 @@ namespace CSharpAsn1CRT
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
             return Decode(strm, encRule, true, 9);
-//            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 9);
         }
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
             return Encode(strm, encRule, true, 9);
-//            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 9);
         }
     }
 
@@ -464,29 +463,35 @@ namespace CSharpAsn1CRT
         }
     }
 
-    public class Asn1OctetStringObject : Asn1Object
+    public class Asn1OctetStringObject : Asn1PrimitiveObject<List<byte>>/*Asn1Object*/
     {
-//        public List<byte> m_Data = new List<byte>(10);
 
-        byte[] _Data = null;
 
-        //public List<byte> m_Data
-        //{
-        //    get
-        //    {
+        public Asn1OctetStringObject()
+        {
+            Value = new List<byte>();
+        }
 
-        //    }
-        //}
+        public override string ValueAsString
+        {
+            get
+            {
+                string tmp = string.Empty;
 
+                foreach (byte b in Value)
+                    tmp += b.ToString("X2");
+                return tmp;
+            }
+            set
+            {
+                base.ValueAsString = value;
+            }
+        }
 
         public override void ToXml(StreamWriterLevel o, string tag, int l)
         {
-            string tmp = string.Empty;
-
-            foreach (byte b in _Data)
-                tmp += b.ToString("X2");
             o.P(l);
-            o.WriteLine("<{0}>{1}</{0}>", tag,tmp);
+            o.WriteLine("<{0}>{1}</{0}>", tag,ValueAsString);
 
         }
 
@@ -495,7 +500,7 @@ namespace CSharpAsn1CRT
         {
             long sPos = strm.Position;
             BER.EncodeTagAsInt(strm, tag, primitive);
-            BER.EncodeLengthDF(strm, (uint)_Data.Length);
+            BER.EncodeLengthDF(strm, (uint)Value.Count);
             EncodeContent(strm, encRule);
 
             return (uint)(strm.Position - sPos);
@@ -505,47 +510,29 @@ namespace CSharpAsn1CRT
             if (strm.Length - strm.Position < dataLen)
                 throw new UnexpectedEndOfStreamException();
 
-            //byte[] tmp = new byte[dataLen];
-            //strm.Read(tmp, 0, (int)dataLen);
-            //m_Data = new List<byte>(tmp);
 
-            _Data = new byte[dataLen];
+            byte[] _Data = new byte[dataLen];
             strm.Read(_Data, 0, (int)dataLen);
 
-            //if (m_Data.Capacity < dataLen)
-            //    m_Data.Capacity = (int)dataLen;
+            Value.Clear();
+            Value.AddRange(_Data);
 
-
-            
-
-
-
-            //for (int i = 0; i < dataLen; i++)
-            //{
-            //    int nval = strm.ReadByte();
-            //    //if (nval < 0)
-            //    //    throw new UnexpectedEndOfStreamException();
-            //    m_Data.Add((byte)nval);
-            //}
             return dataLen;
         }
         public override uint EncodeContent(Stream strm, EncodingRules encRule)
         {
+            byte[] _Data = Value.ToArray();
             strm.Write(_Data, 0, _Data.Length);
             return (uint)_Data.Length;
-            //strm.Write(m_Data.ToArray(), 0, m_Data.Count);
-            //return (uint)m_Data.Count;
         }
 
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
             return Decode(strm, encRule, true, 4);
-//            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 4);
         }
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
             return Encode(strm, encRule, true, 4);
-//            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 4);
         }
      
         public override bool IsConstraintValid()
@@ -559,9 +546,12 @@ namespace CSharpAsn1CRT
         }
     }
 
-    public class Asn1BitStringObject : Asn1Object
+    public class Asn1BitStringObject : Asn1PrimitiveObject<System.Collections.BitArray>
     {
-        public System.Collections.BitArray m_Data = new System.Collections.BitArray(0);
+        public Asn1BitStringObject()
+        {
+            Value = new System.Collections.BitArray(0);
+        }
 
         public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen, bool indefiniteForm)
         {
@@ -575,12 +565,10 @@ namespace CSharpAsn1CRT
         
         public override uint Decode(Stream strm, EncodingRules encRule)
         {
-//            return Decode(strm, encRule, TagClass.UNIVERSAL, true, 8);
             return Decode(strm, encRule, true, 8);
         }
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
-//            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 8);
             return Encode(strm, encRule, true, 8);
         }
 
@@ -612,7 +600,7 @@ namespace CSharpAsn1CRT
             T ret = CreateEmptyChild();
             m_children.Add(ret);
             ret.Parent = this;
-            if (childAdded)
+            if (childAdded != null)
                 childAdded(ret);
             return ret;
         }
@@ -985,6 +973,7 @@ namespace CSharpAsn1CRT
                         return !BER.AreNextTwoBytesZeros(strm);
                 };
 
+                
 
                 if (ifCond())
                 {
@@ -1064,7 +1053,7 @@ namespace CSharpAsn1CRT
     }
 
 
-  
+#if fff  
 
     // The difference with the normal dictionary is that
     // the Values property retains order (as inserted)
@@ -1126,6 +1115,6 @@ namespace CSharpAsn1CRT
 
     }
 
-
+#endif
 }
 
