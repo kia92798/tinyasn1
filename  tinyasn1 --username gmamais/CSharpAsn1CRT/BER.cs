@@ -400,7 +400,8 @@ namespace CSharpAsn1CRT
         public static long DecodeInteger(Stream strm, uint dataLen)
         {
             byte[] bytes = new byte[8];
-
+            if (dataLen == 0)
+                return 0;
             for (long i = dataLen-1; i>=0 ; i--)
             {
                 int nReadValue = strm.ReadByte();
