@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using tinyAsn1;
+using semantix.util;
 
 namespace asn1csharp
 {
@@ -27,7 +28,7 @@ namespace asn1csharp
             
             DeclaredTypeName = TypeName;
 
-            csFile.WL(level, "public class {0} : {1}", DeclaredTypeName, baseClassName);
+            csFile.WL(level, "public partial class {0} : {1}", DeclaredTypeName, baseClassName);
             csFile.WL(level++, "{");
             WriteEncodeDecodeMethods(pThis, csFile, level);
             WriteIsConstraintValid(pThis, csFile, level, valueName, enumPrefix);
@@ -221,7 +222,7 @@ namespace asn1csharp
         {
             _declaredTypeName = TypeName;
 
-            csFile.WL(level, "public class {0} : Asn1EnumeratedObject<{0}.Enumerated>", DeclaredTypeName);
+            csFile.WL(level, "public partial class {0} : Asn1EnumeratedObject<{0}.Enumerated>", DeclaredTypeName);
             csFile.WL(level++, "{");
             csFile.WL(level,"public enum Enumerated");
             csFile.WL(level++, "{");

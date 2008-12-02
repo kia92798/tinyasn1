@@ -8,6 +8,7 @@ using Antlr.Utility.Tree;
 using Antlr.Runtime.Tree;
 using System.IO;
 using tinyAsn1;
+using semantix.util;
 
 namespace asn1csharp
 {
@@ -32,10 +33,14 @@ namespace asn1csharp
 
         static int Main2(string[] args)
         {
+
+
+
             List<string> inputFiles = new List<string>();
             CSharpBackend compInv = new CSharpBackend();
 
             bool debug = false;
+            string astXml = string.Empty;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -76,6 +81,22 @@ namespace asn1csharp
                         catch (Exception)
                         {
                             Console.Error.WriteLine("-o argument specified, but no directory was given.");
+                            return Usage();
+                        }
+                    }
+                    else if (args[i] == "-ast")
+                    {
+                        try
+                        {
+                            i++;
+                            astXml = args[i];
+                            FileStream dummy = System.IO.File.Create(astXml);
+                            dummy.Close();
+                            System.IO.File.Delete(astXml);
+                        }
+                        catch (Exception)
+                        {
+                            Console.Error.WriteLine("Can not create file {0}",astXml);
                             return Usage();
                         }
                     }
@@ -133,6 +154,16 @@ namespace asn1csharp
                 return 2;
             }
 
+            if (astXml != string.Empty)
+            {
+                using (StreamWriterLevel xmlstream = new StreamWriterLevel(astXml))
+                {
+                    compInv.ToXml(xmlstream, 0);
+                }
+
+                return 0;
+                
+            }
 
             if (debug)
             {
@@ -159,10 +190,12 @@ namespace asn1csharp
             Console.Error.WriteLine("Current Version is: 0.93");
             Console.Error.WriteLine("Usage:");
             Console.Error.WriteLine();
-            Console.Error.WriteLine("asn1csharp [-debug] [-typePrefix prefix] [-useSpecialComments] [-o outdir] file1, file2, ..., fileN ");
+            Console.Error.WriteLine("asn1csharp [-debug] [-ast ast.xml] [-typePrefix prefix] [-useSpecialComments] [-o outdir] file1, file2, ..., fileN ");
             Console.Error.WriteLine();
             Console.Error.WriteLine("\t -debug\t\t\tre-prints the AST using ASN.1.");
             Console.Error.WriteLine("\t\t\t\tUseful only for debug purposes.");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("\t -ast\t\tProduces an XML file of the parsed input ASN.1 grammar.");
             Console.Error.WriteLine();
             Console.Error.WriteLine("\t -typePrefix\t\tadds 'prefix' to all generated C data types.");
             Console.Error.WriteLine();
