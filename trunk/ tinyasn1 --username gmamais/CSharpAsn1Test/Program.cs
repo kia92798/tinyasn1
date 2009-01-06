@@ -104,9 +104,9 @@ namespace CSharpAsn1Test
 
                         if (convertToXml)
                         {
-                            using (StreamWriterLevel oo = new StreamWriterLevel(outFileName.Replace(".dat",".dat"+i.ToString())))
+                            using (StreamWriterLevel oo = new StreamWriterLevel(outFileName.Replace(".dat",i.ToString())))
                             {
-                                root.ToXml(oo, "TAP", 0);
+                                root.ToXml(oo, "Call", 0);
                             }
                         }
                         else
