@@ -492,12 +492,12 @@ namespace CSharpAsn1CRT
             }
         }
 
-        public override void ToXml(StreamWriterLevel o, string tag, int l)
-        {
-            o.P(l);
-            o.WriteLine("<{0}>{1}</{0}>", tag,ValueAsString);
+        //public override void ToXml(StreamWriterLevel o, string tag, int l)
+        //{
+        //    o.P(l);
+        //    o.WriteLine("<{0}>{1}</{0}>", tag,ValueAsString);
 
-        }
+        //}
 
 
         public override uint Encode(Stream strm, EncodingRules encRule, bool primitive, uint tag)
