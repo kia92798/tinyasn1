@@ -285,7 +285,11 @@ namespace CSharpAsn1CRT
                 yield return this;
         }
 
-
+        public override void ToXml(StreamWriterLevel o, string tag, int l)
+        {
+            o.P(l);
+            o.WriteLine("<{0}>{1}</{0}>", tag, ValueAsString);
+        }
     }
 
     public class Asn1IntegerObject : Asn1PrimitiveObject<Int64>

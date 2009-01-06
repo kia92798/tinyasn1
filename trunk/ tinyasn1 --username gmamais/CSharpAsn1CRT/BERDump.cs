@@ -13,8 +13,11 @@ namespace CSharpAsn1CRT
             using (MemoryStream f = new MemoryStream(File.ReadAllBytes(fileName), false))
             using (StreamWriterLevel w = new StreamWriterLevel(outFileName))
             {
-                BERNode root = BERNode.Create(f);
-                root.dump(w, 0);
+                while (f.Position < f.Length)
+                {
+                    BERNode root = BERNode.Create(f);
+                    root.dump(w, 0);
+                }
             }
 
         }
