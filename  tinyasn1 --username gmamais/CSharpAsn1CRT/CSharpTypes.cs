@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using semantix.util;
+using System.Xml;
 
 namespace CSharpAsn1CRT
 {
@@ -27,7 +28,9 @@ namespace CSharpAsn1CRT
     {
     }
 
-
+    public class Xml2Asn1DecodeException : Exception
+    {
+    }
 
     public enum EncodingRules
     {
@@ -210,6 +213,59 @@ namespace CSharpAsn1CRT
         }
 
 
+        public void FromXml(System.IO.Stream inputData, string rootTag, 
+            Dictionary<string, Action<Asn1Object>> notifyEvents)
+        {
+            using (XmlTextReader tr = new XmlTextReader(inputData))
+            {
+
+                List<Asn1Object> stackOfVisitedNodes = new List<Asn1Object>();
+                Asn1Object curNode = this;
+
+                stackOfVisitedNodes.Add(curNode);
+
+                while (tr.Read())
+                {
+                    if (tr.NodeType == XmlNodeType.Element)
+                    {
+                        if (tr.Name == rootTag)
+                            continue;
+                        curNode = OnXmlOpenTag(tr.Name);
+
+                        stackOfVisitedNodes.Add(curNode);
+                    }
+                    else if (tr.NodeType == XmlNodeType.Text)
+                    {
+                        OnXmlData(tr.Value);
+                    }
+                    else if (tr.NodeType == XmlNodeType.EndElement)
+                    {
+                        if (tr.Name == rootTag)
+                            continue;
+                        if (notifyEvents != null && notifyEvents.ContainsKey(tr.Name))
+                            notifyEvents[tr.Name](curNode);
+
+                        if (stackOfVisitedNodes.Count > 0)
+                        {
+                            stackOfVisitedNodes.RemoveAt(stackOfVisitedNodes.Count - 1);
+                            if (stackOfVisitedNodes.Count > 0)
+                                curNode = stackOfVisitedNodes[stackOfVisitedNodes.Count - 1];
+                            else
+                                throw new Xml2Asn1DecodeException();
+                        }
+                    }
+                }
+            }
+        }
+
+        protected virtual Asn1Object OnXmlOpenTag(string tag)
+        {
+            return this;
+        }
+
+        protected virtual void OnXmlData(string data)
+        {
+        }
     }
 
 
@@ -322,6 +378,11 @@ namespace CSharpAsn1CRT
             return dataLen;
         }
 
+        protected override void OnXmlData(string data)
+        {
+            Value = long.Parse(data);
+        }
+
     }
 
     public class Asn1RealObject : Asn1PrimitiveObject<double>
@@ -341,6 +402,10 @@ namespace CSharpAsn1CRT
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
             return Encode(strm, encRule, true, 9);
+        }
+        protected override void OnXmlData(string data)
+        {
+            Value = double.Parse(data);
         }
     }
 
@@ -375,6 +440,10 @@ namespace CSharpAsn1CRT
         {
             return Encode(strm, encRule, true, 1);
 //            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 1);
+        }
+        protected override void OnXmlData(string data)
+        {
+            Value = bool.Parse(data);
         }
     }
 
@@ -412,6 +481,10 @@ namespace CSharpAsn1CRT
         {
             return Encode(strm, encRule, true, 22);
 //            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 22);
+        }
+        protected override void OnXmlData(string data)
+        {
+            Value = data;
         }
     }
 
@@ -464,6 +537,10 @@ namespace CSharpAsn1CRT
         {
 //            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 10);
             return Encode(strm, encRule, true, 10);
+        }
+        protected override void OnXmlData(string data)
+        {
+            Value = (T)Enum.ToObject(Value.GetType(), long.Parse(data));
         }
     }
 
@@ -547,6 +624,16 @@ namespace CSharpAsn1CRT
         {
             if (includeMyself)
                 yield return this;
+        }
+        protected override void OnXmlData(string data)
+        {
+            foreach (Char ch in data)
+            {
+                string tmp = new string(ch, 1);
+
+                Value.Add(byte.Parse(tmp, System.Globalization.NumberStyles.HexNumber));
+            }
+
         }
     }
 
@@ -704,6 +791,11 @@ namespace CSharpAsn1CRT
             o.WriteLine("</{0}>", tag);
         }
 
+        protected override Asn1Object OnXmlOpenTag(string tag)
+        {
+            return AppendNewChild();
+        }
+
     }
 
     public abstract class Asn1SequenceOfObject<T> : Asn1ArrayObject<T> where T : Asn1Object
@@ -854,6 +946,11 @@ namespace CSharpAsn1CRT
             }
             o.P(l);
             o.WriteLine("</{0}>", tag);
+        }
+
+        protected override Asn1Object OnXmlOpenTag(string tag)
+        {
+            return CreateChild(tag);
         }
 
     }
