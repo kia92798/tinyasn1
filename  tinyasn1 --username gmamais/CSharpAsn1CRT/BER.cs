@@ -368,9 +368,9 @@ namespace CSharpAsn1CRT
 
             for (int i = bytes.Length - 1; i > 0; i--)
             {
-                if (bytes[i] == 0xFF && (bytes[i - 1] & 0x80) == 0x80)
+                if (Value<0 && bytes[i] == 0xFF && (bytes[i - 1] & 0x80) == 0x80)
                     continue;
-                if (bytes[i] == 0x0 && (bytes[i - 1] & 0x80) == 0x0)
+                if (Value>=0 && bytes[i] == 0x0 && (bytes[i - 1] & 0x80) == 0x0)
                     continue;
                 ret ++;
                 strm.WriteByte(bytes[i]);

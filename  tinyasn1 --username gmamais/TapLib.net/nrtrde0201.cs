@@ -1369,15 +1369,15 @@ namespace NRTRDE_0201
         }
     }
 
-    public partial class AsciiString : Asn1OctetStringObject
+    public partial class AsciiString : Asn1IA5StringObject
     {
     }
 
-    public partial class HexString : Asn1OctetStringObject
+    public partial class HexString : Asn1IA5StringObject
     {
     }
 
-    public partial class NumberString : Asn1OctetStringObject
+    public partial class NumberString : Asn1NumericStringObject
     {
     }
 

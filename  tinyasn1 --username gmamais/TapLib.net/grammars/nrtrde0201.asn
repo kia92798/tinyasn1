@@ -193,18 +193,18 @@ UtcTimeOffset ::= [APPLICATION 45] AsciiString --(SIZE(5))
 -- The following definitions should be used for NRTRDE record creation 
 -- instead of the default specifications (OCTET STRING)
 --
---    AsciiString ::= VisibleString
+AsciiString ::= VisibleString
 --
---    HexString ::= VisibleString
+HexString ::= VisibleString
 --
---    NumberString ::= NumericString
+NumberString ::= NumericString
 --
 
-AsciiString ::= OCTET STRING
+-- AsciiString ::= OCTET STRING
 
-HexString ::= OCTET STRING
+-- HexString ::= OCTET STRING
 
-NumberString ::= OCTET STRING
+-- NumberString ::= OCTET STRING
 
 --
 -- The BCDString data type (Binary Coded Decimal String) is used to

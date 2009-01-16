@@ -332,5 +332,76 @@ namespace semantix.util
 
     }
 
+    public static class XML
+    {
+        public static string esc(string s)
+        {
+            return s.Replace("\"", "&quot;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("&", "&amp;");
+        }
+    }
+
+    public class CmdLineArgs
+    {
+        public class ArgException : Exception
+        {
+            public ArgException(string Message)
+                : base(Message)
+            {
+            }
+        }
+        public static bool HasArg(string[] args, string arg)
+        {
+            foreach (string a in args)
+                if (a == arg)
+                    return true;
+            return false;
+        }
+
+        public static string GetArgValue(string[] args, string arg, string errMsg)
+        {
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (args[i] == arg)
+                {
+                    i++;
+                    if (i>=args.Length)
+                        throw new ArgException(errMsg);
+                    if (args[i].StartsWith("-"))
+                        throw new ArgException(errMsg);
+                    return args[i];
+                }
+            }
+            throw new ArgException(errMsg);
+        }
+
+        public static List<string> GetFiles(string[] args, params string[] singleArgs)
+        {
+            List<string> ret = new List<string>();
+            List<string> sArgs = new List<string>(singleArgs);
+            foreach (string s in sArgs)
+                if (!s.StartsWith("-"))
+                    throw new Exception("Bug. Single args should start with '-'");
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (args[i].StartsWith("-"))
+                {
+                    if (sArgs.Contains(args[i]))
+                        continue;
+                    else
+                    {
+                        // value argument ...
+                        i++;
+                        if (i >= args.Length)
+                            throw new ArgException("Argument: '" + args[i] + "' is missing!");
+                        continue;
+                    }
+                } else
+                    ret.Add(args[i]);
+            }
+            return ret;
+        }
+    }
+
 
 }
