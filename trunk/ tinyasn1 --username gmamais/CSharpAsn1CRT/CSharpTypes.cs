@@ -207,7 +207,7 @@ namespace CSharpAsn1CRT
 
         }
 
-        public virtual void ToXml(StreamWriterLevel o, string tag, int l)
+        public virtual void ToXml(StreamWriterLevel o, string tag, int l, string attrs)
         {
            
         }
@@ -230,13 +230,13 @@ namespace CSharpAsn1CRT
                     {
                         if (tr.Name == rootTag)
                             continue;
-                        curNode = OnXmlOpenTag(tr.Name);
+                        curNode = curNode.OnXmlOpenTag(tr.Name);
 
                         stackOfVisitedNodes.Add(curNode);
                     }
                     else if (tr.NodeType == XmlNodeType.Text)
                     {
-                        OnXmlData(tr.Value);
+                        curNode.OnXmlData(tr.Value);
                     }
                     else if (tr.NodeType == XmlNodeType.EndElement)
                     {
@@ -305,10 +305,10 @@ namespace CSharpAsn1CRT
                 yield return this;
         }
 
-        public override void ToXml(StreamWriterLevel o, string tag, int l)
+        public override void ToXml(StreamWriterLevel o, string tag, int l, string attrs)
         {
             o.P(l);
-            o.WriteLine("<{0}>NULL</{0}>", tag);
+            o.WriteLine("<{0} {1}>NULL</{0}>", tag,attrs);
 
         }
     }
@@ -341,10 +341,10 @@ namespace CSharpAsn1CRT
                 yield return this;
         }
 
-        public override void ToXml(StreamWriterLevel o, string tag, int l)
+        public override void ToXml(StreamWriterLevel o, string tag, int l, string attrs)
         {
             o.P(l);
-            o.WriteLine("<{0}>{1}</{0}>", tag, ValueAsString);
+            o.WriteLine("<{0} {2}>{1}</{0}>", tag, XML.esc(ValueAsString),attrs);
         }
     }
 
@@ -627,12 +627,15 @@ namespace CSharpAsn1CRT
         }
         protected override void OnXmlData(string data)
         {
-            foreach (Char ch in data)
-            {
-                string tmp = new string(ch, 1);
 
-                Value.Add(byte.Parse(tmp, System.Globalization.NumberStyles.HexNumber));
-            }
+            string dat = data;
+            if (data.Length % 2 == 1)
+                dat = "0" + data;
+
+            for (int i = 0; i < dat.Length / 2; i += 2)
+                Value.Add(byte.Parse(dat.Substring(i, 2), System.Globalization.NumberStyles.HexNumber));
+
+
 
         }
     }
@@ -777,15 +780,15 @@ namespace CSharpAsn1CRT
             }
         }
 
-        public override void ToXml(StreamWriterLevel o, string tag, int l)
+        public override void ToXml(StreamWriterLevel o, string tag, int l, string attrs)
         {
             o.P(l);
-            o.WriteLine("<{0}>", tag);
+            o.WriteLine("<{0} {1}>", tag, attrs);
 
 
             foreach (Asn1Object ch in m_children)
             {
-                ch.ToXml(o, InternalTypeName,l+1);
+                ch.ToXml(o, InternalTypeName,l+1,"");
             }
             o.P(l);
             o.WriteLine("</{0}>", tag);
@@ -935,14 +938,14 @@ namespace CSharpAsn1CRT
             return m_children[ch.m_index];
         }
 
-        public override void ToXml(StreamWriterLevel o, string tag, int l)
+        public override void ToXml(StreamWriterLevel o, string tag, int l, string attrs)
         {
             o.P(l);
-            o.WriteLine("<{0}>", tag);
+            o.WriteLine("<{0} {1}>", tag, attrs);
             foreach (NamedChild ch in ClassDef.m_children.Values)
             {
                 if (m_children[ch.m_index]!=null)
-                    m_children[ch.m_index].ToXml(o, ch.m_name,l+1);
+                    m_children[ch.m_index].ToXml(o, ch.m_name,l+1,"");
             }
             o.P(l);
             o.WriteLine("</{0}>", tag);
@@ -1097,7 +1100,8 @@ namespace CSharpAsn1CRT
             if (encRule == EncodingRules.CER || encRule == EncodingRules.DER)
             {
                 if (m_AlternativeName == string.Empty || m_Alternative == null)
-                    throw new EmptyChoiceException();
+                    return 0;
+//                    throw new EmptyChoiceException();
                 return m_Alternative.Encode(strm, encRule);
             }
             else
