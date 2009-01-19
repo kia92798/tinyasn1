@@ -8,15 +8,35 @@ namespace CSharpAsn1CRT
 {
     public static class BERDump
     {
-        public static void dump(string fileName, string outFileName)
+        public static void dump(string fileName, string outFileName, bool ignoreExtraBytes, bool handleExtraBytesAsDNA)
         {
             using (MemoryStream f = new MemoryStream(File.ReadAllBytes(fileName), false))
             using (StreamWriterLevel w = new StreamWriterLevel(outFileName))
             {
-                while (f.Position < f.Length)
+
+                do
                 {
                     BERNode root = BERNode.Create(f);
                     root.dump(w, 0);
+                } while (!ignoreExtraBytes && handleExtraBytesAsDNA && f.Length>f.Position);
+
+
+
+                if (!ignoreExtraBytes && !handleExtraBytesAsDNA && f.Position < f.Length)
+                {
+                    w.WriteLine("File contains {0} extra bytes at the end", f.Length-f.Position);
+                    int rdVal = 0;
+
+                    int col = 0;
+                    while ((rdVal = f.ReadByte()) != -1)
+                    {
+                        col++;
+                        if (col % 80 == 0)
+                            w.WriteLine();
+                        byte b = (byte)rdVal;
+                        w.Write(b.ToString("X2"));
+                    }
+
                 }
             }
 
