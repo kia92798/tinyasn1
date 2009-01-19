@@ -336,7 +336,7 @@ namespace semantix.util
     {
         public static string esc(string s)
         {
-            return s.Replace("\"", "&quot;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("&", "&amp;");
+            return s.Replace("&", "&amp;").Replace("\"", "&quot;").Replace("<", "&lt;").Replace(">", "&gt;");
         }
     }
 

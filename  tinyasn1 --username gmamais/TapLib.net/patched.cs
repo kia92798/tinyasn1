@@ -373,6 +373,8 @@ namespace TAP_0309
             Value = TAP3Common.BCDUtils.StringToBCD(data);
         }
     }
+
+
 }
 
 

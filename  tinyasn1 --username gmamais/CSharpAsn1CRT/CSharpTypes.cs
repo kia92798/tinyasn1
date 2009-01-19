@@ -230,11 +230,13 @@ namespace CSharpAsn1CRT
                     {
                         if (tr.Name == rootTag)
                             continue;
+
+
                         curNode = curNode.OnXmlOpenTag(tr.Name);
 
                         stackOfVisitedNodes.Add(curNode);
                     }
-                    else if (tr.NodeType == XmlNodeType.Text)
+                    else if (tr.NodeType == XmlNodeType.Text || tr.NodeType == XmlNodeType.Whitespace)
                     {
                         curNode.OnXmlData(tr.Value);
                     }
@@ -462,6 +464,7 @@ namespace CSharpAsn1CRT
             byte[] _Data = new byte[dataLen];
             strm.Read(_Data, 0, (int)dataLen);
 
+
             Value = ASCIIEncoding.ASCII.GetString(_Data);
 
             return dataLen;
@@ -632,7 +635,7 @@ namespace CSharpAsn1CRT
             if (data.Length % 2 == 1)
                 dat = "0" + data;
 
-            for (int i = 0; i < dat.Length / 2; i += 2)
+            for (int i = 0; i < dat.Length ; i += 2)
                 Value.Add(byte.Parse(dat.Substring(i, 2), System.Globalization.NumberStyles.HexNumber));
 
 

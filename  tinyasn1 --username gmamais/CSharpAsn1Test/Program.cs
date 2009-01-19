@@ -86,7 +86,7 @@ namespace CSharpAsn1Test
             ProcessArgs(args, out inFileName, out outFileName, out dumpBER, out convertToXml, out encode);
             if (dumpBER)
             {
-                BERDump.dump(inFileName, outFileName);
+                BERDump.dump(inFileName, outFileName, true, false);
             }
             else if (convertToXml || encode)
             {
