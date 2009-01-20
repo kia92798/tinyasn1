@@ -268,6 +268,19 @@ namespace CSharpAsn1CRT
         protected virtual void OnXmlData(string data)
         {
         }
+
+        bool HasFather(Type father)
+        {
+            Asn1Object par = Parent;
+            while (par != null)
+            {
+                if (par.GetType() == father)
+                    return true;
+                par = par.Parent;
+            }
+
+            return false;
+        }
     }
 
 
