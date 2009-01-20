@@ -437,6 +437,8 @@ namespace TAP_0311_DNA
         {
             o.P(l); o.WriteLine("<{0}>", tag);
 
+            
+
             string ret = string.Empty;
             OSField[] flds = OSField.GetFieldsByOSSInfo(Value);
 
