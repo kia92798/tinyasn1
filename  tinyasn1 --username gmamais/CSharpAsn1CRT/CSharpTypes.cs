@@ -207,16 +207,28 @@ namespace CSharpAsn1CRT
 
         }
 
-        public virtual void ToXml(StreamWriterLevel o, string tag, int l, string attrs)
+        public virtual void ToXml(XmlWriter o, string tag, params KeyValuePair<string,string>[] attrs)
         {
-           
+            o.WriteStartElement(tag);
+            foreach (KeyValuePair<string, string> at in attrs)
+                o.WriteAttributeString(at.Key, at.Value);
+            WriteXmlContent(o);
+            o.WriteEndElement();
+        }
+
+        public virtual void WriteXmlContent(XmlWriter o)
+        {
         }
 
 
         public void FromXml(System.IO.Stream inputData, string rootTag, 
             Dictionary<string, Action<Asn1Object>> notifyEvents)
         {
-            using (XmlTextReader tr = new XmlTextReader(inputData))
+            XmlReaderSettings settings = new XmlReaderSettings();
+            settings.CheckCharacters = false;
+
+//            using (XmlTextReader tr = new XmlTextReader(inputData))
+            using (XmlReader tr = XmlTextReader.Create(inputData,settings))
             {
 
                 List<Asn1Object> stackOfVisitedNodes = new List<Asn1Object>();
@@ -230,9 +242,9 @@ namespace CSharpAsn1CRT
                     {
                         if (tr.Name == rootTag)
                             continue;
-
-
-                        curNode = curNode.OnXmlOpenTag(tr.Name);
+                        
+                        
+                        curNode = curNode.OnXmlOpenTag(tr.Name, tr);
 
                         stackOfVisitedNodes.Add(curNode);
                     }
@@ -260,9 +272,12 @@ namespace CSharpAsn1CRT
             }
         }
 
-        protected virtual Asn1Object OnXmlOpenTag(string tag)
+        protected virtual Asn1Object OnXmlOpenTag(string tag, XmlReader tr)
         {
             return this;
+        }
+        public virtual void OnXmlAttribute(XmlReader tr)
+        {
         }
 
         protected virtual void OnXmlData(string data)
@@ -281,6 +296,7 @@ namespace CSharpAsn1CRT
 
             return false;
         }
+
     }
 
 
@@ -320,11 +336,10 @@ namespace CSharpAsn1CRT
                 yield return this;
         }
 
-        public override void ToXml(StreamWriterLevel o, string tag, int l, string attrs)
-        {
-            o.P(l);
-            o.WriteLine("<{0} {1}>NULL</{0}>", tag,attrs);
 
+        public override void WriteXmlContent(XmlWriter o)
+        {
+            o.WriteString("NULL");
         }
     }
 
@@ -356,11 +371,27 @@ namespace CSharpAsn1CRT
                 yield return this;
         }
 
-        public override void ToXml(StreamWriterLevel o, string tag, int l, string attrs)
+        //public override void ToXml(XmlWriter o, string tag, int l, string attrs)
+        //{
+        //    o.P(l);
+        //    if (attrs != "")
+        //        attrs = ' ' + attrs;
+        //    o.WriteLine("<{0}{2}>{1}</{0}>", tag, XML.esc(ValueAsString), attrs);
+        //}
+        public override void WriteXmlContent(XmlWriter o)
         {
-            o.P(l);
-            o.WriteLine("<{0} {2}>{1}</{0}>", tag, XML.esc(ValueAsString),attrs);
+            //string tmp = ValueAsString;
+            //string tmp2 = string.Empty;
+            //foreach (char ch in tmp)
+            //    if (ch < ' ')
+            //        tmp2 += ' ';
+            //    else
+            //        tmp2 += ch;
+
+            //o.WriteString(tmp2);
+            o.WriteString(ValueAsString);
         }
+
     }
 
     public class Asn1IntegerObject : Asn1PrimitiveObject<Int64>
@@ -478,13 +509,15 @@ namespace CSharpAsn1CRT
             strm.Read(_Data, 0, (int)dataLen);
 
 
-            Value = ASCIIEncoding.ASCII.GetString(_Data);
+            //Value = ASCIIEncoding.ASCII.GetString(_Data);
+            Value = Encoding.GetEncoding(0).GetString(_Data);
 
             return dataLen;
         }
         public override uint EncodeContent(Stream strm, EncodingRules encRule)
         {
-            Byte[] _Data = ASCIIEncoding.ASCII.GetBytes(Value);
+            //Byte[] _Data = ASCIIEncoding.ASCII.GetBytes(Value);
+            Byte[] _Data = Encoding.GetEncoding(0).GetBytes(Value);
             strm.Write(_Data, 0, _Data.Length);
             return (uint)_Data.Length;
         }
@@ -796,23 +829,36 @@ namespace CSharpAsn1CRT
             }
         }
 
-        public override void ToXml(StreamWriterLevel o, string tag, int l, string attrs)
+        //public override void ToXml(XmlWriter o, string tag, int l, string attrs)
+        //{
+        //    o.P(l);
+        //    if (attrs != "")
+        //        attrs = ' ' + attrs;
+        //    o.WriteLine("<{0}{1}>", tag, attrs);
+
+
+        //    foreach (Asn1Object ch in m_children)
+        //    {
+        //        ch.ToXml(o, InternalTypeName,l+1,"");
+        //    }
+        //    o.P(l);
+        //    o.WriteLine("</{0}>", tag);
+        //}
+
+        public override void WriteXmlContent(XmlWriter o)
         {
-            o.P(l);
-            o.WriteLine("<{0} {1}>", tag, attrs);
-
-
             foreach (Asn1Object ch in m_children)
             {
-                ch.ToXml(o, InternalTypeName,l+1,"");
+                ch.ToXml(o, InternalTypeName);
             }
-            o.P(l);
-            o.WriteLine("</{0}>", tag);
         }
 
-        protected override Asn1Object OnXmlOpenTag(string tag)
+
+        protected override Asn1Object OnXmlOpenTag(string tag, XmlReader tr)
         {
-            return AppendNewChild();
+            Asn1Object ret = AppendNewChild();
+            ret.OnXmlAttribute(tr);
+            return ret;
         }
 
     }
@@ -954,22 +1000,35 @@ namespace CSharpAsn1CRT
             return m_children[ch.m_index];
         }
 
-        public override void ToXml(StreamWriterLevel o, string tag, int l, string attrs)
+        //public override void ToXml(XmlWriter o, string tag, int l, string attrs)
+        //{
+        //    o.P(l);
+        //    if (attrs != "")
+        //        attrs = ' ' + attrs;
+        //    o.WriteLine("<{0}{1}>", tag, attrs);
+        //    foreach (NamedChild ch in ClassDef.m_children.Values)
+        //    {
+        //        if (m_children[ch.m_index]!=null)
+        //            m_children[ch.m_index].ToXml(o, ch.m_name,l+1,"");
+        //    }
+        //    o.P(l);
+        //    o.WriteLine("</{0}>", tag);
+        //}
+
+        public override void WriteXmlContent(XmlWriter o)
         {
-            o.P(l);
-            o.WriteLine("<{0} {1}>", tag, attrs);
             foreach (NamedChild ch in ClassDef.m_children.Values)
             {
-                if (m_children[ch.m_index]!=null)
-                    m_children[ch.m_index].ToXml(o, ch.m_name,l+1,"");
+                if (m_children[ch.m_index] != null)
+                    m_children[ch.m_index].ToXml(o, ch.m_name);
             }
-            o.P(l);
-            o.WriteLine("</{0}>", tag);
         }
 
-        protected override Asn1Object OnXmlOpenTag(string tag)
+        protected override Asn1Object OnXmlOpenTag(string tag, XmlReader tr)
         {
-            return CreateChild(tag);
+            Asn1Object ret = CreateChild(tag);
+            ret.OnXmlAttribute(tr);
+            return ret;
         }
 
     }

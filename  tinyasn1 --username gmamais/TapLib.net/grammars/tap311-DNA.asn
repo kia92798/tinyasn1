@@ -29,6 +29,12 @@ BEGIN
 -- Structure of a Tap batch 
 --
 
+RootNode ::= SEQUENCE OF DataInterChange
+
+
+
+
+
 DataInterChange ::= CHOICE 
 {
     transferBatch TransferBatch, 
@@ -929,8 +935,43 @@ ObjectType ::= [APPLICATION 281] INTEGER
 
 OperatorSpecInfoList ::= [APPLICATION 162] SEQUENCE OF OperatorSpecInformation
 
+
+--Changes made for DNA Fin
 --OperatorSpecInformation ::= [APPLICATION 163] AsciiString
 OperatorSpecInformation ::= [APPLICATION 163] OCTET STRING
+
+OperatorSpecInformation ::= [APPLICATION 163] CHOICE {
+	city		City,
+	city_mms	City_MMS,
+	sgw_sms		SGw_SMS,
+	sgw_mms		SGw_MMS,
+	sgw_wap		SGw_WAP
+}
+
+/*
+City ::= [APPLICATION 800] SEQUENCE {
+	callIdentificationNumber	BCDString (SIZE(
+}
+
+City_MMS ::= [APPLICATION 801] SEQUENCE {
+	
+}
+
+SGw_SMS ::= [APPLICATION 802] SEQUENCE {
+	
+}
+
+SGw_MMS ::= [APPLICATION 803] SEQUENCE {
+	
+}
+
+SGw_WAP ::= [APPLICATION 804] SEQUENCE {
+	
+}
+*/
+
+
+--End of Changes made for DNA Fin
 
 OrderPlacedTimeStamp ::= [APPLICATION 300] DateTime
 
