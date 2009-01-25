@@ -5,6 +5,7 @@ using CSharpAsn1CRT;
 using semantix.util;
 using System.Reflection;
 using TAP3Common;
+using System.Xml;
 
 namespace Tap2Xml.net
 {
@@ -91,13 +92,21 @@ namespace Tap2Xml.net
             {
                 Asn1Object root = fv.CreateRootNode();
                 root.Decode(f, CSharpAsn1CRT.EncodingRules.CER);
-                using (StreamWriterLevel of = new StreamWriterLevel(outFile))
+                XmlWriterSettings settings = new XmlWriterSettings();
+                settings.Indent = true;
+                settings.OmitXmlDeclaration = true;
+                settings.CheckCharacters = false;
+                using (XmlWriter xw = XmlTextWriter.Create(outFile, settings))
                 {
-                    string attrs = string.Format("Version=\"{0}\" Release=\"{1}\"", fv.majorVersion, fv.minorVersion);
+                    List<KeyValuePair<string, string>> attributes = new List<KeyValuePair<string, string>>();
+                    attributes.Add(new KeyValuePair<string, string>("Version", fv.majorVersion.ToString()));
+                    attributes.Add(new KeyValuePair<string, string>("Release", fv.minorVersion.ToString()));
                     if (fv.m_protocolClass == FileVersion.ProtocolClass.RAP)
-                        attrs += string.Format(" SecVersion=\"{0}\" SecRelease=\"{1}\"", fv.secMajorVersion, fv.secMinorVersion);
-                    string fileClass = fv.m_protocolClass.ToString();
-                    root.ToXml(of, fileClass, 0, attrs);
+                    {
+                        attributes.Add(new KeyValuePair<string, string>("SecVersion", fv.secMajorVersion.ToString()));
+                        attributes.Add(new KeyValuePair<string, string>("SecRelease", fv.secMinorVersion.ToString()));
+                    }
+                    root.ToXml(xw, fv.m_protocolClass.ToString(), attributes.ToArray());
                 }
             }
 

@@ -244,6 +244,7 @@ namespace CSharpAsn1CRT
                 return 1;
             }
 
+
             List<byte> encBytes = new List<byte>();
 
             while (length > 0)
