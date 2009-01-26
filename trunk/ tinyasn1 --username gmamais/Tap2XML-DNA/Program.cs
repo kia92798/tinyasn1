@@ -6,6 +6,7 @@ using semantix.util;
 using System.Reflection;
 using TAP3Common;
 using System.Xml;
+using TAP_0311_DNA;
 
 namespace Tap2Xml_DNA
 {
@@ -45,9 +46,9 @@ namespace Tap2Xml_DNA
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("Unkown exception ...");
+                Console.Error.Write("Error: ");
                 Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(ex.StackTrace);
+//                Console.Error.WriteLine(ex.StackTrace);
                 return 2;
             }
         }
@@ -79,51 +80,12 @@ namespace Tap2Xml_DNA
                 usage(string.Format("Input file {0} does not exist", inputFile));
             }
             if (toBer)
-                ToBer(inputFile, outFile);
+                RootNode.ToBer(inputFile, outFile);
             else
-                ToXml(inputFile, outFile);
+                RootNode.ToXml(inputFile, outFile);
             return 0;
         }
 
-        static void ToXml(string inputFile, string outFile)
-        {
-            using (System.IO.MemoryStream f = new System.IO.MemoryStream(System.IO.File.ReadAllBytes(inputFile), false))
-            {
-                Asn1Object root = new TAP_0311_DNA.RootNode();
-                root.Decode(f, CSharpAsn1CRT.EncodingRules.CER);
-
-                XmlWriterSettings settings = new XmlWriterSettings();
-                settings.Indent = true;
-                settings.OmitXmlDeclaration = true;
-                settings.CheckCharacters = false;
-
-//                using (StreamWriterLevel of = new StreamWriterLevel(outFile))
-                using (XmlWriter xw = XmlTextWriter.Create(outFile, settings))
-                {
-                    string attrs = string.Format("Version=\"{0}\" Release=\"{1}\"", 3, 11);
-                    root.ToXml(xw, "TAP3-DNA", new KeyValuePair<string, string>("Version", "3"), new KeyValuePair<string, string>("Release", "11"));
-                }
-            }
-
-        }
-
-        static void ToBer(string inputFile, string outFile)
-        {
-
-            Asn1Object root = new TAP_0311_DNA.RootNode();
-
-            using (System.IO.MemoryStream f = new System.IO.MemoryStream(System.IO.File.ReadAllBytes(inputFile), false))
-            {
-                root.FromXml(f, "TAP3-DNA", null);
-            }
-
-            using (System.IO.FileStream w = new System.IO.FileStream(outFile, System.IO.FileMode.Create))
-            {
-                root.Encode(w, CSharpAsn1CRT.EncodingRules.CER);
-            }
-
-
-        }
     }
 }
 

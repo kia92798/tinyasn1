@@ -30,6 +30,9 @@ namespace CSharpAsn1CRT
 
     public class Xml2Asn1DecodeException : Exception
     {
+        public Xml2Asn1DecodeException(string errMessage, params object[] args):base(string.Format(errMessage,args)) 
+        {
+        }
     }
 
     public enum EncodingRules
@@ -226,48 +229,65 @@ namespace CSharpAsn1CRT
         {
             XmlReaderSettings settings = new XmlReaderSettings();
             settings.CheckCharacters = false;
+            
 
-//            using (XmlTextReader tr = new XmlTextReader(inputData))
-            using (XmlReader tr = XmlTextReader.Create(inputData,settings))
+            using (XmlReader tr = XmlReader.Create(inputData, settings))
             {
-
-                List<Asn1Object> stackOfVisitedNodes = new List<Asn1Object>();
-                Asn1Object curNode = this;
-
-                stackOfVisitedNodes.Add(curNode);
-
-                while (tr.Read())
+                
+                try
                 {
-                    if (tr.NodeType == XmlNodeType.Element)
-                    {
-                        if (tr.Name == rootTag)
-                            continue;
-                        
-                        
-                        curNode = curNode.OnXmlOpenTag(tr.Name, tr);
+                    List<Asn1Object> stackOfVisitedNodes = new List<Asn1Object>();
+                    Asn1Object curNode = this;
 
-                        stackOfVisitedNodes.Add(curNode);
-                    }
-                    else if (tr.NodeType == XmlNodeType.Text || tr.NodeType == XmlNodeType.Whitespace)
+                    stackOfVisitedNodes.Add(curNode);
+                    bool hasText = false;
+                    while (tr.Read())
                     {
-                        curNode.OnXmlData(tr.Value);
-                    }
-                    else if (tr.NodeType == XmlNodeType.EndElement)
-                    {
-                        if (tr.Name == rootTag)
-                            continue;
-                        if (notifyEvents != null && notifyEvents.ContainsKey(tr.Name))
-                            notifyEvents[tr.Name](curNode);
-
-                        if (stackOfVisitedNodes.Count > 0)
+                        if (tr.NodeType == XmlNodeType.Element)
                         {
-                            stackOfVisitedNodes.RemoveAt(stackOfVisitedNodes.Count - 1);
+                            if (tr.Name == "CallIdentificationNumber")
+                            {
+                                int g = 0;
+                            }
+                            if (tr.Name == rootTag)
+                                continue;
+                            hasText = false;
+
+                            curNode = curNode.OnXmlOpenTag(tr.Name, tr);
+
+                            stackOfVisitedNodes.Add(curNode);
+                        }
+                        else if (tr.NodeType == XmlNodeType.Text || tr.NodeType == XmlNodeType.Whitespace)
+                        {
+                            hasText = true;
+                            curNode.OnXmlData(tr.Value);
+                        }
+                        else if (tr.NodeType == XmlNodeType.EndElement)
+                        {
+                            if (tr.Name == rootTag)
+                                continue;
+                            if (notifyEvents != null && notifyEvents.ContainsKey(tr.Name))
+                                notifyEvents[tr.Name](curNode);
+                            if (!hasText)
+                                curNode.NodeHasNoData();
+
+                            hasText = false;
+
                             if (stackOfVisitedNodes.Count > 0)
-                                curNode = stackOfVisitedNodes[stackOfVisitedNodes.Count - 1];
-                            else
-                                throw new Xml2Asn1DecodeException();
+                            {
+                                stackOfVisitedNodes.RemoveAt(stackOfVisitedNodes.Count - 1);
+                                if (stackOfVisitedNodes.Count > 0)
+                                    curNode = stackOfVisitedNodes[stackOfVisitedNodes.Count - 1];
+                                else
+                                    throw new Xml2Asn1DecodeException("Unexpected error. Possibly end elements are missing from the XML file");
+                            }
                         }
                     }
+                }
+                catch (Exception ex)
+                {
+                    IXmlLineInfo li = (IXmlLineInfo)tr;
+                    throw new Exception(ex.Message + "\nLine: " + li.LineNumber + ", Col: " + li.LinePosition);
                 }
             }
         }
@@ -283,6 +303,10 @@ namespace CSharpAsn1CRT
         protected virtual void OnXmlData(string data)
         {
         }
+        protected virtual void NodeHasNoData()
+        {
+        }
+
 
         bool HasFather(Type father)
         {
@@ -371,24 +395,8 @@ namespace CSharpAsn1CRT
                 yield return this;
         }
 
-        //public override void ToXml(XmlWriter o, string tag, int l, string attrs)
-        //{
-        //    o.P(l);
-        //    if (attrs != "")
-        //        attrs = ' ' + attrs;
-        //    o.WriteLine("<{0}{2}>{1}</{0}>", tag, XML.esc(ValueAsString), attrs);
-        //}
         public override void WriteXmlContent(XmlWriter o)
         {
-            //string tmp = ValueAsString;
-            //string tmp2 = string.Empty;
-            //foreach (char ch in tmp)
-            //    if (ch < ' ')
-            //        tmp2 += ' ';
-            //    else
-            //        tmp2 += ch;
-
-            //o.WriteString(tmp2);
             o.WriteString(ValueAsString);
         }
 
@@ -428,6 +436,10 @@ namespace CSharpAsn1CRT
         {
             Value = long.Parse(data);
         }
+        protected override void NodeHasNoData()
+        {
+            throw new Xml2Asn1DecodeException("Missing value for integer field");
+        }
 
     }
 
@@ -452,6 +464,10 @@ namespace CSharpAsn1CRT
         protected override void OnXmlData(string data)
         {
             Value = double.Parse(data);
+        }
+        protected override void NodeHasNoData()
+        {
+            throw new Xml2Asn1DecodeException("Missing value for real field");
         }
     }
 
@@ -490,6 +506,10 @@ namespace CSharpAsn1CRT
         protected override void OnXmlData(string data)
         {
             Value = bool.Parse(data);
+        }
+        protected override void NodeHasNoData()
+        {
+            throw new Xml2Asn1DecodeException("Missing value for boolean field");
         }
     }
 
@@ -856,6 +876,9 @@ namespace CSharpAsn1CRT
 
         protected override Asn1Object OnXmlOpenTag(string tag, XmlReader tr)
         {
+            if (InternalTypeName != tag)
+                throw new Xml2Asn1DecodeException("Node {0} cannot contain elements of type {1}.", GetType().Name, tag);
+
             Asn1Object ret = AppendNewChild();
             ret.OnXmlAttribute(tr);
             return ret;
@@ -994,6 +1017,11 @@ namespace CSharpAsn1CRT
 
         public virtual Asn1Object CreateChild(string childName)
         {
+            if (!ClassDef.m_children.ContainsKey(childName))
+            {
+                throw new Xml2Asn1DecodeException("Node {0} cannot contain elements of type {1}.", GetType().Name, childName);
+            }
+
             NamedChild ch = ClassDef.m_children[childName];
             m_children[ch.m_index] = ch.createObj();
             m_children[ch.m_index].Parent = this;
@@ -1201,9 +1229,9 @@ namespace CSharpAsn1CRT
             set
             {
                 if (ClassDef.m_children.ContainsKey(value))
-                        choiceAlternative = value;
+                    choiceAlternative = value;
                 else
-                    throw new ArgumentNullException();
+                    throw new Xml2Asn1DecodeException("Node {0} cannot contain elements of type {1}.", GetType().Name, value);
             }
         }
 
