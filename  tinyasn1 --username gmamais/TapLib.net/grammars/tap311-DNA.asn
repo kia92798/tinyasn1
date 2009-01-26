@@ -940,6 +940,7 @@ OperatorSpecInfoList ::= [APPLICATION 162] SEQUENCE OF OperatorSpecInformation
 --OperatorSpecInformation ::= [APPLICATION 163] AsciiString
 OperatorSpecInformation ::= [APPLICATION 163] OCTET STRING
 
+/*
 OperatorSpecInformation ::= [APPLICATION 163] CHOICE {
 	city		City,
 	city_mms	City_MMS,
@@ -948,7 +949,6 @@ OperatorSpecInformation ::= [APPLICATION 163] CHOICE {
 	sgw_wap		SGw_WAP
 }
 
-/*
 City ::= [APPLICATION 800] SEQUENCE {
 	callIdentificationNumber	BCDString (SIZE(
 }

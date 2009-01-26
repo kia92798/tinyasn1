@@ -456,6 +456,47 @@ namespace TAP_0311_DNA
                 ret += ch.Encode(strm, encRule);
             return ret;
         }
+
+
+        public static void ToXml(string inputFile, string outFile)
+        {
+            using (System.IO.MemoryStream f = new System.IO.MemoryStream(System.IO.File.ReadAllBytes(inputFile), false))
+            {
+                Asn1Object root = new TAP_0311_DNA.RootNode();
+                root.Decode(f, CSharpAsn1CRT.EncodingRules.CER);
+
+                XmlWriterSettings settings = new XmlWriterSettings();
+                settings.Indent = true;
+                settings.OmitXmlDeclaration = true;
+                settings.CheckCharacters = false;
+
+                //                using (StreamWriterLevel of = new StreamWriterLevel(outFile))
+                using (XmlWriter xw = XmlTextWriter.Create(outFile, settings))
+                {
+                    string attrs = string.Format("Version=\"{0}\" Release=\"{1}\"", 3, 11);
+                    root.ToXml(xw, "TAP3-DNA", new KeyValuePair<string, string>("Version", "3"), new KeyValuePair<string, string>("Release", "11"));
+                }
+            }
+
+        }
+
+        public static void ToBer(string inputFile, string outFile)
+        {
+
+            Asn1Object root = new TAP_0311_DNA.RootNode();
+
+            using (System.IO.MemoryStream f = new System.IO.MemoryStream(System.IO.File.ReadAllBytes(inputFile), false))
+            {
+                root.FromXml(f, "TAP3-DNA", null);
+            }
+
+            using (System.IO.FileStream w = new System.IO.FileStream(outFile, System.IO.FileMode.Create))
+            {
+                root.Encode(w, CSharpAsn1CRT.EncodingRules.CER);
+            }
+
+        }
+
     
     }
 
@@ -524,7 +565,17 @@ namespace TAP_0311_DNA
 
         public override void OnXmlAttribute(XmlReader tr)
         {
-            cll = DNACall.CreateCall(tr.GetAttribute("callType"));
+            string callType = tr.GetAttribute("callType");
+            if (callType == null || !DNACall.CallTypes.Contains(callType))
+            {
+                string callTypes = string.Empty;
+                foreach (string ct in DNACall.CallTypes)
+                    callTypes += "callType=\"" + ct + "\" or ";
+                callTypes = callTypes.Substring(0, callTypes.Length - 4);
+                throw new Exception("Mandatory attribute 'callType' is missing. Valid values are: "+callTypes);
+            }
+
+            cll = DNACall.CreateCall(callType);
         }
 
         protected override void OnXmlData(string data)
@@ -598,10 +649,27 @@ namespace TAP_0311_DNA
 
         public virtual void AddFieldValue(string fieldName, string value)
         {
-            StaticFldDesc  f = GetFldDecs().Find(delegate(StaticFldDesc p) { if (p.m_FieldName == fieldName) return true; return false; });
-            if (f == null)
+            StaticFldDesc stField = GetFldDecs().Find(delegate(StaticFldDesc p) { if (p.m_FieldName == fieldName) return true; return false; });
+            if (stField == null)
                 throw new Exception(string.Format("Call of type {0} does not contain field with name {1}", CallType, fieldName));
-            Fields.Add(new FieldValue(f, value));
+
+            if (value.Trim().Length == 0 && Fields.Exists(delegate(FieldValue fv) { if (fv.m_fldDesc.m_FieldName == fieldName) return true; return false; }))
+                return;
+
+            if (value.Trim().Length != 0 && Fields.Exists(delegate(FieldValue fv) { if (fv.m_fldDesc.m_FieldName == fieldName) return true; return false; }))
+                throw new ConversionErrorException("Field {0} can not be contained twice", stField.m_FieldName);
+
+            if (stField.m_FieldType == StaticFldDesc.FieldType.BCD)
+            {
+                if (value.Length > stField.m_sizeInHalfBytes)
+                    throw new ConversionErrorException("Field {0} can contain values up to {1} nibbles. Current value '{2}' has {3}. ",
+                        stField.m_FieldName, stField.m_sizeInHalfBytes, value, value.Length);
+                if (value.Length < stField.m_sizeInHalfBytes)
+                    value += new string('F', stField.m_sizeInHalfBytes - value.Length);
+            }
+
+
+            Fields.Add(new FieldValue(stField, value));
         }
         
 
@@ -637,42 +705,42 @@ namespace TAP_0311_DNA
 
         public static DNACall CreateCall(List<Byte> osData) 
         {
-            if (recCreators == null)
-            {
-                recCreators = new Dictionary<int, Func<List<byte>,DNACall>>();
-                recCreators.Add(sizeInHalfBytes(City_GSM_call.City_GSM), delegate(List<byte> osInfo) { return new City_GSM_call(osInfo); });
-                recCreators.Add(sizeInHalfBytes(City_SCU_MMS_call.City_SCU_MMS), delegate(List<byte> osInfo) { return new City_SCU_MMS_call(osInfo); });
-                recCreators.Add(sizeInHalfBytes(SGw_SMS_call.SGw_SMS), delegate(List<byte> osInfo) { return new SGw_SMS_call(osInfo); });
-                recCreators.Add(sizeInHalfBytes(SGw_MMS_call.SGw_MMS), delegate(List<byte> osInfo) { return new SGw_MMS_call(osInfo); });
-                recCreators.Add(sizeInHalfBytes(SGw_WAP_call.SGw_WAP), delegate(List<byte> osInfo) { return new SGw_WAP_call(osInfo); });
-            }
-
+ 
             return recCreators[osData.Count * 2](osData);
 
 
         }
 
         static Dictionary<int, Func<List<byte>, DNACall>> recCreators = null;
+        static DNACall()
+        {
+            recCreators = new Dictionary<int, Func<List<byte>, DNACall>>();
+            recCreators.Add(sizeInHalfBytes(City_GSM_call.City_GSM), delegate(List<byte> osInfo) { return new City_GSM_call(osInfo); });
+            recCreators.Add(sizeInHalfBytes(City_SCU_MMS_call.City_SCU_MMS), delegate(List<byte> osInfo) { return new City_SCU_MMS_call(osInfo); });
+            recCreators.Add(sizeInHalfBytes(SGw_SMS_call.SGw_SMS), delegate(List<byte> osInfo) { return new SGw_SMS_call(osInfo); });
+            recCreators.Add(sizeInHalfBytes(SGw_MMS_call.SGw_MMS), delegate(List<byte> osInfo) { return new SGw_MMS_call(osInfo); });
+            recCreators.Add(sizeInHalfBytes(SGw_WAP_call.SGw_WAP), delegate(List<byte> osInfo) { return new SGw_WAP_call(osInfo); });
 
+            recCreators2 = new Dictionary<string, Func<DNACall>>();
+            recCreators2.Add(typeof(City_GSM_call).Name, delegate() { return new City_GSM_call(); });
+            recCreators2.Add(typeof(City_SCU_MMS_call).Name, delegate() { return new City_SCU_MMS_call(); });
+            recCreators2.Add(typeof(SGw_SMS_call).Name, delegate() { return new SGw_SMS_call(); });
+            recCreators2.Add(typeof(SGw_MMS_call).Name, delegate() { return new SGw_MMS_call(); });
+            recCreators2.Add(typeof(SGw_WAP_call).Name, delegate() { return new SGw_WAP_call(); });
+        }
 
         public static DNACall CreateCall(string protocolClass)
         {
-            if (recCreators2 == null)
-            {
-                recCreators2 = new Dictionary<string, Func<DNACall>>();
-                recCreators2.Add(typeof(City_GSM_call).Name, delegate() { return new City_GSM_call(); });
-                recCreators2.Add(typeof(City_SCU_MMS_call).Name, delegate() { return new City_SCU_MMS_call(); });
-                recCreators2.Add(typeof(SGw_SMS_call).Name, delegate() { return new SGw_SMS_call(); });
-                recCreators2.Add(typeof(SGw_MMS_call).Name, delegate() { return new SGw_MMS_call(); });
-                recCreators2.Add(typeof(SGw_WAP_call).Name, delegate() { return new SGw_WAP_call(); });
-            }
-
-            
-
+  
             return recCreators2[protocolClass]();
         }
 
         static Dictionary<string, Func<DNACall>> recCreators2 = null;
+
+        public static List<string> CallTypes
+        {
+            get { return new List<string>(recCreators2.Keys); }
+        }
 
         static int sizeInHalfBytes(StaticFldDesc[] arr)
         {
@@ -718,7 +786,8 @@ namespace TAP_0311_DNA
                     if (stField.m_FieldType == StaticFldDesc.FieldType.BCD)
                     {
                         if (val.Length > stField.m_sizeInHalfBytes)
-                            throw new ConversionErrorException("Field {0} can contain values up to {1} nibbles. Cuttent value '{2}' has {3}. ", stField.m_FieldName, stField.m_sizeInHalfBytes, val, val.Length);
+                            throw new ConversionErrorException("Field {0} can contain values up to {1} nibbles. Current value '{2}' has {3}. ", 
+                                stField.m_FieldName, stField.m_sizeInHalfBytes, val, val.Length);
                         if (val.Length < stField.m_sizeInHalfBytes)
                             val += new string('F', stField.m_sizeInHalfBytes - val.Length);
                         //                        val = new string('0', stField.m_sizeInHalfBytes - val.Length) + val;
@@ -727,7 +796,8 @@ namespace TAP_0311_DNA
                     else if (stField.m_FieldType == StaticFldDesc.FieldType.CHAR)
                     {
                         if (val.Length > stField.m_sizeInHalfBytes / 2)
-                            throw new ConversionErrorException("Field {0} can contain values up to {1} characters. Cuttent value '{2}' has {3}. ", stField.m_FieldName, stField.m_sizeInHalfBytes / 2, val, val.Length);
+                            throw new ConversionErrorException("Field {0} can contain values up to {1} characters. Current value '{2}' has {3}. ", 
+                                stField.m_FieldName, stField.m_sizeInHalfBytes / 2, val, val.Length);
 
                         if (val.Length < stField.m_sizeInHalfBytes / 2)
                             val += new string(' ', stField.m_sizeInHalfBytes / 2 - val.Length);
