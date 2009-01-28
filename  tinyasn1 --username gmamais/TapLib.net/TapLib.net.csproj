@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{56405B5B-C0D8-474B-8AFA-6900A171E718}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -61,6 +61,10 @@
     <ProjectReference Include="..\CSharpAsn1CRT\CSharpAsn1CRT.csproj">
       <Project>{FE21F61E-EC00-4DFF-86E9-BB2F8E9D7CB0}</Project>
       <Name>CSharpAsn1CRT</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tap3Utils\Tap3Utils.csproj">
+      <Project>{90B09199-93E2-428A-9F72-F377B10F8963}</Project>
+      <Name>Tap3Utils</Name>
     </ProjectReference>
     <ProjectReference Include="..\Util\Util.csproj">
       <Project>{EA7C291B-8B03-4D02-906A-87561F46278F}</Project>

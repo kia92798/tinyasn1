@@ -5,12 +5,12 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{B5E721CB-7738-4CF0-B73E-BD7A39E03CE7}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{90B09199-93E2-428A-9F72-F377B10F8963}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Tap2XML_DNA</RootNamespace>
-    <AssemblyName>Tap2XML-DNA</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <RootNamespace>Tap3Utils</RootNamespace>
+    <AssemblyName>Tap3Utils</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -32,25 +32,20 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Tap3Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CSharpAsn1CRT\CSharpAsn1CRT.csproj">
       <Project>{FE21F61E-EC00-4DFF-86E9-BB2F8E9D7CB0}</Project>
       <Name>CSharpAsn1CRT</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\TapLib-DNA\TapLib-DNA.csproj">
-      <Project>{202DA7B9-CA8C-4AD8-936A-DE6E4CDC1BED}</Project>
-      <Name>TapLib-DNA</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Util\Util.csproj">
-      <Project>{EA7C291B-8B03-4D02-906A-87561F46278F}</Project>
-      <Name>Util</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -31,6 +31,17 @@ namespace CSharpAsn1CRT
 //        public OrderedDictionary<string, T> m_children = new OrderedDictionary<string, T>();
         public Dictionary<string, T> m_children = new Dictionary<string, T>();
 
+        public T this[string childName] { get { return m_children[childName]; } }
+        public T this[int childIndex] { 
+            get 
+            {
+                foreach (var a in m_children.Values)
+                    if (a.m_index == childIndex)
+                        return a;
+                throw new Exception("Invalid childIndex");
+            } 
+        }
+
 //        private Dictionary<Tag, T> m_tags = null;
 
         void foo()
@@ -40,6 +51,7 @@ namespace CSharpAsn1CRT
             //System.Collections.Specialized.ListDictionary g = new System.Collections.Specialized.ListDictionary();
             
         }
+
 
 
         protected Dictionary<UInt32, T> m_posChildren = new Dictionary<uint, T>();

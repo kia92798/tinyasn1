@@ -86,7 +86,8 @@ namespace asn1csharp
                 csFile.WL(--level, "}");
 
             }
-            
+
+            CSharpType.WriteCustomAttrList(pThis, csFile, level);
             CSharpType.WriteEncodeDecodeMethods(pThis, csFile, level);
 
             csFile.WL(level, "static Asn1CompositeClass<OptionalNamedChild> _clsDef = new {0}ClassDefinition();",TypeName);
@@ -325,6 +326,8 @@ namespace asn1csharp
                 csFile.WL(--level, "}");
 
             }
+
+            CSharpType.WriteCustomAttrList(this, csFile, level);
 
             CSharpType.WriteEncodeDecodeMethods(this, csFile, level);
 

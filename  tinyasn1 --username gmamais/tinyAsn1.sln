@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tap2XML-DNA", "Tap2XML-DNA\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tap2XML-DNA-Win", "Tap2XML-DNA-Win\Tap2XML-DNA-Win.csproj", "{27E923AB-691D-43BD-8DE0-21E043923AA9}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Tap2XML-DNA-Setup", "Tap2XML-DNA-Setup\Tap2XML-DNA-Setup.vdproj", "{008CCA44-CEEE-4F4A-9437-A58B22C64B1B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -215,6 +217,12 @@ Global
 		{27E923AB-691D-43BD-8DE0-21E043923AA9}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{27E923AB-691D-43BD-8DE0-21E043923AA9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{27E923AB-691D-43BD-8DE0-21E043923AA9}.Release|Win32.ActiveCfg = Release|Any CPU
+		{008CCA44-CEEE-4F4A-9437-A58B22C64B1B}.Debug|Any CPU.ActiveCfg = Debug
+		{008CCA44-CEEE-4F4A-9437-A58B22C64B1B}.Debug|Mixed Platforms.ActiveCfg = Debug
+		{008CCA44-CEEE-4F4A-9437-A58B22C64B1B}.Debug|Win32.ActiveCfg = Debug
+		{008CCA44-CEEE-4F4A-9437-A58B22C64B1B}.Release|Any CPU.ActiveCfg = Release
+		{008CCA44-CEEE-4F4A-9437-A58B22C64B1B}.Release|Mixed Platforms.ActiveCfg = Release
+		{008CCA44-CEEE-4F4A-9437-A58B22C64B1B}.Release|Win32.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -39,6 +39,8 @@ namespace tinyAsn1
         
         public List<ITree> m_AntlrConstraints = new List<ITree>();
 
+        public Dictionary<string, string> m_CustomAttributes = new Dictionary<string, string>();
+
 
         public virtual IEnumerable<T> GetMySelfAndAnyChildren<T>() where T : Asn1Type 
         {
@@ -354,6 +356,9 @@ namespace tinyAsn1
                         //    ret.m_constraints.Add(Constraint.CreateFromAntlrAst(child));
                         ret.m_AntlrConstraints.Add(child);
                         break;
+                    case asn1Parser.CUSTOM_ATTR_LIST:
+                        HandleCustomAttrList(ret, child);
+                        break;
                     default:
                         throw new Exception("Unkown child: " + child.Text + " for node: " + tree.Text);
 
@@ -368,6 +373,30 @@ namespace tinyAsn1
                     ret.m_tag.m_type = ret;
             }
             return ret;
+        }
+
+        static void HandleCustomAttrList(Asn1Type asn1Type, ITree list)
+        {
+            if (list.Type != asn1Parser.CUSTOM_ATTR_LIST)
+                throw new Exception("BUG");
+
+            for (int i = 0; i < list.ChildCount; i++)
+            {
+                ITree child = list.GetChild(i);
+
+                string key = child.GetChild(0).Text;
+                string value = child.GetChild(1).Text;
+
+                if (value.StartsWith("\""))
+                    value = value.Substring(1);
+                if (value.EndsWith("\""))
+                    value = value.Substring(0, value.Length - 1);
+
+                if (asn1Type.m_CustomAttributes.ContainsKey(key))
+                    throw new SemanticErrorException("Error1 in Line:" + child.Line + ", col:" + child.CharPositionInLine +
+                    " . Custom attribute '" + key + "' appears twice ");
+                asn1Type.m_CustomAttributes.Add(key, value);                
+            }
         }
 
         public virtual Tag UniversalTag { get { return null; } }

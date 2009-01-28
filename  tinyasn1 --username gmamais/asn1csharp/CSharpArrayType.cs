@@ -43,6 +43,7 @@ namespace asn1csharp
                 csFile.WL(level++, "{");
             }
 
+            CSharpType.WriteCustomAttrList(pThis, csFile, level);
             CSharpType.WriteEncodeDecodeMethods(pThis, csFile, level);
             CSharpType.WriteIsConstraintValid(pThis, csFile, level, "m_children", "");
 

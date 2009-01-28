@@ -4,7 +4,6 @@ using System.Text;
 using CSharpAsn1CRT;
 using semantix.util;
 using System.Reflection;
-using TAP3Common;
 using System.Xml;
 using TAP_0311_DNA;
 
@@ -15,7 +14,7 @@ namespace Tap2Xml_DNA
 
         static void usage(string errMessage)
         {
-            Console.WriteLine("Tap2Xml.net [version 1.0]");
+            Console.WriteLine("Tap2Xml-DNA [version 1.0]");
             Console.WriteLine("(C) Copyright Semantix Information Technologies");
             Console.WriteLine();
             Console.WriteLine();

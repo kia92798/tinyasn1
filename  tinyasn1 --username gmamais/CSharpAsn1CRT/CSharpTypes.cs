@@ -88,18 +88,21 @@ namespace CSharpAsn1CRT
     }
 
 
-    public delegate TResult Func<TResult>();
-    public delegate TResult Func<T, TResult>(T arg);
 
-    public delegate void Action();
-    public delegate void Action<T1>(T1 arg1);
-    public delegate void Action<T1,T2>(T1 arg1, T2 arg2);
-    
-    public abstract class Asn1Object
+
+
+
+    public interface IOnXmlVisitNode
+    {
+        IOnXmlVisitNode OnChildElement(string tag, XmlReader tr);
+        void OnXmlAttribute(XmlReader tr);
+        void OnXmlData(string data);
+        void NodeHasNoData();
+    }
+
+    public abstract class Asn1Object : IOnXmlVisitNode
     {
         
-        
-
         public abstract uint Decode(Stream strm, EncodingRules encRule);
         public abstract uint Encode(Stream strm, EncodingRules encRule);
         //Encodes only the content, not tag and length
@@ -111,6 +114,9 @@ namespace CSharpAsn1CRT
         public abstract bool IsConstraintValid();
 
         public abstract IEnumerable<Asn1Object> GetChildren(bool includeMyself);
+
+        private static Dictionary<string, string> m_defaultCustomeAttrs = new Dictionary<string, string>();
+        public virtual Dictionary<string, string> CustomAttrs { get { return m_defaultCustomeAttrs; } }
 
 
         Asn1Object _parent = null;
@@ -236,8 +242,8 @@ namespace CSharpAsn1CRT
                 
                 try
                 {
-                    List<Asn1Object> stackOfVisitedNodes = new List<Asn1Object>();
-                    Asn1Object curNode = this;
+                    List<IOnXmlVisitNode> stackOfVisitedNodes = new List<IOnXmlVisitNode>();
+                    IOnXmlVisitNode curNode = this;
 
                     stackOfVisitedNodes.Add(curNode);
                     bool hasText = false;
@@ -245,17 +251,20 @@ namespace CSharpAsn1CRT
                     {
                         if (tr.NodeType == XmlNodeType.Element)
                         {
-                            if (tr.Name == "CallIdentificationNumber")
-                            {
-                                int g = 0;
-                            }
                             if (tr.Name == rootTag)
                                 continue;
                             hasText = false;
-
-                            curNode = curNode.OnXmlOpenTag(tr.Name, tr);
-
-                            stackOfVisitedNodes.Add(curNode);
+                            if (!tr.IsEmptyElement)
+                            {
+                                curNode = curNode.OnChildElement(tr.Name, tr);
+                                stackOfVisitedNodes.Add(curNode);
+                            }
+                            else
+                            {
+                                IOnXmlVisitNode emptyElem = curNode.OnChildElement(tr.Name, tr);
+                                emptyElem.NodeHasNoData();
+                                continue;
+                            }
                         }
                         else if (tr.NodeType == XmlNodeType.Text || tr.NodeType == XmlNodeType.Whitespace)
                         {
@@ -267,7 +276,7 @@ namespace CSharpAsn1CRT
                             if (tr.Name == rootTag)
                                 continue;
                             if (notifyEvents != null && notifyEvents.ContainsKey(tr.Name))
-                                notifyEvents[tr.Name](curNode);
+                                notifyEvents[tr.Name]((Asn1Object)curNode);
                             if (!hasText)
                                 curNode.NodeHasNoData();
 
@@ -292,18 +301,18 @@ namespace CSharpAsn1CRT
             }
         }
 
-        protected virtual Asn1Object OnXmlOpenTag(string tag, XmlReader tr)
+        public virtual IOnXmlVisitNode OnChildElement(string tag, XmlReader tr)
         {
-            return this;
+            throw new Exception("Node cannot have child elements");
         }
         public virtual void OnXmlAttribute(XmlReader tr)
         {
         }
 
-        protected virtual void OnXmlData(string data)
+        public virtual void OnXmlData(string data)
         {
         }
-        protected virtual void NodeHasNoData()
+        public virtual void NodeHasNoData()
         {
         }
 
@@ -369,7 +378,7 @@ namespace CSharpAsn1CRT
 
     public abstract class Asn1PrimitiveObject<T> : Asn1Object
     {
-        public T Value;
+        public virtual T Value { get; set; }
 
         public virtual string ValueAsString
         {
@@ -432,11 +441,11 @@ namespace CSharpAsn1CRT
             return dataLen;
         }
 
-        protected override void OnXmlData(string data)
+        public override void OnXmlData(string data)
         {
             Value = long.Parse(data);
         }
-        protected override void NodeHasNoData()
+        public override void NodeHasNoData()
         {
             throw new Xml2Asn1DecodeException("Missing value for integer field");
         }
@@ -461,11 +470,11 @@ namespace CSharpAsn1CRT
         {
             return Encode(strm, encRule, true, 9);
         }
-        protected override void OnXmlData(string data)
+        public override void OnXmlData(string data)
         {
             Value = double.Parse(data);
         }
-        protected override void NodeHasNoData()
+        public override void NodeHasNoData()
         {
             throw new Xml2Asn1DecodeException("Missing value for real field");
         }
@@ -503,11 +512,11 @@ namespace CSharpAsn1CRT
             return Encode(strm, encRule, true, 1);
 //            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 1);
         }
-        protected override void OnXmlData(string data)
+        public override void OnXmlData(string data)
         {
             Value = bool.Parse(data);
         }
-        protected override void NodeHasNoData()
+        public override void NodeHasNoData()
         {
             throw new Xml2Asn1DecodeException("Missing value for boolean field");
         }
@@ -551,7 +560,7 @@ namespace CSharpAsn1CRT
             return Encode(strm, encRule, true, 22);
 //            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 22);
         }
-        protected override void OnXmlData(string data)
+        public override void OnXmlData(string data)
         {
             Value = data;
         }
@@ -607,7 +616,7 @@ namespace CSharpAsn1CRT
 //            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 10);
             return Encode(strm, encRule, true, 10);
         }
-        protected override void OnXmlData(string data)
+        public override void OnXmlData(string data)
         {
             Value = (T)Enum.ToObject(Value.GetType(), long.Parse(data));
         }
@@ -694,7 +703,7 @@ namespace CSharpAsn1CRT
             if (includeMyself)
                 yield return this;
         }
-        protected override void OnXmlData(string data)
+        public override void OnXmlData(string data)
         {
 
             string dat = data;
@@ -874,7 +883,7 @@ namespace CSharpAsn1CRT
         }
 
 
-        protected override Asn1Object OnXmlOpenTag(string tag, XmlReader tr)
+        public override IOnXmlVisitNode OnChildElement(string tag, XmlReader tr)
         {
             if (InternalTypeName != tag)
                 throw new Xml2Asn1DecodeException("Node {0} cannot contain elements of type {1}.", GetType().Name, tag);
@@ -1052,7 +1061,7 @@ namespace CSharpAsn1CRT
             }
         }
 
-        protected override Asn1Object OnXmlOpenTag(string tag, XmlReader tr)
+        public override IOnXmlVisitNode OnChildElement(string tag, XmlReader tr)
         {
             Asn1Object ret = CreateChild(tag);
             ret.OnXmlAttribute(tr);
