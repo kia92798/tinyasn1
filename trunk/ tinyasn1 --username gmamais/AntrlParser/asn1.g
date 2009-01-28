@@ -93,6 +93,8 @@ tokens {
 	EXCEPTION_SPEC_VAL_REF;
 	EXCEPTION_SPEC_TYPE_VALUE;
 	EMPTY_LIST;
+	CUSTOM_ATTR_LIST;
+	CUSTOM_ATTR;
 }
 
 
@@ -249,26 +251,36 @@ values for this type are those of the intersection of constraints .
 */
 type	: typeTag?
 (	 nULL													-> ^(TYPE_DEF typeTag? nULL)
-	|bitStringType constraint*								-> ^(TYPE_DEF typeTag? bitStringType constraint*)
-	|booleanType constraint*								-> ^(TYPE_DEF typeTag? booleanType constraint*)
-	|enumeratedType constraint*								-> ^(TYPE_DEF typeTag? enumeratedType constraint*)
-	|integerType constraint*								-> ^(TYPE_DEF typeTag? integerType constraint*)
-    |realType constraint*									-> ^(TYPE_DEF typeTag? realType constraint*)
-	|stringType constraint*									-> ^(TYPE_DEF typeTag? stringType constraint*)
-	|referencedType	constraint*								-> ^(TYPE_DEF typeTag? referencedType constraint*)
+	|bitStringType constraint*	customAttributes?							-> ^(TYPE_DEF typeTag? bitStringType constraint* customAttributes?)
+	|booleanType constraint*	customAttributes?							-> ^(TYPE_DEF typeTag? booleanType constraint* customAttributes?)
+	|enumeratedType constraint*	customAttributes?							-> ^(TYPE_DEF typeTag? enumeratedType constraint* customAttributes?)
+	|integerType constraint*	customAttributes?							-> ^(TYPE_DEF typeTag? integerType constraint* customAttributes?)
+    |realType constraint*		customAttributes?							-> ^(TYPE_DEF typeTag? realType constraint* customAttributes?)
+	|stringType constraint*		customAttributes?							-> ^(TYPE_DEF typeTag? stringType constraint* customAttributes?)
+	|referencedType	constraint*	customAttributes?							-> ^(TYPE_DEF typeTag? referencedType constraint* customAttributes?)
 	|sequenceOfType 										-> ^(TYPE_DEF typeTag? sequenceOfType)
-	|choiceType	constraint*									-> ^(TYPE_DEF typeTag? choiceType constraint*)
-    |sequenceType constraint*								-> ^(TYPE_DEF typeTag? sequenceType constraint*)
-    |setType	constraint*											-> ^(TYPE_DEF typeTag? setType)
+	|choiceType	constraint*		customAttributes?							-> ^(TYPE_DEF typeTag? choiceType constraint* customAttributes?)
+    |sequenceType constraint*	customAttributes?							-> ^(TYPE_DEF typeTag? sequenceType constraint* customAttributes?)
+    |setType	constraint*		customAttributes?									-> ^(TYPE_DEF typeTag? setType customAttributes?)
     |setOfType												-> ^(TYPE_DEF typeTag? setOfType)
-    |objectIdentifier constraint*							-> ^(TYPE_DEF typeTag? objectIdentifier constraint*)
-    |relativeOID	constraint*								-> ^(TYPE_DEF typeTag? relativeOID constraint*)
+    |objectIdentifier constraint*	customAttributes?						-> ^(TYPE_DEF typeTag? objectIdentifier constraint* customAttributes?)
+    |relativeOID	constraint*		customAttributes?						-> ^(TYPE_DEF typeTag? relativeOID constraint* customAttributes?)
     |selectionType											-> ^(TYPE_DEF typeTag? selectionType)
 )
 ;
 
+
+customAttributes 
+	:	CUSTOM_ATTR_BEGIN customAttribute+ CUSTOM_ATTR_END 	-> ^(CUSTOM_ATTR_LIST customAttribute+ )
+	;
+
+customAttribute
+	:	UID ASSIG_OP StringLiteral								-> ^(CUSTOM_ATTR UID StringLiteral)
+	;
+	
+
 selectionType	:	
-	identifier a='<' type											->^(SELECTION_TYPE[$a] identifier type)
+	identifier a=LESS_THAN type											->^(SELECTION_TYPE[$a] identifier type)
 ;
 
 sizeShortConstraint
@@ -379,11 +391,11 @@ componentType
 	;	
 	
 sequenceOfType
-	:	a=SEQUENCE (sizeShortConstraint | constraint)? OF (identifier)? type			-> ^(SEQUENCE_OF_TYPE[$a] sizeShortConstraint? constraint? identifier? type)
+	:	a=SEQUENCE (sizeShortConstraint | constraint)? customAttributes? OF (identifier)? type			-> ^(SEQUENCE_OF_TYPE[$a] sizeShortConstraint? constraint? identifier? type customAttributes?)
 	;
 	
 setOfType
-	:	a=SET (sizeShortConstraint | constraint)? OF (identifier)? type				-> ^(SET_OF_TYPE[$a] sizeShortConstraint? constraint? identifier? type)
+	:	a=SET (sizeShortConstraint | constraint)? customAttributes? OF (identifier)? type				-> ^(SET_OF_TYPE[$a] sizeShortConstraint? constraint? identifier? type customAttributes?)
 	;		
 
 	
@@ -661,10 +673,19 @@ COMMA		:	',';
 EXT_MARK	: '...';
 DOUBLE_DOT  : '..';
 
+CUSTOM_ATTR_BEGIN 	: '<<';
+
+CUSTOM_ATTR_END 	: '>>';
+
+LESS_THAN			: '<';
+
+
 BitStringLiteral	:
 	'\'' ('0'|'1'|' ' | '\t' | '\r' | '\n')* '\'B'
 	;
 	
+
+
 
 OctectStringLiteral	:
 	'\'' ('0'..'9'|'a'..'f'|'A'..'F'|' ' | '\t' | '\r' | '\n')* '\'H'

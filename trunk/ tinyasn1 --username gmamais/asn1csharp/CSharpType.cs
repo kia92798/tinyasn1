@@ -30,13 +30,28 @@ namespace asn1csharp
 
             csFile.WL(level, "public partial class {0} : {1}", DeclaredTypeName, baseClassName);
             csFile.WL(level++, "{");
+            WriteCustomAttrList(pThis, csFile, level);
             WriteEncodeDecodeMethods(pThis, csFile, level);
             WriteIsConstraintValid(pThis, csFile, level, valueName, enumPrefix);
             csFile.WL(--level, "}");
 
         }
 
+        public static void WriteCustomAttrList(Asn1Type pThis, StreamWriterLevel csFile, int level)
+        {
+            if (pThis.m_CustomAttributes.Count == 0)
+                return;
+            csFile.WL(level, "private static Dictionary<string, string> m_CustomAttrs = new Dictionary<string, string>()");
+            csFile.WL(level++, "{");
+            foreach (var kv in pThis.m_CustomAttributes)
+            {
+                csFile.WL(level, "{{\"{0}\",\"{1}\"}},", kv.Key, kv.Value);
+            }
 
+            csFile.WL(--level, "};");
+            csFile.WL(level, "public override Dictionary<string, string> CustomAttrs { get { return m_CustomAttrs; } }");
+
+        }
 
         public static void WriteIsConstraintValid(Asn1Type pThis, StreamWriterLevel csFile, int level, 
             string valueName, string enumPrefix)
@@ -288,7 +303,7 @@ namespace asn1csharp
             return true;
         }
 
-        public string ConstraintVariable { get { return "m_Data"; } }
+        public string ConstraintVariable { get { return "Value"; } }
     }
 
     public class CSharpBitStringType : BitStringType, ICSharpType

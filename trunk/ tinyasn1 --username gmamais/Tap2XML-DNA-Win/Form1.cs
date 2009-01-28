@@ -15,72 +15,24 @@ namespace Tap2XML_DNA_Win
         public Form1()
         {
             InitializeComponent();
+            Application.Idle += new EventHandler(Application_Idle);
         }
 
-        private void btnToXml_Click(object sender, EventArgs e)
+        void Application_Idle(object sender, EventArgs e)
         {
-            OpenFileDialog dlg = new OpenFileDialog();
-            dlg.Filter = "All files (*.*)|*.*";
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                SaveFileDialog svDlg = new SaveFileDialog();
-                svDlg.Filter = "XML files (*.xml)|*.xml";
-                svDlg.FileName = dlg.FileName + ".xml";
+            btConvert.Enabled = System.IO.File.Exists(txtSource.Text) && txtDest.Text.Trim().Length>0;
                 
-                if (svDlg.ShowDialog() == DialogResult.OK)
-                {
-                    try
-                    {
-                        RootNode.ToXml(dlg.FileName, svDlg.FileName);
-                        ShowMessageToStatusBar("Conversion succeeded");
-
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Error file during conversion:\n\n" + ex.Message+"\n\n Call stack:\n\n" +ex.StackTrace, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-            }
-
-
         }
-
-        private void btnToBer_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog dlg = new OpenFileDialog();
-            dlg.Filter = "XML files (*.xml)|*.xml";
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                SaveFileDialog svDlg = new SaveFileDialog();
-                svDlg.Filter = "All files (*.*)|*.*";
-
-                if (dlg.FileName.EndsWith(".xml"))
-                    svDlg.FileName = dlg.FileName.Substring(0, dlg.FileName.Length - 4);
-                else
-                    svDlg.FileName = dlg.FileName;
-
-                if (svDlg.ShowDialog() == DialogResult.OK)
-                {
-                    try
-                    {
-                        RootNode.ToBer(dlg.FileName, svDlg.FileName);
-                        ShowMessageToStatusBar("Conversion succeeded");
-
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Error file during conversion:\n\n" + ex.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-            }
-        }
-
 
         void ShowMessageToStatusBar(string message, params object[] args)
         {
+
+            label.ForeColor = Color.DarkBlue;
             label.Text = string.Format(message, args);
 
             Timer timer = new Timer();
+
+
 
             timer.Interval = 2000;
 
@@ -88,7 +40,8 @@ namespace Tap2XML_DNA_Win
 
             timer.Tick += new EventHandler(delegate(object sender, EventArgs e)
             {
-                label.Text = "";
+                label.ForeColor = Color.Black;
+                label.Text = "Ready";
                 timer.Stop();
                 timer.Dispose();
             });
@@ -105,6 +58,95 @@ namespace Tap2XML_DNA_Win
         {
             Application.Exit();
         }
+        
+        private void btnSource_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+            if (rdToBer.Checked)
+                dlg.Filter = "XML files (*.xml)|*.xml";
+            else
+                dlg.Filter = "All files (*.*)|*.*";
+
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                txtSource.Text = dlg.FileName;
+                txtDest.Text = getDestFile();
+                
+            }
+        }
+
+        private void btnDest_Click(object sender, EventArgs e)
+        {
+
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.CheckFileExists = false;
+
+            if (rdToBer.Checked)
+                dlg.Filter = "All files (*.*)|*.*";
+            else
+                dlg.Filter = "XML files (*.xml)|*.xml";
+
+            dlg.FileName = getDestFile();
+
+
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                txtDest.Text = dlg.FileName;
+            }
+        }
+
+        string getDestFile()
+        {
+            if (rdToBer.Checked)
+            {
+                if (txtSource.Text.EndsWith(".xml"))
+                    return txtSource.Text.Substring(0, txtSource.Text.Length - 4);
+                else
+                    return txtSource.Text;
+            }
+            else
+            {
+                return txtSource.Text + ".xml";
+            }
+        }
+
+        private void btConvert_Click(object sender, EventArgs e)
+        {
+            if (System.IO.File.Exists(txtDest.Text))
+            {
+                if (MessageBox.Show("Output file exists and will be overwritten.\nDo you want to proceed?",
+                    Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                    return;
+            }
+
+            Cursor cur = Cursor;
+            try
+            {
+                Cursor = Cursors.WaitCursor;
+                if (rdToBer.Checked)
+                    RootNode.ToBer(txtSource.Text, txtDest.Text);
+                else
+                    RootNode.ToXml(txtSource.Text, txtDest.Text);
+
+                Cursor = cur;
+                ShowMessageToStatusBar("Conversion succeeded");
+
+
+            }
+            catch (Exception ex)
+            {
+                Cursor = cur;
+                MessageBox.Show("Error file during conversion:\n\n" + ex.Message, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+        }
+
+        private void rdToXml_CheckedChanged(object sender, EventArgs e)
+        {
+            txtSource.Text = "";
+            txtDest.Text = "";
+        }
+
 
     }
 }
