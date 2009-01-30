@@ -106,6 +106,10 @@ namespace tinyAsn1
 
         }
 
+        public override void ToXml2(StreamWriterLevel o, int p)
+        {
+            o.P(p); o.WriteLine("<NullType />");
+        }
     }
 
 

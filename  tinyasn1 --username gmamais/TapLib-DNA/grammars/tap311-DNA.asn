@@ -30,7 +30,7 @@ BEGIN
 -- Structure of a Tap batch 
 --
 
-RootNode ::= SEQUENCE OF DataInterChange
+DNARootNode ::= SEQUENCE OF DataInterChange
 
 
 
