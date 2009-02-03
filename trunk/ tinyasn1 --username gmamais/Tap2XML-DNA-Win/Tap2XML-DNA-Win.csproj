@@ -3,14 +3,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{27E923AB-691D-43BD-8DE0-21E043923AA9}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Tap2XML_DNA_Win</RootNamespace>
     <AssemblyName>Tap2XML-DNA-Win</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ApplicationIcon>cellphone.ico</ApplicationIcon>
   </PropertyGroup>
@@ -33,6 +33,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
@@ -96,9 +99,9 @@
       <Project>{FE21F61E-EC00-4DFF-86E9-BB2F8E9D7CB0}</Project>
       <Name>CSharpAsn1CRT</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TapLib.net\TapLib.net.csproj">
-      <Project>{56405B5B-C0D8-474B-8AFA-6900A171E718}</Project>
-      <Name>TapLib.net</Name>
+    <ProjectReference Include="..\TapLib-DNA\TapLib-DNA.csproj">
+      <Project>{202DA7B9-CA8C-4AD8-936A-DE6E4CDC1BED}</Project>
+      <Name>TapLib-DNA</Name>
     </ProjectReference>
     <ProjectReference Include="..\Util\Util.csproj">
       <Project>{EA7C291B-8B03-4D02-906A-87561F46278F}</Project>
