@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using CSharpAsn1CRT;
 using semantix.util;
-using TAP3Common;
 
 
 namespace CSharpAsn1Test
@@ -81,7 +80,7 @@ namespace CSharpAsn1Test
             bool encode;
 
 
-
+#if dfgdf
 
             ProcessArgs(args, out inFileName, out outFileName, out dumpBER, out convertToXml, out encode);
             if (dumpBER)
@@ -121,6 +120,7 @@ namespace CSharpAsn1Test
                 }
 
             }
+#endif
             return 0;
 
         }

@@ -4,8 +4,8 @@ using System.Text;
 using CSharpAsn1CRT;
 using semantix.util;
 using System.Reflection;
-using TAP3Common;
 using System.Xml;
+using TAP3Common;
 
 namespace Tap2Xml.net
 {
