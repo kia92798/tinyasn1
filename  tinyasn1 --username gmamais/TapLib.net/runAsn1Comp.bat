@@ -5,6 +5,5 @@ asn1csharp -o .\ grammars\RAP0104_0304.asn grammars\tap304.asn
 asn1csharp -o .\ grammars\RAP0104_0309.asn grammars\tap309.asn
 asn1csharp -o .\ grammars\RAP0104_0310.asn grammars\tap310.asn
 asn1csharp -o .\ grammars\RAP0104_0311.asn grammars\tap311.asn
-asn1csharp -o .\ grammars\tap311-DNA.asn
 asn1csharp -o .\ grammars\nrtrde0201.asn
 

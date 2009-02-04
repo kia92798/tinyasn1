@@ -813,7 +813,7 @@ namespace tinyAsn1
             {
                 string defaultValue = string.Empty;
                 if (ch.m_defaultValue!=null)
-                    defaultValue = string.Format("DefaultValue=\"{2}\"", ch.m_defaultValue.ToString());
+                    defaultValue = string.Format("DefaultValue=\"{0}\"", ch.m_defaultValue.ToString());
 
                 o.P(p + 1); o.WriteLine("<SequenceOrSetChild VarName=\"{0}\" Optional=\"{1}\" {2} Line=\"{3}\" CharPositionInLine=\"{4}\">",
                     ch.m_childVarName, ch.m_optional.ToString(), defaultValue, ch.antlrNode.Line,ch.antlrNode.CharPositionInLine);

@@ -1076,14 +1076,16 @@ Code ::= [APPLICATION 243] INTEGER
 -- the default specifications (OCTET STRING)
 --
 
-AsciiString ::= VisibleString
+AsciiString ::= MyVisibleString
 --
-Currency ::= VisibleString
+Currency ::= MyVisibleString
 --
-HexString ::= VisibleString
+HexString ::= MyVisibleString
 --
-NumberString ::= NumericString
+NumberString ::= MyVisibleString
 --
+
+MyVisibleString ::= OCTET STRING
 
 -- AsciiString ::= OCTET STRING
 
@@ -1093,7 +1095,9 @@ NumberString ::= NumericString
 --
 -- Currency ::= OCTET STRING
 
-Description ::= OCTET STRING
+--Description ::= OCTET STRING
+
+Description ::= MyVisibleString
 
 -- HexString ::= OCTET STRING
 

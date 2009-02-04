@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Generic; 
+using System.Linq;
 using System.Text;
 using CSharpAsn1CRT;
 using System.IO;
 using System.Xml;
 using Tap3Utils;
 using semantix.util;
-using System.Linq;
 
 namespace TAP_0311_DNA
 {
@@ -175,7 +175,6 @@ namespace TAP_0311_DNA
             NamedChild childClass = _creators[dataLen];
             m_children[childClass.m_index] = childClass.createObj();
             m_children[childClass.m_index].Parent = this;
-            m_AlternativeName = childClass.m_name;
             return ((Asn1SequenceOrSetObject)m_children[childClass.m_index]).DecodeContent_and_only_content(strm, encRule);
         }
 

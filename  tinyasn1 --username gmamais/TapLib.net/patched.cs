@@ -215,10 +215,6 @@ namespace NRTRDE_0201
             get { return BCDUtils.BCDToString(Value); }
             set { Value = BCDUtils.StringToBCD(value); }
         }
-        public override void OnXmlData(string data)
-        {
-            Value = BCDUtils.StringToBCD(data);
-        }
     }
 
 
@@ -236,11 +232,17 @@ namespace TAP_0301
             get { return BCDUtils.BCDToString(Value);  }
             set { Value = BCDUtils.StringToBCD(value); }
         }
-        public override void OnXmlData(string data)
+    }
+
+    public partial class MyVisibleString
+    {
+        public override string ValueAsString
         {
-            Value = BCDUtils.StringToBCD(data);
+            get { return Encoding.GetEncoding(0).GetString(Value.ToArray()); }
+            set { Value = new List<byte>(Encoding.GetEncoding(0).GetBytes(value)); }
         }
     }
+
 }
 
 
@@ -253,9 +255,13 @@ namespace TAP_0302
             get { return BCDUtils.BCDToString(Value); }
             set { Value = BCDUtils.StringToBCD(value); }
         }
-        public override void OnXmlData(string data)
+    }
+    public partial class MyVisibleString
+    {
+        public override string ValueAsString
         {
-            Value = BCDUtils.StringToBCD(data);
+            get { return Encoding.GetEncoding(0).GetString(Value.ToArray()); }
+            set { Value = new List<byte>(Encoding.GetEncoding(0).GetBytes(value)); }
         }
     }
 }
@@ -269,9 +275,13 @@ namespace TAP_0303
             get { return BCDUtils.BCDToString(Value); }
             set { Value = BCDUtils.StringToBCD(value); }
         }
-        public override void OnXmlData(string data)
+    }
+    public partial class MyVisibleString
+    {
+        public override string ValueAsString
         {
-            Value = BCDUtils.StringToBCD(data);
+            get { return Encoding.GetEncoding(0).GetString(Value.ToArray()); }
+            set { Value = new List<byte>(Encoding.GetEncoding(0).GetBytes(value)); }
         }
     }
 }
@@ -286,9 +296,13 @@ namespace TAP_0304
             get { return BCDUtils.BCDToString(Value); }
             set { Value = BCDUtils.StringToBCD(value); }
         }
-        public override void OnXmlData(string data)
+    }
+    public partial class MyVisibleString
+    {
+        public override string ValueAsString
         {
-            Value = BCDUtils.StringToBCD(data);
+            get { return Encoding.GetEncoding(0).GetString(Value.ToArray()); }
+            set { Value = new List<byte>(Encoding.GetEncoding(0).GetBytes(value)); }
         }
     }
 }
@@ -302,13 +316,15 @@ namespace TAP_0309
             get { return BCDUtils.BCDToString(Value); }
             set { Value = BCDUtils.StringToBCD(value); }
         }
-        public override void OnXmlData(string data)
+    }
+    public partial class MyVisibleString
+    {
+        public override string ValueAsString
         {
-            Value = BCDUtils.StringToBCD(data);
+            get { return Encoding.GetEncoding(0).GetString(Value.ToArray()); }
+            set { Value = new List<byte>(Encoding.GetEncoding(0).GetBytes(value)); }
         }
     }
-
-
 }
 
 
@@ -322,9 +338,13 @@ namespace TAP_0310
             get { return BCDUtils.BCDToString(Value); }
             set { Value = BCDUtils.StringToBCD(value); }
         }
-        public override void OnXmlData(string data)
+    }
+    public partial class MyVisibleString
+    {
+        public override string ValueAsString
         {
-            Value = BCDUtils.StringToBCD(data);
+            get { return Encoding.GetEncoding(0).GetString(Value.ToArray()); }
+            set { Value = new List<byte>(Encoding.GetEncoding(0).GetBytes(value)); }
         }
     }
 }
@@ -339,13 +359,15 @@ namespace TAP_0311
             get { return BCDUtils.BCDToString(Value); }
             set { Value = BCDUtils.StringToBCD(value); }
         }
-
-        public override void OnXmlData(string data)
+    }
+    public partial class MyVisibleString
+    {
+        public override string ValueAsString
         {
-            Value = BCDUtils.StringToBCD(data);
+            get { return Encoding.GetEncoding(0).GetString(Value.ToArray()); }
+            set { Value = new List<byte>(Encoding.GetEncoding(0).GetBytes(value)); }
         }
     }
-
 }
 
 

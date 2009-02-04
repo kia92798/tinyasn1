@@ -1344,13 +1344,13 @@ Code ::= [APPLICATION 243] INTEGER
 -- The following definitions should be used for TAP file creation instead of
 -- the default specifications (OCTET STRING)
 --
-    AsciiString ::= VisibleString
+    AsciiString ::= MyVisibleString
 --
-    Currency ::= VisibleString
+    Currency ::= MyVisibleString
 --
-    HexString ::= VisibleString
+    HexString ::= MyVisibleString
 --
-    NumberString ::= NumericString
+    NumberString ::= MyVisibleString
 --
 
 -- AsciiString ::= OCTET STRING
@@ -1361,7 +1361,9 @@ Code ::= [APPLICATION 243] INTEGER
 --
 -- Currency ::= OCTET STRING
 
-Description ::= OCTET STRING
+MyVisibleString ::= OCTET STRING
+Description ::= MyVisibleString
+--Description ::= OCTET STRING
 
 -- HexString ::= OCTET STRING
 
