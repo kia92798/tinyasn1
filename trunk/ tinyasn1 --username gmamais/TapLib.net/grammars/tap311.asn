@@ -1333,14 +1333,19 @@ Code ::= INTEGER
 -- The following definitions should be used for TAP file creation instead of
 -- the default specifications (OCTET STRING)
 --
-AsciiString ::= VisibleString
+AsciiString ::= MyVisibleString
 
-Currency ::= VisibleString
+Currency ::= MyVisibleString
 
-HexString ::= VisibleString
+HexString ::= MyVisibleString
 
-NumberString ::= NumericString
+NumberString ::= MyVisibleString
+
+MyVisibleString ::= OCTET STRING
+
+
 --
+
 --    AsciiString contains visible ISO 646 characters.
 --    Leading and trailing spaces must be discarded during processing.
 --    An AsciiString cannot contain only spaces.

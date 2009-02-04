@@ -398,7 +398,7 @@ namespace tinyAsn1
             }
 
             if (m_value > Config.MAXINT || m_value < Config.MININT)
-                throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Integer value (" + m_value + ") is too large and can be supported in the target platform");
+                throw new SemanticErrorException("Error in line : " + antlrNode.Line + ". Integer value (" + m_value + ") is too large and cannot be supported in the target platform");
         }
         public IntegerValue(IntegerValue o, ITree antlr)
         {

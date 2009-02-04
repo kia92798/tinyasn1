@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Generic; using System.Linq;
 using System.Text;
 using System.IO;
 using semantix.util;
@@ -100,8 +100,42 @@ namespace CSharpAsn1CRT
         void NodeHasNoData();
     }
 
-    public abstract class Asn1Object : IOnXmlVisitNode
+    public static class Asn1ObjectExtensions
     {
+        public static IntPtr Handle(this Asn1Object obj)
+        {
+            if (obj == null)
+                return IntPtr.Zero;
+            return obj._handle;
+        }
+    }
+
+
+    public abstract class Asn1Object : IOnXmlVisitNode, IDisposable
+    {
+
+        static int _HandleCount=0;
+        internal IntPtr _handle = IntPtr.Zero;
+        static Dictionary<IntPtr, Asn1Object> _ptrToObj = new Dictionary<IntPtr, Asn1Object>();
+        public static T GetObjectFromHandle<T>(IntPtr handle) where T : Asn1Object
+        {
+            if (handle == IntPtr.Zero)
+                return null;
+            return (T)_ptrToObj[handle];
+        }
+
+        public Asn1Object()
+        {
+            _handle = (IntPtr)(++_HandleCount);
+            _ptrToObj.Add(_handle, this);
+        }
+
+        public virtual void Dispose()
+        {
+            _ptrToObj.Remove(_handle);
+        }
+
+
         
         public abstract uint Decode(Stream strm, EncodingRules encRule);
         public abstract uint Encode(Stream strm, EncodingRules encRule);
@@ -330,11 +364,10 @@ namespace CSharpAsn1CRT
             return false;
         }
 
+
+
+
     }
-
-
-
-
 
     public class Asn1NullObject : Asn1Object
     {
@@ -408,11 +441,27 @@ namespace CSharpAsn1CRT
         {
             o.WriteString(ValueAsString);
         }
+        
+        public override void OnXmlData(string data)
+        {
+            ValueAsString = data;
+        }
 
     }
 
     public class Asn1IntegerObject : Asn1PrimitiveObject<Int64>
     {
+        public virtual string ValueAsString
+        {
+            get
+            {
+                return Value.ToString();
+            }
+            set
+            {
+                Value = long.Parse(value);
+            }
+        }
 
         public override uint Encode(Stream strm, EncodingRules encRule)
         {
@@ -441,10 +490,6 @@ namespace CSharpAsn1CRT
             return dataLen;
         }
 
-        public override void OnXmlData(string data)
-        {
-            Value = long.Parse(data);
-        }
         public override void NodeHasNoData()
         {
             throw new Xml2Asn1DecodeException("Missing value for integer field");
@@ -454,6 +499,18 @@ namespace CSharpAsn1CRT
 
     public class Asn1RealObject : Asn1PrimitiveObject<double>
     {
+        public virtual string ValueAsString
+        {
+            get
+            {
+                return Value.ToString();
+            }
+            set
+            {
+                Value = double.Parse(value);
+            }
+        }
+
         public override uint EncodeContent(Stream strm, EncodingRules encRule)
         {
             throw new Exception("The method or operation is not implemented.");
@@ -470,10 +527,6 @@ namespace CSharpAsn1CRT
         {
             return Encode(strm, encRule, true, 9);
         }
-        public override void OnXmlData(string data)
-        {
-            Value = double.Parse(data);
-        }
         public override void NodeHasNoData()
         {
             throw new Xml2Asn1DecodeException("Missing value for real field");
@@ -482,6 +535,18 @@ namespace CSharpAsn1CRT
 
     public class Asn1BoolObject : Asn1PrimitiveObject<bool>
     {
+        public virtual string ValueAsString
+        {
+            get
+            {
+                return Value.ToString();
+            }
+            set
+            {
+                Value = bool.Parse(value);
+            }
+        }
+
         public override uint EncodeContent(Stream strm, EncodingRules encRule)
         {
             if (Value)
@@ -512,10 +577,6 @@ namespace CSharpAsn1CRT
             return Encode(strm, encRule, true, 1);
 //            return Encode(strm, encRule, TagClass.UNIVERSAL, true, 1);
         }
-        public override void OnXmlData(string data)
-        {
-            Value = bool.Parse(data);
-        }
         public override void NodeHasNoData()
         {
             throw new Xml2Asn1DecodeException("Missing value for boolean field");
@@ -528,6 +589,18 @@ namespace CSharpAsn1CRT
         {
             Value = string.Empty;
         }
+        public virtual string ValueAsString
+        {
+            get
+            {
+                return Value;
+            }
+            set
+            {
+                Value = value;
+            }
+        }
+
 
         public override uint DecodeContent(Stream strm, EncodingRules encRule, uint dataLen, bool indefiniteForm)
         {
@@ -624,8 +697,6 @@ namespace CSharpAsn1CRT
 
     public class Asn1OctetStringObject : Asn1PrimitiveObject<List<byte>>/*Asn1Object*/
     {
-
-
         public Asn1OctetStringObject()
         {
             Value = new List<byte>();
@@ -643,17 +714,14 @@ namespace CSharpAsn1CRT
             }
             set
             {
-                base.ValueAsString = value;
+                string dat = value;
+                if (value.Length % 2 == 1)
+                    dat = "0" + value;
+
+                for (int i = 0; i < dat.Length; i += 2)
+                    Value.Add(byte.Parse(dat.Substring(i, 2), System.Globalization.NumberStyles.HexNumber));
             }
         }
-
-        //public override void ToXml(StreamWriterLevel o, string tag, int l)
-        //{
-        //    o.P(l);
-        //    o.WriteLine("<{0}>{1}</{0}>", tag,ValueAsString);
-
-        //}
-
 
         public override uint Encode(Stream strm, EncodingRules encRule, bool primitive, uint tag)
         {
@@ -703,19 +771,6 @@ namespace CSharpAsn1CRT
             if (includeMyself)
                 yield return this;
         }
-        public override void OnXmlData(string data)
-        {
-
-            string dat = data;
-            if (data.Length % 2 == 1)
-                dat = "0" + data;
-
-            for (int i = 0; i < dat.Length ; i += 2)
-                Value.Add(byte.Parse(dat.Substring(i, 2), System.Globalization.NumberStyles.HexNumber));
-
-
-
-        }
     }
 
     public class Asn1BitStringObject : Asn1PrimitiveObject<System.Collections.BitArray>
@@ -755,9 +810,26 @@ namespace CSharpAsn1CRT
         }
     }
 
+    public interface ISnaccArray
+    {
+        Asn1Object AppendChild();
+        int ChildCount { get; }
+        Asn1Object Current { get; }
+        Asn1Object First { get; }
+        Asn1Object Last { get; }
+        int CurrentElementIndex { get; }
+        Asn1Object GoNext();
+        Asn1Object GoPrev();
+        Asn1Object InsertAfter();
+        Asn1Object InsertBefore();
+        void RemoveCurrFromList();
+        void SetCurrElmt(int idx);
+        void SetCurrToFirst();
+        void SetCurrToLast();
+        string InternalTypeName {get;}
+    }
 
-
-    public abstract class Asn1ArrayObject<T> : Asn1Object where T : Asn1Object
+    public abstract class Asn1ArrayObject<T> : Asn1Object, ISnaccArray where T : Asn1Object
     {
         public List<T> m_children = new List<T>(5);
 
@@ -767,7 +839,8 @@ namespace CSharpAsn1CRT
 
         public event Action<T> childAdded = null;
 
-        public T AppendNewChild()
+
+        public T AppendNewChild() 
         {
             T ret = CreateEmptyChild();
             m_children.Add(ret);
@@ -848,7 +921,7 @@ namespace CSharpAsn1CRT
 
 
         string _internalTypeName = null;
-        protected string InternalTypeName
+        public string InternalTypeName
         {
             get
             {
@@ -858,21 +931,7 @@ namespace CSharpAsn1CRT
             }
         }
 
-        //public override void ToXml(XmlWriter o, string tag, int l, string attrs)
-        //{
-        //    o.P(l);
-        //    if (attrs != "")
-        //        attrs = ' ' + attrs;
-        //    o.WriteLine("<{0}{1}>", tag, attrs);
 
-
-        //    foreach (Asn1Object ch in m_children)
-        //    {
-        //        ch.ToXml(o, InternalTypeName,l+1,"");
-        //    }
-        //    o.P(l);
-        //    o.WriteLine("</{0}>", tag);
-        //}
 
         public override void WriteXmlContent(XmlWriter o)
         {
@@ -893,6 +952,84 @@ namespace CSharpAsn1CRT
             return ret;
         }
 
+        public override void Dispose()
+        {
+            base.Dispose();
+            foreach (Asn1Object ch in m_children)
+            {
+                ch.Dispose();
+            }
+        }
+
+        #region ISnaccArray Members
+
+        int _current = 0;
+
+        public int CurrentElementIndex { get { return _current; } }
+
+        public int ChildCount { get { return m_children.Count; } }
+
+
+        public Asn1Object AppendChild() { return AppendNewChild(); }
+
+
+        public Asn1Object Current
+        {
+            get { return m_children[_current]; }
+        }
+
+        public Asn1Object First { get { return m_children.FirstOrDefault(); } }
+        public Asn1Object Last { get { return m_children.Count > 0 ? m_children[m_children.Count - 1] : null; } }
+
+        public Asn1Object GoNext()
+        { 
+            _current++;
+            if (_current < m_children.Count)
+                return m_children[_current];
+            return null;
+        }
+
+        public Asn1Object GoPrev()
+        {
+            _current--;
+            if (_current >= 0)
+                return m_children[_current];
+            return null;
+        }
+
+        public Asn1Object InsertAfter()
+        {
+            T ret = CreateEmptyChild();
+            m_children.Insert(++_current, ret);
+            ret.Parent = this;
+            if (childAdded != null)
+                childAdded(ret);
+            return ret;
+        }
+
+        public Asn1Object InsertBefore()
+        {
+            T ret = CreateEmptyChild();
+            m_children.Insert(_current, ret);
+            ret.Parent = this;
+            if (childAdded != null)
+                childAdded(ret);
+            return ret;
+        }
+
+        public void RemoveCurrFromList()
+        {
+            Asn1Object ch = m_children[_current];
+            ch.Dispose();
+            ch = null;
+            m_children.RemoveAt(_current);
+        }
+
+        public void SetCurrElmt(int idx) { _current = idx; }
+        public void SetCurrToFirst() { _current = 0; }
+        public void SetCurrToLast() { _current = m_children.Count > 0 ? m_children.Count - 1 : 0; }
+
+        #endregion
     }
 
     public abstract class Asn1SequenceOfObject<T> : Asn1ArrayObject<T> where T : Asn1Object
@@ -988,7 +1125,13 @@ namespace CSharpAsn1CRT
     }
 
 
-    public abstract class Asn1CompositeObject<T> : Asn1Object where T : NamedChild
+    public interface ICompositeObject
+    {
+        Asn1Object CreateChild(string childName);
+        Asn1Object GetChildByName(string childName);
+    }
+
+    public abstract class Asn1CompositeObject<T> : Asn1Object, ICompositeObject where T : NamedChild
     {
 
         public override bool IsPrimitive { get { return false; } }
@@ -1037,6 +1180,17 @@ namespace CSharpAsn1CRT
             return m_children[ch.m_index];
         }
 
+        public virtual Asn1Object GetChildByName(string childName)
+        {
+            if (!ClassDef.m_children.ContainsKey(childName))
+            {
+                throw new Xml2Asn1DecodeException("Node {0} cannot contain elements of type {1}.", GetType().Name, childName);
+            }
+
+            NamedChild ch = ClassDef.m_children[childName];
+            return m_children[ch.m_index];
+        }
+
         //public override void ToXml(XmlWriter o, string tag, int l, string attrs)
         //{
         //    o.P(l);
@@ -1066,6 +1220,29 @@ namespace CSharpAsn1CRT
             Asn1Object ret = CreateChild(tag);
             ret.OnXmlAttribute(tr);
             return ret;
+        }
+        public override void Dispose()
+        {
+            base.Dispose();
+            foreach (Asn1Object ch in m_children)
+            {
+                if (ch !=null)
+                    ch.Dispose();
+            }
+        }
+
+        public void RemoveChild(string childName)
+        {
+            foreach (NamedChild ch in ClassDef.m_children.Values)
+            {
+                if (ch.m_name == childName)
+                {
+                    m_children[ch.m_index].Dispose();
+                    m_children[ch.m_index] = null;
+                    break;
+                }
+            }
+
         }
 
     }
@@ -1168,6 +1345,7 @@ namespace CSharpAsn1CRT
 
     }
 
+
     public abstract class Asn1ChoiceObject : Asn1CompositeObject<NamedChild>
     {
         public Asn1ChoiceObject() : base() { }
@@ -1197,7 +1375,6 @@ namespace CSharpAsn1CRT
                     NamedChild childClass = ClassDef.getChildByTag2(nextTag);
                     m_children[childClass.m_index] = childClass.createObj();
                     m_children[childClass.m_index].Parent = this;
-                    m_AlternativeName = childClass.m_name;
                     ret += m_children[childClass.m_index].Decode(strm, encRule);
                 }
 
@@ -1230,17 +1407,16 @@ namespace CSharpAsn1CRT
         }
 
 
-        private string choiceAlternative = string.Empty;
 
         public string m_AlternativeName
         {
-            get { return choiceAlternative; }
-            set
-            {
-                if (ClassDef.m_children.ContainsKey(value))
-                    choiceAlternative = value;
-                else
-                    throw new Xml2Asn1DecodeException("Node {0} cannot contain elements of type {1}.", GetType().Name, value);
+            get {
+                for (int i = 0; i < m_children.Length; i++)
+                {
+                    if (m_children[i] != null)
+                        return ClassDef.m_children.Values.Where(a => a.m_index == i).First().m_name;
+                }
+                throw new Exception("No Alternative Set");
             }
         }
 
@@ -1263,8 +1439,13 @@ namespace CSharpAsn1CRT
         public override Asn1Object CreateChild(string childName)
         {
             for (int i = 0; i < m_children.Length; i++)
-                m_children[i] = null;
-            m_AlternativeName = childName;
+            {
+                if (m_children[i] != null)
+                {
+                    m_children[i].Dispose();
+                    m_children[i] = null;
+                }
+            }
             return base.CreateChild(childName);
         }
     }

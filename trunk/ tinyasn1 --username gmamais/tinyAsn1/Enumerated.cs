@@ -32,6 +32,8 @@ namespace tinyAsn1
         // excpetion specification
         public ExceptionSpec m_exceptionSpec;
 
+        public bool ValuesAutoCalculated = false;
+
         internal List<NumberedItem> m_enumValuesPriv = new List<NumberedItem>();
 
         /// <summary>
@@ -183,6 +185,7 @@ namespace tinyAsn1
 
 //                while (IsValueDefined(proposedVal))
 
+                ValuesAutoCalculated = true;
                 i.m_value = proposedVal;
                 i.m_valCalculated = true;
 
@@ -446,7 +449,7 @@ namespace tinyAsn1
 
         public override void ToXml2(StreamWriterLevel o, int p)
         {
-            o.P(p); o.WriteLine("<EnumeratedType Extensible=\"{0}\">", m_extMarkPresent.ToString());
+            o.P(p); o.WriteLine("<EnumeratedType Extensible=\"{0}\" ValuesAutoCalculated=\"{1}\">", m_extMarkPresent.ToString(), ValuesAutoCalculated.ToString());
             o.P(p + 1); o.WriteLine("<EnumValues>");
             foreach (Item it in m_enumValues.Values)
             {

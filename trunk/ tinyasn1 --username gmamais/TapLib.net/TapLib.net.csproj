@@ -58,7 +58,6 @@
     <Compile Include="tap304.cs" />
     <Compile Include="tap309.cs" />
     <Compile Include="tap310.cs" />
-    <Compile Include="tap311-DNA.cs" />
     <Compile Include="tap311.cs" />
   </ItemGroup>
   <ItemGroup>
